@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0B2D5B">
+    <title>Zakir Travel & Tours | Mobile Admin Portal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            DEFAULT: '#0B2D5B',
+                            dark: '#071E3E',
+                            light: '#16437E'
+                        },
+                        teal: {
+                            DEFAULT: '#0D8A9E',
+                            dark: '#096979',
+                            light: '#15B2CB',
+                            accent: '#E6F6F8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-sans bg-slate-100 text-slate-800 antialiased selection:bg-teal selection:text-white">
+    <div id="standaloneAdminRoot"></div>
+
+    <script type="module">
+        import { AdminPortalManager } from "./js/admin-portal.js";
+        const root = document.getElementById("standaloneAdminRoot");
+        new AdminPortalManager(root, { isDrawer: false });
+    </script>
+</body>
+</html>
+
