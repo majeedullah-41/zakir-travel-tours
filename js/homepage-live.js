@@ -15,6 +15,22 @@
     let liveVisas = zakirDB.getLocalVisaServices();
     let adminDrawerInstance = null;
 
+    /**
+     * Resolves the active WhatsApp number, ensuring that if the admin updated
+     * managerWhatsApp / secondaryWhatsApp, the active routing number is always valid.
+     */
+    function getResolvedActiveWhatsApp(config) {
+        const c = (config && config.contacts) || {};
+        const mgrWA = cleanWhatsAppDigits(c.managerWhatsApp || "923490558345");
+        const secWA = cleanWhatsAppDigits(c.secondaryWhatsApp || "923434159182");
+        const rawActive = cleanWhatsAppDigits(c.activeBookingWhatsApp);
+
+        if (rawActive && (rawActive === mgrWA || rawActive === secWA)) {
+            return rawActive;
+        }
+        return mgrWA || secWA || "923490558345";
+    }
+
     // ============================================================================
     // 1. REAL-TIME SNAPSHOT BINDINGS
     // ============================================================================
@@ -23,6 +39,10 @@
         zakirDB.onSiteConfigSnapshot((config) => {
             liveSiteConfig = config;
             renderSiteConfigToDOM(config);
+            // Re-render package & visa grids too so their WhatsApp links & agency name update immediately
+            renderUmrahPackagesGrid(livePackages);
+            renderVisaServicesGrid(liveVisas);
+            populateHeroUmrahDropdown(livePackages, config);
             updateCalculator();
         });
 
@@ -36,6 +56,17 @@
             liveVisas = visas;
             renderVisaServicesGrid(visas);
             populateHeroVisaDropdown(visas);
+        });
+
+        // Also re-sync when tab gains focus (helpful for file:// cross-tab edits)
+        window.addEventListener("focus", () => {
+            liveSiteConfig = zakirDB.getLocalSiteConfig();
+            livePackages = zakirDB.getLocalUmrahPackages();
+            liveVisas = zakirDB.getLocalVisaServices();
+            renderSiteConfigToDOM(liveSiteConfig);
+            renderUmrahPackagesGrid(livePackages);
+            renderVisaServicesGrid(liveVisas);
+            updateCalculator();
         });
 
         checkAdminHashRoute();
@@ -53,29 +84,41 @@
         const c = config.contacts || {};
         const srv = s.servicesIncluded || {};
 
-        const activeWA = cleanWhatsAppDigits(c.activeBookingWhatsApp || c.managerWhatsApp || "923490558345");
         const managerWA = cleanWhatsAppDigits(c.managerWhatsApp || "923490558345");
         const secondaryWA = cleanWhatsAppDigits(c.secondaryWhatsApp || "923434159182");
+        const activeWA = getResolvedActiveWhatsApp(config);
+
         const managerTel = String(c.managerPhone || "+92 349 0558345").replace(/\s+/g, "");
         const secondaryTel = String(c.secondaryPhone || "+92 343 4159182").replace(/\s+/g, "");
 
+        const cleanManagerDisplayName = (c.managerName || "Inam Khan").replace(/\s*\(Manager\)/i, "").trim();
+        const cleanSecondaryDisplayName = (c.secondaryName || "Sadiq Ullah").trim();
+
         const activeAgentName =
-            activeWA === secondaryWA
-                ? c.secondaryName || "Sadiq Ullah"
-                : (c.managerName || "Inam Khan").replace(/\s*\(Manager\)/i, "");
+            activeWA === secondaryWA && secondaryWA !== managerWA
+                ? cleanSecondaryDisplayName
+                : cleanManagerDisplayName;
+
+        const agencyName = c.agencyName || "Zakir Travel & Tours";
+        const taglinePrimary = c.taglinePrimary || "Your Journey Our Priority";
+        const taglineSecondary = c.taglineSecondary || "Your Journey Our Responsibility";
+        const officeAddress =
+            c.officeAddress ||
+            "Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad";
+
+        // Update document title
+        document.title = `${agencyName} | ${taglinePrimary}`;
 
         const setText = (id, text) => {
             const el = document.getElementById(id);
             if (el) el.textContent = text;
         };
 
-        setText(
-            "topBarOfficeAddress",
-            c.officeAddress || "Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad"
-        );
-        setText("topBarManagerName", (c.managerName || "Inam Khan").replace(/\s*\(Manager\)/i, ""));
+        // --- Top Contact Bar ---
+        setText("topBarOfficeAddress", officeAddress);
+        setText("topBarManagerName", cleanManagerDisplayName);
         setText("topBarManagerPhone", c.managerPhone || "+92 349 0558345");
-        setText("topBarSecondaryName", c.secondaryName || "Sadiq Ullah");
+        setText("topBarSecondaryName", cleanSecondaryDisplayName);
         setText("topBarSecondaryPhone", c.secondaryPhone || "+92 343 4159182");
 
         const topManagerLink = document.getElementById("topBarManagerLink");
@@ -84,10 +127,17 @@
         const topSecondaryLink = document.getElementById("topBarSecondaryLink");
         if (topSecondaryLink) topSecondaryLink.href = `tel:${secondaryTel}`;
 
-        setText("headerTaglinePrimary", c.taglinePrimary || "YOUR JOURNEY OUR PRIORITY");
+        // --- Header Logo & Tagline ---
+        const agencyParts = agencyName.trim().split(/\s+/);
+        const logoMain = agencyParts[0] || "ZAKIR";
+        const logoSub = agencyParts.length > 1 ? agencyParts.slice(1).join(" ") : "TRAVEL & TOURS";
+        setText("headerAgencyNameMain", logoMain.toUpperCase());
+        setText("headerAgencyNameSub", logoSub.toUpperCase());
+        setText("headerTaglinePrimary", taglinePrimary.toUpperCase());
 
+        // --- Navbar & Mobile Menu WhatsApp Links ---
         const generalWAMsg = encodeURIComponent(
-            `Assalam-o-Alaikum ${c.agencyName || "Zakir Travel & Tours"}! I would like to inquire about your travel & Umrah services.`
+            `Assalam-o-Alaikum ${agencyName}! I would like to inquire about your travel & Umrah services.`
         );
         const navWALink = document.getElementById("navWhatsAppBtn");
         if (navWALink) navWALink.href = `https://wa.me/${activeWA}?text=${generalWAMsg}`;
@@ -98,8 +148,9 @@
             setText("mobileWhatsAppBtnText", `Chat with ${activeAgentName}`);
         }
 
-        setText("heroTaglineSecondary", `${c.taglineSecondary || "Our Responsibility"}.`);
-        populateHeroUmrahDropdown(livePackages, config);
+        // --- Hero Section & Services Agency Name ---
+        setText("heroTaglineSecondary", `${taglineSecondary}.`);
+        setText("servicesAgencyName", agencyName);
 
         const heroRoomSelect = document.getElementById("umrahRoom");
         if (heroRoomSelect) {
@@ -115,6 +166,7 @@
             }
         }
 
+        // --- Featured Flyer Spotlight Section ---
         setText("spotlightMonthLabel", `${s.monthLabel || "January"} & Upcoming`);
 
         const titleWords = String(s.title || "UMRAH PACKAGE").trim().split(/\s+/);
@@ -161,7 +213,7 @@
         const spotWABtn = document.getElementById("spotlightWhatsAppBtn");
         if (spotWABtn) {
             const spotMsg = encodeURIComponent(
-                `Assalam-o-Alaikum ${c.agencyName || "Zakir Travel & Tours"}! I am interested in the Featured ${s.monthLabel || "January"} ${s.title || "Umrah Package"} (${s.duration || "14 Nights"}, Dep: ${s.departureDate || "Jan 26, 2026"}) starting from PKR ${formatPKR(s.startingPrice || 232000)} (${s.priceUnit || "PER PERSON SHARING"}).`
+                `Assalam-o-Alaikum ${agencyName}! I am interested in the Featured ${s.monthLabel || "January"} ${s.title || "Umrah Package"} (${s.duration || "14 Nights"}, Dep: ${s.departureDate || "Jan 26, 2026"}) starting from PKR ${formatPKR(s.startingPrice || 232000)} (${s.priceUnit || "PER PERSON SHARING"}).`
             );
             spotWABtn.href = `https://wa.me/${activeWA}?text=${spotMsg}`;
         }
@@ -171,6 +223,7 @@
             flyerTriggerBtn.classList.toggle("hidden", s.showFlyerOnHomepage === false);
         }
 
+        // --- Calculator Section ---
         setText("calcIntroBasePrice", `PKR ${formatPKR(r.sharingPrice || s.startingPrice || 232000)}`);
 
         const calcRoomSelect = document.getElementById("calcRoom");
@@ -190,43 +243,51 @@
             calcRoomSelect.selectedIndex = Math.min(prevIndex, calcRoomSelect.options.length - 1);
         }
 
-        setText("contactSectionAgencyName", c.agencyName || "Zakir Travel & Tours");
-        setText("contactSectionTagline", `"${c.taglineSecondary || "Your Journey Our Responsibility"}"`);
-        setText(
-            "contactSectionAddress",
-            c.officeAddress || "Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad."
-        );
+        // --- Contact & Islamabad Office Section ---
+        setText("contactSectionAgencyName", agencyName);
+        setText("contactSectionTagline", `"${taglineSecondary}"`);
+        setText("contactSectionAddress", officeAddress);
 
-        setText("contactCardManagerName", (c.managerName || "Inam Khan").replace(/\s*\(Manager\)/i, ""));
+        setText("contactCardManagerName", c.managerName || "Inam Khan");
         setText("contactCardManagerPhone", c.managerPhone || "+92 349 0558345");
         const mPhoneLink1 = document.getElementById("contactCardManagerTel1");
         const mPhoneLink2 = document.getElementById("contactCardManagerTel2");
         const mWALink = document.getElementById("contactCardManagerWA");
         if (mPhoneLink1) mPhoneLink1.href = `tel:${managerTel}`;
-        if (mPhoneLink2) mPhoneLink2.href = `tel:${managerTel}`;
+        if (mPhoneLink2) {
+            mPhoneLink2.href = `tel:${managerTel}`;
+            mPhoneLink2.title = `Call ${cleanManagerDisplayName}`;
+        }
         if (mWALink) {
             const mMsg = encodeURIComponent(
-                `Assalam-o-Alaikum ${(c.managerName || "Inam Khan").replace(/\s*\(Manager\)/i, "")} Sahib, I need details regarding ${c.agencyName || "Zakir Travel & Tours"}.`
+                `Assalam-o-Alaikum ${cleanManagerDisplayName} Sahib, I need details regarding ${agencyName}.`
             );
             mWALink.href = `https://wa.me/${managerWA}?text=${mMsg}`;
+            mWALink.title = `WhatsApp ${cleanManagerDisplayName}`;
         }
 
-        setText("contactCardSecondaryName", c.secondaryName || "Sadiq Ullah");
+        setText("contactCardSecondaryName", cleanSecondaryDisplayName);
         setText("contactCardSecondaryPhone", c.secondaryPhone || "+92 343 4159182");
         const sPhoneLink1 = document.getElementById("contactCardSecondaryTel1");
         const sPhoneLink2 = document.getElementById("contactCardSecondaryTel2");
         const sWALink = document.getElementById("contactCardSecondaryWA");
         if (sPhoneLink1) sPhoneLink1.href = `tel:${secondaryTel}`;
-        if (sPhoneLink2) sPhoneLink2.href = `tel:${secondaryTel}`;
+        if (sPhoneLink2) {
+            sPhoneLink2.href = `tel:${secondaryTel}`;
+            sPhoneLink2.title = `Call ${cleanSecondaryDisplayName}`;
+        }
         if (sWALink) {
             const sMsg = encodeURIComponent(
-                `Assalam-o-Alaikum ${c.secondaryName || "Sadiq Ullah"} Sahib, I need details regarding ${c.agencyName || "Zakir Travel & Tours"}.`
+                `Assalam-o-Alaikum ${cleanSecondaryDisplayName} Sahib, I need details regarding ${agencyName}.`
             );
             sWALink.href = `https://wa.me/${secondaryWA}?text=${sMsg}`;
+            sWALink.title = `WhatsApp ${cleanSecondaryDisplayName}`;
         }
 
-        setText("footerAgencyName", c.agencyName || "Zakir Travel & Tours");
-        setText("footerTaglinePrimary", c.taglinePrimary || "Your Journey Our Priority");
+        // --- Footer & Modal Consultant Dropdown ---
+        setText("footerAgencyName", agencyName);
+        setText("footerTaglinePrimary", taglinePrimary);
+        setText("footerCopyrightAgency", agencyName);
 
         const modalAgentSelect = document.getElementById("modalAgentPhone");
         if (modalAgentSelect) {
@@ -277,16 +338,16 @@
             return;
         }
 
-        const activeWA = cleanWhatsAppDigits(
-            (liveSiteConfig && liveSiteConfig.contacts && liveSiteConfig.contacts.activeBookingWhatsApp) ||
-                "923490558345"
-        );
+        const activeWA = getResolvedActiveWhatsApp(liveSiteConfig);
+        const agencyName =
+            (liveSiteConfig && liveSiteConfig.contacts && liveSiteConfig.contacts.agencyName) ||
+            "Zakir Travel & Tours";
 
         grid.innerHTML = activePkgs
             .map((pkg) => {
                 const servicesList = Array.isArray(pkg.services) ? pkg.services : [];
                 const waText = encodeURIComponent(
-                    `Assalam-o-Alaikum Zakir Travel & Tours!\n\nI would like to book / inquire about:\n*Package:* ${pkg.title}\n*Rate:* PKR ${formatPKR(pkg.price)} (${pkg.roomType})\n*Duration:* ${pkg.duration}\n*Departure:* ${pkg.departureDate}\n\nPlease share availability and seat confirmation.`
+                    `Assalam-o-Alaikum ${agencyName}!\n\nI would like to book / inquire about:\n*Package:* ${pkg.title}\n*Rate:* PKR ${formatPKR(pkg.price)} (${pkg.roomType})\n*Duration:* ${pkg.duration}\n*Departure:* ${pkg.departureDate}\n\nPlease share availability and seat confirmation.`
                 );
 
                 return `
@@ -394,15 +455,15 @@
             return;
         }
 
-        const activeWA = cleanWhatsAppDigits(
-            (liveSiteConfig && liveSiteConfig.contacts && liveSiteConfig.contacts.activeBookingWhatsApp) ||
-                "923490558345"
-        );
+        const activeWA = getResolvedActiveWhatsApp(liveSiteConfig);
+        const agencyName =
+            (liveSiteConfig && liveSiteConfig.contacts && liveSiteConfig.contacts.agencyName) ||
+            "Zakir Travel & Tours";
 
         grid.innerHTML = activeVisas
             .map((v) => {
                 const waMsg = encodeURIComponent(
-                    `Assalam-o-Alaikum Zakir Travel & Tours!\n\nI would like to inquire about *${v.countryName} (${v.visaType})*:\n- Starting Fee: PKR ${formatPKR(v.pricePKR)}\n- Processing Time: ${v.processingTime}\n\nPlease guide me on the visa application process.`
+                    `Assalam-o-Alaikum ${agencyName}!\n\nI would like to inquire about *${v.countryName} (${v.visaType})*:\n- Starting Fee: PKR ${formatPKR(v.pricePKR)}\n- Processing Time: ${v.processingTime}\n\nPlease guide me on the visa application process.`
                 );
 
                 return `
@@ -457,7 +518,7 @@
     function updateFlyerModalContent(config) {
         const s = (config && config.spotlight) || {};
         const c = (config && config.contacts) || {};
-        const activeWA = cleanWhatsAppDigits(c.activeBookingWhatsApp || "923490558345");
+        const activeWA = getResolvedActiveWhatsApp(config);
 
         const customImg = document.getElementById("flyerModalCustomImage");
         const digitalCard = document.getElementById("flyerModalDigitalPreview");
@@ -570,10 +631,7 @@
     window.handleHeroSubmit = function (e) {
         e.preventDefault();
         const clientInfo = document.getElementById("clientPhone").value.trim();
-        const activeWA = cleanWhatsAppDigits(
-            (liveSiteConfig && liveSiteConfig.contacts && liveSiteConfig.contacts.activeBookingWhatsApp) ||
-                "923490558345"
-        );
+        const activeWA = getResolvedActiveWhatsApp(liveSiteConfig);
         const agencyName =
             (liveSiteConfig && liveSiteConfig.contacts && liveSiteConfig.contacts.agencyName) ||
             "Zakir Travel & Tours";
@@ -660,10 +718,7 @@
                 hotelSelect.options[hotelSelect.selectedIndex].text) ||
             "Standard";
 
-        const activeWA = cleanWhatsAppDigits(
-            (liveSiteConfig && liveSiteConfig.contacts && liveSiteConfig.contacts.activeBookingWhatsApp) ||
-                "923490558345"
-        );
+        const activeWA = getResolvedActiveWhatsApp(liveSiteConfig);
         const agencyName =
             (liveSiteConfig && liveSiteConfig.contacts && liveSiteConfig.contacts.agencyName) ||
             "Zakir Travel & Tours";
@@ -694,10 +749,7 @@
         const agentPhoneEl = document.getElementById("modalAgentPhone");
         const agentPhone =
             cleanWhatsAppDigits(agentPhoneEl && agentPhoneEl.value) ||
-            cleanWhatsAppDigits(
-                (liveSiteConfig && liveSiteConfig.contacts && liveSiteConfig.contacts.activeBookingWhatsApp) ||
-                    "923490558345"
-            );
+            getResolvedActiveWhatsApp(liveSiteConfig);
         const notes = document.getElementById("modalUserNotes").value.trim() || "None";
         const agencyName =
             (liveSiteConfig && liveSiteConfig.contacts && liveSiteConfig.contacts.agencyName) ||

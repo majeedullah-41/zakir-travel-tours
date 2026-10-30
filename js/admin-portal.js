@@ -23,6 +23,8 @@
 
             this.activeTab = "spotlight";
             this.activeCrudSubtab = "packages";
+            // Track whether activeBookingWhatsApp is routed to "manager" or "secondary"
+            this.selectedRoutingRole = "manager";
 
             const db = window.zakirDB;
             this.siteConfig = db.getLocalSiteConfig();
@@ -30,7 +32,20 @@
             this.visas = db.getLocalVisaServices();
             this.currentUser = db.getCurrentUser();
 
+            this._detectRoutingRole(this.siteConfig);
             this._init();
+        }
+
+        _detectRoutingRole(config) {
+            const c = (config && config.contacts) || {};
+            const activeWA = cleanWhatsAppDigits(c.activeBookingWhatsApp);
+            const secWA = cleanWhatsAppDigits(c.secondaryWhatsApp);
+            const mgrWA = cleanWhatsAppDigits(c.managerWhatsApp);
+            if (activeWA && secWA && activeWA === secWA && activeWA !== mgrWA) {
+                this.selectedRoutingRole = "secondary";
+            } else {
+                this.selectedRoutingRole = "manager";
+            }
         }
 
         _init() {
@@ -45,6 +60,7 @@
 
             db.onSiteConfigSnapshot((config) => {
                 this.siteConfig = config;
+                this._detectRoutingRole(config);
                 this._populateConfigFields();
                 this._updateLivePreviewBadges();
             });
@@ -167,7 +183,7 @@
                 <!-- ============================================================== -->
                 <div id="adminDashboardView" class="hidden min-h-screen bg-slate-100 pb-24">
                     
-                    <!-- Sticky Top Admin Bar with Live Preview Badge & Lock Button -->
+                    <!-- Sticky Top Admin Bar with Save & Push Button, Live Preview Badge & Lock Button -->
                     <header class="sticky top-0 z-40 bg-[#0B2D5B] text-white shadow-lg border-b border-white/10">
                         <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
                             <div class="flex items-center gap-3">
@@ -185,15 +201,21 @@
                                 </div>
                             </div>
 
-                            <!-- Live Price Preview Pill & Action Buttons -->
-                            <div class="flex items-center gap-2 sm:gap-3 ml-auto">
-                                <div class="bg-white/10 border border-white/15 rounded-xl px-3 py-1.5 flex items-center gap-2">
+                            <!-- Live Price Preview Pill & Header Action Buttons -->
+                            <div class="flex flex-wrap items-center gap-2 sm:gap-2.5 ml-auto">
+                                <div class="hidden md:flex bg-white/10 border border-white/15 rounded-xl px-3 py-1.5 items-center gap-2">
                                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
                                     <div class="text-left">
                                         <span class="text-[9px] uppercase tracking-wider text-sky-200 block leading-none">Live Featured Price</span>
                                         <span id="livePreviewPriceBadge" class="text-xs sm:text-sm font-black text-white">PKR 232,000</span>
                                     </div>
                                 </div>
+
+                                <!-- NEW: Save & Push to Website Button in Header -->
+                                <button type="button" id="headerSavePushBtn" data-action="save-push-all" class="bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-1.5 shadow-lg transition-all ring-2 ring-emerald-300/40">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    <span>Save & Push to Website</span>
+                                </button>
 
                                 ${
                                     this.isDrawer
@@ -550,8 +572,8 @@
                                     <div>
                                         <label class="block text-xs font-bold uppercase text-slate-600 mb-2">Route Website Booking Inquiries To:</label>
                                         <select id="contactActiveRouting" class="w-full bg-emerald-50 border-2 border-emerald-500 rounded-2xl px-4 py-3.5 text-sm font-black text-[#0B2D5B] focus:outline-none">
-                                            <option value="923490558345">Inam Khan (Manager) — 923490558345</option>
-                                            <option value="923434159182">Sadiq Ullah — 923434159182</option>
+                                            <option value="manager">Primary Contact (Inam Khan)</option>
+                                            <option value="secondary">Secondary Contact (Sadiq Ullah)</option>
                                         </select>
                                     </div>
 
@@ -860,23 +882,35 @@
             }
         }
 
+        _syncRoutingSelectOptions() {
+            const routingSelect = this.container.querySelector("#contactActiveRouting");
+            if (!routingSelect) return;
+
+            const mgrNameInput = this.container.querySelector("#contactManagerName");
+            const mgrWAInput = this.container.querySelector("#contactManagerWA");
+            const secNameInput = this.container.querySelector("#contactSecondaryName");
+            const secWAInput = this.container.querySelector("#contactSecondaryWA");
+
+            const c = (this.siteConfig && this.siteConfig.contacts) || {};
+            const mgrName = (mgrNameInput && mgrNameInput.value.trim()) || c.managerName || "Inam Khan (Manager)";
+            const mgrWA = cleanWhatsAppDigits((mgrWAInput && mgrWAInput.value) || c.managerWhatsApp || "923490558345");
+            const secName = (secNameInput && secNameInput.value.trim()) || c.secondaryName || "Sadiq Ullah";
+            const secWA = cleanWhatsAppDigits((secWAInput && secWAInput.value) || c.secondaryWhatsApp || "923434159182");
+
+            routingSelect.innerHTML = `
+                <option value="manager">Primary: ${mgrName} — ${mgrWA}</option>
+                <option value="secondary">Secondary: ${secName} — ${secWA}</option>
+            `;
+            routingSelect.value = this.selectedRoutingRole === "secondary" ? "secondary" : "manager";
+        }
+
         _updateLivePreviewBadges() {
             const s = (this.siteConfig && this.siteConfig.spotlight) || {};
-            const c = (this.siteConfig && this.siteConfig.contacts) || {};
             const badge = this.container.querySelector("#livePreviewPriceBadge");
             if (badge) {
                 badge.textContent = `PKR ${formatPKR(s.startingPrice || 232000)} (${s.monthLabel || "January"})`;
             }
-
-            const routingSelect = this.container.querySelector("#contactActiveRouting");
-            if (routingSelect && c.managerWhatsApp && c.secondaryWhatsApp) {
-                const currentVal = c.activeBookingWhatsApp || c.managerWhatsApp;
-                routingSelect.innerHTML = `
-                    <option value="${cleanWhatsAppDigits(c.managerWhatsApp)}">${c.managerName || "Inam Khan"} — ${cleanWhatsAppDigits(c.managerWhatsApp)}</option>
-                    <option value="${cleanWhatsAppDigits(c.secondaryWhatsApp)}">${c.secondaryName || "Sadiq Ullah"} — ${cleanWhatsAppDigits(c.secondaryWhatsApp)}</option>
-                `;
-                routingSelect.value = cleanWhatsAppDigits(currentVal);
-            }
+            this._syncRoutingSelectOptions();
         }
 
         _populateConfigFields() {
@@ -954,6 +988,92 @@
             setVal("#contactSecondaryWA", c.secondaryWhatsApp || "923434159182");
             setVal("#contactOfficeAddress", c.officeAddress || "");
             this._updateLivePreviewBadges();
+        }
+
+        /**
+         * Collects and saves ALL form fields across Spotlight, Calculator, Media, and Contacts
+         * in one atomic update and pushes them live to the website.
+         */
+        async saveAllPortalChanges() {
+            const db = window.zakirDB;
+
+            const startingPrice = Number(this.container.querySelector("#spotStartingPrice").value);
+            const sharingPrice = Number(this.container.querySelector("#rateSharing").value);
+            const quadPrice = Number(this.container.querySelector("#rateQuad").value);
+            const triplePrice = Number(this.container.querySelector("#rateTriple").value);
+            const doublePrice = Number(this.container.querySelector("#rateDouble").value);
+
+            if ([startingPrice, sharingPrice, quadPrice, triplePrice, doublePrice].some((p) => !p || p <= 0)) {
+                this.showToast("All package and calculator prices must be greater than 0 PKR.", "error");
+                return false;
+            }
+
+            const managerPhone = this.container.querySelector("#contactManagerPhone").value.trim();
+            const managerWhatsApp = cleanWhatsAppDigits(this.container.querySelector("#contactManagerWA").value);
+            const secondaryPhone = this.container.querySelector("#contactSecondaryPhone").value.trim();
+            const secondaryWhatsApp = cleanWhatsAppDigits(
+                this.container.querySelector("#contactSecondaryWA").value
+            );
+
+            if (!managerPhone || !managerWhatsApp || !secondaryPhone || !secondaryWhatsApp) {
+                this.showToast("Phone and WhatsApp numbers cannot be empty!", "error");
+                return false;
+            }
+
+            const routingRole = this.container.querySelector("#contactActiveRouting").value;
+            this.selectedRoutingRole = routingRole === "secondary" ? "secondary" : "manager";
+            const activeBookingWhatsApp =
+                this.selectedRoutingRole === "secondary" ? secondaryWhatsApp : managerWhatsApp;
+
+            const madinahImageUrl = this.container.querySelector("#inputMadinahUrl").value.trim();
+            const makkahImageUrl = this.container.querySelector("#inputMakkahUrl").value.trim();
+            const promotionalFlyerUrl = this.container.querySelector("#inputFlyerUrl").value.trim();
+            const showFlyerOnHomepage = this.container.querySelector("#chkShowFlyerButton").checked;
+
+            await db.updateSiteConfig({
+                spotlight: {
+                    monthLabel: this.container.querySelector("#spotMonthLabel").value.trim(),
+                    title: this.container.querySelector("#spotTitle").value.trim(),
+                    startingPrice,
+                    priceUnit: this.container.querySelector("#spotPriceUnit").value.trim(),
+                    departureDate: this.container.querySelector("#spotDepartureDate").value.trim(),
+                    returnDate: this.container.querySelector("#spotReturnDate").value.trim(),
+                    duration: this.container.querySelector("#spotDuration").value.trim(),
+                    madinahImageUrl: madinahImageUrl || this.siteConfig.spotlight.madinahImageUrl,
+                    makkahImageUrl: makkahImageUrl || this.siteConfig.spotlight.makkahImageUrl,
+                    promotionalFlyerUrl,
+                    showFlyerOnHomepage,
+                    servicesIncluded: {
+                        roundTrip: this.container.querySelector("#srvRoundTrip").checked,
+                        visa: this.container.querySelector("#srvVisa").checked,
+                        hotel: this.container.querySelector("#srvHotel").checked,
+                        transport: this.container.querySelector("#srvTransport").checked
+                    }
+                },
+                calculatorRates: {
+                    autoCalculateTiers: this.container.querySelector("#calcAutoScaleToggle").checked,
+                    sharingPrice,
+                    quadPrice,
+                    triplePrice,
+                    doublePrice
+                },
+                contacts: {
+                    agencyName: this.container.querySelector("#contactAgencyName").value.trim(),
+                    taglinePrimary: this.container.querySelector("#contactTagline1").value.trim(),
+                    taglineSecondary: this.container.querySelector("#contactTagline2").value.trim(),
+                    managerName: this.container.querySelector("#contactManagerName").value.trim(),
+                    managerPhone,
+                    managerWhatsApp,
+                    secondaryName: this.container.querySelector("#contactSecondaryName").value.trim(),
+                    secondaryPhone,
+                    secondaryWhatsApp,
+                    activeBookingWhatsApp,
+                    officeAddress: this.container.querySelector("#contactOfficeAddress").value.trim()
+                }
+            });
+
+            this.showToast("Saved & Pushed All Changes Live to Website!");
+            return true;
         }
 
         _renderPackagesList() {
@@ -1117,90 +1237,91 @@
                 });
             }
 
-            const quickForm = this.container.querySelector("#quickUpdateForm");
-            if (quickForm) {
-                quickForm.addEventListener("submit", async (e) => {
-                    e.preventDefault();
-                    const startingPrice = Number(this.container.querySelector("#quickStartingPrice").value);
-                    const departureDate = this.container.querySelector("#quickDepartureDate").value.trim();
-                    const monthLabel = this.container.querySelector("#quickMonthLabel").value.trim();
-
-                    if (!startingPrice || startingPrice <= 0) {
-                        this.showToast("Price must be a positive PKR number!", "error");
-                        return;
-                    }
-                    if (!departureDate || !monthLabel) {
-                        this.showToast("Please fill in Departure Date and Month Label.", "error");
-                        return;
-                    }
-
-                    try {
-                        await db.publishQuickUpdate({ startingPrice, departureDate, monthLabel });
-                        this.showToast("Saved & Published Live! All tiers updated.");
-                    } catch (err) {
-                        this.showToast(err.message || "Update failed.", "error");
-                    }
-                });
-            }
+            // Two-way input mirroring between Quick Update Bar and Tab 1 Spotlight inputs
+            const quickPriceEl = this.container.querySelector("#quickStartingPrice");
+            const quickDepEl = this.container.querySelector("#quickDepartureDate");
+            const quickMonthEl = this.container.querySelector("#quickMonthLabel");
 
             const spotPriceInput = this.container.querySelector("#spotStartingPrice");
+            const spotDepInput = this.container.querySelector("#spotDepartureDate");
+            const spotMonthInput = this.container.querySelector("#spotMonthLabel");
             const autoScaleChk = this.container.querySelector("#calcAutoScaleToggle");
-            const syncScaledInputs = () => {
-                if (autoScaleChk && autoScaleChk.checked && spotPriceInput) {
-                    const scaled = window.calculateScaledTiers(spotPriceInput.value);
+
+            const syncScaledInputs = (baseVal) => {
+                if (autoScaleChk && autoScaleChk.checked) {
+                    const scaled = window.calculateScaledTiers(baseVal);
                     this.container.querySelector("#rateSharing").value = scaled.sharingPrice;
                     this.container.querySelector("#rateQuad").value = scaled.quadPrice;
                     this.container.querySelector("#rateTriple").value = scaled.triplePrice;
                     this.container.querySelector("#rateDouble").value = scaled.doublePrice;
                 }
             };
-            if (spotPriceInput) spotPriceInput.addEventListener("input", syncScaledInputs);
-            if (autoScaleChk) autoScaleChk.addEventListener("change", syncScaledInputs);
 
+            if (quickPriceEl && spotPriceInput) {
+                quickPriceEl.addEventListener("input", () => {
+                    spotPriceInput.value = quickPriceEl.value;
+                    syncScaledInputs(quickPriceEl.value);
+                });
+                spotPriceInput.addEventListener("input", () => {
+                    quickPriceEl.value = spotPriceInput.value;
+                    syncScaledInputs(spotPriceInput.value);
+                });
+            }
+            if (quickDepEl && spotDepInput) {
+                quickDepEl.addEventListener("input", () => {
+                    spotDepInput.value = quickDepEl.value;
+                });
+                spotDepInput.addEventListener("input", () => {
+                    quickDepEl.value = spotDepInput.value;
+                });
+            }
+            if (quickMonthEl && spotMonthInput) {
+                quickMonthEl.addEventListener("input", () => {
+                    spotMonthInput.value = quickMonthEl.value;
+                });
+                spotMonthInput.addEventListener("input", () => {
+                    quickMonthEl.value = spotMonthInput.value;
+                });
+            }
+            if (autoScaleChk && spotPriceInput) {
+                autoScaleChk.addEventListener("change", () => syncScaledInputs(spotPriceInput.value));
+            }
+
+            // Live sync the Routing Dropdown options whenever Manager/Secondary Name or WhatsApp is edited
+            const routingSelect = this.container.querySelector("#contactActiveRouting");
+            if (routingSelect) {
+                routingSelect.addEventListener("change", () => {
+                    this.selectedRoutingRole = routingSelect.value === "secondary" ? "secondary" : "manager";
+                });
+            }
+            ["#contactManagerName", "#contactManagerWA", "#contactSecondaryName", "#contactSecondaryWA"].forEach(
+                (sel) => {
+                    const el = this.container.querySelector(sel);
+                    if (el) {
+                        el.addEventListener("input", () => this._syncRoutingSelectOptions());
+                    }
+                }
+            );
+
+            // Quick Update Form Submit -> saves all portal changes
+            const quickForm = this.container.querySelector("#quickUpdateForm");
+            if (quickForm) {
+                quickForm.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    await this.saveAllPortalChanges();
+                });
+            }
+
+            // Tab 1 Form Submit -> saves all portal changes
             const spotForm = this.container.querySelector("#spotlightAndCalcForm");
             if (spotForm) {
                 spotForm.addEventListener("submit", async (e) => {
                     e.preventDefault();
-                    const startingPrice = Number(this.container.querySelector("#spotStartingPrice").value);
-                    const sharingPrice = Number(this.container.querySelector("#rateSharing").value);
-                    const quadPrice = Number(this.container.querySelector("#rateQuad").value);
-                    const triplePrice = Number(this.container.querySelector("#rateTriple").value);
-                    const doublePrice = Number(this.container.querySelector("#rateDouble").value);
-
-                    if ([startingPrice, sharingPrice, quadPrice, triplePrice, doublePrice].some((p) => !p || p <= 0)) {
-                        this.showToast("All package and calculator prices must be greater than 0 PKR.", "error");
-                        return;
-                    }
-
-                    await db.updateSiteConfig({
-                        spotlight: {
-                            monthLabel: this.container.querySelector("#spotMonthLabel").value.trim(),
-                            title: this.container.querySelector("#spotTitle").value.trim(),
-                            startingPrice,
-                            priceUnit: this.container.querySelector("#spotPriceUnit").value.trim(),
-                            departureDate: this.container.querySelector("#spotDepartureDate").value.trim(),
-                            returnDate: this.container.querySelector("#spotReturnDate").value.trim(),
-                            duration: this.container.querySelector("#spotDuration").value.trim(),
-                            servicesIncluded: {
-                                roundTrip: this.container.querySelector("#srvRoundTrip").checked,
-                                visa: this.container.querySelector("#srvVisa").checked,
-                                hotel: this.container.querySelector("#srvHotel").checked,
-                                transport: this.container.querySelector("#srvTransport").checked
-                            }
-                        },
-                        calculatorRates: {
-                            autoCalculateTiers: this.container.querySelector("#calcAutoScaleToggle").checked,
-                            sharingPrice,
-                            quadPrice,
-                            triplePrice,
-                            doublePrice
-                        }
-                    });
-
-                    this.showToast("Saved & Published Live!");
+                    await this.saveAllPortalChanges();
                 });
             }
 
+            // Tab 3 Media File Uploads + Form Submit
             this.container.querySelectorAll("input[type='file'][data-upload-target]").forEach((fileInput) => {
                 fileInput.addEventListener("change", async (e) => {
                     const file = e.target.files && e.target.files[0];
@@ -1222,7 +1343,7 @@
                             const ph = this.container.querySelector("#previewFlyerPlaceholder");
                             if (ph) ph.classList.add("hidden");
                         }
-                        this.showToast("Image ready! Click Save & Publish Media Changes.");
+                        this.showToast("Image ready! Click Save & Push to Website.");
                     } catch (err) {
                         this.showToast(err.message || "Failed to upload image.", "error");
                     }
@@ -1233,58 +1354,16 @@
             if (mediaForm) {
                 mediaForm.addEventListener("submit", async (e) => {
                     e.preventDefault();
-                    const madinahImageUrl = this.container.querySelector("#inputMadinahUrl").value.trim();
-                    const makkahImageUrl = this.container.querySelector("#inputMakkahUrl").value.trim();
-                    const promotionalFlyerUrl = this.container.querySelector("#inputFlyerUrl").value.trim();
-                    const showFlyerOnHomepage = this.container.querySelector("#chkShowFlyerButton").checked;
-
-                    await db.updateSiteConfig({
-                        spotlight: {
-                            madinahImageUrl: madinahImageUrl || this.siteConfig.spotlight.madinahImageUrl,
-                            makkahImageUrl: makkahImageUrl || this.siteConfig.spotlight.makkahImageUrl,
-                            promotionalFlyerUrl,
-                            showFlyerOnHomepage
-                        }
-                    });
-                    this.showToast("Media & Flyer Settings Saved & Published Live!");
+                    await this.saveAllPortalChanges();
                 });
             }
 
+            // Tab 4 Contacts Form Submit
             const contactsForm = this.container.querySelector("#contactsForm");
             if (contactsForm) {
                 contactsForm.addEventListener("submit", async (e) => {
                     e.preventDefault();
-                    const managerPhone = this.container.querySelector("#contactManagerPhone").value.trim();
-                    const managerWhatsApp = cleanWhatsAppDigits(this.container.querySelector("#contactManagerWA").value);
-                    const secondaryPhone = this.container.querySelector("#contactSecondaryPhone").value.trim();
-                    const secondaryWhatsApp = cleanWhatsAppDigits(
-                        this.container.querySelector("#contactSecondaryWA").value
-                    );
-
-                    if (!managerPhone || !managerWhatsApp || !secondaryPhone || !secondaryWhatsApp) {
-                        this.showToast("Phone and WhatsApp numbers cannot be empty!", "error");
-                        return;
-                    }
-
-                    await db.updateSiteConfig({
-                        contacts: {
-                            agencyName: this.container.querySelector("#contactAgencyName").value.trim(),
-                            taglinePrimary: this.container.querySelector("#contactTagline1").value.trim(),
-                            taglineSecondary: this.container.querySelector("#contactTagline2").value.trim(),
-                            managerName: this.container.querySelector("#contactManagerName").value.trim(),
-                            managerPhone,
-                            managerWhatsApp,
-                            secondaryName: this.container.querySelector("#contactSecondaryName").value.trim(),
-                            secondaryPhone,
-                            secondaryWhatsApp,
-                            activeBookingWhatsApp: cleanWhatsAppDigits(
-                                this.container.querySelector("#contactActiveRouting").value
-                            ),
-                            officeAddress: this.container.querySelector("#contactOfficeAddress").value.trim()
-                        }
-                    });
-
-                    this.showToast("Contacts & WhatsApp Routing Published Live!");
+                    await this.saveAllPortalChanges();
                 });
             }
 
@@ -1367,13 +1446,17 @@
                 if (!actionEl) return;
                 const action = actionEl.getAttribute("data-action");
 
-                if (action === "quick-fill-login") {
+                if (action === "save-push-all") {
+                    await this.saveAllPortalChanges();
+                } else if (action === "quick-fill-login") {
                     this.container.querySelector("#adminLoginEmail").value = actionEl.getAttribute("data-email");
                     this.container.querySelector("#adminLoginPassword").value = actionEl.getAttribute("data-pass");
                 } else if (action === "logout") {
                     await db.logout();
                     this.showToast("Admin session locked.", "warning");
                 } else if (action === "close-drawer") {
+                    // Auto-save before closing drawer so no edits are ever lost
+                    await this.saveAllPortalChanges();
                     this.onCloseDrawer();
                 } else if (action === "open-pkg-modal") {
                     this._openPkgModal(null);
