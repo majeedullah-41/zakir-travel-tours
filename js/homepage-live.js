@@ -1,5 +1,7 @@
 /**
  * Zakir Travel & Tours - Real-Time Homepage Binding & Interactive Widgets
+ * Supports Multi-Deal Special Flyer Showcases (CRUD), Umrah Packages, Visas,
+ * Live Cost Calculator, and Instant Contact/WhatsApp Routing.
  * Works natively on both file:// (direct browser open) and http/https servers!
  */
 (function (window) {
@@ -11,9 +13,20 @@
     const AdminPortalManager = window.AdminPortalManager;
 
     let liveSiteConfig = zakirDB.getLocalSiteConfig();
+    let liveSpecialDeals = zakirDB.getLocalSpecialDeals ? zakirDB.getLocalSpecialDeals() : [];
     let livePackages = zakirDB.getLocalUmrahPackages();
     let liveVisas = zakirDB.getLocalVisaServices();
+    let selectedSpecialDealFilter = "ALL"; // "ALL" or specific deal.id
     let adminDrawerInstance = null;
+
+    function escapeHtmlAttr(str) {
+        return String(str == null ? "" : str)
+            .replace(/&/g, "&amp;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+    }
 
     /**
      * Resolves the active WhatsApp number, ensuring that if the admin updated
@@ -39,17 +52,25 @@
         zakirDB.onSiteConfigSnapshot((config) => {
             liveSiteConfig = config;
             renderSiteConfigToDOM(config);
-            // Re-render package & visa grids too so their WhatsApp links & agency name update immediately
+            renderSpecialDealsShowcase(liveSpecialDeals);
             renderUmrahPackagesGrid(livePackages);
             renderVisaServicesGrid(liveVisas);
-            populateHeroUmrahDropdown(livePackages, config);
+            populateHeroUmrahDropdown(livePackages, liveSpecialDeals, config);
             updateCalculator();
         });
+
+        if (zakirDB.onSpecialDealsSnapshot) {
+            zakirDB.onSpecialDealsSnapshot((deals) => {
+                liveSpecialDeals = Array.isArray(deals) ? deals : [];
+                renderSpecialDealsShowcase(liveSpecialDeals);
+                populateHeroUmrahDropdown(livePackages, liveSpecialDeals, liveSiteConfig);
+            });
+        }
 
         zakirDB.onUmrahPackagesSnapshot((packages) => {
             livePackages = packages;
             renderUmrahPackagesGrid(packages);
-            populateHeroUmrahDropdown(packages, liveSiteConfig);
+            populateHeroUmrahDropdown(packages, liveSpecialDeals, liveSiteConfig);
         });
 
         zakirDB.onVisaServicesSnapshot((visas) => {
@@ -58,14 +79,17 @@
             populateHeroVisaDropdown(visas);
         });
 
-        // Also re-sync when tab gains focus (helpful for file:// cross-tab edits)
+        // Re-sync when tab gains focus (helpful for file:// cross-tab edits)
         window.addEventListener("focus", () => {
             liveSiteConfig = zakirDB.getLocalSiteConfig();
+            liveSpecialDeals = zakirDB.getLocalSpecialDeals ? zakirDB.getLocalSpecialDeals() : [];
             livePackages = zakirDB.getLocalUmrahPackages();
             liveVisas = zakirDB.getLocalVisaServices();
             renderSiteConfigToDOM(liveSiteConfig);
+            renderSpecialDealsShowcase(liveSpecialDeals);
             renderUmrahPackagesGrid(livePackages);
             renderVisaServicesGrid(liveVisas);
+            populateHeroUmrahDropdown(livePackages, liveSpecialDeals, liveSiteConfig);
             updateCalculator();
         });
 
@@ -74,7 +98,7 @@
     }
 
     // ============================================================================
-    // 2. RENDER SITE CONFIG (SPOTLIGHT, CALCULATOR TIERS, CONTACTS & ROUTING)
+    // 2. RENDER SITE CONFIG (HEADER, HERO, CALCULATOR TIERS, CONTACTS & ROUTING)
     // ============================================================================
 
     function renderSiteConfigToDOM(config) {
@@ -82,7 +106,6 @@
         const s = config.spotlight || {};
         const r = config.calculatorRates || {};
         const c = config.contacts || {};
-        const srv = s.servicesIncluded || {};
 
         const managerWA = cleanWhatsAppDigits(c.managerWhatsApp || "923490558345");
         const secondaryWA = cleanWhatsAppDigits(c.secondaryWhatsApp || "923434159182");
@@ -106,7 +129,6 @@
             c.officeAddress ||
             "Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad";
 
-        // Update document title
         document.title = `${agencyName} | ${taglinePrimary}`;
 
         const setText = (id, text) => {
@@ -164,63 +186,6 @@
             if (currentVal && [...heroRoomSelect.options].some((o) => o.value === currentVal)) {
                 heroRoomSelect.value = currentVal;
             }
-        }
-
-        // --- Featured Flyer Spotlight Section ---
-        setText("spotlightMonthLabel", `${s.monthLabel || "January"} & Upcoming`);
-
-        const titleWords = String(s.title || "UMRAH PACKAGE").trim().split(/\s+/);
-        const firstWord = titleWords[0] || "UMRAH";
-        const restWords = titleWords.slice(1).join(" ") || "PACKAGE";
-        setText("spotlightTitlePrimary", firstWord);
-        setText("spotlightTitleSecondary", restWords);
-
-        setText("spotlightDurationCopy", s.duration || "14 Nights");
-        setText("spotlightStartingPrice", formatPKR(s.startingPrice || 232000));
-        setText("spotlightPriceUnit", `PKR ${s.priceUnit || "PER PERSON (SHARING)"}`);
-        setText("spotlightDepartureDate", s.departureDate || "Jan 26, 2026");
-        setText("spotlightReturnDate", s.returnDate || "Nov 10, 2026");
-        setText("spotlightDurationBadge", s.duration || "14 Nights");
-
-        const madinahImg = document.getElementById("spotlightMadinahImg");
-        if (madinahImg && s.madinahImageUrl) madinahImg.src = s.madinahImageUrl;
-
-        const makkahImg = document.getElementById("spotlightMakkahImg");
-        if (makkahImg && s.makkahImageUrl) makkahImg.src = s.makkahImageUrl;
-
-        const toggleServiceCard = (cardId, isIncluded) => {
-            const card = document.getElementById(cardId);
-            if (!card) return;
-            if (isIncluded !== false) {
-                card.classList.remove("opacity-40", "grayscale", "line-through");
-            } else {
-                card.classList.add("opacity-40", "grayscale", "line-through");
-            }
-        };
-        toggleServiceCard("srvCardRoundTrip", srv.roundTrip);
-        toggleServiceCard("srvCardVisa", srv.visa);
-        toggleServiceCard("srvCardHotel", srv.hotel);
-        toggleServiceCard("srvCardTransport", srv.transport);
-
-        const spotReserveBtn = document.getElementById("spotlightReserveBtn");
-        if (spotReserveBtn) {
-            spotReserveBtn.onclick = () =>
-                window.openBookingModal(
-                    `Featured ${s.monthLabel || "January"} ${s.title || "Umrah Package"} (${s.duration || "14 Nights"} - PKR ${formatPKR(s.startingPrice || 232000)})`
-                );
-        }
-
-        const spotWABtn = document.getElementById("spotlightWhatsAppBtn");
-        if (spotWABtn) {
-            const spotMsg = encodeURIComponent(
-                `Assalam-o-Alaikum ${agencyName}! I am interested in the Featured ${s.monthLabel || "January"} ${s.title || "Umrah Package"} (${s.duration || "14 Nights"}, Dep: ${s.departureDate || "Jan 26, 2026"}) starting from PKR ${formatPKR(s.startingPrice || 232000)} (${s.priceUnit || "PER PERSON SHARING"}).`
-            );
-            spotWABtn.href = `https://wa.me/${activeWA}?text=${spotMsg}`;
-        }
-
-        const flyerTriggerBtn = document.getElementById("viewPromotionalFlyerBtn");
-        if (flyerTriggerBtn) {
-            flyerTriggerBtn.classList.toggle("hidden", s.showFlyerOnHomepage === false);
         }
 
         // --- Calculator Section ---
@@ -302,24 +267,392 @@
     }
 
     // ============================================================================
-    // 3. RENDER UMRAH PACKAGES COLLECTION GRID
+    // 2B. DYNAMIC MULTI-DEAL SPECIAL FLYER SHOWCASE RENDERER (CRUD)
     // ============================================================================
 
-    function populateHeroUmrahDropdown(packages, config) {
+    function getActiveSpecialDeals(deals) {
+        const list = Array.isArray(deals) ? deals.filter((d) => d && d.isActive !== false) : [];
+        if (list.length > 0) return list;
+
+        // Fallback to site_config.spotlight if all deals were deleted or none exist
+        const s = (liveSiteConfig && liveSiteConfig.spotlight) || {};
+        return [
+            {
+                id: "deal_fallback_spotlight",
+                monthLabel: s.monthLabel || "January",
+                title: s.title || "UMRAH PACKAGE",
+                subtitle: "Complete spiritual peace of mind with our all-inclusive Umrah deal from Islamabad to Haramain.",
+                startingPrice: Number(s.startingPrice || 232000),
+                priceUnit: s.priceUnit || "PER PERSON (SHARING)",
+                badgeTag: "All-Inclusive Deal",
+                departureDate: s.departureDate || "Jan 26, 2026",
+                returnDate: s.returnDate || "Nov 10, 2026",
+                duration: s.duration || "14 Nights",
+                madinahImageUrl:
+                    s.madinahImageUrl ||
+                    "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=900&q=80",
+                makkahImageUrl:
+                    s.makkahImageUrl ||
+                    "https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?auto=format&fit=crop&w=900&q=80",
+                leftFrameBadge: "Ziyarat & Stay",
+                leftFrameTitle: "Madinah Munawwarah",
+                rightFrameBadge: "Haram View Options",
+                rightFrameTitle: "Makkah Mukarramah",
+                promotionalFlyerUrl: s.promotionalFlyerUrl || "",
+                showFlyerButton: s.showFlyerOnHomepage !== false,
+                servicesIncluded: s.servicesIncluded || {
+                    roundTrip: true,
+                    visa: true,
+                    hotel: true,
+                    transport: true
+                },
+                isPrimary: true,
+                isActive: true
+            }
+        ];
+    }
+
+    window.filterSpecialDealsShowcase = function (dealId) {
+        selectedSpecialDealFilter = dealId || "ALL";
+        renderSpecialDealsShowcase(liveSpecialDeals);
+    };
+
+    function renderSpecialDealsShowcase(deals) {
+        const container = document.getElementById("specialDealsShowcaseContainer");
+        const filterBar = document.getElementById("specialDealsFilterBar");
+
+        const activeDeals = getActiveSpecialDeals(deals);
+        const primaryDeal = activeDeals.find((d) => d.isPrimary) || activeDeals[0];
+
+        // Also update the top section header to reflect the primary deal or multi-deal count
+        const setText = (id, text) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        };
+
+        if (primaryDeal) {
+            setText(
+                "spotlightMonthLabel",
+                activeDeals.length > 1
+                    ? `${primaryDeal.monthLabel || "January"} & Special Seasonal Offers`
+                    : `${primaryDeal.monthLabel || "January"} & Upcoming`
+            );
+            const titleWords = String(primaryDeal.title || "UMRAH PACKAGE").trim().split(/\s+/);
+            setText("spotlightTitlePrimary", titleWords[0] || "UMRAH");
+            setText("spotlightTitleSecondary", titleWords.slice(1).join(" ") || "PACKAGE");
+            setText("spotlightDurationCopy", primaryDeal.duration || "14 Nights");
+        }
+
+        if (!container) return;
+
+        // If selected filter no longer exists, reset to ALL
+        if (
+            selectedSpecialDealFilter !== "ALL" &&
+            !activeDeals.some((d) => d.id === selectedSpecialDealFilter)
+        ) {
+            selectedSpecialDealFilter = "ALL";
+        }
+
+        // Render interactive Deal Switcher Pills if there are multiple active deals
+        if (filterBar) {
+            if (activeDeals.length > 1) {
+                filterBar.classList.remove("hidden");
+                filterBar.innerHTML = `
+                    <div class="inline-flex flex-wrap items-center justify-center gap-2 bg-white/90 backdrop-blur-md p-2 rounded-2xl shadow-md border border-teal/20">
+                        <button type="button" onclick="filterSpecialDealsShowcase('ALL')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all flex items-center gap-2 ${
+                            selectedSpecialDealFilter === "ALL"
+                                ? "bg-gradient-to-r from-navy to-teal text-white shadow-md scale-[1.02]"
+                                : "text-slate-600 hover:text-navy hover:bg-slate-100"
+                        }">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <span>All Special Offers (${activeDeals.length})</span>
+                        </button>
+                        ${activeDeals
+                            .map(
+                                (deal) => `
+                            <button type="button" onclick="filterSpecialDealsShowcase('${escapeHtmlAttr(deal.id)}')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all flex items-center gap-2 ${
+                                    selectedSpecialDealFilter === deal.id
+                                        ? "bg-gradient-to-r from-navy to-teal text-white shadow-md scale-[1.02]"
+                                        : "text-slate-600 hover:text-navy hover:bg-slate-100"
+                                }">
+                                <i class="fa-solid ${deal.isPrimary ? "fa-crown text-amber-400" : "fa-star text-teal"}"></i>
+                                <span>${escapeHtmlAttr(deal.monthLabel)}: PKR ${formatPKR(deal.startingPrice)}</span>
+                            </button>
+                        `
+                            )
+                            .join("")}
+                    </div>
+                `;
+            } else {
+                filterBar.classList.add("hidden");
+                filterBar.innerHTML = "";
+            }
+        }
+
+        const dealsToShow =
+            selectedSpecialDealFilter === "ALL"
+                ? activeDeals
+                : activeDeals.filter((d) => d.id === selectedSpecialDealFilter);
+
+        const activeWA = getResolvedActiveWhatsApp(liveSiteConfig);
+        const agencyName =
+            (liveSiteConfig && liveSiteConfig.contacts && liveSiteConfig.contacts.agencyName) ||
+            "Zakir Travel & Tours";
+
+        container.innerHTML = dealsToShow
+            .map((deal, idx) => {
+                const srv = deal.servicesIncluded || {};
+                const titleWords = String(deal.title || "UMRAH PACKAGE").trim().split(/\s+/);
+                const firstWord = titleWords[0] || "UMRAH";
+                const restWords = titleWords.slice(1).join(" ") || "PACKAGE";
+
+                const bookingLabel = `${deal.monthLabel || "Special"} ${deal.title || "Umrah Package"} (${deal.duration || "14 Nights"} - PKR ${formatPKR(deal.startingPrice || 232000)})`;
+                const waText = encodeURIComponent(
+                    `Assalam-o-Alaikum ${agencyName}!\n\nI am interested in your Special Offer:\n*${deal.monthLabel || "Special"} ${deal.title || "UMRAH PACKAGE"}*\n- Starting Price: PKR ${formatPKR(deal.startingPrice || 232000)} (${deal.priceUnit || "PER PERSON SHARING"})\n- Duration: ${deal.duration || "14 Nights"}\n- Departure: ${deal.departureDate || "Flexible"}\n- Return: ${deal.returnDate || "Scheduled"}\n\nPlease share seat availability and booking details.`
+                );
+
+                const srvClass = (isInc) =>
+                    isInc !== false
+                        ? "bg-slate-50 hover:bg-teal-accent/60 border border-slate-200 hover:border-teal/40 hover:-translate-y-1 shadow-sm"
+                        : "bg-slate-50 border border-slate-200 opacity-40 grayscale line-through";
+
+                return `
+                <div class="special-deal-showcase-card bg-white rounded-3xl shadow-flyer border-2 ${
+                    deal.isPrimary ? "border-teal/35" : "border-navy/15"
+                } overflow-hidden transition-all duration-500 hover:shadow-2xl" style="animation: zakirDealCardEntrance 0.55s cubic-bezier(0.16, 1, 0.3, 1) ${idx * 0.12}s both;">
+                    
+                    <!-- Deal Top Ribbon Header (Always shown when multiple deals exist or for clear deal branding) -->
+                    <div class="bg-gradient-to-r from-slate-50 via-teal-accent/40 to-slate-50 px-6 sm:px-10 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full shadow-sm ${
+                                deal.isPrimary
+                                    ? "bg-gradient-to-r from-navy to-teal text-white"
+                                    : "bg-navy/10 text-navy"
+                            }">
+                                <i class="fa-solid ${deal.isPrimary ? "fa-crown text-amber-300" : "fa-bolt text-teal"}"></i>
+                                ${escapeHtmlAttr(deal.badgeTag || (deal.isPrimary ? "Primary Spotlight Deal" : "Limited Time Offer"))}
+                            </span>
+                            <span class="font-script text-2xl sm:text-3xl text-teal">${escapeHtmlAttr(deal.monthLabel || "January")}</span>
+                            <h3 class="text-xl sm:text-2xl font-black tracking-tight uppercase">
+                                <span class="text-navy">${escapeHtmlAttr(firstWord)}</span>
+                                <span class="text-teal">${escapeHtmlAttr(restWords)}</span>
+                            </h3>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs font-bold text-slate-500">
+                            <span class="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-slate-200 text-navy shadow-sm">
+                                <i class="fa-regular fa-calendar-check text-teal"></i>
+                                Dep: <strong class="text-teal">${escapeHtmlAttr(deal.departureDate || "Jan 26, 2026")}</strong>
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-slate-200 text-navy shadow-sm">
+                                <i class="fa-regular fa-clock text-teal"></i>
+                                <strong>${escapeHtmlAttr(deal.duration || "14 Nights")}</strong>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="p-6 sm:p-10 lg:p-12">
+                        <!-- Dual Framed Images (Madinah & Makkah) with Animated Floating Center Price Shield -->
+                        <div class="relative grid md:grid-cols-2 gap-6 lg:gap-12 items-center">
+                            
+                            <!-- Left Frame: Masjid an-Nabawi (Madinah) -->
+                            <div class="group relative rounded-2xl overflow-hidden border-4 border-teal shadow-lg h-64 sm:h-80">
+                                <img src="${escapeHtmlAttr(
+                                    deal.madinahImageUrl ||
+                                        "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=900&q=80"
+                                )}" 
+                                     onerror="this.src='https://placehold.co/800x600/0B2D5B/FFFFFF?text=Masjid+an-Nabawi+Madinah'"
+                                     alt="${escapeHtmlAttr(deal.leftFrameTitle || "Madinah Munawwarah")}" 
+                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
+                                <div class="absolute inset-0 bg-gradient-to-t from-navy/85 via-navy/20 to-transparent"></div>
+                                <div class="absolute bottom-4 left-4 text-white">
+                                    <span class="bg-teal text-xs font-bold uppercase px-2.5 py-1 rounded-md shadow">${escapeHtmlAttr(
+                                        deal.leftFrameBadge || "Ziyarat & Stay"
+                                    )}</span>
+                                    <h4 class="text-xl font-bold mt-1.5 drop-shadow">${escapeHtmlAttr(
+                                        deal.leftFrameTitle || "Madinah Munawwarah"
+                                    )}</h4>
+                                </div>
+                            </div>
+
+                            <!-- Center Overlapping Price Badge (Animated Floating Flyer Shield) -->
+                            <div class="md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-20 flex justify-center my-2 md:my-0">
+                                <div class="flyer-badge floating-price-shield text-white p-1.5 rounded-3xl shadow-2xl border-4 border-white text-center w-64 sm:w-72 transform hover:scale-105 transition-transform duration-300">
+                                    <div class="border-2 border-teal-light/60 rounded-2xl py-5 px-4 bg-navy/40 backdrop-blur-sm">
+                                        <span class="text-[11px] font-bold uppercase tracking-widest text-sky-200 block">STARTING FROM</span>
+                                        <div class="text-3xl sm:text-4xl font-black tracking-tight my-1 text-white drop-shadow">
+                                            ${formatPKR(deal.startingPrice || 232000)}
+                                        </div>
+                                        <span class="text-xs font-semibold uppercase tracking-wider text-teal-accent block">PKR ${escapeHtmlAttr(
+                                            deal.priceUnit || "PER PERSON (SHARING)"
+                                        )}</span>
+                                        <div class="mt-2 inline-flex items-center gap-1 text-[11px] bg-white/15 px-2.5 py-0.5 rounded-full">
+                                            <i class="fa-solid fa-mosque text-amber-300"></i> ${escapeHtmlAttr(
+                                                deal.badgeTag || "All-Inclusive Deal"
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Frame: Holy Kaaba (Makkah) -->
+                            <div class="group relative rounded-2xl overflow-hidden border-4 border-navy shadow-lg h-64 sm:h-80">
+                                <img src="${escapeHtmlAttr(
+                                    deal.makkahImageUrl ||
+                                        "https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?auto=format&fit=crop&w=900&q=80"
+                                )}" 
+                                     onerror="this.src='https://placehold.co/800x600/0D8A9E/FFFFFF?text=Makkah+Mukarramah'"
+                                     alt="${escapeHtmlAttr(deal.rightFrameTitle || "Makkah Mukarramah")}" 
+                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
+                                <div class="absolute inset-0 bg-gradient-to-t from-navy/85 via-navy/20 to-transparent"></div>
+                                <div class="absolute bottom-4 left-4 md:left-auto md:right-4 md:text-right text-white">
+                                    <span class="bg-navy text-xs font-bold uppercase px-2.5 py-1 rounded-md shadow">${escapeHtmlAttr(
+                                        deal.rightFrameBadge || "Haram View Options"
+                                    )}</span>
+                                    <h4 class="text-xl font-bold mt-1.5 drop-shadow">${escapeHtmlAttr(
+                                        deal.rightFrameTitle || "Makkah Mukarramah"
+                                    )}</h4>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Schedule Strip (Departures | Return | Duration) -->
+                        <div class="mt-10 border-2 border-teal rounded-2xl bg-slate-50 p-4 sm:p-6 grid grid-cols-1 md:grid-cols-3 gap-4 divide-y md:divide-y-0 md:divide-x divide-teal/30">
+                            <div class="flex items-center justify-center gap-4 pt-2 md:pt-0">
+                                <div class="w-12 h-12 rounded-xl bg-navy/10 text-navy flex items-center justify-center text-2xl">
+                                    <i class="fa-solid fa-plane-departure"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold uppercase tracking-wider text-navy">Departures</div>
+                                    <div class="text-lg sm:text-xl font-extrabold text-teal">
+                                        <span>${escapeHtmlAttr(deal.departureDate || "Jan 26, 2026")}</span>
+                                        <span class="text-xs font-normal text-slate-500 block sm:inline">(Weekly Batches)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-center gap-4 pt-4 md:pt-0">
+                                <div class="w-12 h-12 rounded-xl bg-navy/10 text-navy flex items-center justify-center text-2xl">
+                                    <i class="fa-solid fa-plane-arrival"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold uppercase tracking-wider text-navy">Return / Schedule</div>
+                                    <div class="text-lg sm:text-xl font-extrabold text-teal">${escapeHtmlAttr(
+                                        deal.returnDate || "Nov 10, 2026"
+                                    )}</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-center gap-4 pt-4 md:pt-0">
+                                <div class="w-12 h-12 rounded-xl bg-navy/10 text-navy flex items-center justify-center text-2xl">
+                                    <i class="fa-regular fa-clock"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold uppercase tracking-wider text-navy">Duration</div>
+                                    <div class="text-lg sm:text-xl font-extrabold text-teal">${escapeHtmlAttr(
+                                        deal.duration || "14 Nights"
+                                    )}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Services Included Banner -->
+                        <div class="mt-10 text-center">
+                            <div class="inline-flex items-center gap-3 bg-gradient-to-r from-navy via-teal to-navy text-white font-extrabold uppercase tracking-wider px-8 py-2.5 rounded-full shadow-md text-sm sm:text-base">
+                                <span class="text-xs">◆</span>
+                                <span>SERVICES INCLUDED</span>
+                                <span class="text-xs">◆</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mt-8 max-w-4xl mx-auto">
+                                <div class="${srvClass(srv.roundTrip)} rounded-2xl p-5 flex flex-col items-center transition-all duration-300 group">
+                                    <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-2xl mb-3 transition-all">
+                                        <i class="fa-solid fa-earth-americas"></i>
+                                    </div>
+                                    <h4 class="font-extrabold text-navy text-base">Round Trip</h4>
+                                    <p class="text-xs text-slate-500 mt-1">Return Air Ticket Included</p>
+                                </div>
+
+                                <div class="${srvClass(srv.visa)} rounded-2xl p-5 flex flex-col items-center transition-all duration-300 group">
+                                    <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-2xl mb-3 transition-all">
+                                        <i class="fa-solid fa-id-card-clip"></i>
+                                    </div>
+                                    <h4 class="font-extrabold text-navy text-base">Umrah Visa</h4>
+                                    <p class="text-xs text-slate-500 mt-1">Fast E-Visa & Insurance</p>
+                                </div>
+
+                                <div class="${srvClass(srv.hotel)} rounded-2xl p-5 flex flex-col items-center transition-all duration-300 group">
+                                    <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-2xl mb-3 transition-all">
+                                        <i class="fa-solid fa-hotel"></i>
+                                    </div>
+                                    <h4 class="font-extrabold text-navy text-base">Hotel Stay</h4>
+                                    <p class="text-xs text-slate-500 mt-1">Makkah & Madinah Hotels</p>
+                                </div>
+
+                                <div class="${srvClass(srv.transport)} rounded-2xl p-5 flex flex-col items-center transition-all duration-300 group">
+                                    <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-2xl mb-3 transition-all">
+                                        <i class="fa-solid fa-bus-simple"></i>
+                                    </div>
+                                    <h4 class="font-extrabold text-navy text-base">Transport</h4>
+                                    <p class="text-xs text-slate-500 mt-1">Luxury AC Ground Transport</p>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="mt-8 flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4">
+                                <button type="button" onclick="openBookingModal('${escapeHtmlAttr(bookingLabel.replace(/'/g, "\\'"))}')" class="w-full sm:w-auto bg-navy hover:bg-navy-light text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-calendar-check text-teal-light"></i>
+                                    <span>Reserve Your Seat Now</span>
+                                </button>
+                                <a href="https://wa.me/${activeWA}?text=${waText}" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto bg-teal hover:bg-teal-dark text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                                    <i class="fa-brands fa-whatsapp text-xl"></i>
+                                    <span>Book via WhatsApp</span>
+                                </a>
+                                ${
+                                    deal.showFlyerButton !== false
+                                        ? `<button type="button" onclick="openPromotionalFlyerModal('${escapeHtmlAttr(deal.id)}')" class="w-full sm:w-auto bg-slate-100 hover:bg-teal-accent text-navy font-bold px-6 py-4 rounded-xl border border-teal/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                                            <i class="fa-solid fa-file-image text-teal"></i>
+                                            <span>View Latest Flyer</span>
+                                           </button>`
+                                        : ""
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                `;
+            })
+            .join("");
+    }
+
+    // ============================================================================
+    // 3. RENDER UMRAH PACKAGES COLLECTION GRID & HERO DROPDOWN
+    // ============================================================================
+
+    function populateHeroUmrahDropdown(packages, specialDeals, config) {
         const select = document.getElementById("umrahPackageType");
         if (!select) return;
 
-        const s = (config && config.spotlight) || {};
+        const activeDeals = getActiveSpecialDeals(specialDeals);
         const activePkgs = (packages || []).filter((p) => p.isActive !== false);
 
-        const optionsHtml = [
-            `<option value="${s.monthLabel || "January"} ${s.title || "Umrah Package"} (${s.duration || "14 Nights"} - PKR ${formatPKR(s.startingPrice || 232000)})">Featured ${s.monthLabel || "January"} (${s.duration || "14 Nights"} - PKR ${formatPKR(s.startingPrice || 232000)})</option>`
-        ];
+        const optionsHtml = [];
 
+        // Include all active Special Flyer Deals first
+        activeDeals.forEach((d) => {
+            const label = `${d.monthLabel || "Special"} ${d.title || "Umrah Deal"} (${d.duration || "14 Nights"} - PKR ${formatPKR(d.startingPrice || 232000)})`;
+            optionsHtml.push(
+                `<option value="${escapeHtmlAttr(label)}">★ ${escapeHtmlAttr(d.monthLabel || "Special")} ${escapeHtmlAttr(d.title || "Umrah")} (${escapeHtmlAttr(d.duration || "14 Nights")} - PKR ${formatPKR(d.startingPrice || 232000)})</option>`
+            );
+        });
+
+        // Include Comparison Umrah Packages
         activePkgs.forEach((p) => {
             if (!p.isFeatured) {
+                const val = `${p.title} (${p.duration} - PKR ${formatPKR(p.price)})`;
                 optionsHtml.push(
-                    `<option value="${p.title} (${p.duration} - PKR ${formatPKR(p.price)})">${p.title} (PKR ${formatPKR(p.price)})</option>`
+                    `<option value="${escapeHtmlAttr(val)}">${escapeHtmlAttr(p.title)} (PKR ${formatPKR(p.price)})</option>`
                 );
             }
         });
@@ -351,7 +684,7 @@
                 );
 
                 return `
-                <div class="bg-white rounded-3xl p-6 border-2 ${pkg.isFeatured ? "border-teal shadow-flyer" : "border-slate-200/90 shadow-md"} hover:border-teal transition-all flex flex-col justify-between relative overflow-hidden">
+                <div class="bg-white rounded-3xl p-6 border-2 ${pkg.isFeatured ? "border-teal shadow-flyer" : "border-slate-200/90 shadow-md"} hover:border-teal hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
                     ${
                         pkg.isFeatured
                             ? `<div class="absolute top-0 right-0 bg-gradient-to-r from-navy to-teal text-white text-[10px] font-black uppercase tracking-wider px-3.5 py-1 rounded-bl-2xl">
@@ -467,7 +800,7 @@
                 );
 
                 return `
-                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-lg hover:border-teal transition-all flex flex-col justify-between gap-4">
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-teal transition-all duration-300 flex flex-col justify-between gap-4">
                     <div>
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-center gap-3.5">
@@ -515,8 +848,8 @@
     // 5. PROMOTIONAL FLYER MODAL & ADMIN PORTAL DRAWER
     // ============================================================================
 
-    function updateFlyerModalContent(config) {
-        const s = (config && config.spotlight) || {};
+    function updateFlyerModalContent(config, specificDeal) {
+        const s = specificDeal || (config && config.spotlight) || {};
         const c = (config && config.contacts) || {};
         const activeWA = getResolvedActiveWhatsApp(config);
 
@@ -557,7 +890,16 @@
         }
     }
 
-    function openPromotionalFlyerModal() {
+    function openPromotionalFlyerModal(dealId) {
+        if (dealId) {
+            const activeDeals = getActiveSpecialDeals(liveSpecialDeals);
+            const found = activeDeals.find((d) => d.id === dealId);
+            if (found) {
+                updateFlyerModalContent(liveSiteConfig, found);
+            }
+        } else {
+            updateFlyerModalContent(liveSiteConfig);
+        }
         const modal = document.getElementById("promotionalFlyerModal");
         if (modal) modal.classList.remove("hidden");
     }

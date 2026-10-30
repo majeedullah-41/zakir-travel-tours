@@ -8,31 +8,44 @@
     "use strict";
 
     // ============================================================================
-    // 1. INITIAL SEED DATA ("JANUARY FLYER DEFAULTS")
+    // 1. INITIAL SEED DATA ("JANUARY FLYER DEFAULTS" + SPECIAL DEALS COLLECTION)
     // ============================================================================
+
+    const DEFAULT_PRIMARY_DEAL = {
+        id: "deal_jan_umrah_2026",
+        monthLabel: "January & Upcoming",
+        title: "UMRAH PACKAGE",
+        subtitle: "Complete spiritual peace of mind with our all-inclusive featured Umrah package. Everything handled from Islamabad to Haramain.",
+        badgeTag: "All-Inclusive Deal",
+        startingPrice: 232000,
+        priceUnit: "PER PERSON (SHARING)",
+        departureDate: "Jan 26, 2026",
+        departureSubtext: "(Weekly Batches)",
+        returnDate: "Nov 10, 2026",
+        duration: "14 Nights",
+        leftFrameTitle: "Madinah Munawwarah",
+        leftFrameBadge: "Ziyarat & Stay",
+        madinahImageUrl: "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=900&q=80",
+        rightFrameTitle: "Makkah Mukarramah",
+        rightFrameBadge: "Haram View Options",
+        makkahImageUrl: "https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?auto=format&fit=crop&w=900&q=80",
+        promotionalFlyerUrl: "",
+        showFlyerOnHomepage: true,
+        servicesIncluded: {
+            roundTrip: true,
+            visa: true,
+            hotel: true,
+            transport: true
+        },
+        isPrimary: true,
+        isActive: true,
+        sortOrder: 1
+    };
 
     const FLYER_DEFAULTS = {
         site_config: {
             main_settings: {
-                spotlight: {
-                    monthLabel: "January",
-                    title: "UMRAH PACKAGE",
-                    startingPrice: 232000,
-                    priceUnit: "PER PERSON (SHARING)",
-                    departureDate: "Jan 26, 2026",
-                    returnDate: "Nov 10, 2026",
-                    duration: "14 Nights",
-                    madinahImageUrl: "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=900&q=80",
-                    makkahImageUrl: "https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?auto=format&fit=crop&w=900&q=80",
-                    promotionalFlyerUrl: "",
-                    showFlyerOnHomepage: true,
-                    servicesIncluded: {
-                        roundTrip: true,
-                        visa: true,
-                        hotel: true,
-                        transport: true
-                    }
-                },
+                spotlight: { ...DEFAULT_PRIMARY_DEAL },
                 calculatorRates: {
                     sharingPrice: 232000,
                     quadPrice: 248000,
@@ -56,6 +69,9 @@
                 updatedAt: new Date().toISOString()
             }
         },
+        special_deals: [
+            { ...DEFAULT_PRIMARY_DEAL }
+        ],
         umrah_packages: [
             {
                 id: "pkg_jan_saver",
@@ -218,6 +234,7 @@
     const STORAGE_KEYS = {
         FIREBASE_CONFIG: "zakir_firebase_config_v1",
         SITE_CONFIG: "zakir_db_site_config_v1",
+        SPECIAL_DEALS: "zakir_db_special_deals_v1",
         UMRAH_PACKAGES: "zakir_db_umrah_packages_v1",
         VISA_SERVICES: "zakir_db_visa_services_v1",
         AUTH_SESSION: "zakir_auth_session_v1"
@@ -254,6 +271,7 @@
 
             this.listeners = {
                 site_config: new Set(),
+                special_deals: new Set(),
                 umrah_packages: new Set(),
                 visa_services: new Set(),
                 auth: new Set()
@@ -283,6 +301,7 @@
             window.addEventListener("storage", (e) => {
                 if (
                     e.key === STORAGE_KEYS.SITE_CONFIG ||
+                    e.key === STORAGE_KEYS.SPECIAL_DEALS ||
                     e.key === STORAGE_KEYS.UMRAH_PACKAGES ||
                     e.key === STORAGE_KEYS.VISA_SERVICES
                 ) {
@@ -303,6 +322,19 @@
                         STORAGE_KEYS.SITE_CONFIG,
                         JSON.stringify(FLYER_DEFAULTS.site_config.main_settings)
                     );
+                }
+                if (!localStorage.getItem(STORAGE_KEYS.SPECIAL_DEALS)) {
+                    // Seed initial special deal from current site_config.spotlight if present
+                    const cfg = this.getLocalSiteConfig();
+                    const initialDeal = {
+                        ...DEFAULT_PRIMARY_DEAL,
+                        ...(cfg.spotlight || {}),
+                        id: "deal_jan_umrah_2026",
+                        isPrimary: true,
+                        isActive: true,
+                        sortOrder: 1
+                    };
+                    localStorage.setItem(STORAGE_KEYS.SPECIAL_DEALS, JSON.stringify([initialDeal]));
                 }
                 if (!localStorage.getItem(STORAGE_KEYS.UMRAH_PACKAGES)) {
                     localStorage.setItem(
@@ -422,6 +454,18 @@
                     }
                 });
 
+            const unsubDeals = this.db
+                .collection("special_deals")
+                .orderBy("sortOrder", "asc")
+                .onSnapshot((snap) => {
+                    const list = [];
+                    snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
+                    if (list.length) {
+                        localStorage.setItem(STORAGE_KEYS.SPECIAL_DEALS, JSON.stringify(list));
+                        this.listeners.special_deals.forEach((cb) => cb(list));
+                    }
+                });
+
             const unsubPkgs = this.db
                 .collection("umrah_packages")
                 .orderBy("sortOrder", "asc")
@@ -442,13 +486,23 @@
                     this.listeners.visa_services.forEach((cb) => cb(list));
                 });
 
-            this.firebaseUnsubscribes.push(unsubConfig, unsubPkgs, unsubVisas);
+            this.firebaseUnsubscribes.push(unsubConfig, unsubDeals, unsubPkgs, unsubVisas);
         }
+
+        // --------------------------------------------------------------------
+        // SNAPSHOT LISTENERS
+        // --------------------------------------------------------------------
 
         onSiteConfigSnapshot(callback) {
             this.listeners.site_config.add(callback);
             callback(this.getLocalSiteConfig());
             return () => this.listeners.site_config.delete(callback);
+        }
+
+        onSpecialDealsSnapshot(callback) {
+            this.listeners.special_deals.add(callback);
+            callback(this.getLocalSpecialDeals());
+            return () => this.listeners.special_deals.delete(callback);
         }
 
         onUmrahPackagesSnapshot(callback) {
@@ -471,10 +525,12 @@
 
         _notifyLocalListeners() {
             const siteConfig = this.getLocalSiteConfig();
+            const deals = this.getLocalSpecialDeals();
             const packages = this.getLocalUmrahPackages();
             const visas = this.getLocalVisaServices();
 
             this.listeners.site_config.forEach((cb) => cb(siteConfig));
+            this.listeners.special_deals.forEach((cb) => cb(deals));
             this.listeners.umrah_packages.forEach((cb) => cb(packages));
             this.listeners.visa_services.forEach((cb) => cb(visas));
         }
@@ -486,6 +542,10 @@
                 } catch (_) {}
             }
         }
+
+        // --------------------------------------------------------------------
+        // GETTERS
+        // --------------------------------------------------------------------
 
         getLocalSiteConfig() {
             try {
@@ -519,6 +579,30 @@
             return JSON.parse(JSON.stringify(FLYER_DEFAULTS.site_config.main_settings));
         }
 
+        getLocalSpecialDeals() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.SPECIAL_DEALS);
+                if (raw) {
+                    const list = JSON.parse(raw);
+                    if (Array.isArray(list) && list.length > 0) {
+                        return [...list]
+                            .map((d) => ({
+                                ...DEFAULT_PRIMARY_DEAL,
+                                ...d,
+                                servicesIncluded: {
+                                    ...DEFAULT_PRIMARY_DEAL.servicesIncluded,
+                                    ...(d.servicesIncluded || {})
+                                }
+                            }))
+                            .sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+                    }
+                }
+            } catch (e) {
+                console.error("Error reading special_deals:", e);
+            }
+            return JSON.parse(JSON.stringify(FLYER_DEFAULTS.special_deals));
+        }
+
         getLocalUmrahPackages() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEYS.UMRAH_PACKAGES);
@@ -545,7 +629,157 @@
             return JSON.parse(JSON.stringify(FLYER_DEFAULTS.visa_services));
         }
 
-        async updateSiteConfig(partialOrFullConfig) {
+        // --------------------------------------------------------------------
+        // MUTATIONS: SPECIAL FLYER DEALS (FULL CRUD + PRIMARY SYNC)
+        // --------------------------------------------------------------------
+
+        async saveSpecialDeal(dealData) {
+            const list = this.getLocalSpecialDeals();
+            const cleanPrice = Number(dealData.startingPrice);
+            if (!cleanPrice || cleanPrice <= 0) {
+                throw new Error("Special deal starting price must be greater than 0 PKR.");
+            }
+
+            let targetDeal;
+            if (dealData.id) {
+                const idx = list.findIndex((d) => d.id === dealData.id);
+                if (idx !== -1) {
+                    targetDeal = {
+                        ...list[idx],
+                        ...dealData,
+                        startingPrice: cleanPrice,
+                        servicesIncluded: {
+                            ...(list[idx].servicesIncluded || DEFAULT_PRIMARY_DEAL.servicesIncluded),
+                            ...(dealData.servicesIncluded || {})
+                        },
+                        sortOrder: Number(dealData.sortOrder ?? list[idx].sortOrder ?? idx + 1)
+                    };
+                    list[idx] = targetDeal;
+                }
+            }
+
+            if (!targetDeal) {
+                const newId = dealData.id || `deal_${Date.now()}`;
+                targetDeal = {
+                    ...DEFAULT_PRIMARY_DEAL,
+                    ...dealData,
+                    id: newId,
+                    startingPrice: cleanPrice,
+                    servicesIncluded: {
+                        ...DEFAULT_PRIMARY_DEAL.servicesIncluded,
+                        ...(dealData.servicesIncluded || {})
+                    },
+                    isPrimary: list.length === 0 ? true : Boolean(dealData.isPrimary),
+                    isActive: dealData.isActive !== undefined ? Boolean(dealData.isActive) : true,
+                    sortOrder: Number(dealData.sortOrder ?? list.length + 1)
+                };
+                list.push(targetDeal);
+            }
+
+            if (targetDeal.isPrimary) {
+                list.forEach((d) => {
+                    if (d.id !== targetDeal.id) d.isPrimary = false;
+                });
+            } else if (!list.some((d) => d.isPrimary)) {
+                list[0].isPrimary = true;
+            }
+
+            localStorage.setItem(STORAGE_KEYS.SPECIAL_DEALS, JSON.stringify(list));
+
+            // Sync primary deal with site_config.spotlight & calculatorRates
+            const primaryDeal = list.find((d) => d.isPrimary) || list[0];
+            if (primaryDeal) {
+                await this.updateSiteConfig(
+                    {
+                        spotlight: { ...primaryDeal }
+                    },
+                    { skipDealSync: true }
+                );
+            } else {
+                this._notifyLocalListeners();
+                this._broadcastChange("DB_UPDATED");
+            }
+
+            if (this.mode === "firebase" && this.db) {
+                await this.db.collection("special_deals").doc(targetDeal.id).set(targetDeal, { merge: true });
+            }
+
+            return targetDeal;
+        }
+
+        async deleteSpecialDeal(dealId) {
+            let list = this.getLocalSpecialDeals();
+            if (list.length <= 1) {
+                throw new Error("At least one Special Flyer Deal must remain. You can edit or hide it instead.");
+            }
+            list = list.filter((d) => d.id !== dealId);
+            if (!list.some((d) => d.isPrimary) && list.length > 0) {
+                list[0].isPrimary = true;
+            }
+
+            localStorage.setItem(STORAGE_KEYS.SPECIAL_DEALS, JSON.stringify(list));
+            const primaryDeal = list.find((d) => d.isPrimary) || list[0];
+            if (primaryDeal) {
+                await this.updateSiteConfig({ spotlight: { ...primaryDeal } }, { skipDealSync: true });
+            } else {
+                this._notifyLocalListeners();
+                this._broadcastChange("DB_UPDATED");
+            }
+
+            if (this.mode === "firebase" && this.db) {
+                await this.db.collection("special_deals").doc(dealId).delete();
+            }
+        }
+
+        async reorderSpecialDeal(dealId, direction) {
+            const list = this.getLocalSpecialDeals();
+            const idx = list.findIndex((d) => d.id === dealId);
+            if (idx === -1) return;
+            const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+            if (swapIdx < 0 || swapIdx >= list.length) return;
+
+            const temp = list[idx];
+            list[idx] = list[swapIdx];
+            list[swapIdx] = temp;
+
+            list.forEach((item, index) => {
+                item.sortOrder = index + 1;
+            });
+
+            localStorage.setItem(STORAGE_KEYS.SPECIAL_DEALS, JSON.stringify(list));
+            this._notifyLocalListeners();
+            this._broadcastChange("DB_UPDATED");
+
+            if (this.mode === "firebase" && this.db) {
+                const batch = this.db.batch();
+                list.forEach((item) => {
+                    batch.set(this.db.collection("special_deals").doc(item.id), item, { merge: true });
+                });
+                await batch.commit();
+            }
+        }
+
+        async duplicateSpecialDeal(dealId) {
+            const list = this.getLocalSpecialDeals();
+            const orig = list.find((d) => d.id === dealId);
+            if (!orig) return null;
+
+            const copy = {
+                ...JSON.parse(JSON.stringify(orig)),
+                id: `deal_${Date.now()}`,
+                monthLabel: `${orig.monthLabel} (Copy)`,
+                isPrimary: false,
+                isActive: true,
+                sortOrder: list.length + 1
+            };
+            return this.saveSpecialDeal(copy);
+        }
+
+        // --------------------------------------------------------------------
+        // MUTATIONS: SITE CONFIG & 10-SECOND QUICK UPDATE
+        // --------------------------------------------------------------------
+
+        async updateSiteConfig(partialOrFullConfig, options = {}) {
             const current = this.getLocalSiteConfig();
             const updated = {
                 ...current,
@@ -582,6 +816,22 @@
             }
 
             localStorage.setItem(STORAGE_KEYS.SITE_CONFIG, JSON.stringify(updated));
+
+            // Keep primary deal in special_deals in sync when spotlight is updated directly
+            if (partialOrFullConfig.spotlight && !options.skipDealSync) {
+                const deals = this.getLocalSpecialDeals();
+                const primaryIdx = deals.findIndex((d) => d.isPrimary);
+                const targetIdx = primaryIdx !== -1 ? primaryIdx : 0;
+                if (deals[targetIdx]) {
+                    deals[targetIdx] = {
+                        ...deals[targetIdx],
+                        ...updated.spotlight,
+                        id: deals[targetIdx].id,
+                        isPrimary: true
+                    };
+                    localStorage.setItem(STORAGE_KEYS.SPECIAL_DEALS, JSON.stringify(deals));
+                }
+            }
 
             if (partialOrFullConfig.spotlight) {
                 const pkgs = this.getLocalUmrahPackages();
@@ -635,6 +885,10 @@
                 calculatorRates: newRates
             });
         }
+
+        // --------------------------------------------------------------------
+        // MUTATIONS: UMRAH PACKAGES & VISA SERVICES
+        // --------------------------------------------------------------------
 
         async saveUmrahPackage(pkgData) {
             const list = this.getLocalUmrahPackages();
@@ -877,10 +1131,12 @@
 
         async resetToFlyerDefaults() {
             const defaultConfig = JSON.parse(JSON.stringify(FLYER_DEFAULTS.site_config.main_settings));
+            const defaultDeals = JSON.parse(JSON.stringify(FLYER_DEFAULTS.special_deals));
             const defaultPkgs = JSON.parse(JSON.stringify(FLYER_DEFAULTS.umrah_packages));
             const defaultVisas = JSON.parse(JSON.stringify(FLYER_DEFAULTS.visa_services));
 
             localStorage.setItem(STORAGE_KEYS.SITE_CONFIG, JSON.stringify(defaultConfig));
+            localStorage.setItem(STORAGE_KEYS.SPECIAL_DEALS, JSON.stringify(defaultDeals));
             localStorage.setItem(STORAGE_KEYS.UMRAH_PACKAGES, JSON.stringify(defaultPkgs));
             localStorage.setItem(STORAGE_KEYS.VISA_SERVICES, JSON.stringify(defaultVisas));
 
@@ -890,6 +1146,12 @@
             if (this.mode === "firebase" && this.db) {
                 const batch = this.db.batch();
                 batch.set(this.db.collection("site_config").doc("main_settings"), defaultConfig);
+
+                const existingDeals = await this.db.collection("special_deals").get();
+                existingDeals.forEach((d) => batch.delete(d.ref));
+                defaultDeals.forEach((deal) => {
+                    batch.set(this.db.collection("special_deals").doc(deal.id), deal);
+                });
 
                 const existingPkgs = await this.db.collection("umrah_packages").get();
                 existingPkgs.forEach((d) => batch.delete(d.ref));
@@ -908,6 +1170,7 @@
 
             return {
                 site_config: defaultConfig,
+                special_deals: defaultDeals,
                 umrah_packages: defaultPkgs,
                 visa_services: defaultVisas
             };
@@ -1001,6 +1264,7 @@
 
     const zakirDB = new ZakirBackendService();
 
+    window.DEFAULT_PRIMARY_DEAL = DEFAULT_PRIMARY_DEAL;
     window.FLYER_DEFAULTS = FLYER_DEFAULTS;
     window.calculateScaledTiers = calculateScaledTiers;
     window.zakirDB = zakirDB;

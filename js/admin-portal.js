@@ -1,6 +1,8 @@
 /**
- * Zakir Travel & Tours - Mobile-First Admin Portal Controller
- * Works natively on both file:// (direct browser open) and http/https servers!
+ * Zakir Travel & Tours - Next-Gen Animated Mobile-First Admin Portal Controller
+ * Full CRUD for Special Flyer Deals (special_deals), Umrah Packages (umrah_packages),
+ * Country Visas (visa_services), Calculator Rates, Media, and Contacts/WhatsApp Routing.
+ * Works natively on both file:// and http/https servers!
  */
 (function (window) {
     "use strict";
@@ -15,19 +17,75 @@
         return String(str || "").replace(/[^0-9]/g, "");
     }
 
+    // Inject sleek animations and modern glassmorphic styles
+    function ensureAdminAnimationsStyle() {
+        if (document.getElementById("zakir-admin-animations-css")) return;
+        const style = document.createElement("style");
+        style.id = "zakir-admin-animations-css";
+        style.textContent = `
+            @keyframes zakirFadeInUp {
+                from { opacity: 0; transform: translateY(14px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes zakirScaleIn {
+                from { opacity: 0; transform: scale(0.95); }
+                to { opacity: 1; transform: scale(1); }
+            }
+            @keyframes zakirFloatBadge {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-5px); }
+            }
+            @keyframes zakirPulseGlow {
+                0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45); }
+                50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            }
+            @keyframes zakirShimmerBg {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+            .anim-fade-up {
+                animation: zakirFadeInUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+            .anim-scale-in {
+                animation: zakirScaleIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+            .anim-float {
+                animation: zakirFloatBadge 3.4s ease-in-out infinite;
+            }
+            .anim-pulse-emerald {
+                animation: zakirPulseGlow 2.2s infinite;
+            }
+            .admin-gradient-animated {
+                background: linear-gradient(125deg, #071E3E, #0B2D5B, #0D8A9E, #0B2D5B);
+                background-size: 260% 260%;
+                animation: zakirShimmerBg 10s ease infinite;
+            }
+            .admin-card-hover {
+                transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+            }
+            .admin-card-hover:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 16px 35px -10px rgba(11, 45, 91, 0.14);
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
     class AdminPortalManager {
         constructor(containerEl, options = {}) {
+            ensureAdminAnimationsStyle();
             this.container = containerEl;
             this.isDrawer = Boolean(options.isDrawer);
             this.onCloseDrawer = options.onCloseDrawer || function () {};
 
-            this.activeTab = "spotlight";
-            this.activeCrudSubtab = "packages";
-            // Track whether activeBookingWhatsApp is routed to "manager" or "secondary"
+            this.activeTab = "spotlight"; // "spotlight" | "crud" | "media" | "contacts"
+            this.activeCrudSubtab = "packages"; // "packages" | "visas"
             this.selectedRoutingRole = "manager";
 
             const db = window.zakirDB;
             this.siteConfig = db.getLocalSiteConfig();
+            this.specialDeals = db.getLocalSpecialDeals();
             this.packages = db.getLocalUmrahPackages();
             this.visas = db.getLocalVisaServices();
             this.currentUser = db.getCurrentUser();
@@ -65,14 +123,22 @@
                 this._updateLivePreviewBadges();
             });
 
+            db.onSpecialDealsSnapshot((deals) => {
+                this.specialDeals = deals;
+                this._renderSpecialDealsList();
+                this._updateTabCounters();
+            });
+
             db.onUmrahPackagesSnapshot((pkgs) => {
                 this.packages = pkgs;
                 this._renderPackagesList();
+                this._updateTabCounters();
             });
 
             db.onVisaServicesSnapshot((visas) => {
                 this.visas = visas;
                 this._renderVisasList();
+                this._updateTabCounters();
             });
         }
 
@@ -94,7 +160,7 @@
                     ? "fa-triangle-exclamation"
                     : "fa-circle-check";
 
-            toast.className = `${bgClass} text-white px-4 py-3 rounded-2xl shadow-2xl border flex items-center gap-3 text-sm font-bold transform transition-all duration-300 translate-y-2 opacity-0`;
+            toast.className = `${bgClass} text-white px-4 py-3.5 rounded-2xl shadow-2xl border flex items-center gap-3 text-sm font-bold transform transition-all duration-300 translate-y-2 opacity-0`;
             toast.innerHTML = `
                 <i class="fa-solid ${iconClass} text-lg"></i>
                 <span>${message}</span>
@@ -114,26 +180,26 @@
         renderShell() {
             this.container.innerHTML = `
                 <!-- Toast Notification Container -->
-                <div id="adminToastContainer" class="fixed bottom-5 right-5 z-[90] flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+                <div id="adminToastContainer" class="fixed bottom-5 right-5 z-[95] flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
 
                 <!-- ============================================================== -->
                 <!-- 1. AUTHENTICATION LOGIN SCREEN                                 -->
                 <!-- ============================================================== -->
-                <div id="adminAuthView" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#071E3E] via-[#0B2D5B] to-[#0D8A9E]">
-                    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-white/20">
+                <div id="adminAuthView" class="min-h-screen flex items-center justify-center p-4 admin-gradient-animated">
+                    <div class="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-white/30 anim-scale-in">
                         <div class="flex items-center justify-between mb-6">
                             <div class="flex items-center gap-3">
-                                <div class="w-11 h-11 rounded-2xl bg-[#0B2D5B] text-white flex items-center justify-center font-black text-xl shadow">
+                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#0B2D5B] to-[#0D8A9E] text-white flex items-center justify-center font-black text-2xl shadow-lg">
                                     Z
                                 </div>
                                 <div>
-                                    <span class="text-[11px] font-bold uppercase tracking-widest text-[#0D8A9E] block">Staff Control Center</span>
+                                    <span class="text-[10px] font-extrabold uppercase tracking-widest text-[#0D8A9E] block">Cloud Control Center</span>
                                     <h1 class="text-xl font-black text-[#0B2D5B]">Zakir Travel Admin</h1>
                                 </div>
                             </div>
                             ${
                                 this.isDrawer
-                                    ? `<button type="button" data-action="close-drawer" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center" title="Back to Website">
+                                    ? `<button type="button" data-action="close-drawer" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-transform hover:rotate-90" title="Back to Website">
                                         <i class="fa-solid fa-xmark"></i>
                                        </button>`
                                     : `<a href="zakir_travel_tours_homepage.html" class="text-xs font-bold text-[#0D8A9E] hover:underline flex items-center gap-1">
@@ -142,20 +208,20 @@
                             }
                         </div>
 
-                        <div class="bg-[#E6F6F8] border border-[#0D8A9E]/30 rounded-2xl p-3.5 mb-5 text-xs text-[#0B2D5B]">
+                        <div class="bg-gradient-to-r from-[#E6F6F8] to-sky-50 border border-[#0D8A9E]/30 rounded-2xl p-4 mb-5 text-xs text-[#0B2D5B]">
                             <div class="font-extrabold flex items-center gap-1.5 mb-1">
-                                <i class="fa-solid fa-bolt text-[#0D8A9E]"></i>
-                                <span>Mobile 10-Second Quick Portal</span>
+                                <i class="fa-solid fa-bolt text-amber-500"></i>
+                                <span>10-Second Mobile Quick Portal</span>
                             </div>
                             <p class="text-slate-600 leading-relaxed">
-                                Sign in as <strong>Inam Khan</strong> or <strong>Sadiq Ullah</strong> to update Umrah prices, dates, packages, visas, and WhatsApp routing live.
+                                Tap a staff profile below or enter your credentials to manage Special Flyer Deals, Umrah Packages, Visas, and WhatsApp lead routing.
                             </p>
-                            <div class="flex flex-wrap gap-2 mt-2.5">
-                                <button type="button" data-action="quick-fill-login" data-email="inam@zakirtravels.com" data-pass="Zakir2026!" class="bg-white hover:bg-[#0B2D5B] hover:text-white text-[#0B2D5B] border border-[#0B2D5B]/20 font-bold px-2.5 py-1 rounded-lg text-[11px] transition-colors">
-                                    <i class="fa-solid fa-user-tie mr-1"></i>Fill Inam Khan
+                            <div class="grid grid-cols-2 gap-2 mt-3">
+                                <button type="button" data-action="quick-fill-login" data-email="inam@zakirtravels.com" data-pass="Zakir2026!" class="bg-white hover:bg-[#0B2D5B] hover:text-white text-[#0B2D5B] border border-[#0B2D5B]/20 font-bold py-2 px-3 rounded-xl text-[11px] transition-all flex items-center justify-center gap-1.5 shadow-sm">
+                                    <i class="fa-solid fa-user-tie"></i> Inam Khan
                                 </button>
-                                <button type="button" data-action="quick-fill-login" data-email="sadiq@zakirtravels.com" data-pass="Zakir2026!" class="bg-white hover:bg-[#0D8A9E] hover:text-white text-[#0D8A9E] border border-[#0D8A9E]/20 font-bold px-2.5 py-1 rounded-lg text-[11px] transition-colors">
-                                    <i class="fa-solid fa-user-check mr-1"></i>Fill Sadiq Ullah
+                                <button type="button" data-action="quick-fill-login" data-email="sadiq@zakirtravels.com" data-pass="Zakir2026!" class="bg-white hover:bg-[#0D8A9E] hover:text-white text-[#0D8A9E] border border-[#0D8A9E]/20 font-bold py-2 px-3 rounded-xl text-[11px] transition-all flex items-center justify-center gap-1.5 shadow-sm">
+                                    <i class="fa-solid fa-user-check"></i> Sadiq Ullah
                                 </button>
                             </div>
                         </div>
@@ -163,16 +229,16 @@
                         <form id="adminLoginForm" class="space-y-4">
                             <div>
                                 <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Staff Email Address</label>
-                                <input type="email" id="adminLoginEmail" required value="inam@zakirtravels.com" placeholder="inam@zakirtravels.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#0D8A9E]">
+                                <input type="email" id="adminLoginEmail" required value="inam@zakirtravels.com" placeholder="inam@zakirtravels.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#0D8A9E] focus:ring-2 focus:ring-[#0D8A9E]/20 transition-all">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Password</label>
-                                <input type="password" id="adminLoginPassword" required value="Zakir2026!" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#0D8A9E]">
+                                <input type="password" id="adminLoginPassword" required value="Zakir2026!" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#0D8A9E] focus:ring-2 focus:ring-[#0D8A9E]/20 transition-all">
                             </div>
                             <div id="adminLoginError" class="hidden text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl p-3"></div>
-                            <button type="submit" class="w-full bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-extrabold py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                            <button type="submit" class="w-full bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-extrabold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-unlock-keyhole"></i>
-                                <span>Unlock Admin Portal</span>
+                                <span>Unlock Admin Dashboard</span>
                             </button>
                         </form>
                     </div>
@@ -181,55 +247,55 @@
                 <!-- ============================================================== -->
                 <!-- 2. AUTHENTICATED MOBILE-FIRST ADMIN DASHBOARD                  -->
                 <!-- ============================================================== -->
-                <div id="adminDashboardView" class="hidden min-h-screen bg-slate-100 pb-24">
+                <div id="adminDashboardView" class="hidden min-h-screen bg-slate-100/90 pb-24">
                     
-                    <!-- Sticky Top Admin Bar with Save & Push Button, Live Preview Badge & Lock Button -->
-                    <header class="sticky top-0 z-40 bg-[#0B2D5B] text-white shadow-lg border-b border-white/10">
-                        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+                    <!-- Sticky Glassmorphic Top Admin Header -->
+                    <header class="sticky top-0 z-40 bg-[#071E3E]/95 backdrop-blur-md text-white shadow-xl border-b border-white/10">
+                        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-[#0D8A9E] flex items-center justify-center font-black text-lg shadow">
+                                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#0D8A9E] to-[#15B2CB] flex items-center justify-center font-black text-xl shadow-lg">
                                     Z
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <h1 class="font-black text-base sm:text-lg leading-none">Zakir Admin Portal</h1>
-                                        <span id="dbModeBadge" class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-                                            Live Sync
+                                        <h1 class="font-black text-base sm:text-lg tracking-tight leading-none">Zakir Control Center</h1>
+                                        <span id="dbModeBadge" class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-1">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Live Sync
                                         </span>
                                     </div>
-                                    <p id="adminActiveUserLabel" class="text-[11px] text-slate-300 mt-0.5">Logged in as Inam Khan</p>
+                                    <p id="adminActiveUserLabel" class="text-[11px] text-slate-300 mt-0.5">Signed in as Inam Khan</p>
                                 </div>
                             </div>
 
-                            <!-- Live Price Preview Pill & Header Action Buttons -->
+                            <!-- Live Price Badge & Action Buttons -->
                             <div class="flex flex-wrap items-center gap-2 sm:gap-2.5 ml-auto">
-                                <div class="hidden md:flex bg-white/10 border border-white/15 rounded-xl px-3 py-1.5 items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                                <div class="hidden md:flex bg-white/10 border border-white/15 rounded-xl px-3.5 py-1.5 items-center gap-2.5">
+                                    <i class="fa-solid fa-tag text-[#15B2CB]"></i>
                                     <div class="text-left">
-                                        <span class="text-[9px] uppercase tracking-wider text-sky-200 block leading-none">Live Featured Price</span>
+                                        <span class="text-[9px] uppercase tracking-wider text-sky-200 block leading-none">Primary Flyer Deal</span>
                                         <span id="livePreviewPriceBadge" class="text-xs sm:text-sm font-black text-white">PKR 232,000</span>
                                     </div>
                                 </div>
 
-                                <!-- NEW: Save & Push to Website Button in Header -->
-                                <button type="button" id="headerSavePushBtn" data-action="save-push-all" class="bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-1.5 shadow-lg transition-all ring-2 ring-emerald-300/40">
-                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <!-- Save & Push to Website Button -->
+                                <button type="button" id="headerSavePushBtn" data-action="save-push-all" class="anim-pulse-emerald bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-lg transition-all active:scale-95">
+                                    <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
                                     <span>Save & Push to Website</span>
                                 </button>
 
                                 ${
                                     this.isDrawer
-                                        ? `<button type="button" data-action="close-drawer" class="bg-[#0D8A9E] hover:bg-[#096979] text-white text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 shadow">
-                                            <i class="fa-solid fa-eye"></i>
+                                        ? `<button type="button" data-action="close-drawer" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition-all">
+                                            <i class="fa-solid fa-eye text-[#15B2CB]"></i>
                                             <span class="hidden sm:inline">View Live Page</span>
                                            </button>`
-                                        : `<a href="zakir_travel_tours_homepage.html" class="bg-[#0D8A9E] hover:bg-[#096979] text-white text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 shadow">
-                                            <i class="fa-solid fa-eye"></i>
+                                        : `<a href="zakir_travel_tours_homepage.html" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition-all">
+                                            <i class="fa-solid fa-eye text-[#15B2CB]"></i>
                                             <span class="hidden sm:inline">Live Website</span>
                                            </a>`
                                 }
 
-                                <button type="button" data-action="logout" class="bg-rose-600/90 hover:bg-rose-600 text-white text-xs font-bold px-3 py-2.5 rounded-xl flex items-center gap-1.5 shadow" title="Lock / Logout">
+                                <button type="button" data-action="logout" class="bg-rose-500/20 hover:bg-rose-600 border border-rose-400/30 text-rose-200 hover:text-white text-xs font-bold px-3 py-2.5 rounded-xl flex items-center gap-1.5 transition-all" title="Lock / Logout">
                                     <i class="fa-solid fa-lock"></i>
                                     <span class="hidden sm:inline">Lock</span>
                                 </button>
@@ -237,28 +303,29 @@
                         </div>
                     </header>
 
-                    <main class="max-w-6xl mx-auto px-4 pt-5 space-y-6">
+                    <main class="max-w-7xl mx-auto px-4 pt-6 space-y-6">
 
                         <!-- ========================================================== -->
                         <!-- TOP "10-SECOND QUICK UPDATE" BAR (MOBILE PRIORITY)         -->
                         <!-- ========================================================== -->
-                        <section class="bg-gradient-to-r from-[#0B2D5B] via-[#16437E] to-[#0D8A9E] rounded-3xl p-5 sm:p-6 text-white shadow-xl border border-white/15 relative overflow-hidden">
+                        <section class="admin-gradient-animated rounded-3xl p-5 sm:p-6 text-white shadow-2xl border border-white/15 relative overflow-hidden anim-fade-up">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-                                <div class="flex items-center gap-2">
-                                    <span class="bg-amber-400 text-[#0B2D5B] text-[10px] font-black uppercase px-2.5 py-1 rounded-full flex items-center gap-1">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="bg-amber-400 text-[#071E3E] text-[10px] font-black uppercase px-3 py-1 rounded-full flex items-center gap-1 shadow">
                                         <i class="fa-solid fa-bolt"></i> 10-Second Quick Update
                                     </span>
-                                    <h2 class="text-base sm:text-lg font-extrabold">Instant Mobile Flyer Rate Updater</h2>
+                                    <h2 class="text-base sm:text-lg font-black tracking-tight">Primary Flyer Deal & Tier Rate Updater</h2>
                                 </div>
-                                <span id="quickUpdateTierHint" class="text-[11px] text-sky-200 font-medium">
-                                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Auto-scales Quad, Triple & Double tiers
+                                <span id="quickUpdateTierHint" class="text-[11px] text-sky-200 font-semibold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+                                    <span>Auto-scales Primary Deal + Calculator Tiers</span>
                                 </span>
                             </div>
 
                             <form id="quickUpdateForm" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
                                 <div class="sm:col-span-4">
                                     <label class="block text-[11px] font-bold uppercase tracking-wider text-sky-200 mb-1">
-                                        Featured Starting Price (PKR)
+                                        Primary Deal Starting Price (PKR)
                                     </label>
                                     <div class="relative">
                                         <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-[#0B2D5B]">PKR</span>
@@ -277,15 +344,15 @@
 
                                 <div class="sm:col-span-2">
                                     <label class="block text-[11px] font-bold uppercase tracking-wider text-sky-200 mb-1">
-                                        Month Label
+                                        Season / Month Label
                                     </label>
                                     <input type="text" id="quickMonthLabel" required placeholder="e.g. Ramzan"
                                         class="w-full bg-white text-[#0B2D5B] font-extrabold text-sm rounded-xl px-3.5 py-3.5 focus:outline-none focus:ring-2 focus:ring-amber-300 shadow-inner">
                                 </div>
 
                                 <div class="sm:col-span-3">
-                                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-black py-3.5 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 text-sm">
-                                        <i class="fa-solid fa-cloud-arrow-up text-base"></i>
+                                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-black py-3.5 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2 text-sm">
+                                        <i class="fa-solid fa-bolt"></i>
                                         <span>Publish Live Now</span>
                                     </button>
                                 </div>
@@ -295,154 +362,73 @@
                         <!-- ========================================================== -->
                         <!-- 4 ORGANIZED MANAGEMENT TABS NAVIGATION                     -->
                         <!-- ========================================================== -->
-                        <nav class="grid grid-cols-2 lg:grid-cols-4 gap-2 bg-white p-2 rounded-2xl shadow-sm border border-slate-200">
-                            <button type="button" data-tab="spotlight" class="admin-tab-btn bg-[#0B2D5B] text-white font-extrabold text-xs sm:text-sm py-3 px-3 rounded-xl flex items-center justify-center gap-2 transition-all">
-                                <i class="fa-solid fa-kaaba text-[#15B2CB]"></i>
-                                <span>1. Spotlight & Calc</span>
+                        <nav class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 bg-white p-2 rounded-2xl shadow-md border border-slate-200/80">
+                            <button type="button" data-tab="spotlight" class="admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#16437E] text-white font-extrabold text-xs sm:text-sm py-3.5 px-3 rounded-xl flex items-center justify-center gap-2 shadow-md transition-all">
+                                <i class="fa-solid fa-fire-flame-curved text-amber-300"></i>
+                                <span>1. Special Flyer Deals</span>
+                                <span id="tabBadgeDeals" class="bg-white/20 text-white text-[10px] font-black px-2 py-0.5 rounded-full">1</span>
                             </button>
-                            <button type="button" data-tab="crud" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3 px-3 rounded-xl flex items-center justify-center gap-2 transition-all">
-                                <i class="fa-solid fa-box-open text-[#0D8A9E]"></i>
+                            <button type="button" data-tab="crud" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3.5 px-3 rounded-xl flex items-center justify-center gap-2 transition-all">
+                                <i class="fa-solid fa-cubes text-[#0D8A9E]"></i>
                                 <span>2. Packages & Visas</span>
+                                <span id="tabBadgePkgsVisas" class="bg-slate-200 text-slate-700 text-[10px] font-black px-2 py-0.5 rounded-full">10</span>
                             </button>
-                            <button type="button" data-tab="media" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3 px-3 rounded-xl flex items-center justify-center gap-2 transition-all">
-                                <i class="fa-solid fa-images text-[#0D8A9E]"></i>
-                                <span>3. Media & Flyer</span>
+                            <button type="button" data-tab="media" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3.5 px-3 rounded-xl flex items-center justify-center gap-2 transition-all">
+                                <i class="fa-solid fa-wand-magic-sparkles text-[#0D8A9E]"></i>
+                                <span>3. Calculator & Media</span>
                             </button>
-                            <button type="button" data-tab="contacts" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3 px-3 rounded-xl flex items-center justify-center gap-2 transition-all">
-                                <i class="fa-brands fa-whatsapp text-emerald-600"></i>
+                            <button type="button" data-tab="contacts" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3.5 px-3 rounded-xl flex items-center justify-center gap-2 transition-all">
+                                <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i>
                                 <span>4. Contacts & Routing</span>
                             </button>
                         </nav>
 
                         <!-- ========================================================== -->
-                        <!-- TAB 1: SPOTLIGHT & CALCULATOR TAB                          -->
+                        <!-- TAB 1: SPECIAL FLYER DEALS (MULTI-DEAL CRUD)               -->
                         <!-- ========================================================== -->
-                        <div id="admin-panel-spotlight" class="admin-tab-panel space-y-6">
-                            <form id="spotlightAndCalcForm" class="grid lg:grid-cols-12 gap-6">
-                                
-                                <!-- Left Card: Featured Umrah Spotlight Editor -->
-                                <div class="lg:col-span-7 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
-                                    <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-                                        <div>
-                                            <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Hero & Flyer Section</span>
-                                            <h3 class="text-lg font-black text-[#0B2D5B]">Featured Umrah Spotlight</h3>
-                                        </div>
-                                        <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">Main Flyer Card</span>
+                        <div id="admin-panel-spotlight" class="admin-tab-panel space-y-6 anim-fade-up">
+                            
+                            <!-- Header Bar for Special Flyer Deals CRUD -->
+                            <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200/90 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-amber-100 text-amber-800 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
+                                            Dynamic Flyer Showcase CRUD
+                                        </span>
+                                        <span class="text-xs font-bold text-[#0D8A9E]">• Live on Homepage</span>
                                     </div>
-
-                                    <div class="grid sm:grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Month / Season Label</label>
-                                            <input type="text" id="spotMonthLabel" required placeholder="January" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Spotlight Heading Title</label>
-                                            <input type="text" id="spotTitle" required placeholder="UMRAH PACKAGE" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Starting Price (PKR)</label>
-                                            <input type="number" id="spotStartingPrice" min="1000" step="500" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-black text-[#0D8A9E] focus:outline-none focus:border-[#0D8A9E]">
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Price Unit Subtitle</label>
-                                            <input type="text" id="spotPriceUnit" required placeholder="PER PERSON (SHARING)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Departure Date</label>
-                                            <input type="text" id="spotDepartureDate" required placeholder="Jan 26, 2026" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Return Date / Schedule</label>
-                                            <input type="text" id="spotReturnDate" required placeholder="Nov 10, 2026" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
-                                        </div>
-                                        <div class="sm:col-span-2">
-                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Package Duration</label>
-                                            <input type="text" id="spotDuration" required placeholder="14 Nights" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
-                                        </div>
-                                    </div>
-
-                                    <!-- Included Services Checkboxes -->
-                                    <div class="pt-2">
-                                        <label class="block text-xs font-bold uppercase text-slate-600 mb-2.5">Included Services Badges (Toggle on Spotlight)</label>
-                                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                            <label class="flex items-center gap-2.5 bg-slate-50 border border-slate-200 rounded-xl p-3 cursor-pointer hover:border-[#0D8A9E]">
-                                                <input type="checkbox" id="srvRoundTrip" class="w-4 h-4 accent-[#0D8A9E] rounded">
-                                                <span class="text-xs font-bold text-[#0B2D5B]">Round Trip</span>
-                                            </label>
-                                            <label class="flex items-center gap-2.5 bg-slate-50 border border-slate-200 rounded-xl p-3 cursor-pointer hover:border-[#0D8A9E]">
-                                                <input type="checkbox" id="srvVisa" class="w-4 h-4 accent-[#0D8A9E] rounded">
-                                                <span class="text-xs font-bold text-[#0B2D5B]">Umrah Visa</span>
-                                            </label>
-                                            <label class="flex items-center gap-2.5 bg-slate-50 border border-slate-200 rounded-xl p-3 cursor-pointer hover:border-[#0D8A9E]">
-                                                <input type="checkbox" id="srvHotel" class="w-4 h-4 accent-[#0D8A9E] rounded">
-                                                <span class="text-xs font-bold text-[#0B2D5B]">Hotel Stay</span>
-                                            </label>
-                                            <label class="flex items-center gap-2.5 bg-slate-50 border border-slate-200 rounded-xl p-3 cursor-pointer hover:border-[#0D8A9E]">
-                                                <input type="checkbox" id="srvTransport" class="w-4 h-4 accent-[#0D8A9E] rounded">
-                                                <span class="text-xs font-bold text-[#0B2D5B]">Transport</span>
-                                            </label>
-                                        </div>
-                                    </div>
+                                    <h3 class="text-xl font-black text-[#0B2D5B] mt-1">Manage Special Flyer Deals & Offers</h3>
+                                    <p class="text-xs text-slate-500 mt-0.5">
+                                        Add multiple large visual Flyer Deals (e.g. January Umrah, Ramzan Special, Rabi-ul-Awal Deal). Each deal renders its own dual-frame showcase card on the homepage!
+                                    </p>
                                 </div>
 
-                                <!-- Right Card: Calculator Tier Pricing & Auto-Scale -->
-                                <div class="lg:col-span-5 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between space-y-5">
-                                    <div class="space-y-4">
-                                        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-                                            <div>
-                                                <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Dynamic Estimator Math</span>
-                                                <h3 class="text-lg font-black text-[#0B2D5B]">Calculator Room Tier Rates</h3>
-                                            </div>
-                                            <i class="fa-solid fa-calculator text-2xl text-[#0D8A9E]"></i>
-                                        </div>
-
-                                        <!-- Auto-scale toggle -->
-                                        <label class="flex items-start gap-3 bg-[#E6F6F8]/70 border border-[#0D8A9E]/30 rounded-2xl p-3.5 cursor-pointer">
-                                            <input type="checkbox" id="calcAutoScaleToggle" class="w-5 h-5 accent-[#0B2D5B] mt-0.5 rounded">
-                                            <div>
-                                                <span class="text-xs font-extrabold text-[#0B2D5B] block">Auto-scale tiers from base price</span>
-                                                <span class="text-[11px] text-slate-600">Automatically calculates Sharing, Quad (+16k), Triple (+36k), and Double (+63k) when Starting Price changes.</span>
-                                            </div>
-                                        </label>
-
-                                        <div class="space-y-3">
-                                            <div>
-                                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Sharing Room Rate (PKR / Person)</label>
-                                                <input type="number" id="rateSharing" min="1000" step="500" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-extrabold text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Quad Room Rate (4 Bed - PKR / Person)</label>
-                                                <input type="number" id="rateQuad" min="1000" step="500" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-extrabold text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Triple Room Rate (3 Bed - PKR / Person)</label>
-                                                <input type="number" id="rateTriple" min="1000" step="500" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-extrabold text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Double / Couple Room Rate (2 Bed - PKR / Person)</label>
-                                                <input type="number" id="rateDouble" min="1000" step="500" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-extrabold text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
-                                        <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
-                                        <span>Save Spotlight & Calculator Rates</span>
+                                <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                                    <button type="button" data-action="quick-add-ramzan-deal" class="bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-extrabold text-xs px-4 py-3 rounded-2xl transition-all flex items-center gap-1.5 shadow-sm">
+                                        <i class="fa-solid fa-moon text-amber-600"></i>
+                                        <span>+ Quick Add Ramzan Deal</span>
+                                    </button>
+                                    <button type="button" data-action="open-deal-modal" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg transition-all active:scale-95 flex items-center gap-2">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <span>Add New Special Deal</span>
                                     </button>
                                 </div>
-                            </form>
+                            </div>
+
+                            <!-- Special Flyer Deals Visual CRUD Grid -->
+                            <div id="crudSpecialDealsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
                         </div>
 
                         <!-- ========================================================== -->
                         <!-- TAB 2: PACKAGES & VISAS (CRUD) TAB                         -->
                         <!-- ========================================================== -->
-                        <div id="admin-panel-crud" class="admin-tab-panel hidden space-y-6">
+                        <div id="admin-panel-crud" class="admin-tab-panel hidden space-y-6 anim-fade-up">
                             
                             <!-- Sub-toggle between Umrah Packages and Visa Services -->
-                            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-sm">
                                 <div class="flex gap-2">
-                                    <button type="button" data-crud-subtab="packages" class="crud-subtab-btn bg-[#0B2D5B] text-white font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all">
-                                        <i class="fa-solid fa-kaaba mr-1.5"></i>Umrah Packages
+                                    <button type="button" data-crud-subtab="packages" class="crud-subtab-btn bg-[#0B2D5B] text-white font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow transition-all">
+                                        <i class="fa-solid fa-kaaba mr-1.5"></i>Comparison Umrah Packages
                                     </button>
                                     <button type="button" data-crud-subtab="visas" class="crud-subtab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all">
                                         <i class="fa-solid fa-passport mr-1.5"></i>Country Visa Cards
@@ -450,107 +436,159 @@
                                 </div>
 
                                 <div class="flex gap-2">
-                                    <button type="button" data-action="open-pkg-modal" class="bg-[#0D8A9E] hover:bg-[#096979] text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow flex items-center gap-1.5">
-                                        <i class="fa-solid fa-plus"></i> Add Umrah Package
+                                    <button type="button" data-action="open-pkg-modal" class="bg-[#0D8A9E] hover:bg-[#096979] text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow flex items-center gap-1.5 transition-all">
+                                        <i class="fa-solid fa-plus"></i> Add Package Card
                                     </button>
-                                    <button type="button" data-action="open-visa-modal" class="bg-[#0B2D5B] hover:bg-[#16437E] text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow flex items-center gap-1.5">
+                                    <button type="button" data-action="open-visa-modal" class="bg-[#0B2D5B] hover:bg-[#16437E] text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow flex items-center gap-1.5 transition-all">
                                         <i class="fa-solid fa-plus"></i> Add Country Visa
                                     </button>
                                 </div>
                             </div>
 
                             <!-- Umrah Packages List -->
-                            <div id="crudPackagesContainer" class="space-y-3"></div>
+                            <div id="crudPackagesContainer" class="grid md:grid-cols-2 gap-4"></div>
 
                             <!-- Country Visas List -->
-                            <div id="crudVisasContainer" class="hidden space-y-3"></div>
+                            <div id="crudVisasContainer" class="hidden grid md:grid-cols-2 gap-4"></div>
                         </div>
 
                         <!-- ========================================================== -->
-                        <!-- TAB 3: MEDIA & FLYER UPLOADER TAB                          -->
+                        <!-- TAB 3: CALCULATOR TIER RATES & MEDIA UPLOADER TAB          -->
                         <!-- ========================================================== -->
-                        <div id="admin-panel-media" class="admin-tab-panel hidden space-y-6">
-                            <form id="mediaForm" class="grid md:grid-cols-3 gap-6">
+                        <div id="admin-panel-media" class="admin-tab-panel hidden space-y-6 anim-fade-up">
+                            <form id="spotlightAndCalcForm" class="grid lg:grid-cols-12 gap-6">
                                 
-                                <!-- 1. Madinah Spotlight Frame -->
-                                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between space-y-4">
-                                    <div class="space-y-3">
-                                        <span class="text-[10px] font-bold uppercase tracking-wider text-[#0D8A9E] bg-[#E6F6F8] px-2.5 py-1 rounded-full">Left Frame</span>
-                                        <h3 class="text-base font-black text-[#0B2D5B]">Madinah Munawwarah Image</h3>
-                                        <div class="h-44 rounded-2xl overflow-hidden border-2 border-[#0D8A9E] bg-slate-100 relative">
-                                            <img id="previewMadinahImg" src="" alt="Madinah Preview" class="w-full h-full object-cover">
-                                        </div>
-                                        <div>
-                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Paste Image URL</label>
-                                            <input type="text" id="inputMadinahUrl" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-[#0D8A9E]">
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="w-full bg-slate-100 hover:bg-slate-200 text-[#0B2D5B] font-bold text-xs py-2.5 px-3 rounded-xl cursor-pointer flex items-center justify-center gap-2 transition-colors">
-                                            <i class="fa-solid fa-camera"></i>
-                                            <span>Upload from Phone / PC</span>
-                                            <input type="file" accept="image/*" data-upload-target="inputMadinahUrl" data-preview-target="previewMadinahImg" class="hidden">
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- 2. Makkah Spotlight Frame -->
-                                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between space-y-4">
-                                    <div class="space-y-3">
-                                        <span class="text-[10px] font-bold uppercase tracking-wider text-[#0B2D5B] bg-slate-100 px-2.5 py-1 rounded-full">Right Frame</span>
-                                        <h3 class="text-base font-black text-[#0B2D5B]">Makkah Mukarramah Image</h3>
-                                        <div class="h-44 rounded-2xl overflow-hidden border-2 border-[#0B2D5B] bg-slate-100 relative">
-                                            <img id="previewMakkahImg" src="" alt="Makkah Preview" class="w-full h-full object-cover">
-                                        </div>
-                                        <div>
-                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Paste Image URL</label>
-                                            <input type="text" id="inputMakkahUrl" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-[#0D8A9E]">
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="w-full bg-slate-100 hover:bg-slate-200 text-[#0B2D5B] font-bold text-xs py-2.5 px-3 rounded-xl cursor-pointer flex items-center justify-center gap-2 transition-colors">
-                                            <i class="fa-solid fa-camera"></i>
-                                            <span>Upload from Phone / PC</span>
-                                            <input type="file" accept="image/*" data-upload-target="inputMakkahUrl" data-preview-target="previewMakkahImg" class="hidden">
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- 3. Promotional Monthly WhatsApp Flyer -->
-                                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between space-y-4">
-                                    <div class="space-y-3">
-                                        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">Monthly Flyer Popup</span>
-                                        <h3 class="text-base font-black text-[#0B2D5B]">Promotional Flyer Image</h3>
-                                        <div class="h-44 rounded-2xl overflow-hidden border-2 border-dashed border-[#0D8A9E] bg-slate-50 flex items-center justify-center relative">
-                                            <img id="previewFlyerImg" src="" alt="Flyer Preview" class="w-full h-full object-cover hidden">
-                                            <div id="previewFlyerPlaceholder" class="text-center p-4 text-xs text-slate-500">
-                                                <i class="fa-solid fa-file-image text-2xl text-[#0D8A9E] mb-1 block"></i>
-                                                Auto-generated live digital flyer active (or upload custom flyer image)
+                                <!-- Left Column: Calculator Tier Pricing & Auto-Scale -->
+                                <div class="lg:col-span-5 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between space-y-5">
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                                            <div>
+                                                <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Interactive Estimator Math</span>
+                                                <h3 class="text-lg font-black text-[#0B2D5B]">Calculator Room Tier Rates</h3>
+                                            </div>
+                                            <div class="w-10 h-10 rounded-2xl bg-[#E6F6F8] text-[#0D8A9E] flex items-center justify-center text-lg">
+                                                <i class="fa-solid fa-calculator"></i>
                                             </div>
                                         </div>
-                                        <div>
-                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Custom Flyer Image URL (Optional)</label>
-                                            <input type="text" id="inputFlyerUrl" placeholder="Leave blank for live digital flyer" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-[#0D8A9E]">
+
+                                        <!-- Auto-scale toggle -->
+                                        <label class="flex items-start gap-3 bg-[#E6F6F8]/70 border border-[#0D8A9E]/30 rounded-2xl p-3.5 cursor-pointer">
+                                            <input type="checkbox" id="calcAutoScaleToggle" class="w-5 h-5 accent-[#0B2D5B] mt-0.5 rounded">
+                                            <div>
+                                                <span class="text-xs font-extrabold text-[#0B2D5B] block">Auto-scale tiers from Primary Deal price</span>
+                                                <span class="text-[11px] text-slate-600">Automatically scales Sharing, Quad (+16k), Triple (+36k), and Double (+63k) when the Primary Deal price changes.</span>
+                                            </div>
+                                        </label>
+
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Sharing Room (PKR)</label>
+                                                <input type="number" id="rateSharing" min="1000" step="500" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-black text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Quad Room - 4 Bed (PKR)</label>
+                                                <input type="number" id="rateQuad" min="1000" step="500" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-black text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Triple Room - 3 Bed (PKR)</label>
+                                                <input type="number" id="rateTriple" min="1000" step="500" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-black text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Double Room - 2 Bed (PKR)</label>
+                                                <input type="number" id="rateDouble" min="1000" step="500" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-black text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
+                                            </div>
                                         </div>
-                                        <label class="flex items-center gap-2 pt-1 cursor-pointer">
-                                            <input type="checkbox" id="chkShowFlyerButton" class="w-4 h-4 accent-[#0D8A9E] rounded">
-                                            <span class="text-xs font-bold text-[#0B2D5B]">Show "View Latest Flyer" modal button on homepage</span>
-                                        </label>
+
+                                        <!-- Hidden synced primary deal inputs for unified save -->
+                                        <input type="hidden" id="spotMonthLabel">
+                                        <input type="hidden" id="spotTitle">
+                                        <input type="hidden" id="spotStartingPrice">
+                                        <input type="hidden" id="spotPriceUnit">
+                                        <input type="hidden" id="spotDepartureDate">
+                                        <input type="hidden" id="spotReturnDate">
+                                        <input type="hidden" id="spotDuration">
+                                        <input type="checkbox" id="srvRoundTrip" class="hidden" checked>
+                                        <input type="checkbox" id="srvVisa" class="hidden" checked>
+                                        <input type="checkbox" id="srvHotel" class="hidden" checked>
+                                        <input type="checkbox" id="srvTransport" class="hidden" checked>
                                     </div>
-                                    <div class="space-y-2">
-                                        <label class="w-full bg-slate-100 hover:bg-slate-200 text-[#0B2D5B] font-bold text-xs py-2.5 px-3 rounded-xl cursor-pointer flex items-center justify-center gap-2 transition-colors">
-                                            <i class="fa-solid fa-upload"></i>
-                                            <span>Upload Monthly Flyer</span>
-                                            <input type="file" accept="image/*" data-upload-target="inputFlyerUrl" data-preview-target="previewFlyerImg" class="hidden">
-                                        </label>
-                                    </div>
+
+                                    <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+                                        <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
+                                        <span>Save Calculator Tier Rates</span>
+                                    </button>
                                 </div>
 
-                                <div class="md:col-span-3 flex justify-end">
-                                    <button type="submit" class="w-full sm:w-auto bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold px-8 py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
-                                        <i class="fa-solid fa-cloud-arrow-up text-[#15B2CB]"></i>
-                                        <span>Save & Publish Media Changes</span>
-                                    </button>
+                                <!-- Right Column: Primary Deal Media & Flyer Uploader -->
+                                <div class="lg:col-span-7 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
+                                    <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                                        <div>
+                                            <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Default Spotlight Frames & Flyer</span>
+                                            <h3 class="text-lg font-black text-[#0B2D5B]">Primary Deal Images & Monthly Flyer</h3>
+                                        </div>
+                                        <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">Phone Upload Ready</span>
+                                    </div>
+
+                                    <div class="grid sm:grid-cols-3 gap-4">
+                                        <!-- Madinah -->
+                                        <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200 flex flex-col justify-between space-y-3">
+                                            <div>
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Madinah Frame</span>
+                                                <div class="h-32 rounded-xl overflow-hidden border border-[#0D8A9E] bg-slate-200 mt-1.5">
+                                                    <img id="previewMadinahImg" src="" alt="Madinah" class="w-full h-full object-cover">
+                                                </div>
+                                                <input type="text" id="inputMadinahUrl" placeholder="Image URL..." class="mt-2 w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px]">
+                                            </div>
+                                            <label class="w-full bg-white hover:bg-[#0B2D5B] hover:text-white text-[#0B2D5B] border border-slate-200 font-bold text-[11px] py-2 px-2.5 rounded-xl cursor-pointer flex items-center justify-center gap-1.5 transition-colors">
+                                                <i class="fa-solid fa-camera"></i> Upload Photo
+                                                <input type="file" accept="image/*" data-upload-target="inputMadinahUrl" data-preview-target="previewMadinahImg" class="hidden">
+                                            </label>
+                                        </div>
+
+                                        <!-- Makkah -->
+                                        <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200 flex flex-col justify-between space-y-3">
+                                            <div>
+                                                <span class="text-[10px] font-bold uppercase text-[#0B2D5B]">Makkah Frame</span>
+                                                <div class="h-32 rounded-xl overflow-hidden border border-[#0B2D5B] bg-slate-200 mt-1.5">
+                                                    <img id="previewMakkahImg" src="" alt="Makkah" class="w-full h-full object-cover">
+                                                </div>
+                                                <input type="text" id="inputMakkahUrl" placeholder="Image URL..." class="mt-2 w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px]">
+                                            </div>
+                                            <label class="w-full bg-white hover:bg-[#0B2D5B] hover:text-white text-[#0B2D5B] border border-slate-200 font-bold text-[11px] py-2 px-2.5 rounded-xl cursor-pointer flex items-center justify-center gap-1.5 transition-colors">
+                                                <i class="fa-solid fa-camera"></i> Upload Photo
+                                                <input type="file" accept="image/*" data-upload-target="inputMakkahUrl" data-preview-target="previewMakkahImg" class="hidden">
+                                            </label>
+                                        </div>
+
+                                        <!-- Promotional Flyer -->
+                                        <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200 flex flex-col justify-between space-y-3">
+                                            <div>
+                                                <span class="text-[10px] font-bold uppercase text-emerald-700">Monthly Flyer Popup</span>
+                                                <div class="h-32 rounded-xl overflow-hidden border border-dashed border-[#0D8A9E] bg-white mt-1.5 flex items-center justify-center">
+                                                    <img id="previewFlyerImg" src="" alt="Flyer" class="w-full h-full object-cover hidden">
+                                                    <div id="previewFlyerPlaceholder" class="text-center p-2 text-[10px] text-slate-400">
+                                                        <i class="fa-solid fa-file-image text-xl text-[#0D8A9E] block mb-1"></i>
+                                                        Live Digital Flyer Active
+                                                    </div>
+                                                </div>
+                                                <input type="text" id="inputFlyerUrl" placeholder="Custom Flyer URL (Optional)" class="mt-2 w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px]">
+                                            </div>
+                                            <label class="w-full bg-white hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 font-bold text-[11px] py-2 px-2.5 rounded-xl cursor-pointer flex items-center justify-center gap-1.5 transition-colors">
+                                                <i class="fa-solid fa-upload"></i> Upload Flyer
+                                                <input type="file" accept="image/*" data-upload-target="inputFlyerUrl" data-preview-target="previewFlyerImg" class="hidden">
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" id="chkShowFlyerButton" class="w-4 h-4 accent-[#0D8A9E] rounded">
+                                            <span class="text-xs font-bold text-[#0B2D5B]">Show "View Latest Flyer" button on Deal Cards</span>
+                                        </label>
+                                        <button type="submit" class="bg-[#0D8A9E] hover:bg-[#096979] text-white font-extrabold px-6 py-3 rounded-xl shadow text-xs flex items-center gap-2">
+                                            <i class="fa-solid fa-cloud-arrow-up"></i> Save Media & Rates
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -558,7 +596,7 @@
                         <!-- ========================================================== -->
                         <!-- TAB 4: CONTACTS & WHATSAPP ROUTING TAB                     -->
                         <!-- ========================================================== -->
-                        <div id="admin-panel-contacts" class="admin-tab-panel hidden space-y-6">
+                        <div id="admin-panel-contacts" class="admin-tab-panel hidden space-y-6 anim-fade-up">
                             <form id="contactsForm" class="grid lg:grid-cols-12 gap-6">
                                 
                                 <!-- Left Column: Active WhatsApp Lead Routing + Staff Numbers -->
@@ -566,7 +604,7 @@
                                     <div class="border-b border-slate-100 pb-4">
                                         <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600">Instant Lead Distribution</span>
                                         <h3 class="text-lg font-black text-[#0B2D5B]">Active WhatsApp Booking Routing</h3>
-                                        <p class="text-xs text-slate-500 mt-0.5">Choose which staff member receives automated inquiries from the Hero Widget, Umrah Calculator, and Visa/Package CTA buttons.</p>
+                                        <p class="text-xs text-slate-500 mt-0.5">Choose which staff member receives automated inquiries from the Hero Widget, Special Deal Cards, Umrah Calculator, and Visa CTA buttons.</p>
                                     </div>
 
                                     <div>
@@ -579,8 +617,9 @@
 
                                     <!-- Primary Contact: Inam Khan -->
                                     <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-3">
-                                        <div class="text-xs font-black uppercase text-[#0B2D5B] flex items-center gap-1.5">
-                                            <i class="fa-solid fa-user-tie text-[#0D8A9E]"></i> Primary Contact (Manager)
+                                        <div class="text-xs font-black uppercase text-[#0B2D5B] flex items-center justify-between">
+                                            <span><i class="fa-solid fa-user-tie text-[#0D8A9E] mr-1.5"></i>Primary Contact (Manager)</span>
+                                            <span id="badgeRoutingManager" class="hidden bg-emerald-500 text-white text-[10px] px-2.5 py-0.5 rounded-full">Active Lead Receiver</span>
                                         </div>
                                         <div class="grid sm:grid-cols-3 gap-3">
                                             <div>
@@ -600,8 +639,9 @@
 
                                     <!-- Secondary Contact: Sadiq Ullah -->
                                     <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-3">
-                                        <div class="text-xs font-black uppercase text-[#0B2D5B] flex items-center gap-1.5">
-                                            <i class="fa-solid fa-headset text-[#0D8A9E]"></i> Secondary Contact (Consultant)
+                                        <div class="text-xs font-black uppercase text-[#0B2D5B] flex items-center justify-between">
+                                            <span><i class="fa-solid fa-headset text-[#0D8A9E] mr-1.5"></i>Secondary Contact (Consultant)</span>
+                                            <span id="badgeRoutingSecondary" class="hidden bg-emerald-500 text-white text-[10px] px-2.5 py-0.5 rounded-full">Active Lead Receiver</span>
                                         </div>
                                         <div class="grid sm:grid-cols-3 gap-3">
                                             <div>
@@ -644,7 +684,7 @@
                                         </div>
                                         <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
                                             <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
-                                            <span>Save Contacts & Routing</span>
+                                            <span>Save Contacts & Push to Website</span>
                                         </button>
                                     </div>
 
@@ -658,12 +698,12 @@
                                             <i class="fa-solid fa-shield-halved text-xl text-rose-500"></i>
                                         </div>
                                         <p class="text-xs text-slate-500">
-                                            Made a mistake while editing? Restore all prices, dates, packages, visas, and contacts back to the original <strong>January Flyer Defaults (PKR 232,000)</strong>.
+                                            Restore all Special Deals, prices, dates, packages, visas, and contacts back to the original <strong>January Flyer Defaults (PKR 232,000)</strong>.
                                         </p>
                                         <div class="flex flex-col sm:flex-row gap-2.5">
                                             <button type="button" data-action="reset-flyer-defaults" class="flex-1 bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 font-extrabold py-3 px-4 rounded-xl text-xs transition-all flex items-center justify-center gap-2">
                                                 <i class="fa-solid fa-rotate-left"></i>
-                                                <span>Reset to Original January Flyer Defaults</span>
+                                                <span>Reset to January Flyer Defaults</span>
                                             </button>
                                             <button type="button" data-action="open-firebase-modal" class="bg-slate-100 hover:bg-slate-200 text-[#0B2D5B] font-bold py-3 px-4 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5">
                                                 <i class="fa-solid fa-database text-[#0D8A9E]"></i>
@@ -679,10 +719,140 @@
                 </div>
 
                 <!-- ============================================================== -->
+                <!-- MODAL: ADD / EDIT SPECIAL FLYER DEAL (FULL CRUD)               -->
+                <!-- ============================================================== -->
+                <div id="dealCrudModal" class="fixed inset-0 z-[85] hidden bg-[#071E3E]/80 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl max-h-[92vh] overflow-y-auto anim-scale-in">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
+                            <div>
+                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#0D8A9E]">Flyer Showcase Offer</span>
+                                <h3 id="dealModalTitle" class="text-xl font-black text-[#0B2D5B]">Add / Edit Special Flyer Deal</h3>
+                            </div>
+                            <button type="button" data-action="close-deal-modal" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+
+                        <form id="dealCrudForm" class="space-y-4">
+                            <input type="hidden" id="dealEditId">
+                            <div class="grid sm:grid-cols-3 gap-3.5">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Month / Season Script</label>
+                                    <input type="text" id="dealEditMonth" required placeholder="e.g. Ramzan Special" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0D8A9E]">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Main Deal Heading</label>
+                                    <input type="text" id="dealEditTitle" required placeholder="e.g. UMRAH PACKAGE" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-black text-[#0B2D5B]">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Starting Price (PKR)</label>
+                                    <input type="number" id="dealEditPrice" min="1000" step="500" required placeholder="232000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-black text-emerald-700">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Price Unit Label</label>
+                                    <input type="text" id="dealEditUnit" required placeholder="PER PERSON (SHARING)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Shield Badge Tag</label>
+                                    <input type="text" id="dealEditBadgeTag" required placeholder="All-Inclusive Deal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Departure Date</label>
+                                    <input type="text" id="dealEditDep" required placeholder="Jan 26, 2026" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B]">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Return / Schedule</label>
+                                    <input type="text" id="dealEditRet" required placeholder="Nov 10, 2026" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B]">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Duration</label>
+                                    <input type="text" id="dealEditDuration" required placeholder="14 Nights" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B]">
+                                </div>
+                            </div>
+
+                            <!-- Left & Right Frame Customization -->
+                            <div class="grid sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                                <div class="space-y-2">
+                                    <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Left Frame (Madinah / Destination 1)</span>
+                                    <input type="text" id="dealEditLeftTitle" required placeholder="Madinah Munawwarah" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                    <input type="text" id="dealEditLeftBadge" required placeholder="Ziyarat & Stay" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                    <div class="flex gap-2">
+                                        <input type="text" id="dealEditMadinahUrl" required placeholder="Left Image URL" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                        <label class="bg-[#0D8A9E] hover:bg-[#096979] text-white text-xs font-bold px-3 py-2 rounded-xl cursor-pointer flex items-center gap-1 shrink-0">
+                                            <i class="fa-solid fa-upload"></i>
+                                            <input type="file" accept="image/*" data-deal-upload="dealEditMadinahUrl" class="hidden">
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-2">
+                                    <span class="text-[10px] font-black uppercase text-[#0B2D5B]">Right Frame (Makkah / Destination 2)</span>
+                                    <input type="text" id="dealEditRightTitle" required placeholder="Makkah Mukarramah" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                    <input type="text" id="dealEditRightBadge" required placeholder="Haram View Options" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                    <div class="flex gap-2">
+                                        <input type="text" id="dealEditMakkahUrl" required placeholder="Right Image URL" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                        <label class="bg-[#0B2D5B] hover:bg-[#16437E] text-white text-xs font-bold px-3 py-2 rounded-xl cursor-pointer flex items-center gap-1 shrink-0">
+                                            <i class="fa-solid fa-upload"></i>
+                                            <input type="file" accept="image/*" data-deal-upload="dealEditMakkahUrl" class="hidden">
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Included Services Checkboxes -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-2">Included Services on Deal Card</label>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                                    <label class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl p-2.5 cursor-pointer">
+                                        <input type="checkbox" id="dealSrvRoundTrip" checked class="w-4 h-4 accent-[#0D8A9E]">
+                                        <span class="text-xs font-bold text-[#0B2D5B]">Round Trip</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl p-2.5 cursor-pointer">
+                                        <input type="checkbox" id="dealSrvVisa" checked class="w-4 h-4 accent-[#0D8A9E]">
+                                        <span class="text-xs font-bold text-[#0B2D5B]">Umrah Visa</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl p-2.5 cursor-pointer">
+                                        <input type="checkbox" id="dealSrvHotel" checked class="w-4 h-4 accent-[#0D8A9E]">
+                                        <span class="text-xs font-bold text-[#0B2D5B]">Hotel Stay</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl p-2.5 cursor-pointer">
+                                        <input type="checkbox" id="dealSrvTransport" checked class="w-4 h-4 accent-[#0D8A9E]">
+                                        <span class="text-xs font-bold text-[#0B2D5B]">Transport</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-6 pt-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="dealEditActive" checked class="w-4 h-4 accent-[#0D8A9E]">
+                                    <span class="text-xs font-bold text-[#0B2D5B]">Active (Show on Website)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="dealEditPrimary" class="w-4 h-4 accent-amber-500">
+                                    <span class="text-xs font-bold text-[#0B2D5B]">Set as Primary Deal (Syncs with 10s Quick Bar & Calculator)</span>
+                                </label>
+                            </div>
+
+                            <div class="flex gap-3 pt-2">
+                                <button type="button" data-action="close-deal-modal" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 px-6 rounded-xl text-xs">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="flex-1 bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black py-3.5 px-6 rounded-xl shadow-lg text-sm flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    <span>Save & Publish Special Deal</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
                 <!-- MODAL: ADD / EDIT UMRAH PACKAGE                                -->
                 <!-- ============================================================== -->
-                <div id="pkgCrudModal" class="fixed inset-0 z-[80] hidden bg-[#071E3E]/80 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div id="pkgCrudModal" class="fixed inset-0 z-[85] hidden bg-[#071E3E]/80 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto anim-scale-in">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
                             <h3 id="pkgModalTitle" class="text-lg font-black text-[#0B2D5B]">Add / Edit Umrah Package</h3>
                             <button type="button" data-action="close-pkg-modal" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center">
@@ -753,8 +923,8 @@
                 <!-- ============================================================== -->
                 <!-- MODAL: ADD / EDIT COUNTRY VISA SERVICE                         -->
                 <!-- ============================================================== -->
-                <div id="visaCrudModal" class="fixed inset-0 z-[80] hidden bg-[#071E3E]/80 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div id="visaCrudModal" class="fixed inset-0 z-[85] hidden bg-[#071E3E]/80 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto anim-scale-in">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
                             <h3 id="visaModalTitle" class="text-lg font-black text-[#0B2D5B]">Add / Edit Country Visa</h3>
                             <button type="button" data-action="close-visa-modal" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center">
@@ -807,14 +977,14 @@
                 <!-- ============================================================== -->
                 <!-- MODAL: RESET TO FLYER DEFAULTS CONFIRMATION                    -->
                 <!-- ============================================================== -->
-                <div id="resetConfirmModal" class="fixed inset-0 z-[85] hidden bg-[#071E3E]/80 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl text-center space-y-4">
+                <div id="resetConfirmModal" class="fixed inset-0 z-[90] hidden bg-[#071E3E]/80 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl text-center space-y-4 anim-scale-in">
                         <div class="w-14 h-14 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl mx-auto">
                             <i class="fa-solid fa-rotate-left"></i>
                         </div>
                         <h3 class="text-xl font-black text-[#0B2D5B]">Reset to Original January Flyer Defaults?</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            This will restore the Featured Umrah Price to <strong>PKR 232,000</strong>, dates to <strong>Jan 26 – Nov 10, 2026 (14 Nights)</strong>, and reset all calculator tiers, packages, visas, and contacts to the original flyer settings.
+                            This will restore the Featured Umrah Price to <strong>PKR 232,000</strong>, dates to <strong>Jan 26 – Nov 10, 2026 (14 Nights)</strong>, and reset all Special Deals, calculator tiers, packages, visas, and contacts.
                         </p>
                         <div class="flex gap-3 pt-2">
                             <button type="button" data-action="cancel-reset-modal" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-xs">
@@ -830,8 +1000,8 @@
                 <!-- ============================================================== -->
                 <!-- MODAL: FIREBASE CLOUD CONFIGURATION                            -->
                 <!-- ============================================================== -->
-                <div id="firebaseConfigModal" class="fixed inset-0 z-[85] hidden bg-[#071E3E]/80 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+                <div id="firebaseConfigModal" class="fixed inset-0 z-[90] hidden bg-[#071E3E]/80 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 anim-scale-in">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                             <div>
                                 <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Cloud Backend</span>
@@ -842,7 +1012,7 @@
                             </button>
                         </div>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            By default, the app runs with instant real-time cross-tab synchronization. Paste your Firebase Web App JSON config below to connect directly to your live Google Firebase project (Firestore, Auth & Storage).
+                            By default, the app runs with instant real-time cross-tab synchronization. Paste your Firebase Web App JSON config below to connect directly to your live Google Firebase project.
                         </p>
                         <textarea id="firebaseConfigTextarea" rows="6" placeholder='{"apiKey": "AIza...", "authDomain": "...", "projectId": "...", "storageBucket": "..."}' class="w-full font-mono text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-[#0D8A9E]"></textarea>
                         <div class="flex justify-between gap-3">
@@ -856,6 +1026,16 @@
                     </div>
                 </div>
             `;
+        }
+
+        _updateTabCounters() {
+            const dealBadge = this.container.querySelector("#tabBadgeDeals");
+            if (dealBadge) dealBadge.textContent = String((this.specialDeals || []).length);
+
+            const pkgVisaBadge = this.container.querySelector("#tabBadgePkgsVisas");
+            if (pkgVisaBadge) {
+                pkgVisaBadge.textContent = String((this.packages || []).length + (this.visas || []).length);
+            }
         }
 
         _updateAuthView() {
@@ -873,8 +1053,10 @@
                     userLabel.textContent = `Signed in as ${this.currentUser.displayName || this.currentUser.email}`;
                 }
                 if (modeBadge) {
-                    modeBadge.textContent =
-                        window.zakirDB.mode === "firebase" ? "Firebase Cloud" : "Real-Time Sync";
+                    modeBadge.innerHTML =
+                        window.zakirDB.mode === "firebase"
+                            ? `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Firebase Cloud`
+                            : `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Live Sync`;
                 }
             } else {
                 authView.classList.remove("hidden");
@@ -902,6 +1084,13 @@
                 <option value="secondary">Secondary: ${secName} — ${secWA}</option>
             `;
             routingSelect.value = this.selectedRoutingRole === "secondary" ? "secondary" : "manager";
+
+            const badgeMgr = this.container.querySelector("#badgeRoutingManager");
+            const badgeSec = this.container.querySelector("#badgeRoutingSecondary");
+            if (badgeMgr && badgeSec) {
+                badgeMgr.classList.toggle("hidden", this.selectedRoutingRole === "secondary");
+                badgeSec.classList.toggle("hidden", this.selectedRoutingRole !== "secondary");
+            }
         }
 
         _updateLivePreviewBadges() {
@@ -990,14 +1179,163 @@
             this._updateLivePreviewBadges();
         }
 
-        /**
-         * Collects and saves ALL form fields across Spotlight, Calculator, Media, and Contacts
-         * in one atomic update and pushes them live to the website.
-         */
+        // --------------------------------------------------------------------
+        // RENDER SPECIAL FLYER DEALS (VISUAL CRUD CARDS)
+        // --------------------------------------------------------------------
+
+        _renderSpecialDealsList() {
+            const wrap = this.container.querySelector("#crudSpecialDealsContainer");
+            if (!wrap) return;
+
+            if (!this.specialDeals || !this.specialDeals.length) {
+                wrap.innerHTML = `<div class="col-span-full bg-white rounded-3xl p-8 text-center text-slate-500">No Special Deals found. Click "Add New Special Deal" to create one.</div>`;
+                return;
+            }
+
+            wrap.innerHTML = this.specialDeals
+                .map((deal, idx) => {
+                    const srv = deal.servicesIncluded || {};
+                    return `
+                    <div class="admin-card-hover bg-white rounded-3xl border-2 ${
+                        deal.isPrimary
+                            ? "border-[#0D8A9E] shadow-xl"
+                            : deal.isActive
+                            ? "border-slate-200 shadow-md"
+                            : "border-slate-200 opacity-60 bg-slate-50"
+                    } overflow-hidden flex flex-col justify-between">
+                        
+                        <div>
+                            <!-- Dual Image Mini Banner with Floating Price Shield -->
+                            <div class="relative grid grid-cols-2 gap-1 bg-slate-900 h-40 overflow-hidden">
+                                <div class="relative h-full overflow-hidden">
+                                    <img src="${deal.madinahImageUrl}" onerror="this.src='https://placehold.co/600x400/0B2D5B/FFFFFF?text=Madinah'" class="w-full h-full object-cover opacity-90">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-[#071E3E]/90 via-transparent to-transparent"></div>
+                                    <span class="absolute bottom-2 left-2.5 text-[10px] font-bold text-white">${deal.leftFrameTitle || "Madinah"}</span>
+                                </div>
+                                <div class="relative h-full overflow-hidden">
+                                    <img src="${deal.makkahImageUrl}" onerror="this.src='https://placehold.co/600x400/0D8A9E/FFFFFF?text=Makkah'" class="w-full h-full object-cover opacity-90">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-[#071E3E]/90 via-transparent to-transparent"></div>
+                                    <span class="absolute bottom-2 right-2.5 text-[10px] font-bold text-white">${deal.rightFrameTitle || "Makkah"}</span>
+                                </div>
+
+                                <!-- Top Left Status Badges -->
+                                <div class="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5 z-10">
+                                    <span class="bg-[#071E3E]/90 backdrop-blur-sm text-white text-[10px] font-black px-2.5 py-1 rounded-full">
+                                        Deal #${idx + 1}
+                                    </span>
+                                    ${
+                                        deal.isPrimary
+                                            ? `<span class="bg-amber-400 text-[#071E3E] text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow flex items-center gap-1">
+                                                <i class="fa-solid fa-star"></i> Primary Flyer
+                                               </span>`
+                                            : ""
+                                    }
+                                    ${
+                                        !deal.isActive
+                                            ? `<span class="bg-rose-600 text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full">Hidden</span>`
+                                            : `<span class="bg-emerald-500 text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full">Live</span>`
+                                    }
+                                </div>
+
+                                <!-- Center Price Shield -->
+                                <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                                    <div class="bg-gradient-to-b from-[#0B2D5B] via-[#0D8A9E] to-[#0B2D5B] text-white px-4 py-2 rounded-2xl border-2 border-white shadow-2xl text-center">
+                                        <span class="text-[8px] font-bold uppercase tracking-widest text-sky-200 block">STARTING FROM</span>
+                                        <div class="text-lg font-black leading-tight">PKR ${formatPKR(deal.startingPrice)}</div>
+                                        <span class="text-[8px] font-bold uppercase text-teal-100 block">${deal.priceUnit || "PER PERSON"}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Deal Info Body -->
+                            <div class="p-5 space-y-3">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div>
+                                        <span class="text-xs font-extrabold text-[#0D8A9E] block">${deal.monthLabel}</span>
+                                        <h4 class="text-lg font-black text-[#0B2D5B] uppercase tracking-tight">${deal.title}</h4>
+                                    </div>
+                                    <span class="bg-[#E6F6F8] text-[#0D8A9E] text-[10px] font-extrabold px-2.5 py-1 rounded-lg">
+                                        ${deal.badgeTag || "All-Inclusive"}
+                                    </span>
+                                </div>
+
+                                <!-- Schedule Strip Preview -->
+                                <div class="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-2xl border border-slate-200/80 text-center text-xs">
+                                    <div>
+                                        <span class="text-[10px] text-slate-400 font-bold uppercase block">Departure</span>
+                                        <strong class="text-[#0B2D5B] font-extrabold">${deal.departureDate}</strong>
+                                    </div>
+                                    <div class="border-x border-slate-200">
+                                        <span class="text-[10px] text-slate-400 font-bold uppercase block">Return</span>
+                                        <strong class="text-[#0B2D5B] font-extrabold">${deal.returnDate}</strong>
+                                    </div>
+                                    <div>
+                                        <span class="text-[10px] text-slate-400 font-bold uppercase block">Duration</span>
+                                        <strong class="text-[#0D8A9E] font-extrabold">${deal.duration}</strong>
+                                    </div>
+                                </div>
+
+                                <!-- Services Included Pills -->
+                                <div class="flex flex-wrap gap-1.5 pt-1">
+                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${srv.roundTrip !== false ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-slate-100 text-slate-400 line-through"}">
+                                        <i class="fa-solid fa-plane mr-1"></i>Round Trip
+                                    </span>
+                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${srv.visa !== false ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-slate-100 text-slate-400 line-through"}">
+                                        <i class="fa-solid fa-passport mr-1"></i>Umrah Visa
+                                    </span>
+                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${srv.hotel !== false ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-slate-100 text-slate-400 line-through"}">
+                                        <i class="fa-solid fa-hotel mr-1"></i>Hotel Stay
+                                    </span>
+                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${srv.transport !== false ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-slate-100 text-slate-400 line-through"}">
+                                        <i class="fa-solid fa-bus mr-1"></i>Transport
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CRUD Action Bar -->
+                        <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" data-action="move-deal" data-id="${deal.id}" data-dir="up" ${idx === 0 ? "disabled" : ""} class="w-8 h-8 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs" title="Move Up">
+                                    <i class="fa-solid fa-arrow-up"></i>
+                                </button>
+                                <button type="button" data-action="move-deal" data-id="${deal.id}" data-dir="down" ${idx === this.specialDeals.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs" title="Move Down">
+                                    <i class="fa-solid fa-arrow-down"></i>
+                                </button>
+                                <button type="button" data-action="toggle-deal-active" data-id="${deal.id}" class="px-3 py-1.5 rounded-xl text-xs font-bold border ${deal.isActive ? "bg-white text-emerald-700 border-emerald-200 hover:bg-emerald-50" : "bg-slate-200 text-slate-700 border-slate-300"}">
+                                    ${deal.isActive ? "Visible" : "Hidden"}
+                                </button>
+                                ${
+                                    !deal.isPrimary
+                                        ? `<button type="button" data-action="set-primary-deal" data-id="${deal.id}" class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200" title="Set as Primary Deal">
+                                            <i class="fa-regular fa-star mr-1"></i>Set Primary
+                                           </button>`
+                                        : ""
+                                }
+                            </div>
+
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" data-action="duplicate-deal" data-id="${deal.id}" class="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold" title="Duplicate Deal">
+                                    <i class="fa-regular fa-copy mr-1"></i>Clone
+                                </button>
+                                <button type="button" data-action="edit-deal" data-id="${deal.id}" class="px-3.5 py-1.5 rounded-xl bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-xs font-bold transition-colors shadow-sm">
+                                    <i class="fa-solid fa-pen mr-1"></i>Edit Deal
+                                </button>
+                                <button type="button" data-action="delete-deal" data-id="${deal.id}" class="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors" title="Delete Deal">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                })
+                .join("");
+        }
+
         async saveAllPortalChanges() {
             const db = window.zakirDB;
 
-            const startingPrice = Number(this.container.querySelector("#spotStartingPrice").value);
+            const startingPrice = Number(this.container.querySelector("#quickStartingPrice").value || this.container.querySelector("#spotStartingPrice").value);
             const sharingPrice = Number(this.container.querySelector("#rateSharing").value);
             const quadPrice = Number(this.container.querySelector("#rateQuad").value);
             const triplePrice = Number(this.container.querySelector("#rateTriple").value);
@@ -1030,15 +1368,18 @@
             const promotionalFlyerUrl = this.container.querySelector("#inputFlyerUrl").value.trim();
             const showFlyerOnHomepage = this.container.querySelector("#chkShowFlyerButton").checked;
 
+            const quickMonth = this.container.querySelector("#quickMonthLabel").value.trim();
+            const quickDep = this.container.querySelector("#quickDepartureDate").value.trim();
+
             await db.updateSiteConfig({
                 spotlight: {
-                    monthLabel: this.container.querySelector("#spotMonthLabel").value.trim(),
-                    title: this.container.querySelector("#spotTitle").value.trim(),
+                    monthLabel: quickMonth || this.container.querySelector("#spotMonthLabel").value.trim(),
+                    title: this.container.querySelector("#spotTitle").value.trim() || "UMRAH PACKAGE",
                     startingPrice,
-                    priceUnit: this.container.querySelector("#spotPriceUnit").value.trim(),
-                    departureDate: this.container.querySelector("#spotDepartureDate").value.trim(),
-                    returnDate: this.container.querySelector("#spotReturnDate").value.trim(),
-                    duration: this.container.querySelector("#spotDuration").value.trim(),
+                    priceUnit: this.container.querySelector("#spotPriceUnit").value.trim() || "PER PERSON (SHARING)",
+                    departureDate: quickDep || this.container.querySelector("#spotDepartureDate").value.trim(),
+                    returnDate: this.container.querySelector("#spotReturnDate").value.trim() || "Nov 10, 2026",
+                    duration: this.container.querySelector("#spotDuration").value.trim() || "14 Nights",
                     madinahImageUrl: madinahImageUrl || this.siteConfig.spotlight.madinahImageUrl,
                     makkahImageUrl: makkahImageUrl || this.siteConfig.spotlight.makkahImageUrl,
                     promotionalFlyerUrl,
@@ -1081,46 +1422,52 @@
             if (!wrap) return;
 
             if (!this.packages.length) {
-                wrap.innerHTML = `<div class="bg-white rounded-2xl p-8 text-center text-slate-500 text-sm">No Umrah packages found. Click "Add Umrah Package" to create one.</div>`;
+                wrap.innerHTML = `<div class="col-span-full bg-white rounded-2xl p-8 text-center text-slate-500 text-sm">No Umrah packages found. Click "Add Package Card" to create one.</div>`;
                 return;
             }
 
             wrap.innerHTML = this.packages
                 .map(
                     (pkg, idx) => `
-                <div class="bg-white rounded-2xl p-4 sm:p-5 border ${pkg.isActive ? "border-slate-200" : "border-slate-200 opacity-60 bg-slate-50"} shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div class="space-y-1">
-                        <div class="flex flex-wrap items-center gap-2">
-                            <span class="bg-[#0B2D5B] text-white text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full">#${idx + 1}</span>
-                            <span class="bg-[#E6F6F8] text-[#0D8A9E] text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full">${pkg.badgeText || "Package"}</span>
-                            ${pkg.isFeatured ? `<span class="bg-amber-100 text-amber-800 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-star mr-1"></i>Featured</span>` : ""}
-                            ${!pkg.isActive ? `<span class="bg-rose-100 text-rose-700 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full">Hidden</span>` : ""}
+                <div class="admin-card-hover bg-white rounded-3xl p-5 border ${pkg.isActive ? "border-slate-200" : "border-slate-200 opacity-60 bg-slate-50"} shadow-sm flex flex-col justify-between gap-4">
+                    <div class="space-y-2">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-1.5">
+                                <span class="bg-[#0B2D5B] text-white text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full">#${idx + 1}</span>
+                                <span class="bg-[#E6F6F8] text-[#0D8A9E] text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full">${pkg.badgeText || "Package"}</span>
+                                ${pkg.isFeatured ? `<span class="bg-amber-100 text-amber-800 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-star mr-1"></i>Featured</span>` : ""}
+                            </div>
+                            <span class="text-lg font-black text-[#0D8A9E]">PKR ${formatPKR(pkg.price)}</span>
                         </div>
                         <h4 class="text-base font-black text-[#0B2D5B]">${pkg.title}</h4>
-                        <div class="text-xs text-slate-500 flex flex-wrap gap-x-4 gap-y-1">
-                            <span><strong class="text-[#0D8A9E]">PKR ${formatPKR(pkg.price)}</strong> (${pkg.roomType})</span>
-                            <span><i class="fa-regular fa-calendar mr-1"></i>${pkg.departureDate}</span>
-                            <span><i class="fa-regular fa-clock mr-1"></i>${pkg.duration}</span>
-                            <span><i class="fa-solid fa-hotel mr-1"></i>Makkah: ${pkg.makkahHotelDist}</span>
+                        <div class="text-xs text-slate-500 grid grid-cols-2 gap-1.5 bg-slate-50 p-3 rounded-2xl">
+                            <span><i class="fa-solid fa-bed text-[#0D8A9E] mr-1"></i>${pkg.roomType}</span>
+                            <span><i class="fa-regular fa-clock text-[#0D8A9E] mr-1"></i>${pkg.duration}</span>
+                            <span><i class="fa-solid fa-plane-departure text-[#0D8A9E] mr-1"></i>${pkg.departureDate}</span>
+                            <span><i class="fa-solid fa-kaaba text-[#0D8A9E] mr-1"></i>${pkg.makkahHotelDist}</span>
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-1.5 sm:justify-end">
-                        <button type="button" data-action="move-pkg" data-id="${pkg.id}" data-dir="up" ${idx === 0 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs" title="Move Up">
-                            <i class="fa-solid fa-arrow-up"></i>
-                        </button>
-                        <button type="button" data-action="move-pkg" data-id="${pkg.id}" data-dir="down" ${idx === this.packages.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs" title="Move Down">
-                            <i class="fa-solid fa-arrow-down"></i>
-                        </button>
-                        <button type="button" data-action="toggle-pkg-active" data-id="${pkg.id}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${pkg.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-200 text-slate-700"}">
-                            ${pkg.isActive ? "Active" : "Hidden"}
-                        </button>
-                        <button type="button" data-action="edit-pkg" data-id="${pkg.id}" class="px-3 py-1.5 rounded-lg bg-[#E6F6F8] text-[#0B2D5B] hover:bg-[#0D8A9E] hover:text-white text-xs font-bold transition-colors">
-                            <i class="fa-solid fa-pen mr-1"></i>Edit
-                        </button>
-                        <button type="button" data-action="delete-pkg" data-id="${pkg.id}" class="w-8 h-8 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors" title="Delete">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
+                    <div class="flex flex-wrap items-center justify-between gap-1.5 pt-2 border-t border-slate-100">
+                        <div class="flex items-center gap-1">
+                            <button type="button" data-action="move-pkg" data-id="${pkg.id}" data-dir="up" ${idx === 0 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-arrow-up"></i>
+                            </button>
+                            <button type="button" data-action="move-pkg" data-id="${pkg.id}" data-dir="down" ${idx === this.packages.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-arrow-down"></i>
+                            </button>
+                            <button type="button" data-action="toggle-pkg-active" data-id="${pkg.id}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${pkg.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-200 text-slate-700"}">
+                                ${pkg.isActive ? "Active" : "Hidden"}
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" data-action="edit-pkg" data-id="${pkg.id}" class="px-3.5 py-1.5 rounded-lg bg-[#0B2D5B] text-white hover:bg-[#0D8A9E] text-xs font-bold transition-colors">
+                                <i class="fa-solid fa-pen mr-1"></i>Edit
+                            </button>
+                            <button type="button" data-action="delete-pkg" data-id="${pkg.id}" class="w-8 h-8 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `
@@ -1133,48 +1480,51 @@
             if (!wrap) return;
 
             if (!this.visas.length) {
-                wrap.innerHTML = `<div class="bg-white rounded-2xl p-8 text-center text-slate-500 text-sm">No Visa services found. Click "Add Country Visa" to create one.</div>`;
+                wrap.innerHTML = `<div class="col-span-full bg-white rounded-2xl p-8 text-center text-slate-500 text-sm">No Visa services found. Click "Add Country Visa" to create one.</div>`;
                 return;
             }
 
             wrap.innerHTML = this.visas
                 .map(
                     (v, idx) => `
-                <div class="bg-white rounded-2xl p-4 sm:p-5 border ${v.isActive ? "border-slate-200" : "border-slate-200 opacity-60 bg-slate-50"} shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div class="flex items-start gap-3.5">
-                        <div class="w-12 h-12 rounded-2xl bg-[#E6F6F8] text-2xl flex items-center justify-center shrink-0">
-                            ${v.flagEmoji || "🌍"}
-                        </div>
-                        <div class="space-y-1">
-                            <div class="flex flex-wrap items-center gap-2">
+                <div class="admin-card-hover bg-white rounded-3xl p-5 border ${v.isActive ? "border-slate-200" : "border-slate-200 opacity-60 bg-slate-50"} shadow-sm flex flex-col justify-between gap-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex items-start gap-3.5">
+                            <div class="w-12 h-12 rounded-2xl bg-[#E6F6F8] text-2xl flex items-center justify-center shrink-0">
+                                ${v.flagEmoji || "🌍"}
+                            </div>
+                            <div>
                                 <h4 class="text-base font-black text-[#0B2D5B]">${v.countryName}</h4>
                                 <span class="bg-slate-100 text-slate-700 text-[10px] font-bold uppercase px-2 py-0.5 rounded-md">${v.visaType}</span>
-                                ${!v.isActive ? `<span class="bg-rose-100 text-rose-700 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full">Hidden</span>` : ""}
+                                <p class="text-[11px] text-slate-500 mt-2">${v.requirementsSummary}</p>
                             </div>
-                            <div class="text-xs text-slate-500 flex flex-wrap gap-x-4 gap-y-1">
-                                <span>Fee: <strong class="text-[#0D8A9E]">PKR ${formatPKR(v.pricePKR)}</strong></span>
-                                <span><i class="fa-regular fa-clock mr-1"></i>${v.processingTime}</span>
-                            </div>
-                            <p class="text-[11px] text-slate-500">${v.requirementsSummary}</p>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <span class="text-sm font-black text-[#0D8A9E] block">PKR ${formatPKR(v.pricePKR)}</span>
+                            <span class="text-[10px] text-slate-400 font-semibold">${v.processingTime}</span>
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-1.5 sm:justify-end">
-                        <button type="button" data-action="move-visa" data-id="${v.id}" data-dir="up" ${idx === 0 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs" title="Move Up">
-                            <i class="fa-solid fa-arrow-up"></i>
-                        </button>
-                        <button type="button" data-action="move-visa" data-id="${v.id}" data-dir="down" ${idx === this.visas.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs" title="Move Down">
-                            <i class="fa-solid fa-arrow-down"></i>
-                        </button>
-                        <button type="button" data-action="toggle-visa-active" data-id="${v.id}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${v.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-200 text-slate-700"}">
-                            ${v.isActive ? "Active" : "Hidden"}
-                        </button>
-                        <button type="button" data-action="edit-visa" data-id="${v.id}" class="px-3 py-1.5 rounded-lg bg-[#E6F6F8] text-[#0B2D5B] hover:bg-[#0D8A9E] hover:text-white text-xs font-bold transition-colors">
-                            <i class="fa-solid fa-pen mr-1"></i>Edit
-                        </button>
-                        <button type="button" data-action="delete-visa" data-id="${v.id}" class="w-8 h-8 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors" title="Delete">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
+                    <div class="flex flex-wrap items-center justify-between gap-1.5 pt-2 border-t border-slate-100">
+                        <div class="flex items-center gap-1">
+                            <button type="button" data-action="move-visa" data-id="${v.id}" data-dir="up" ${idx === 0 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-arrow-up"></i>
+                            </button>
+                            <button type="button" data-action="move-visa" data-id="${v.id}" data-dir="down" ${idx === this.visas.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-arrow-down"></i>
+                            </button>
+                            <button type="button" data-action="toggle-visa-active" data-id="${v.id}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${v.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-200 text-slate-700"}">
+                                ${v.isActive ? "Active" : "Hidden"}
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" data-action="edit-visa" data-id="${v.id}" class="px-3.5 py-1.5 rounded-lg bg-[#0B2D5B] text-white hover:bg-[#0D8A9E] text-xs font-bold transition-colors">
+                                <i class="fa-solid fa-pen mr-1"></i>Edit
+                            </button>
+                            <button type="button" data-action="delete-visa" data-id="${v.id}" class="w-8 h-8 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `
@@ -1187,8 +1537,8 @@
             this.container.querySelectorAll(".admin-tab-btn").forEach((btn) => {
                 const isMatch = btn.getAttribute("data-tab") === tabName;
                 btn.className = isMatch
-                    ? "admin-tab-btn bg-[#0B2D5B] text-white font-extrabold text-xs sm:text-sm py-3 px-3 rounded-xl flex items-center justify-center gap-2 shadow transition-all"
-                    : "admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3 px-3 rounded-xl flex items-center justify-center gap-2 transition-all";
+                    ? "admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#16437E] text-white font-extrabold text-xs sm:text-sm py-3.5 px-3 rounded-xl flex items-center justify-center gap-2 shadow-md transition-all"
+                    : "admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3.5 px-3 rounded-xl flex items-center justify-center gap-2 transition-all";
             });
 
             ["spotlight", "crud", "media", "contacts"].forEach((t) => {
@@ -1204,7 +1554,7 @@
             this.container.querySelectorAll(".crud-subtab-btn").forEach((btn) => {
                 const isMatch = btn.getAttribute("data-crud-subtab") === subtab;
                 btn.className = isMatch
-                    ? "crud-subtab-btn bg-[#0B2D5B] text-white font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all"
+                    ? "crud-subtab-btn bg-[#0B2D5B] text-white font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow transition-all"
                     : "crud-subtab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all";
             });
 
@@ -1237,14 +1587,9 @@
                 });
             }
 
-            // Two-way input mirroring between Quick Update Bar and Tab 1 Spotlight inputs
+            // Sync Quick Update Bar with Calculator Tiers
             const quickPriceEl = this.container.querySelector("#quickStartingPrice");
-            const quickDepEl = this.container.querySelector("#quickDepartureDate");
-            const quickMonthEl = this.container.querySelector("#quickMonthLabel");
-
             const spotPriceInput = this.container.querySelector("#spotStartingPrice");
-            const spotDepInput = this.container.querySelector("#spotDepartureDate");
-            const spotMonthInput = this.container.querySelector("#spotMonthLabel");
             const autoScaleChk = this.container.querySelector("#calcAutoScaleToggle");
 
             const syncScaledInputs = (baseVal) => {
@@ -1257,34 +1602,14 @@
                 }
             };
 
-            if (quickPriceEl && spotPriceInput) {
+            if (quickPriceEl) {
                 quickPriceEl.addEventListener("input", () => {
-                    spotPriceInput.value = quickPriceEl.value;
+                    if (spotPriceInput) spotPriceInput.value = quickPriceEl.value;
                     syncScaledInputs(quickPriceEl.value);
                 });
-                spotPriceInput.addEventListener("input", () => {
-                    quickPriceEl.value = spotPriceInput.value;
-                    syncScaledInputs(spotPriceInput.value);
-                });
             }
-            if (quickDepEl && spotDepInput) {
-                quickDepEl.addEventListener("input", () => {
-                    spotDepInput.value = quickDepEl.value;
-                });
-                spotDepInput.addEventListener("input", () => {
-                    quickDepEl.value = spotDepInput.value;
-                });
-            }
-            if (quickMonthEl && spotMonthInput) {
-                quickMonthEl.addEventListener("input", () => {
-                    spotMonthInput.value = quickMonthEl.value;
-                });
-                spotMonthInput.addEventListener("input", () => {
-                    quickMonthEl.value = spotMonthInput.value;
-                });
-            }
-            if (autoScaleChk && spotPriceInput) {
-                autoScaleChk.addEventListener("change", () => syncScaledInputs(spotPriceInput.value));
+            if (autoScaleChk && quickPriceEl) {
+                autoScaleChk.addEventListener("change", () => syncScaledInputs(quickPriceEl.value));
             }
 
             // Live sync the Routing Dropdown options whenever Manager/Secondary Name or WhatsApp is edited
@@ -1292,6 +1617,7 @@
             if (routingSelect) {
                 routingSelect.addEventListener("change", () => {
                     this.selectedRoutingRole = routingSelect.value === "secondary" ? "secondary" : "manager";
+                    this._syncRoutingSelectOptions();
                 });
             }
             ["#contactManagerName", "#contactManagerWA", "#contactSecondaryName", "#contactSecondaryWA"].forEach(
@@ -1303,7 +1629,7 @@
                 }
             );
 
-            // Quick Update Form Submit -> saves all portal changes
+            // Quick Update Form Submit
             const quickForm = this.container.querySelector("#quickUpdateForm");
             if (quickForm) {
                 quickForm.addEventListener("submit", async (e) => {
@@ -1312,7 +1638,7 @@
                 });
             }
 
-            // Tab 1 Form Submit -> saves all portal changes
+            // Calculator & Media Form Submit
             const spotForm = this.container.querySelector("#spotlightAndCalcForm");
             if (spotForm) {
                 spotForm.addEventListener("submit", async (e) => {
@@ -1321,7 +1647,7 @@
                 });
             }
 
-            // Tab 3 Media File Uploads + Form Submit
+            // Media File Uploads (Tab 3)
             this.container.querySelectorAll("input[type='file'][data-upload-target]").forEach((fileInput) => {
                 fileInput.addEventListener("change", async (e) => {
                     const file = e.target.files && e.target.files[0];
@@ -1330,7 +1656,7 @@
                     const previewImgId = fileInput.getAttribute("data-preview-target");
 
                     try {
-                        this.showToast("Processing & uploading image...", "warning");
+                        this.showToast("Uploading & optimizing image...", "warning");
                         const url = await db.uploadMediaFile(file);
                         const urlInput = this.container.querySelector(`#${targetInputId}`);
                         if (urlInput) urlInput.value = url;
@@ -1350,11 +1676,63 @@
                 });
             });
 
-            const mediaForm = this.container.querySelector("#mediaForm");
-            if (mediaForm) {
-                mediaForm.addEventListener("submit", async (e) => {
+            // Special Deal Modal Image File Uploads
+            this.container.querySelectorAll("input[type='file'][data-deal-upload]").forEach((fileInput) => {
+                fileInput.addEventListener("change", async (e) => {
+                    const file = e.target.files && e.target.files[0];
+                    if (!file) return;
+                    const targetId = fileInput.getAttribute("data-deal-upload");
+                    try {
+                        this.showToast("Optimizing deal image...", "warning");
+                        const url = await db.uploadMediaFile(file);
+                        const inputEl = this.container.querySelector(`#${targetId}`);
+                        if (inputEl) inputEl.value = url;
+                        this.showToast("Deal image uploaded!");
+                    } catch (err) {
+                        this.showToast(err.message || "Image upload failed.", "error");
+                    }
+                });
+            });
+
+            // Special Flyer Deal Modal Form Submit
+            const dealForm = this.container.querySelector("#dealCrudForm");
+            if (dealForm) {
+                dealForm.addEventListener("submit", async (e) => {
                     e.preventDefault();
-                    await this.saveAllPortalChanges();
+                    const startingPrice = Number(this.container.querySelector("#dealEditPrice").value);
+                    if (!startingPrice || startingPrice <= 0) {
+                        this.showToast("Deal starting price must be greater than 0 PKR!", "error");
+                        return;
+                    }
+
+                    await db.saveSpecialDeal({
+                        id: this.container.querySelector("#dealEditId").value || undefined,
+                        monthLabel: this.container.querySelector("#dealEditMonth").value.trim(),
+                        title: this.container.querySelector("#dealEditTitle").value.trim(),
+                        startingPrice,
+                        priceUnit: this.container.querySelector("#dealEditUnit").value.trim(),
+                        badgeTag: this.container.querySelector("#dealEditBadgeTag").value.trim(),
+                        departureDate: this.container.querySelector("#dealEditDep").value.trim(),
+                        returnDate: this.container.querySelector("#dealEditRet").value.trim(),
+                        duration: this.container.querySelector("#dealEditDuration").value.trim(),
+                        leftFrameTitle: this.container.querySelector("#dealEditLeftTitle").value.trim(),
+                        leftFrameBadge: this.container.querySelector("#dealEditLeftBadge").value.trim(),
+                        madinahImageUrl: this.container.querySelector("#dealEditMadinahUrl").value.trim(),
+                        rightFrameTitle: this.container.querySelector("#dealEditRightTitle").value.trim(),
+                        rightFrameBadge: this.container.querySelector("#dealEditRightBadge").value.trim(),
+                        makkahImageUrl: this.container.querySelector("#dealEditMakkahUrl").value.trim(),
+                        servicesIncluded: {
+                            roundTrip: this.container.querySelector("#dealSrvRoundTrip").checked,
+                            visa: this.container.querySelector("#dealSrvVisa").checked,
+                            hotel: this.container.querySelector("#dealSrvHotel").checked,
+                            transport: this.container.querySelector("#dealSrvTransport").checked
+                        },
+                        isActive: this.container.querySelector("#dealEditActive").checked,
+                        isPrimary: this.container.querySelector("#dealEditPrimary").checked
+                    });
+
+                    this.container.querySelector("#dealCrudModal").classList.add("hidden");
+                    this.showToast("Special Flyer Deal Saved & Published Live!");
                 });
             }
 
@@ -1367,6 +1745,7 @@
                 });
             }
 
+            // Package Modal Submit
             const pkgForm = this.container.querySelector("#pkgCrudForm");
             if (pkgForm) {
                 pkgForm.addEventListener("submit", async (e) => {
@@ -1402,6 +1781,7 @@
                 });
             }
 
+            // Visa Modal Submit
             const visaForm = this.container.querySelector("#visaCrudForm");
             if (visaForm) {
                 visaForm.addEventListener("submit", async (e) => {
@@ -1429,6 +1809,7 @@
                 });
             }
 
+            // Delegated Click Actions
             this.container.addEventListener("click", async (e) => {
                 const tabBtn = e.target.closest("[data-tab]");
                 if (tabBtn) {
@@ -1455,9 +1836,65 @@
                     await db.logout();
                     this.showToast("Admin session locked.", "warning");
                 } else if (action === "close-drawer") {
-                    // Auto-save before closing drawer so no edits are ever lost
                     await this.saveAllPortalChanges();
                     this.onCloseDrawer();
+                } else if (action === "open-deal-modal") {
+                    this._openDealModal(null);
+                } else if (action === "close-deal-modal") {
+                    this.container.querySelector("#dealCrudModal").classList.add("hidden");
+                } else if (action === "edit-deal") {
+                    const deal = this.specialDeals.find((d) => d.id === actionEl.getAttribute("data-id"));
+                    if (deal) this._openDealModal(deal);
+                } else if (action === "duplicate-deal") {
+                    await db.duplicateSpecialDeal(actionEl.getAttribute("data-id"));
+                    this.showToast("Special Flyer Deal cloned & published!");
+                } else if (action === "set-primary-deal") {
+                    const deal = this.specialDeals.find((d) => d.id === actionEl.getAttribute("data-id"));
+                    if (deal) {
+                        await db.saveSpecialDeal({ ...deal, isPrimary: true, isActive: true });
+                        this.showToast(`"${deal.monthLabel}" set as Primary Deal!`);
+                    }
+                } else if (action === "toggle-deal-active") {
+                    const deal = this.specialDeals.find((d) => d.id === actionEl.getAttribute("data-id"));
+                    if (deal) {
+                        await db.saveSpecialDeal({ ...deal, isActive: !deal.isActive });
+                        this.showToast(`Special Deal ${!deal.isActive ? "shown" : "hidden"} live.`);
+                    }
+                } else if (action === "move-deal") {
+                    await db.reorderSpecialDeal(
+                        actionEl.getAttribute("data-id"),
+                        actionEl.getAttribute("data-dir")
+                    );
+                } else if (action === "delete-deal") {
+                    try {
+                        await db.deleteSpecialDeal(actionEl.getAttribute("data-id"));
+                        this.showToast("Special Flyer Deal deleted.", "warning");
+                    } catch (err) {
+                        this.showToast(err.message, "error");
+                    }
+                } else if (action === "quick-add-ramzan-deal") {
+                    await db.saveSpecialDeal({
+                        monthLabel: "Ramzan Ashra Special",
+                        title: "RAMZAN UMRAH DEAL",
+                        badgeTag: "Limited VIP Seats",
+                        startingPrice: 315000,
+                        priceUnit: "PER PERSON (SHARING)",
+                        departureDate: "1st Ramzan 2026",
+                        returnDate: "20th Ramzan / Eid",
+                        duration: "20 Nights",
+                        leftFrameTitle: "Madinah Munawwarah",
+                        leftFrameBadge: "Markazia Walking Stay",
+                        madinahImageUrl:
+                            "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=900&q=80",
+                        rightFrameTitle: "Makkah Mukarramah",
+                        rightFrameBadge: "Near Haram Iftar Options",
+                        makkahImageUrl:
+                            "https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?auto=format&fit=crop&w=900&q=80",
+                        servicesIncluded: { roundTrip: true, visa: true, hotel: true, transport: true },
+                        isActive: true,
+                        isPrimary: false
+                    });
+                    this.showToast("Ramzan Special Flyer Deal added & live on website!");
                 } else if (action === "open-pkg-modal") {
                     this._openPkgModal(null);
                 } else if (action === "close-pkg-modal") {
@@ -1466,8 +1903,7 @@
                     const pkg = this.packages.find((p) => p.id === actionEl.getAttribute("data-id"));
                     if (pkg) this._openPkgModal(pkg);
                 } else if (action === "delete-pkg") {
-                    const id = actionEl.getAttribute("data-id");
-                    await db.deleteUmrahPackage(id);
+                    await db.deleteUmrahPackage(actionEl.getAttribute("data-id"));
                     this.showToast("Package deleted.", "warning");
                 } else if (action === "toggle-pkg-active") {
                     const pkg = this.packages.find((p) => p.id === actionEl.getAttribute("data-id"));
@@ -1488,8 +1924,7 @@
                     const visa = this.visas.find((v) => v.id === actionEl.getAttribute("data-id"));
                     if (visa) this._openVisaModal(visa);
                 } else if (action === "delete-visa") {
-                    const id = actionEl.getAttribute("data-id");
-                    await db.deleteVisaService(id);
+                    await db.deleteVisaService(actionEl.getAttribute("data-id"));
                     this.showToast("Visa destination deleted.", "warning");
                 } else if (action === "toggle-visa-active") {
                     const visa = this.visas.find((v) => v.id === actionEl.getAttribute("data-id"));
@@ -1536,6 +1971,51 @@
                     this.showToast("Switched to Built-In Real-Time Local Sync.");
                 }
             });
+        }
+
+        _openDealModal(deal) {
+            this.container.querySelector("#dealModalTitle").textContent = deal
+                ? "Edit Special Flyer Deal"
+                : "Create New Special Flyer Deal";
+            this.container.querySelector("#dealEditId").value = (deal && deal.id) || "";
+            this.container.querySelector("#dealEditMonth").value =
+                (deal && deal.monthLabel) || "February & शाबान Special";
+            this.container.querySelector("#dealEditTitle").value = (deal && deal.title) || "UMRAH PACKAGE";
+            this.container.querySelector("#dealEditPrice").value = (deal && deal.startingPrice) || 245000;
+            this.container.querySelector("#dealEditUnit").value =
+                (deal && deal.priceUnit) || "PER PERSON (SHARING)";
+            this.container.querySelector("#dealEditBadgeTag").value =
+                (deal && deal.badgeTag) || "All-Inclusive Deal";
+            this.container.querySelector("#dealEditDep").value = (deal && deal.departureDate) || "Feb 15, 2026";
+            this.container.querySelector("#dealEditRet").value = (deal && deal.returnDate) || "Mar 01, 2026";
+            this.container.querySelector("#dealEditDuration").value = (deal && deal.duration) || "14 Nights";
+
+            this.container.querySelector("#dealEditLeftTitle").value =
+                (deal && deal.leftFrameTitle) || "Madinah Munawwarah";
+            this.container.querySelector("#dealEditLeftBadge").value =
+                (deal && deal.leftFrameBadge) || "Ziyarat & Stay";
+            this.container.querySelector("#dealEditMadinahUrl").value =
+                (deal && deal.madinahImageUrl) ||
+                "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=900&q=80";
+
+            this.container.querySelector("#dealEditRightTitle").value =
+                (deal && deal.rightFrameTitle) || "Makkah Mukarramah";
+            this.container.querySelector("#dealEditRightBadge").value =
+                (deal && deal.rightFrameBadge) || "Haram View Options";
+            this.container.querySelector("#dealEditMakkahUrl").value =
+                (deal && deal.makkahImageUrl) ||
+                "https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?auto=format&fit=crop&w=900&q=80";
+
+            const srv = (deal && deal.servicesIncluded) || {};
+            this.container.querySelector("#dealSrvRoundTrip").checked = srv.roundTrip !== false;
+            this.container.querySelector("#dealSrvVisa").checked = srv.visa !== false;
+            this.container.querySelector("#dealSrvHotel").checked = srv.hotel !== false;
+            this.container.querySelector("#dealSrvTransport").checked = srv.transport !== false;
+
+            this.container.querySelector("#dealEditActive").checked = deal ? Boolean(deal.isActive) : true;
+            this.container.querySelector("#dealEditPrimary").checked = deal ? Boolean(deal.isPrimary) : false;
+
+            this.container.querySelector("#dealCrudModal").classList.remove("hidden");
         }
 
         _openPkgModal(pkg) {
