@@ -41,11 +41,22 @@
 <body class="font-sans bg-slate-100 text-slate-800 antialiased selection:bg-teal selection:text-white">
     <div id="standaloneAdminRoot"></div>
 
-    <script type="module">
-        import { AdminPortalManager } from "./js/admin-portal.js";
-        const root = document.getElementById("standaloneAdminRoot");
-        new AdminPortalManager(root, { isDrawer: false });
+    <!-- Firebase v10 Compat SDKs (Works on both file:// and https://) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
+    <!-- Zakir Travel & Tours Database & Admin Portal Scripts -->
+    <script src="./js/firebase-db.js"></script>
+    <script src="./js/admin-portal.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var root = document.getElementById("standaloneAdminRoot");
+            if (root && window.AdminPortalManager) {
+                new window.AdminPortalManager(root, { isDrawer: false });
+            }
+        });
     </script>
 </body>
 </html>
-

@@ -949,7 +949,15 @@
         }
     </script>
 
-    <!-- Full-Stack Real-Time Homepage & Admin Portal Module -->
-    <script type="module" src="./js/homepage-live.js"></script>
+    <!-- Firebase v10 Compat SDKs (Works on both file:// and https://) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
+    <!-- Full-Stack Real-Time Homepage & Admin Portal Scripts -->
+    <script src="./js/firebase-db.js"></script>
+    <script src="./js/admin-portal.js"></script>
+    <script src="./js/homepage-live.js"></script>
 </body>
 </html>
