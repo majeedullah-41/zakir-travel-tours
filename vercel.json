@@ -1,0 +1,36 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/umrah", "destination": "/umrah-packages.html" },
+    { "source": "/umrah-packages", "destination": "/umrah-packages.html" },
+    { "source": "/visas", "destination": "/visa-services.html" },
+    { "source": "/visa-services", "destination": "/visa-services.html" },
+    { "source": "/calculator", "destination": "/calculator.html" },
+    { "source": "/estimator", "destination": "/calculator.html" },
+    { "source": "/contact", "destination": "/contact.html" },
+    { "source": "/contact-us", "destination": "/contact.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*).html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/js/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400"
+        }
+      ]
+    }
+  ]
+}
