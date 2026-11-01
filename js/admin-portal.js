@@ -189,8 +189,8 @@
                     <div class="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-white/30 anim-scale-in">
                         <div class="flex items-center justify-between mb-6">
                             <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#0B2D5B] to-[#0D8A9E] text-white flex items-center justify-center font-black text-2xl shadow-lg">
-                                    Z
+                                <div class="w-12 h-12 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-lg border border-slate-200/80">
+                                    <img src="./assets/logo-mark.png" alt="Zakir Travel Logo" class="w-full h-full object-contain">
                                 </div>
                                 <div>
                                     <span class="text-[10px] font-extrabold uppercase tracking-widest text-[#0D8A9E] block">Cloud Control Center</span>
@@ -253,8 +253,8 @@
                     <header class="sticky top-0 z-40 bg-[#071E3E]/95 backdrop-blur-md text-white shadow-xl border-b border-white/10">
                         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
                             <div class="flex items-center gap-3">
-                                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#0D8A9E] to-[#15B2CB] flex items-center justify-center font-black text-xl shadow-lg">
-                                    Z
+                                <div class="w-11 h-11 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-lg">
+                                    <img src="./assets/logo-mark.png" alt="Zakir Travel Logo" class="w-full h-full object-contain">
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
