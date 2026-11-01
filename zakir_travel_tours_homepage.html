@@ -140,14 +140,14 @@
 
             <!-- Desktop Navigation Links -->
             <nav class="hidden lg:flex items-center space-x-8 font-semibold text-sm text-slate-700">
-                <a href="#home" class="text-teal hover:text-navy transition-colors">Home</a>
-                <a href="#umrah-spotlight" class="hover:text-teal transition-colors flex items-center gap-1.5">
+                <a href="index.html" class="text-teal font-extrabold border-b-2 border-teal transition-colors pb-1">Home</a>
+                <a href="umrah-packages.html" class="hover:text-teal transition-colors flex items-center gap-1.5 pb-1">
                     <span>Umrah Packages</span>
                     <span class="bg-teal text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Live</span>
                 </a>
-                <a href="#visas" class="hover:text-teal transition-colors">Visas & Tickets</a>
-                <a href="#calculator" class="hover:text-teal transition-colors">Package Estimator</a>
-                <a href="#contact" class="hover:text-teal transition-colors">Contact Us</a>
+                <a href="visa-services.html" class="hover:text-teal transition-colors pb-1">Visas & Tickets</a>
+                <a href="calculator.html" class="hover:text-teal transition-colors pb-1">Package Estimator</a>
+                <a href="contact.html" class="hover:text-teal transition-colors pb-1">Contact Us</a>
             </nav>
 
             <!-- CTA Buttons -->
@@ -170,11 +170,11 @@
 
         <!-- Mobile Dropdown Navigation -->
         <div id="mobileMenu" class="hidden lg:hidden bg-white border-t border-slate-100 px-4 pt-3 pb-6 space-y-3 shadow-xl">
-            <a href="#home" class="block py-2 px-3 rounded-lg font-semibold text-navy hover:bg-teal-accent">Home</a>
-            <a href="#umrah-spotlight" class="block py-2 px-3 rounded-lg font-semibold text-navy hover:bg-teal-accent">Featured Umrah Package</a>
-            <a href="#visas" class="block py-2 px-3 rounded-lg font-semibold text-navy hover:bg-teal-accent">Visas & Air Tickets</a>
-            <a href="#calculator" class="block py-2 px-3 rounded-lg font-semibold text-navy hover:bg-teal-accent">Umrah Price Calculator</a>
-            <a href="#contact" class="block py-2 px-3 rounded-lg font-semibold text-navy hover:bg-teal-accent">Office Location & Contact</a>
+            <a href="index.html" class="block py-2 px-3 rounded-lg font-bold text-teal bg-teal-accent">Home</a>
+            <a href="umrah-packages.html" class="block py-2 px-3 rounded-lg font-semibold text-navy hover:bg-teal-accent">Umrah Packages</a>
+            <a href="visa-services.html" class="block py-2 px-3 rounded-lg font-semibold text-navy hover:bg-teal-accent">Visas & Air Tickets</a>
+            <a href="calculator.html" class="block py-2 px-3 rounded-lg font-semibold text-navy hover:bg-teal-accent">Umrah Price Calculator</a>
+            <a href="contact.html" class="block py-2 px-3 rounded-lg font-semibold text-navy hover:bg-teal-accent">Office Location & Contact</a>
             <button type="button" onclick="openAdminPortalDrawer()" class="w-full text-left py-2 px-3 rounded-lg font-bold text-teal hover:bg-teal-accent flex items-center gap-2">
                 <i class="fa-solid fa-user-shield"></i> Staff Admin Portal (10s Quick Edit)
             </button>
@@ -191,7 +191,6 @@
 
     <!-- Hero Section with Interactive Multi-Tab Search Widget -->
     <section id="home" class="relative overflow-hidden hero-gradient text-white pt-12 pb-24 lg:py-24">
-        <!-- Decorative SVG Airplane Trail & Mosque Silhouette Background -->
         <div class="absolute inset-0 opacity-10 pointer-events-none">
             <svg class="w-full h-full" viewBox="0 0 1440 600" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
                 <path d="M-100 500 C 400 400, 800 200, 1300 80" stroke="white" stroke-width="4" stroke-dasharray="12 12"/>
@@ -393,7 +392,12 @@
                         <span class="text-xs font-bold uppercase tracking-widest text-teal">All Available Tiers</span>
                         <h3 class="text-2xl sm:text-3xl font-black text-navy mt-1">Compare Umrah Packages</h3>
                     </div>
-                    <p class="text-xs sm:text-sm text-slate-600">Updated live by our Islamabad booking desk — select any package to book on WhatsApp.</p>
+                    <div class="flex items-center gap-3">
+                        <a href="umrah-packages.html" class="inline-flex items-center gap-2 bg-navy hover:bg-navy-light text-white font-bold text-xs sm:text-sm py-2.5 px-4 rounded-xl shadow transition-all">
+                            <span>View All Umrah Packages</span>
+                            <i class="fa-solid fa-arrow-right text-teal-light"></i>
+                        </a>
+                    </div>
                 </div>
 
                 <div id="umrahPackagesGrid" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -434,9 +438,9 @@
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal"></i> Makkah & Madinah Ziyarat</li>
                         </ul>
                     </div>
-                    <button onclick="openBookingModal('Umrah Package Inquiry')" class="w-full py-2.5 px-4 rounded-xl bg-white border border-navy text-navy font-bold text-sm group-hover:bg-navy group-hover:text-white transition-all">
-                        Inquire Umrah <i class="fa-solid fa-arrow-right ml-1"></i>
-                    </button>
+                    <a href="umrah-packages.html" class="w-full py-2.5 px-4 rounded-xl bg-white border border-navy text-navy font-bold text-sm text-center group-hover:bg-navy group-hover:text-white transition-all block">
+                        View Umrah Packages <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </a>
                 </div>
 
                 <!-- Service 2: Domestic & International Flight Tickets -->
@@ -455,9 +459,9 @@
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal"></i> Date Change & Refund Support</li>
                         </ul>
                     </div>
-                    <button onclick="openBookingModal('Air Ticket Booking')" class="w-full py-2.5 px-4 rounded-xl bg-white border border-navy text-navy font-bold text-sm group-hover:bg-navy group-hover:text-white transition-all">
+                    <a href="visa-services.html#flights-section" class="w-full py-2.5 px-4 rounded-xl bg-white border border-navy text-navy font-bold text-sm text-center group-hover:bg-navy group-hover:text-white transition-all block">
                         Check Ticket Fares <i class="fa-solid fa-arrow-right ml-1"></i>
-                    </button>
+                    </a>
                 </div>
 
                 <!-- Service 3: Worldwide Visa Assistance -->
@@ -476,9 +480,9 @@
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal"></i> UK, Schengen & USA File Prep</li>
                         </ul>
                     </div>
-                    <button onclick="openBookingModal('Visa Assistance Inquiry')" class="w-full py-2.5 px-4 rounded-xl bg-white border border-navy text-navy font-bold text-sm group-hover:bg-navy group-hover:text-white transition-all">
+                    <a href="visa-services.html" class="w-full py-2.5 px-4 rounded-xl bg-white border border-navy text-navy font-bold text-sm text-center group-hover:bg-navy group-hover:text-white transition-all block">
                         Apply for Visa <i class="fa-solid fa-arrow-right ml-1"></i>
-                    </button>
+                    </a>
                 </div>
 
                 <!-- Service 4: Hotels & Transport -->
@@ -497,9 +501,9 @@
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal"></i> Travel Insurance Coverage</li>
                         </ul>
                     </div>
-                    <button onclick="openBookingModal('Hotel & Transport Booking')" class="w-full py-2.5 px-4 rounded-xl bg-white border border-navy text-navy font-bold text-sm group-hover:bg-navy group-hover:text-white transition-all">
-                        Book Stay / Ride <i class="fa-solid fa-arrow-right ml-1"></i>
-                    </button>
+                    <a href="contact.html" class="w-full py-2.5 px-4 rounded-xl bg-white border border-navy text-navy font-bold text-sm text-center group-hover:bg-navy group-hover:text-white transition-all block">
+                        Contact Office <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </a>
                 </div>
             </div>
         </div>
@@ -611,6 +615,13 @@
             <div id="visaServicesGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Populated in real-time by js/homepage-live.js -->
             </div>
+
+            <div class="mt-10 text-center">
+                <a href="visa-services.html" class="inline-flex items-center gap-2 bg-navy hover:bg-navy-light text-white font-bold px-7 py-3.5 rounded-xl shadow-lg transition-all text-xs sm:text-sm">
+                    <span>View All Countries, Document Checklists & Flight Fares</span>
+                    <i class="fa-solid fa-arrow-right text-teal-light"></i>
+                </a>
+            </div>
         </div>
     </section>
 
@@ -640,6 +651,12 @@
                                 <div>
                                     <strong class="text-white">Office Hours:</strong> Monday – Saturday (9:30 AM to 8:00 PM)
                                 </div>
+                            </div>
+                            <div class="pt-2">
+                                <a href="contact.html" class="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 text-white font-bold px-4 py-2 rounded-xl text-xs transition-colors">
+                                    <i class="fa-solid fa-map-location-dot text-teal-accent"></i>
+                                    <span>View Directions & Interactive Map</span>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -834,3 +851,4 @@
     <script src="./js/homepage-live.js"></script>
 </body>
 </html>
+

@@ -202,7 +202,7 @@
                                     ? `<button type="button" data-action="close-drawer" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-transform hover:rotate-90" title="Back to Website">
                                         <i class="fa-solid fa-xmark"></i>
                                        </button>`
-                                    : `<a href="zakir_travel_tours_homepage.html" class="text-xs font-bold text-[#0D8A9E] hover:underline flex items-center gap-1">
+                                    : `<a href="index.html" class="text-xs font-bold text-[#0D8A9E] hover:underline flex items-center gap-1">
                                         <i class="fa-solid fa-arrow-left"></i> Website
                                        </a>`
                             }
@@ -289,7 +289,7 @@
                                             <i class="fa-solid fa-eye text-[#15B2CB]"></i>
                                             <span class="hidden sm:inline">View Live Page</span>
                                            </button>`
-                                        : `<a href="zakir_travel_tours_homepage.html" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition-all">
+                                        : `<a href="index.html" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition-all">
                                             <i class="fa-solid fa-eye text-[#15B2CB]"></i>
                                             <span class="hidden sm:inline">Live Website</span>
                                            </a>`
