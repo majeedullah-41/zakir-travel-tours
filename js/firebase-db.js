@@ -54,39 +54,39 @@
 
     const DEFAULT_PAGE_CONTENT = {
         home: {
-            heroBadge: "Trusted Travel Partner in Islamabad & Swat",
+            heroBadge: "Swat's Trusted Travel & Umrah Partner",
             heroHeadingMain: "Your Spiritual & Global Journey,",
             heroDescription:
-                "Serving over 100,000+ happy pilgrims and global travelers across Pakistan through our official branches in Blue Area Islamabad and Swat Matta. We specialize in Umrah & Ziyarat pilgrimages, domestic & international air ticketing, and worldwide visa consultancy.",
+                "Headquartered on Fazal Banda Rd, Swat Matta with a branch office in Islamabad, Zakir Travel & Tours has proudly served over 100,000+ happy pilgrims and travelers. We specialize in Umrah & Ziyarat pilgrimages, domestic & international air ticketing, and worldwide visa consultancy.",
             aboutBadge: "About Zakir Travel & Tours",
-            aboutHeading: "A Trusted Travel Agency Serving 100,000+ Clients Across Pakistan",
+            aboutHeading: "Swat's Premier Travel & Umrah Agency Serving 100,000+ Clients",
             aboutDescription:
-                "With official offices in Potohar Plaza, Blue Area Islamabad and Fazal Banda Rd, Swat Matta, Zakir Travel & Tours is a full-service travel agency dedicated to making your Umrah pilgrimage, global visa applications, and domestic & international air ticketing completely seamless, transparent, and stress-free.",
+                "Headquartered at Fazal Banda Rd, Swat Matta, Zakir Travel & Tours is a trusted full-service travel agency dedicated to serving families and pilgrims across Swat, Malakand Division, and all of Pakistan — supported by our branch office in Blue Area, Islamabad for seamless airline ticketing, Umrah visas, and global visa processing.",
             missionTitle: "Our Mission & Promise",
             missionDesc:
                 "To serve every pilgrim, family, and traveler with complete honesty, transparent guidance, and reliable arrangements from departure to safe return.",
-            visionTitle: "Our Regional Accessibility",
+            visionTitle: "Rooted in Swat, Connected Nationwide",
             visionDesc:
-                "Connecting travelers across Islamabad, Rawalpindi, Swat Matta, and all of Pakistan with direct in-office and WhatsApp travel support.",
-            branch1Title: "Islamabad Head Office (Blue Area)",
-            branch1Address: "Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad",
+                "Serving families and pilgrims right from our Swat Matta Head Office with direct walk-in support, backed by our Islamabad branch and 24/7 WhatsApp assistance.",
+            branch1Title: "Swat Head Office (Matta)",
+            branch1Address: "Fazal Banda Rd, Swat Matta, Khyber Pakhtunkhwa, Pakistan",
             branch1Desc:
-                "Our central Islamabad desk located in the heart of Blue Area for walk-in Umrah bookings, embassy visa file preparation, and instant air ticketing.",
-            branch2Title: "Swat Regional Branch (Matta)",
-            branch2Address: "Fazal Banda Rd, Swat Matta, Khyber Pakhtunkhwa, Pakistan",
+                "Our central headquarters in Swat Matta providing families, elders, and travelers across Swat and Malakand Division with direct walk-in Umrah bookings, air ticketing, and visa consultancy.",
+            branch2Title: "Islamabad Branch Office",
+            branch2Address: "Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad",
             branch2Desc:
-                "Our dedicated regional branch in Swat Matta providing families and pilgrims across Swat and Malakand Division with direct local travel and Umrah services.",
+                "Our branch office in Blue Area, Islamabad supporting embassy documentation, flight departures, and travelers in the twin cities.",
             stat1Number: "100K+",
             stat1Label: "Happy Clients & Pilgrims Served",
-            stat2Number: "2 Branches",
-            stat2Label: "Islamabad & Swat Matta Offices",
+            stat2Number: "Swat HQ",
+            stat2Label: "Matta Head Office + Islamabad Branch",
             stat3Number: "50+",
             stat3Label: "Global Airlines & Destinations",
             stat4Number: "24/7",
             stat4Label: "WhatsApp & On-Trip Support",
             why1Title: "Transparent & Honest Guidance",
             why1Desc:
-                "Zero hidden charges. Every travel plan shared at our Islamabad or Swat Matta offices includes clear, honest breakdowns of flights, visas, and hotels.",
+                "Zero hidden charges. Every travel plan shared at our Swat Matta Head Office includes clear, honest breakdowns of flights, visas, and hotels.",
             why2Title: "Direct Management Supervision",
             why2Desc:
                 "Direct personal care from our management team (Inam Khan & Sadiq Ullah) from your first inquiry until you safely return home.",
@@ -189,7 +189,7 @@
                     secondaryPhone: "+92 343 4159182",
                     secondaryWhatsApp: "923434159182",
                     activeBookingWhatsApp: "923490558345",
-                    officeAddress: "Office No. 7 Ground Floor Potohar Plaza, Fazal-e-Haq Road Blue Area, Islamabad",
+                    officeAddress: "Fazal Banda Rd, Swat Matta, Khyber Pakhtunkhwa, Pakistan",
                     officeHours: "Monday to Saturday: 9:30 AM – 8:00 PM (Sunday Closed / WhatsApp Support Active)",
                     officeEmail: "info@zakirtravels.com / inam@zakirtravels.com",
                     mapEmbedUrl:
@@ -359,7 +359,11 @@
         const base = baseContent || DEFAULT_PAGE_CONTENT;
         const inc = incomingContent || {};
         const incHome = { ...(inc.home || {}) };
-        if (!incHome.branch2Address || incHome.stat1Number === "100%") {
+        if (
+            !incHome.branch2Address ||
+            incHome.stat1Number === "100%" ||
+            (incHome.branch1Title && incHome.branch1Title.includes("Islamabad"))
+        ) {
             Object.assign(incHome, DEFAULT_PAGE_CONTENT.home);
         }
         return {

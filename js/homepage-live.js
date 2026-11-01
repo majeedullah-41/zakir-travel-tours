@@ -127,7 +127,7 @@
         const taglineSecondary = c.taglineSecondary || "Your Journey Our Responsibility";
         const officeAddress =
             c.officeAddress ||
-            "Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad";
+            "Fazal Banda Rd, Swat Matta, Khyber Pakhtunkhwa, Pakistan";
 
         document.title = `${agencyName} | ${taglinePrimary}`;
 
