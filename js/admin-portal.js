@@ -22,7 +22,7 @@
         if (document.getElementById("zakir-admin-animations-css")) return;
         const style = document.createElement("style");
         style.id = "zakir-admin-animations-css";
-        style.textContent = `
+        style.textContent = ` 
             @keyframes zakirFadeInUp {
                 from { opacity: 0; transform: translateY(14px); }
                 to { opacity: 1; transform: translateY(0); }
