@@ -175,7 +175,16 @@
         setText("servicesAgencyName", agencyName);
 
         const pContent = config.pageContent || {};
-        const pHome = pContent.home || {};
+        const rawHome = pContent.home || {};
+        const isLegacyHome =
+            rawHome.stat1Number === "100%" ||
+            rawHome.stat4Number === "Blue Area" ||
+            (rawHome.aboutHeading && rawHome.aboutHeading.includes("Islamabad")) ||
+            (rawHome.heroBadge && rawHome.heroBadge.includes("Islamabad")) ||
+            (rawHome.branch1Title && rawHome.branch1Title.includes("Islamabad"));
+        const pHome = isLegacyHome
+            ? (window.DEFAULT_PAGE_CONTENT && window.DEFAULT_PAGE_CONTENT.home) || {}
+            : rawHome;
         const pUmrah = pContent.umrah || {};
         const pVisas = pContent.visas || {};
         const pCalc = pContent.calculator || {};

@@ -59,9 +59,9 @@
             heroDescription:
                 "Headquartered on Fazal Banda Rd, Swat Matta with a branch office in Islamabad, Zakir Travel & Tours has proudly served over 100,000+ happy pilgrims and travelers. We specialize in Umrah & Ziyarat pilgrimages, domestic & international air ticketing, and worldwide visa consultancy.",
             aboutBadge: "About Zakir Travel & Tours",
-            aboutHeading: "Swat's Premier Travel & Umrah Agency Serving 100,000+ Clients",
+            aboutHeading: "Swat's Trusted Partner for Spiritual & Worldwide Travel",
             aboutDescription:
-                "Headquartered at Fazal Banda Rd, Swat Matta, Zakir Travel & Tours is a trusted full-service travel agency dedicated to serving families and pilgrims across Swat, Malakand Division, and all of Pakistan — supported by our branch office in Blue Area, Islamabad for seamless airline ticketing, Umrah visas, and global visa processing.",
+                "Headquartered on Fazal Banda Rd, Swat Matta, Zakir Travel & Tours is a full-service travel agency dedicated to making your Umrah pilgrimage, global visa applications, and domestic & international air ticketing completely seamless, transparent, and stress-free — supported by our branch office in Islamabad.",
             missionTitle: "Our Mission & Promise",
             missionDesc:
                 "To serve every pilgrim, family, and traveler with complete honesty, transparent guidance, and reliable arrangements from departure to safe return.",
@@ -78,12 +78,12 @@
                 "Our branch office in Blue Area, Islamabad supporting embassy documentation, flight departures, and travelers in the twin cities.",
             stat1Number: "100K+",
             stat1Label: "Happy Clients & Pilgrims Served",
-            stat2Number: "Swat HQ",
-            stat2Label: "Matta Head Office + Islamabad Branch",
+            stat2Number: "24/7",
+            stat2Label: "WhatsApp & On-Trip Support",
             stat3Number: "50+",
             stat3Label: "Global Airlines & Destinations",
-            stat4Number: "24/7",
-            stat4Label: "WhatsApp & On-Trip Support",
+            stat4Number: "Swat Matta",
+            stat4Label: "Central Head Office (Fazal Banda Rd)",
             why1Title: "Transparent & Honest Guidance",
             why1Desc:
                 "Zero hidden charges. Every travel plan shared at our Swat Matta Head Office includes clear, honest breakdowns of flights, visas, and hotels.",
@@ -362,6 +362,10 @@
         if (
             !incHome.branch2Address ||
             incHome.stat1Number === "100%" ||
+            incHome.stat4Number === "Blue Area" ||
+            incHome.stat4Number === "24/7" ||
+            (incHome.aboutHeading && incHome.aboutHeading.includes("Islamabad")) ||
+            (incHome.heroBadge && incHome.heroBadge.includes("Islamabad")) ||
             (incHome.branch1Title && incHome.branch1Title.includes("Islamabad"))
         ) {
             Object.assign(incHome, DEFAULT_PAGE_CONTENT.home);

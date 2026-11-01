@@ -447,16 +447,16 @@
                                     </div>
 
                                     <div class="border-t border-slate-100 pt-4 space-y-3">
-                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B]">Our Official Offices (Swat Head Office & Islamabad Branch)</h4>
+                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B]">Our 2 Official Branch Locations (Islamabad & Swat Matta)</h4>
                                         <div class="grid sm:grid-cols-2 gap-3">
                                             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
-                                                <span class="text-[10px] font-extrabold uppercase text-[#0B2D5B]">Branch 01 — Swat Head Office (Matta)</span>
+                                                <span class="text-[10px] font-extrabold uppercase text-[#0B2D5B]">Branch 01 (Islamabad)</span>
                                                 <input type="text" id="homeBranch1TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
                                                 <input type="text" id="homeBranch1AddrInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-slate-700">
                                                 <textarea id="homeBranch1DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
                                             </div>
                                             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
-                                                <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Branch 02 — Islamabad Branch</span>
+                                                <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Branch 02 (Swat Matta)</span>
                                                 <input type="text" id="homeBranch2TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
                                                 <input type="text" id="homeBranch2AddrInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-slate-700">
                                                 <textarea id="homeBranch2DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
@@ -469,8 +469,8 @@
                                         <div class="grid grid-cols-2 gap-3">
                                             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
                                                 <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Stat Box 1</span>
-                                                <input type="text" id="homeStat1NumInput" required placeholder="100%" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
-                                                <input type="text" id="homeStat1LblInput" required placeholder="Visa & Documentation Care" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                                <input type="text" id="homeStat1NumInput" required placeholder="100K+" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="homeStat1LblInput" required placeholder="Happy Clients & Pilgrims Served" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
                                             </div>
                                             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
                                                 <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Stat Box 2</span>
@@ -484,8 +484,8 @@
                                             </div>
                                             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
                                                 <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Stat Box 4</span>
-                                                <input type="text" id="homeStat4NumInput" required placeholder="Blue Area" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
-                                                <input type="text" id="homeStat4LblInput" required placeholder="Central Islamabad Head Office" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                                <input type="text" id="homeStat4NumInput" required placeholder="Swat Matta" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="homeStat4LblInput" required placeholder="Central Head Office (Fazal Banda Rd)" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
                                             </div>
                                         </div>
                                     </div>
@@ -1602,7 +1602,7 @@
             setVal("#homeHeroHeadingMainInput", pHome.heroHeadingMain || "Your Spiritual & Global Journey,");
             setVal("#homeHeroDescriptionInput", pHome.heroDescription || "");
             setVal("#homeAboutBadgeInput", pHome.aboutBadge || "About Zakir Travel & Tours");
-            setVal("#homeAboutHeadingInput", pHome.aboutHeading || "Swat's Premier Travel & Umrah Agency Serving 100,000+ Clients");
+            setVal("#homeAboutHeadingInput", pHome.aboutHeading || "Swat's Trusted Partner for Spiritual & Worldwide Travel");
             setVal("#homeAboutDescInput", pHome.aboutDescription || "");
             setVal("#homeMissionTitleInput", pHome.missionTitle || "Our Mission & Promise");
             setVal("#homeMissionDescInput", pHome.missionDesc || "");
@@ -1616,12 +1616,12 @@
             setVal("#homeBranch2DescInput", pHome.branch2Desc || "");
             setVal("#homeStat1NumInput", pHome.stat1Number || "100K+");
             setVal("#homeStat1LblInput", pHome.stat1Label || "Happy Clients & Pilgrims Served");
-            setVal("#homeStat2NumInput", pHome.stat2Number || "Swat HQ");
-            setVal("#homeStat2LblInput", pHome.stat2Label || "Matta Head Office + Islamabad Branch");
+            setVal("#homeStat2NumInput", pHome.stat2Number || "24/7");
+            setVal("#homeStat2LblInput", pHome.stat2Label || "WhatsApp & On-Trip Support");
             setVal("#homeStat3NumInput", pHome.stat3Number || "50+");
             setVal("#homeStat3LblInput", pHome.stat3Label || "Global Airlines & Destinations");
-            setVal("#homeStat4NumInput", pHome.stat4Number || "24/7");
-            setVal("#homeStat4LblInput", pHome.stat4Label || "WhatsApp & On-Trip Support");
+            setVal("#homeStat4NumInput", pHome.stat4Number || "Swat Matta");
+            setVal("#homeStat4LblInput", pHome.stat4Label || "Central Head Office (Fazal Banda Rd)");
             setVal("#homeWhy1TitleInput", pHome.why1Title || "Authorized & Transparent Pricing");
             setVal("#homeWhy1DescInput", pHome.why1Desc || "");
             setVal("#homeWhy2TitleInput", pHome.why2Title || "Dedicated Personal Consultants");
