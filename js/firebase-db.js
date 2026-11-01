@@ -54,43 +54,57 @@
 
     const DEFAULT_PAGE_CONTENT = {
         home: {
-            heroBadge: "Trusted Travel Partner in Blue Area, Islamabad",
+            heroBadge: "Trusted Travel Partner in Islamabad & Swat",
             heroHeadingMain: "Your Spiritual & Global Journey,",
             heroDescription:
-                "From hassle-free Umrah packages with luxury stays near Haram to fast-track worldwide visas and the lowest domestic & international flight fares.",
-            aboutBadge: "About Our Agency",
-            aboutHeading: "Islamabad's Trusted Partner for Spiritual & Worldwide Travel",
+                "Serving over 100,000+ happy pilgrims and global travelers across Pakistan through our official branches in Blue Area Islamabad and Swat Matta. We specialize in Umrah & Ziyarat pilgrimages, domestic & international air ticketing, and worldwide visa consultancy.",
+            aboutBadge: "About Zakir Travel & Tours",
+            aboutHeading: "A Trusted Travel Agency Serving 100,000+ Clients Across Pakistan",
             aboutDescription:
-                "Located in Potohar Plaza, Blue Area Islamabad, Zakir Travel & Tours is a full-service travel agency dedicated to making your Umrah pilgrimage, global visa applications, and international air ticketing completely seamless, transparent, and stress-free.",
-            stat1Number: "100%",
-            stat1Label: "Visa & Documentation Care",
-            stat2Number: "24/7",
-            stat2Label: "WhatsApp & On-Trip Support",
+                "With official offices in Potohar Plaza, Blue Area Islamabad and Fazal Banda Rd, Swat Matta, Zakir Travel & Tours is a full-service travel agency dedicated to making your Umrah pilgrimage, global visa applications, and domestic & international air ticketing completely seamless, transparent, and stress-free.",
+            missionTitle: "Our Mission & Promise",
+            missionDesc:
+                "To serve every pilgrim, family, and traveler with complete honesty, transparent guidance, and reliable arrangements from departure to safe return.",
+            visionTitle: "Our Regional Accessibility",
+            visionDesc:
+                "Connecting travelers across Islamabad, Rawalpindi, Swat Matta, and all of Pakistan with direct in-office and WhatsApp travel support.",
+            branch1Title: "Islamabad Head Office (Blue Area)",
+            branch1Address: "Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad",
+            branch1Desc:
+                "Our central Islamabad desk located in the heart of Blue Area for walk-in Umrah bookings, embassy visa file preparation, and instant air ticketing.",
+            branch2Title: "Swat Regional Branch (Matta)",
+            branch2Address: "Fazal Banda Rd, Swat Matta, Khyber Pakhtunkhwa, Pakistan",
+            branch2Desc:
+                "Our dedicated regional branch in Swat Matta providing families and pilgrims across Swat and Malakand Division with direct local travel and Umrah services.",
+            stat1Number: "100K+",
+            stat1Label: "Happy Clients & Pilgrims Served",
+            stat2Number: "2 Branches",
+            stat2Label: "Islamabad & Swat Matta Offices",
             stat3Number: "50+",
             stat3Label: "Global Airlines & Destinations",
-            stat4Number: "Blue Area",
-            stat4Label: "Central Islamabad Head Office",
-            why1Title: "Authorized & Transparent Pricing",
+            stat4Number: "24/7",
+            stat4Label: "WhatsApp & On-Trip Support",
+            why1Title: "Transparent & Honest Guidance",
             why1Desc:
-                "Zero hidden charges. Every quote we share on WhatsApp or at our Islamabad desk includes clear breakdowns of flights, visas, and hotels.",
-            why2Title: "Dedicated Personal Consultants",
+                "Zero hidden charges. Every travel plan shared at our Islamabad or Swat Matta offices includes clear, honest breakdowns of flights, visas, and hotels.",
+            why2Title: "Direct Management Supervision",
             why2Desc:
-                "Direct access to our management team (Inam Khan & Sadiq Ullah) from the moment you inquire until you safely return home.",
-            why3Title: "Fast-Track Processing",
+                "Direct personal care from our management team (Inam Khan & Sadiq Ullah) from your first inquiry until you safely return home.",
+            why3Title: "Fast-Track One-Window Service",
             why3Desc:
-                "Rapid electronic Umrah visas, embassy file preparation, and instant airline e-ticket issuance under one roof.",
-            srv1Title: "Umrah & Ziyarat Packages",
+                "Electronic Saudi Umrah visas, worldwide tourist visa consultancy, hotel bookings, and instant airline e-tickets handled under one roof.",
+            srv1Title: "Umrah & Ziyarat Pilgrimage",
             srv1Desc:
-                "Economy, Star, and VIP Customized Umrah packages for individuals, families, and groups with guided assistance.",
-            srv2Title: "Flight Tickets",
+                "Economy, Star, and 5-Star VIP Umrah arrangements for individuals, families, and groups with verified Haramain hotels and guided Ziyarat.",
+            srv2Title: "Domestic & International Air Ticketing",
             srv2Desc:
-                "Guaranteed lowest fares on all major domestic and international airlines with instant e-ticket confirmation.",
-            srv3Title: "Visa Consultancy",
+                "Lowest guaranteed fares on PIA, Saudia, Emirates, Qatar Airways, Airblue, Fly Jinnah, and all global airlines with instant e-ticket issuance.",
+            srv3Title: "Worldwide Visa Consultancy",
             srv3Desc:
-                "Expert visa documentation, appointment scheduling, and fast e-visa processing for top global destinations.",
-            srv4Title: "Hotel & Transport",
+                "Expert tourist, visit, and e-visa documentation and file preparation for Saudi Arabia, UAE, Turkey, Malaysia, Thailand, UK, and Schengen.",
+            srv4Title: "Haramain Hotels & Transport",
             srv4Desc:
-                "Worldwide hotel reservations and dedicated private GMC, H1, Coaster, and luxury bus transport in Saudi Arabia."
+                "Walking-distance Makkah & Madinah hotel reservations and comfortable private GMC, H1, Coaster, and luxury AC bus transport."
         },
         umrah: {
             heroBadge: "Direct Departures from Islamabad (ISB)",
@@ -344,8 +358,12 @@
     function mergePageContent(baseContent, incomingContent) {
         const base = baseContent || DEFAULT_PAGE_CONTENT;
         const inc = incomingContent || {};
+        const incHome = { ...(inc.home || {}) };
+        if (!incHome.branch2Address || incHome.stat1Number === "100%") {
+            Object.assign(incHome, DEFAULT_PAGE_CONTENT.home);
+        }
         return {
-            home: { ...DEFAULT_PAGE_CONTENT.home, ...(base.home || {}), ...(inc.home || {}) },
+            home: { ...DEFAULT_PAGE_CONTENT.home, ...(base.home || {}), ...incHome },
             umrah: { ...DEFAULT_PAGE_CONTENT.umrah, ...(base.umrah || {}), ...(inc.umrah || {}) },
             visas: { ...DEFAULT_PAGE_CONTENT.visas, ...(base.visas || {}), ...(inc.visas || {}) },
             calculator: { ...DEFAULT_PAGE_CONTENT.calculator, ...(base.calculator || {}), ...(inc.calculator || {}) },

@@ -419,7 +419,7 @@
                                     </div>
 
                                     <div class="border-t border-slate-100 pt-4 space-y-3">
-                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B]">About Our Agency Section (Home Page)</h4>
+                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B]">About Our Agency & Mission (Home Page)</h4>
                                         <div class="grid sm:grid-cols-2 gap-3">
                                             <div>
                                                 <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">About Section Badge</label>
@@ -432,6 +432,34 @@
                                             <div class="sm:col-span-2">
                                                 <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">About Agency Description</label>
                                                 <textarea id="homeAboutDescInput" rows="3" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700"></textarea>
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Mission Card</span>
+                                                <input type="text" id="homeMissionTitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                <textarea id="homeMissionDescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Regional Accessibility Card</span>
+                                                <input type="text" id="homeVisionTitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                <textarea id="homeVisionDescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-t border-slate-100 pt-4 space-y-3">
+                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B]">Our 2 Official Branch Locations (Islamabad & Swat Matta)</h4>
+                                        <div class="grid sm:grid-cols-2 gap-3">
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-extrabold uppercase text-[#0B2D5B]">Branch 01 (Islamabad)</span>
+                                                <input type="text" id="homeBranch1TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                <input type="text" id="homeBranch1AddrInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-slate-700">
+                                                <textarea id="homeBranch1DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Branch 02 (Swat Matta)</span>
+                                                <input type="text" id="homeBranch2TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                <input type="text" id="homeBranch2AddrInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-slate-700">
+                                                <textarea id="homeBranch2DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -1570,20 +1598,30 @@
             const pCalc = pc.calculator || {};
             const pContact = pc.contact || {};
 
-            setVal("#homeHeroBadgeInput", pHome.heroBadge || "Trusted Travel Partner in Blue Area, Islamabad");
+            setVal("#homeHeroBadgeInput", pHome.heroBadge || "Trusted Travel Partner in Islamabad & Swat");
             setVal("#homeHeroHeadingMainInput", pHome.heroHeadingMain || "Your Spiritual & Global Journey,");
             setVal("#homeHeroDescriptionInput", pHome.heroDescription || "");
-            setVal("#homeAboutBadgeInput", pHome.aboutBadge || "About Our Agency");
-            setVal("#homeAboutHeadingInput", pHome.aboutHeading || "Islamabad's Trusted Partner for Spiritual & Worldwide Travel");
+            setVal("#homeAboutBadgeInput", pHome.aboutBadge || "About Zakir Travel & Tours");
+            setVal("#homeAboutHeadingInput", pHome.aboutHeading || "A Trusted Travel Agency Serving 100,000+ Clients Across Pakistan");
             setVal("#homeAboutDescInput", pHome.aboutDescription || "");
-            setVal("#homeStat1NumInput", pHome.stat1Number || "100%");
-            setVal("#homeStat1LblInput", pHome.stat1Label || "Visa & Documentation Care");
-            setVal("#homeStat2NumInput", pHome.stat2Number || "24/7");
-            setVal("#homeStat2LblInput", pHome.stat2Label || "WhatsApp & On-Trip Support");
+            setVal("#homeMissionTitleInput", pHome.missionTitle || "Our Mission & Promise");
+            setVal("#homeMissionDescInput", pHome.missionDesc || "");
+            setVal("#homeVisionTitleInput", pHome.visionTitle || "Our Regional Accessibility");
+            setVal("#homeVisionDescInput", pHome.visionDesc || "");
+            setVal("#homeBranch1TitleInput", pHome.branch1Title || "Islamabad Head Office (Blue Area)");
+            setVal("#homeBranch1AddrInput", pHome.branch1Address || "Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad");
+            setVal("#homeBranch1DescInput", pHome.branch1Desc || "");
+            setVal("#homeBranch2TitleInput", pHome.branch2Title || "Swat Regional Branch (Matta)");
+            setVal("#homeBranch2AddrInput", pHome.branch2Address || "Fazal Banda Rd, Swat Matta, Khyber Pakhtunkhwa, Pakistan");
+            setVal("#homeBranch2DescInput", pHome.branch2Desc || "");
+            setVal("#homeStat1NumInput", pHome.stat1Number || "100K+");
+            setVal("#homeStat1LblInput", pHome.stat1Label || "Happy Clients & Pilgrims Served");
+            setVal("#homeStat2NumInput", pHome.stat2Number || "2 Branches");
+            setVal("#homeStat2LblInput", pHome.stat2Label || "Islamabad & Swat Matta Offices");
             setVal("#homeStat3NumInput", pHome.stat3Number || "50+");
             setVal("#homeStat3LblInput", pHome.stat3Label || "Global Airlines & Destinations");
-            setVal("#homeStat4NumInput", pHome.stat4Number || "Blue Area");
-            setVal("#homeStat4LblInput", pHome.stat4Label || "Central Islamabad Head Office");
+            setVal("#homeStat4NumInput", pHome.stat4Number || "24/7");
+            setVal("#homeStat4LblInput", pHome.stat4Label || "WhatsApp & On-Trip Support");
             setVal("#homeWhy1TitleInput", pHome.why1Title || "Authorized & Transparent Pricing");
             setVal("#homeWhy1DescInput", pHome.why1Desc || "");
             setVal("#homeWhy2TitleInput", pHome.why2Title || "Dedicated Personal Consultants");
@@ -1890,6 +1928,16 @@
                         aboutBadge: getVal("#homeAboutBadgeInput"),
                         aboutHeading: getVal("#homeAboutHeadingInput"),
                         aboutDescription: getVal("#homeAboutDescInput"),
+                        missionTitle: getVal("#homeMissionTitleInput"),
+                        missionDesc: getVal("#homeMissionDescInput"),
+                        visionTitle: getVal("#homeVisionTitleInput"),
+                        visionDesc: getVal("#homeVisionDescInput"),
+                        branch1Title: getVal("#homeBranch1TitleInput"),
+                        branch1Address: getVal("#homeBranch1AddrInput"),
+                        branch1Desc: getVal("#homeBranch1DescInput"),
+                        branch2Title: getVal("#homeBranch2TitleInput"),
+                        branch2Address: getVal("#homeBranch2AddrInput"),
+                        branch2Desc: getVal("#homeBranch2DescInput"),
                         stat1Number: getVal("#homeStat1NumInput"),
                         stat1Label: getVal("#homeStat1LblInput"),
                         stat2Number: getVal("#homeStat2NumInput"),

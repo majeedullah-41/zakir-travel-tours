@@ -188,6 +188,28 @@
         if (pHome.aboutBadge) setText("homeAboutBadge", pHome.aboutBadge);
         if (pHome.aboutHeading) setText("homeAboutHeading", pHome.aboutHeading);
         if (pHome.aboutDescription) setText("homeAboutDescription", pHome.aboutDescription);
+        if (pHome.missionTitle) setText("homeMissionTitle", pHome.missionTitle);
+        if (pHome.missionDesc) setText("homeMissionDesc", pHome.missionDesc);
+        if (pHome.visionTitle) setText("homeVisionTitle", pHome.visionTitle);
+        if (pHome.visionDesc) setText("homeVisionDesc", pHome.visionDesc);
+        if (pHome.branch1Title) {
+            setText("heroBranch1Title", pHome.branch1Title);
+            setText("homeBranch1CardTitle", pHome.branch1Title);
+        }
+        if (pHome.branch1Address) {
+            setText("heroBranch1Address", pHome.branch1Address);
+            setText("homeBranch1CardAddress", pHome.branch1Address);
+        }
+        if (pHome.branch1Desc) setText("homeBranch1CardDesc", pHome.branch1Desc);
+        if (pHome.branch2Title) {
+            setText("heroBranch2Title", pHome.branch2Title);
+            setText("homeBranch2CardTitle", pHome.branch2Title);
+        }
+        if (pHome.branch2Address) {
+            setText("heroBranch2Address", pHome.branch2Address);
+            setText("homeBranch2CardAddress", pHome.branch2Address);
+        }
+        if (pHome.branch2Desc) setText("homeBranch2CardDesc", pHome.branch2Desc);
         if (pHome.stat1Number) setText("homeStat1Number", pHome.stat1Number);
         if (pHome.stat1Label) setText("homeStat1Label", pHome.stat1Label);
         if (pHome.stat2Number) setText("homeStat2Number", pHome.stat2Number);
