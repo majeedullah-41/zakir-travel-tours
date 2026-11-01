@@ -152,9 +152,9 @@
         // --- Header Logo & Tagline ---
         const agencyParts = agencyName.trim().split(/\s+/);
         const logoMain = agencyParts[0] || "ZAKIR";
-        const logoSub = agencyParts.length > 1 ? agencyParts.slice(1).join(" ") : "TRAVEL & TOURS";
+        const logoSub = agencyParts.length > 1 ? agencyParts.slice(1).join(" ") : "Travel & Tours";
         setText("headerAgencyNameMain", logoMain.toUpperCase());
-        setText("headerAgencyNameSub", logoSub.toUpperCase());
+        setText("headerAgencyNameSub", logoSub);
         setText("headerTaglinePrimary", taglinePrimary.toUpperCase());
 
         // --- Navbar & Mobile Menu WhatsApp Links ---
