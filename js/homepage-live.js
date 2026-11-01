@@ -185,6 +185,23 @@
         if (pHome.heroBadge) setText("homeHeroBadge", pHome.heroBadge);
         if (pHome.heroHeadingMain) setText("homeHeroHeadingMain", pHome.heroHeadingMain);
         if (pHome.heroDescription) setText("homeHeroDescription", pHome.heroDescription);
+        if (pHome.aboutBadge) setText("homeAboutBadge", pHome.aboutBadge);
+        if (pHome.aboutHeading) setText("homeAboutHeading", pHome.aboutHeading);
+        if (pHome.aboutDescription) setText("homeAboutDescription", pHome.aboutDescription);
+        if (pHome.stat1Number) setText("homeStat1Number", pHome.stat1Number);
+        if (pHome.stat1Label) setText("homeStat1Label", pHome.stat1Label);
+        if (pHome.stat2Number) setText("homeStat2Number", pHome.stat2Number);
+        if (pHome.stat2Label) setText("homeStat2Label", pHome.stat2Label);
+        if (pHome.stat3Number) setText("homeStat3Number", pHome.stat3Number);
+        if (pHome.stat3Label) setText("homeStat3Label", pHome.stat3Label);
+        if (pHome.stat4Number) setText("homeStat4Number", pHome.stat4Number);
+        if (pHome.stat4Label) setText("homeStat4Label", pHome.stat4Label);
+        if (pHome.why1Title) setText("homeWhy1Title", pHome.why1Title);
+        if (pHome.why1Desc) setText("homeWhy1Desc", pHome.why1Desc);
+        if (pHome.why2Title) setText("homeWhy2Title", pHome.why2Title);
+        if (pHome.why2Desc) setText("homeWhy2Desc", pHome.why2Desc);
+        if (pHome.why3Title) setText("homeWhy3Title", pHome.why3Title);
+        if (pHome.why3Desc) setText("homeWhy3Desc", pHome.why3Desc);
         if (pHome.srv1Title) setText("homeSrv1Title", pHome.srv1Title);
         if (pHome.srv1Desc) setText("homeSrv1Desc", pHome.srv1Desc);
         if (pHome.srv2Title) setText("homeSrv2Title", pHome.srv2Title);
@@ -208,7 +225,7 @@
             const listEl = document.getElementById(listId);
             if (!listEl || !rawLines) return;
             const lines = String(rawLines)
-                .split(/\r?\n/)
+                .split(/\r?\n|\|/)
                 .map((l) => l.trim())
                 .filter(Boolean);
             if (!lines.length) return;
@@ -240,7 +257,7 @@
         const flightBulletsEl = document.getElementById("visaFlightBulletsList");
         if (flightBulletsEl && pVisas.flightBullets) {
             const fLines = String(pVisas.flightBullets)
-                .split(/\r?\n/)
+                .split(/\r?\n|\|/)
                 .map((l) => l.trim())
                 .filter(Boolean);
             if (fLines.length) {
@@ -282,7 +299,7 @@
         const calcBulletsEl = document.getElementById("calcIncludedBulletsList");
         if (calcBulletsEl && pCalc.includedBullets) {
             const cLines = String(pCalc.includedBullets)
-                .split(/\r?\n/)
+                .split(/\r?\n|\|/)
                 .map((l) => l.trim())
                 .filter(Boolean);
             if (cLines.length) {

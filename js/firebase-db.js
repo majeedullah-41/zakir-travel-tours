@@ -58,6 +58,27 @@
             heroHeadingMain: "Your Spiritual & Global Journey,",
             heroDescription:
                 "From hassle-free Umrah packages with luxury stays near Haram to fast-track worldwide visas and the lowest domestic & international flight fares.",
+            aboutBadge: "About Our Agency",
+            aboutHeading: "Islamabad's Trusted Partner for Spiritual & Worldwide Travel",
+            aboutDescription:
+                "Located in Potohar Plaza, Blue Area Islamabad, Zakir Travel & Tours is a full-service travel agency dedicated to making your Umrah pilgrimage, global visa applications, and international air ticketing completely seamless, transparent, and stress-free.",
+            stat1Number: "100%",
+            stat1Label: "Visa & Documentation Care",
+            stat2Number: "24/7",
+            stat2Label: "WhatsApp & On-Trip Support",
+            stat3Number: "50+",
+            stat3Label: "Global Airlines & Destinations",
+            stat4Number: "Blue Area",
+            stat4Label: "Central Islamabad Head Office",
+            why1Title: "Authorized & Transparent Pricing",
+            why1Desc:
+                "Zero hidden charges. Every quote we share on WhatsApp or at our Islamabad desk includes clear breakdowns of flights, visas, and hotels.",
+            why2Title: "Dedicated Personal Consultants",
+            why2Desc:
+                "Direct access to our management team (Inam Khan & Sadiq Ullah) from the moment you inquire until you safely return home.",
+            why3Title: "Fast-Track Processing",
+            why3Desc:
+                "Rapid electronic Umrah visas, embassy file preparation, and instant airline e-ticket issuance under one roof.",
             srv1Title: "Umrah & Ziyarat Packages",
             srv1Desc:
                 "Economy, Star, and VIP Customized Umrah packages for individuals, families, and groups with guided assistance.",

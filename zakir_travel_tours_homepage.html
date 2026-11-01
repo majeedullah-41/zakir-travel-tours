@@ -357,35 +357,73 @@
         </div>
     </section>
 
-    <!-- 2. Featured Flyer Deal Spotlight (Managed from Admin Tab 1) -->
-    <section id="umrah-spotlight" class="py-16 lg:py-24 islamic-bg relative">
+    <!-- 2. General Agency Overview, Stats & Why Choose Us (Managed from Admin Tab 1) -->
+    <section id="about-agency" class="py-16 lg:py-24 islamic-bg relative border-b border-slate-200/70">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-8">
-                <span id="spotlightMonthLabel" class="font-script text-3xl sm:text-4xl text-teal block mb-1">January & Upcoming</span>
-                <h2 class="text-3xl sm:text-5xl font-black tracking-tight uppercase">
-                    <span id="spotlightTitlePrimary" class="text-navy">UMRAH</span> <span id="spotlightTitleSecondary" class="text-teal">PACKAGE</span>
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span id="homeAboutBadge" class="inline-flex items-center gap-2 bg-teal-accent border border-teal/30 px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-widest text-teal mb-3">
+                    About Our Agency
+                </span>
+                <h2 id="homeAboutHeading" class="text-3xl sm:text-5xl font-black tracking-tight text-navy leading-tight">
+                    Islamabad's Trusted Partner for Spiritual & Worldwide Travel
                 </h2>
-                <div class="w-28 h-1.5 bg-gradient-to-r from-navy to-teal mx-auto mt-3 rounded-full"></div>
-                <p id="spotlightSubtitleCopy" class="text-slate-600 mt-4 text-sm sm:text-base">
-                    Complete spiritual peace of mind with our all-inclusive featured <span id="spotlightDurationCopy" class="font-bold text-navy">14 Nights</span> Umrah package. Everything handled from Islamabad to Haramain.
+                <div class="w-28 h-1.5 bg-gradient-to-r from-navy to-teal mx-auto mt-4 rounded-full"></div>
+                <p id="homeAboutDescription" class="text-slate-600 mt-5 text-sm sm:text-base leading-relaxed">
+                    Located in Potohar Plaza, Blue Area Islamabad, Zakir Travel & Tours is a full-service travel agency dedicated to making your Umrah pilgrimage, global visa applications, and international air ticketing completely seamless, transparent, and stress-free.
                 </p>
             </div>
 
-            <!-- Interactive Deal Switcher / Filter Bar -->
-            <div id="specialDealsFilterBar" class="hidden text-center mb-8"></div>
-
-            <!-- Dynamic Multi-Deal Special Flyer Showcases Container -->
-            <div id="specialDealsShowcaseContainer" class="space-y-12">
-                <!-- Populated dynamically by js/homepage-live.js -->
+            <!-- 4 Agency Key Stats -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
+                <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200/80 text-center hover:border-teal transition-all">
+                    <div id="homeStat1Number" class="text-3xl sm:text-4xl font-black text-teal">100%</div>
+                    <div id="homeStat1Label" class="text-xs sm:text-sm font-bold text-navy mt-1">Visa & Documentation Care</div>
+                </div>
+                <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200/80 text-center hover:border-teal transition-all">
+                    <div id="homeStat2Number" class="text-3xl sm:text-4xl font-black text-teal">24/7</div>
+                    <div id="homeStat2Label" class="text-xs sm:text-sm font-bold text-navy mt-1">WhatsApp & On-Trip Support</div>
+                </div>
+                <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200/80 text-center hover:border-teal transition-all">
+                    <div id="homeStat3Number" class="text-3xl sm:text-4xl font-black text-teal">50+</div>
+                    <div id="homeStat3Label" class="text-xs sm:text-sm font-bold text-navy mt-1">Global Airlines & Destinations</div>
+                </div>
+                <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200/80 text-center hover:border-teal transition-all">
+                    <div id="homeStat4Number" class="text-3xl sm:text-4xl font-black text-teal">Blue Area</div>
+                    <div id="homeStat4Label" class="text-xs sm:text-sm font-bold text-navy mt-1">Central Islamabad Head Office</div>
+                </div>
             </div>
 
-            <!-- Link to Dedicated Umrah Packages Page -->
-            <div class="mt-10 text-center">
-                <a href="umrah-packages.html" class="inline-flex items-center gap-2.5 bg-navy hover:bg-navy-light text-white font-extrabold px-8 py-4 rounded-2xl shadow-xl hover:-translate-y-0.5 transition-all text-sm sm:text-base">
-                    <i class="fa-solid fa-kaaba text-teal-light"></i>
-                    <span>Explore All Umrah Packages & Compare Room Tiers</span>
-                    <i class="fa-solid fa-arrow-right text-teal-light"></i>
-                </a>
+            <!-- 3 Why Choose Us Pillars -->
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-3xl p-7 shadow-md border border-slate-200/90 hover:border-teal transition-all">
+                    <div class="w-12 h-12 rounded-2xl bg-teal-accent text-teal flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h3 id="homeWhy1Title" class="text-lg font-extrabold text-navy mb-2">Authorized & Transparent Pricing</h3>
+                    <p id="homeWhy1Desc" class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                        Zero hidden charges. Every quote we share on WhatsApp or at our Islamabad desk includes clear breakdowns of flights, visas, and hotels.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-3xl p-7 shadow-md border border-slate-200/90 hover:border-teal transition-all">
+                    <div class="w-12 h-12 rounded-2xl bg-teal-accent text-teal flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-user-Check fa-user-tie"></i>
+                    </div>
+                    <h3 id="homeWhy2Title" class="text-lg font-extrabold text-navy mb-2">Dedicated Personal Consultants</h3>
+                    <p id="homeWhy2Desc" class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                        Direct access to our management team (Inam Khan & Sadiq Ullah) from the moment you inquire until you safely return home.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-3xl p-7 shadow-md border border-slate-200/90 hover:border-teal transition-all">
+                    <div class="w-12 h-12 rounded-2xl bg-teal-accent text-teal flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <h3 id="homeWhy3Title" class="text-lg font-extrabold text-navy mb-2">Fast-Track Processing</h3>
+                    <p id="homeWhy3Desc" class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                        Rapid electronic Umrah visas, embassy file preparation, and instant airline e-ticket issuance under one roof.
+                    </p>
+                </div>
             </div>
         </div>
     </section>
@@ -580,55 +618,6 @@
                     <span>Send Inquiry via WhatsApp</span>
                 </button>
             </form>
-        </div>
-    </div>
-
-    <!-- Promotional Monthly Flyer Lightbox Modal -->
-    <div id="promotionalFlyerModal" class="fixed inset-0 z-50 hidden bg-navy-dark/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl relative max-h-[92vh] overflow-y-auto">
-            <button type="button" onclick="closePromotionalFlyerModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center z-10">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div class="text-center mb-4">
-                <span class="text-[11px] font-bold uppercase tracking-widest text-teal">Official Monthly Flyer</span>
-                <h3 class="text-xl font-black text-navy">Zakir Travel & Tours Flyer</h3>
-            </div>
-
-            <img id="flyerModalCustomImage" src="" alt="Promotional Umrah Flyer" class="w-full rounded-2xl border border-slate-200 shadow-md hidden mb-4">
-
-            <div id="flyerModalDigitalPreview" class="bg-gradient-to-br from-navy-dark via-navy to-teal rounded-2xl p-6 text-white text-center space-y-4 shadow-inner mb-5">
-                <div class="font-script text-2xl text-teal-light" id="flyerPreviewMonth">January</div>
-                <div class="text-2xl font-black tracking-tight uppercase" id="flyerPreviewTitle">UMRAH PACKAGE</div>
-                <div class="bg-white/15 border border-white/25 rounded-2xl py-4 px-5 inline-block">
-                    <span class="text-[10px] uppercase tracking-widest text-sky-200 block">Starting From</span>
-                    <div id="flyerPreviewPrice" class="text-3xl font-black text-white my-0.5">PKR 232,000</div>
-                    <span id="flyerPreviewUnit" class="text-[11px] font-bold text-teal-accent uppercase">PER PERSON (SHARING)</span>
-                </div>
-                <div class="grid grid-cols-3 gap-2 text-xs bg-black/20 rounded-xl p-3">
-                    <div>
-                        <span class="text-slate-300 block text-[10px]">Departure</span>
-                        <strong id="flyerPreviewDep">Jan 26, 2026</strong>
-                    </div>
-                    <div>
-                        <span class="text-slate-300 block text-[10px]">Return</span>
-                        <strong id="flyerPreviewRet">Nov 10, 2026</strong>
-                    </div>
-                    <div>
-                        <span class="text-slate-300 block text-[10px]">Duration</span>
-                        <strong id="flyerPreviewDur">14 Nights</strong>
-                    </div>
-                </div>
-                <div class="text-xs text-slate-200 pt-1">
-                    <i class="fa-solid fa-phone-volume text-teal-light mr-1"></i>
-                    <span id="flyerPreviewPhones">+92 349 0558345 | +92 343 4159182</span>
-                </div>
-            </div>
-
-            <a id="flyerModalWhatsAppBtn" href="https://wa.me/923490558345" target="_blank" rel="noopener noreferrer" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-3.5 rounded-xl shadow-lg flex items-center justify-center gap-2 text-sm">
-                <i class="fa-brands fa-whatsapp text-lg"></i>
-                <span>Book This Flyer Deal on WhatsApp</span>
-            </a>
         </div>
     </div>
 

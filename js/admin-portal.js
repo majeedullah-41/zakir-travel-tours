@@ -365,13 +365,13 @@
                         <nav class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 bg-white p-2 rounded-2xl shadow-md border border-slate-200/80">
                             <button type="button" data-tab="spotlight" class="admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#16437E] text-white font-extrabold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-md transition-all">
                                 <i class="fa-solid fa-house-chimney text-amber-300"></i>
-                                <span>1. Home & Deals</span>
-                                <span id="tabBadgeDeals" class="bg-white/20 text-white text-[10px] font-black px-2 py-0.5 rounded-full">1</span>
+                                <span>1. Home Page</span>
                             </button>
                             <button type="button" data-tab="umrah" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all">
                                 <i class="fa-solid fa-kaaba text-[#0D8A9E]"></i>
                                 <span>2. Umrah Page</span>
-                                <span id="tabBadgePkgs" class="bg-slate-200 text-slate-700 text-[10px] font-black px-2 py-0.5 rounded-full">4</span>
+                                <span id="tabBadgeDeals" class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded-full" title="Special Flyer Deals">1</span>
+                                <span id="tabBadgePkgs" class="bg-slate-200 text-slate-700 text-[10px] font-black px-2 py-0.5 rounded-full" title="Comparison Packages">4</span>
                             </button>
                             <button type="button" data-tab="visas" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all">
                                 <i class="fa-solid fa-passport text-[#0D8A9E]"></i>
@@ -389,48 +389,16 @@
                         </nav>
 
                         <!-- ========================================================== -->
-                        <!-- TAB 1: HOME PAGE & SPECIAL FLYER DEALS (MULTI-DEAL CRUD)   -->
+                        <!-- TAB 1: HOME PAGE GENERAL AGENCY INFORMATION (index.html)   -->
                         <!-- ========================================================== -->
                         <div id="admin-panel-spotlight" class="admin-tab-panel space-y-6 anim-fade-up">
-                            
-                            <!-- Header Bar for Special Flyer Deals CRUD -->
-                            <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200/90 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                <div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="bg-amber-100 text-amber-800 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
-                                            Home & Umrah Flyer Showcase CRUD
-                                        </span>
-                                        <span class="text-xs font-bold text-[#0D8A9E]">• Live on Home & Umrah Pages</span>
-                                    </div>
-                                    <h3 class="text-xl font-black text-[#0B2D5B] mt-1">Manage Special Flyer Deals & Offers</h3>
-                                    <p class="text-xs text-slate-500 mt-0.5">
-                                        Add multiple visual Flyer Deals (e.g. January Umrah, Ramzan Special, Rabi-ul-Awal Deal). Each deal renders its own dual-frame showcase card!
-                                    </p>
-                                </div>
-
-                                <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-                                    <button type="button" data-action="quick-add-ramzan-deal" class="bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-extrabold text-xs px-4 py-3 rounded-2xl transition-all flex items-center gap-1.5 shadow-sm">
-                                        <i class="fa-solid fa-moon text-amber-600"></i>
-                                        <span>+ Quick Add Ramzan Deal</span>
-                                    </button>
-                                    <button type="button" data-action="open-deal-modal" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg transition-all active:scale-95 flex items-center gap-2">
-                                        <i class="fa-solid fa-plus"></i>
-                                        <span>Add New Special Deal</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Special Flyer Deals Visual CRUD Grid -->
-                            <div id="crudSpecialDealsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
-
-                            <!-- Home Page Hero, 4 Core Service Cards & Primary Flyer Media Editor -->
                             <form id="homePageContentForm" class="grid lg:grid-cols-12 gap-6">
-                                <!-- Left Column: Home Hero & 4 Service Cards -->
-                                <div class="lg:col-span-7 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
+                                <!-- Left Column: Home Hero, About Our Agency & 4 Key Stats -->
+                                <div class="lg:col-span-6 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
                                     <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                                         <div>
-                                            <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">index.html Content Manager</span>
-                                            <h3 class="text-lg font-black text-[#0B2D5B]">Home Page Hero & 4 Core Service Cards</h3>
+                                            <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">index.html General Agency Info</span>
+                                            <h3 class="text-lg font-black text-[#0B2D5B]">Home Hero, About Agency & 4 Key Stats</h3>
                                         </div>
                                         <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">Home Page</span>
                                     </div>
@@ -450,35 +418,229 @@
                                         </div>
                                     </div>
 
-                                    <div class="border-t border-slate-100 pt-4">
-                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B] mb-3">4 Core Travel Service Cards on Home Page</h4>
+                                    <div class="border-t border-slate-100 pt-4 space-y-3">
+                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B]">About Our Agency Section (Home Page)</h4>
                                         <div class="grid sm:grid-cols-2 gap-3">
-                                            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
-                                                <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Service Card 1 (Umrah)</span>
-                                                <input type="text" id="homeSrv1TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
-                                                <textarea id="homeSrv1DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">About Section Badge</label>
+                                                <input type="text" id="homeAboutBadgeInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
                                             </div>
-                                            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
-                                                <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Service Card 2 (Visas)</span>
-                                                <input type="text" id="homeSrv2TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
-                                                <textarea id="homeSrv2DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">About Section Heading</label>
+                                                <input type="text" id="homeAboutHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
                                             </div>
-                                            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
-                                                <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Service Card 3 (Flights)</span>
-                                                <input type="text" id="homeSrv3TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
-                                                <textarea id="homeSrv3DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                            <div class="sm:col-span-2">
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">About Agency Description</label>
+                                                <textarea id="homeAboutDescInput" rows="3" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700"></textarea>
                                             </div>
-                                            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
-                                                <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Service Card 4 (Hotels & Transport)</span>
-                                                <input type="text" id="homeSrv4TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
-                                                <textarea id="homeSrv4DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-t border-slate-100 pt-4">
+                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B] mb-3">4 Agency Key Highlight Stats</h4>
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Stat Box 1</span>
+                                                <input type="text" id="homeStat1NumInput" required placeholder="100%" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="homeStat1LblInput" required placeholder="Visa & Documentation Care" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Stat Box 2</span>
+                                                <input type="text" id="homeStat2NumInput" required placeholder="24/7" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="homeStat2LblInput" required placeholder="WhatsApp & On-Trip Support" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Stat Box 3</span>
+                                                <input type="text" id="homeStat3NumInput" required placeholder="50+" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="homeStat3LblInput" required placeholder="Global Airlines & Destinations" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Stat Box 4</span>
+                                                <input type="text" id="homeStat4NumInput" required placeholder="Blue Area" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="homeStat4LblInput" required placeholder="Central Islamabad Head Office" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column: 3 Why Choose Us Pillars & 4 Core Service Cards -->
+                                <div class="lg:col-span-6 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5 flex flex-col justify-between">
+                                    <div class="space-y-5">
+                                        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                                            <div>
+                                                <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Trust Pillars & Services Overview</span>
+                                                <h3 class="text-lg font-black text-[#0B2D5B]">Why Choose Us & 4 Core Services</h3>
+                                            </div>
+                                            <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">index.html</span>
+                                        </div>
+
+                                        <div>
+                                            <h4 class="text-xs font-black uppercase text-[#0B2D5B] mb-3">3 "Why Choose Us" Agency Pillars</h4>
+                                            <div class="grid sm:grid-cols-3 gap-3">
+                                                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                    <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Pillar 1</span>
+                                                    <input type="text" id="homeWhy1TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                    <textarea id="homeWhy1DescInput" rows="3" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                                </div>
+                                                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                    <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Pillar 2</span>
+                                                    <input type="text" id="homeWhy2TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                    <textarea id="homeWhy2DescInput" rows="3" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                                </div>
+                                                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                    <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Pillar 3</span>
+                                                    <input type="text" id="homeWhy3TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                    <textarea id="homeWhy3DescInput" rows="3" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="border-t border-slate-100 pt-4">
+                                            <h4 class="text-xs font-black uppercase text-[#0B2D5B] mb-3">4 Core Travel Service Cards on Home Page</h4>
+                                            <div class="grid sm:grid-cols-2 gap-3">
+                                                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+                                                    <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Service Card 1 (Umrah)</span>
+                                                    <input type="text" id="homeSrv1TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                    <textarea id="homeSrv1DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                                </div>
+                                                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+                                                    <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Service Card 2 (Flights)</span>
+                                                    <input type="text" id="homeSrv2TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                    <textarea id="homeSrv2DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                                </div>
+                                                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+                                                    <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Service Card 3 (Visas)</span>
+                                                    <input type="text" id="homeSrv3TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                    <textarea id="homeSrv3DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                                </div>
+                                                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+                                                    <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Service Card 4 (Hotels & Transport)</span>
+                                                    <input type="text" id="homeSrv4TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                    <textarea id="homeSrv4DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
                                         <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
-                                        <span>Save Home Page Content</span>
+                                        <span>Save Home Page General Info</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- ========================================================== -->
+                        <!-- TAB 2: UMRAH PACKAGES PAGE (DEALS + PACKAGES + CONTENT)    -->
+                        <!-- ========================================================== -->
+                        <div id="admin-panel-umrah" class="admin-tab-panel hidden space-y-6 anim-fade-up">
+                            
+                            <!-- Header Bar for Special Flyer Deals CRUD -->
+                            <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200/90 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-amber-100 text-amber-800 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
+                                            Umrah Flyer Showcase CRUD
+                                        </span>
+                                        <span class="text-xs font-bold text-[#0D8A9E]">• Live on umrah-packages.html</span>
+                                    </div>
+                                    <h3 class="text-xl font-black text-[#0B2D5B] mt-1">Manage Special Umrah Flyer Deals & Offers</h3>
+                                    <p class="text-xs text-slate-500 mt-0.5">
+                                        Add multiple visual Flyer Deals (e.g. January Umrah, Ramzan Special, Rabi-ul-Awal Deal). Each deal renders its own dual-frame showcase card on the Umrah page!
+                                    </p>
+                                </div>
+
+                                <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                                    <button type="button" data-action="quick-add-ramzan-deal" class="bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-extrabold text-xs px-4 py-3 rounded-2xl transition-all flex items-center gap-1.5 shadow-sm">
+                                        <i class="fa-solid fa-moon text-amber-600"></i>
+                                        <span>+ Quick Add Ramzan Deal</span>
+                                    </button>
+                                    <button type="button" data-action="open-deal-modal" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg transition-all active:scale-95 flex items-center gap-2">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <span>Add New Special Deal</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Special Flyer Deals Visual CRUD Grid -->
+                            <div id="crudSpecialDealsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+
+                            <!-- Comparison Umrah Packages Header & Grid -->
+                            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+                                <div>
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-[#0D8A9E]">umrah-packages.html Manager</span>
+                                    <h3 class="text-xl font-black text-[#0B2D5B]">Comparison Umrah Packages (CRUD)</h3>
+                                    <p class="text-xs text-slate-500">Add, edit, reorder, or hide Umrah package comparison cards displayed on the Umrah Packages page.</p>
+                                </div>
+                                <button type="button" data-action="open-pkg-modal" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 transition-all">
+                                    <i class="fa-solid fa-plus"></i> Add Umrah Package Card
+                                </button>
+                            </div>
+
+                            <!-- Umrah Packages List -->
+                            <div id="crudPackagesContainer" class="grid md:grid-cols-2 gap-4"></div>
+
+                            <!-- Umrah Page Hero, 3 Inclusions Cards, Family Banner & Primary Deal Media Editor -->
+                            <form id="umrahPageContentForm" class="grid lg:grid-cols-12 gap-6">
+                                <div class="lg:col-span-7 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
+                                    <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                                        <div>
+                                            <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Page Text & Inclusions Editor</span>
+                                            <h3 class="text-lg font-black text-[#0B2D5B]">Umrah Page Banner, Inclusions & Family CTA</h3>
+                                        </div>
+                                        <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">umrah-packages.html</span>
+                                    </div>
+
+                                    <div class="grid sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Top Badge</label>
+                                            <input type="text" id="umrahHeroBadgeInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Main Heading</label>
+                                            <input type="text" id="umrahHeroTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                        </div>
+                                        <div class="sm:col-span-2">
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Subtitle</label>
+                                            <textarea id="umrahHeroSubtitleInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid md:grid-cols-3 gap-3 pt-1">
+                                        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+                                            <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Inclusion 1 (Flights & Visas)</span>
+                                            <input type="text" id="umrahInc1TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                            <label class="block text-[10px] font-semibold text-slate-500">Bullets (1 per line)</label>
+                                            <textarea id="umrahInc1BulletsInput" rows="4" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                        </div>
+                                        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+                                            <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Inclusion 2 (Hotels)</span>
+                                            <input type="text" id="umrahInc2TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                            <label class="block text-[10px] font-semibold text-slate-500">Bullets (1 per line)</label>
+                                            <textarea id="umrahInc2BulletsInput" rows="4" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                        </div>
+                                        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+                                            <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Inclusion 3 (Transport)</span>
+                                            <input type="text" id="umrahInc3TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                            <label class="block text-[10px] font-semibold text-slate-500">Bullets (1 per line)</label>
+                                            <textarea id="umrahInc3BulletsInput" rows="4" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid sm:grid-cols-2 gap-4 pt-1">
+                                        <div>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Family Umrah Banner Heading</label>
+                                            <input type="text" id="umrahFamilyTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Family Umrah Banner Description</label>
+                                            <input type="text" id="umrahFamilyDescInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-700">
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+                                        <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
+                                        <span>Save Umrah Page Content</span>
                                     </button>
                                 </div>
 
@@ -487,7 +649,7 @@
                                     <div class="space-y-4">
                                         <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                                             <div>
-                                                <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Spotlight Frames & Flyer</span>
+                                                <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Umrah Deal Frames & Flyer</span>
                                                 <h3 class="text-lg font-black text-[#0B2D5B]">Primary Deal Images & Monthly Flyer</h3>
                                             </div>
                                             <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">Phone Upload</span>
@@ -546,98 +708,15 @@
 
                                         <label class="flex items-center gap-2 cursor-pointer pt-2">
                                             <input type="checkbox" id="chkShowFlyerButton" class="w-4 h-4 accent-[#0D8A9E] rounded">
-                                            <span class="text-xs font-bold text-[#0B2D5B]">Show "View Latest Flyer" button on Deal Cards</span>
+                                            <span class="text-xs font-bold text-[#0B2D5B]">Show "View Latest Flyer" button on Umrah Deal Cards</span>
                                         </label>
                                     </div>
 
                                     <button type="submit" class="w-full bg-[#0D8A9E] hover:bg-[#096979] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
                                         <i class="fa-solid fa-cloud-arrow-up"></i>
-                                        <span>Save Media & Home Settings</span>
+                                        <span>Save Umrah Media & Flyer Settings</span>
                                     </button>
                                 </div>
-                            </form>
-                        </div>
-
-                        <!-- ========================================================== -->
-                        <!-- TAB 2: UMRAH PACKAGES PAGE (CRUD + PAGE CONTENT)           -->
-                        <!-- ========================================================== -->
-                        <div id="admin-panel-umrah" class="admin-tab-panel hidden space-y-6 anim-fade-up">
-                            
-                            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
-                                <div>
-                                    <span class="text-[10px] font-black uppercase tracking-wider text-[#0D8A9E]">umrah-packages.html Manager</span>
-                                    <h3 class="text-xl font-black text-[#0B2D5B]">Comparison Umrah Packages (CRUD)</h3>
-                                    <p class="text-xs text-slate-500">Add, edit, reorder, or hide Umrah package cards displayed on the Umrah Packages page.</p>
-                                </div>
-                                <button type="button" data-action="open-pkg-modal" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 transition-all">
-                                    <i class="fa-solid fa-plus"></i> Add Umrah Package Card
-                                </button>
-                            </div>
-
-                            <!-- Umrah Packages List -->
-                            <div id="crudPackagesContainer" class="grid md:grid-cols-2 gap-4"></div>
-
-                            <!-- Umrah Page Hero, 3 Inclusions Cards & Family Banner Editor -->
-                            <form id="umrahPageContentForm" class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
-                                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-                                    <div>
-                                        <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Page Text & Inclusions Editor</span>
-                                        <h3 class="text-lg font-black text-[#0B2D5B]">Umrah Page Banner, Inclusions & Family CTA</h3>
-                                    </div>
-                                    <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">umrah-packages.html</span>
-                                </div>
-
-                                <div class="grid sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Top Badge</label>
-                                        <input type="text" id="umrahHeroBadgeInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Main Heading</label>
-                                        <input type="text" id="umrahHeroTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
-                                    </div>
-                                    <div class="sm:col-span-2">
-                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Subtitle</label>
-                                        <textarea id="umrahHeroSubtitleInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
-                                    </div>
-                                </div>
-
-                                <div class="grid md:grid-cols-3 gap-4 pt-2">
-                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Inclusion Card 1 (Flights & Visas)</span>
-                                        <input type="text" id="umrahInc1TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
-                                        <label class="block text-[10px] font-semibold text-slate-500">Bullet Points (1 per line)</label>
-                                        <textarea id="umrahInc1BulletsInput" rows="4" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-600"></textarea>
-                                    </div>
-                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Inclusion Card 2 (Hotels)</span>
-                                        <input type="text" id="umrahInc2TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
-                                        <label class="block text-[10px] font-semibold text-slate-500">Bullet Points (1 per line)</label>
-                                        <textarea id="umrahInc2BulletsInput" rows="4" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-600"></textarea>
-                                    </div>
-                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Inclusion Card 3 (Transport & Ziyarat)</span>
-                                        <input type="text" id="umrahInc3TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
-                                        <label class="block text-[10px] font-semibold text-slate-500">Bullet Points (1 per line)</label>
-                                        <textarea id="umrahInc3BulletsInput" rows="4" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-600"></textarea>
-                                    </div>
-                                </div>
-
-                                <div class="grid sm:grid-cols-2 gap-4 pt-2">
-                                    <div>
-                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Family Umrah Banner Heading</label>
-                                        <input type="text" id="umrahFamilyTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Family Umrah Banner Description</label>
-                                        <input type="text" id="umrahFamilyDescInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-700">
-                                    </div>
-                                </div>
-
-                                <button type="submit" class="w-full sm:w-auto bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold px-8 py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
-                                    <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
-                                    <span>Save Umrah Page Content</span>
-                                </button>
                             </form>
                         </div>
 
@@ -1491,16 +1570,33 @@
             const pCalc = pc.calculator || {};
             const pContact = pc.contact || {};
 
-            setVal("#homeHeroBadgeInput", pHome.heroBadge || "Islamabad's Trusted Umrah & Global Travel Partner");
-            setVal("#homeHeroHeadingMainInput", pHome.heroHeadingMain || "Your Journey, Our Priority.");
+            setVal("#homeHeroBadgeInput", pHome.heroBadge || "Trusted Travel Partner in Blue Area, Islamabad");
+            setVal("#homeHeroHeadingMainInput", pHome.heroHeadingMain || "Your Spiritual & Global Journey,");
             setVal("#homeHeroDescriptionInput", pHome.heroDescription || "");
-            setVal("#homeSrv1TitleInput", pHome.srv1Title || "Umrah Packages");
+            setVal("#homeAboutBadgeInput", pHome.aboutBadge || "About Our Agency");
+            setVal("#homeAboutHeadingInput", pHome.aboutHeading || "Islamabad's Trusted Partner for Spiritual & Worldwide Travel");
+            setVal("#homeAboutDescInput", pHome.aboutDescription || "");
+            setVal("#homeStat1NumInput", pHome.stat1Number || "100%");
+            setVal("#homeStat1LblInput", pHome.stat1Label || "Visa & Documentation Care");
+            setVal("#homeStat2NumInput", pHome.stat2Number || "24/7");
+            setVal("#homeStat2LblInput", pHome.stat2Label || "WhatsApp & On-Trip Support");
+            setVal("#homeStat3NumInput", pHome.stat3Number || "50+");
+            setVal("#homeStat3LblInput", pHome.stat3Label || "Global Airlines & Destinations");
+            setVal("#homeStat4NumInput", pHome.stat4Number || "Blue Area");
+            setVal("#homeStat4LblInput", pHome.stat4Label || "Central Islamabad Head Office");
+            setVal("#homeWhy1TitleInput", pHome.why1Title || "Authorized & Transparent Pricing");
+            setVal("#homeWhy1DescInput", pHome.why1Desc || "");
+            setVal("#homeWhy2TitleInput", pHome.why2Title || "Dedicated Personal Consultants");
+            setVal("#homeWhy2DescInput", pHome.why2Desc || "");
+            setVal("#homeWhy3TitleInput", pHome.why3Title || "Fast-Track Processing");
+            setVal("#homeWhy3DescInput", pHome.why3Desc || "");
+            setVal("#homeSrv1TitleInput", pHome.srv1Title || "Umrah & Ziyarat Packages");
             setVal("#homeSrv1DescInput", pHome.srv1Desc || "");
-            setVal("#homeSrv2TitleInput", pHome.srv2Title || "Global Visa Assistance");
+            setVal("#homeSrv2TitleInput", pHome.srv2Title || "Flight Tickets");
             setVal("#homeSrv2DescInput", pHome.srv2Desc || "");
-            setVal("#homeSrv3TitleInput", pHome.srv3Title || "Air Ticket Booking");
+            setVal("#homeSrv3TitleInput", pHome.srv3Title || "Visa Consultancy");
             setVal("#homeSrv3DescInput", pHome.srv3Desc || "");
-            setVal("#homeSrv4TitleInput", pHome.srv4Title || "Hotels & Transport");
+            setVal("#homeSrv4TitleInput", pHome.srv4Title || "Hotel & Transport");
             setVal("#homeSrv4DescInput", pHome.srv4Desc || "");
 
             setVal("#umrahHeroBadgeInput", pUmrah.heroBadge || "Direct Departures from Islamabad (ISB)");
@@ -1791,6 +1887,23 @@
                         heroBadge: getVal("#homeHeroBadgeInput"),
                         heroHeadingMain: getVal("#homeHeroHeadingMainInput"),
                         heroDescription: getVal("#homeHeroDescriptionInput"),
+                        aboutBadge: getVal("#homeAboutBadgeInput"),
+                        aboutHeading: getVal("#homeAboutHeadingInput"),
+                        aboutDescription: getVal("#homeAboutDescInput"),
+                        stat1Number: getVal("#homeStat1NumInput"),
+                        stat1Label: getVal("#homeStat1LblInput"),
+                        stat2Number: getVal("#homeStat2NumInput"),
+                        stat2Label: getVal("#homeStat2LblInput"),
+                        stat3Number: getVal("#homeStat3NumInput"),
+                        stat3Label: getVal("#homeStat3LblInput"),
+                        stat4Number: getVal("#homeStat4NumInput"),
+                        stat4Label: getVal("#homeStat4LblInput"),
+                        why1Title: getVal("#homeWhy1TitleInput"),
+                        why1Desc: getVal("#homeWhy1DescInput"),
+                        why2Title: getVal("#homeWhy2TitleInput"),
+                        why2Desc: getVal("#homeWhy2DescInput"),
+                        why3Title: getVal("#homeWhy3TitleInput"),
+                        why3Desc: getVal("#homeWhy3DescInput"),
                         srv1Title: getVal("#homeSrv1TitleInput"),
                         srv1Desc: getVal("#homeSrv1DescInput"),
                         srv2Title: getVal("#homeSrv2TitleInput"),
