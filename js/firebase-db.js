@@ -7,8 +7,18 @@
 (function (window) {
     "use strict";
 
+    function formatPKR(val) {
+        const num = Number(val);
+        if (isNaN(num)) return "0";
+        return num.toLocaleString("en-US");
+    }
+
+    function cleanWhatsAppDigits(str) {
+        return String(str || "").replace(/[^0-9]/g, "");
+    }
+
     // ============================================================================
-    // 1. INITIAL SEED DATA ("JANUARY FLYER DEFAULTS" + SPECIAL DEALS COLLECTION)
+    // 1. INITIAL SEED DATA ("JANUARY FLYER DEFAULTS" + MULTI-PAGE CONTENT SCHEMA)
     // ============================================================================
 
     const DEFAULT_PRIMARY_DEAL = {
@@ -42,6 +52,81 @@
         sortOrder: 1
     };
 
+    const DEFAULT_PAGE_CONTENT = {
+        home: {
+            heroBadge: "Trusted Travel Partner in Blue Area, Islamabad",
+            heroHeadingMain: "Your Spiritual & Global Journey,",
+            heroDescription:
+                "From hassle-free Umrah packages with luxury stays near Haram to fast-track worldwide visas and the lowest domestic & international flight fares.",
+            srv1Title: "Umrah & Ziyarat Packages",
+            srv1Desc:
+                "Economy, Star, and VIP Customized Umrah packages for individuals, families, and groups with guided assistance.",
+            srv2Title: "Flight Tickets",
+            srv2Desc:
+                "Guaranteed lowest fares on all major domestic and international airlines with instant e-ticket confirmation.",
+            srv3Title: "Visa Consultancy",
+            srv3Desc:
+                "Expert visa documentation, appointment scheduling, and fast e-visa processing for top global destinations.",
+            srv4Title: "Hotel & Transport",
+            srv4Desc:
+                "Worldwide hotel reservations and dedicated private GMC, H1, Coaster, and luxury bus transport in Saudi Arabia."
+        },
+        umrah: {
+            heroBadge: "Direct Departures from Islamabad (ISB)",
+            heroTitle: "All-Inclusive Umrah Packages",
+            heroSubtitle:
+                "Experience spiritual peace with complete ease. From verified walking-distance Makkah and Madinah hotels to fast-track Saudi Umrah visas, return airline tickets, luxury AC ground transport, and guided historical Ziyarat.",
+            inc1Title: "Flights & Visas",
+            inc1Bullets:
+                "Direct or 1-stop return flight ticket from Islamabad | Electronic Saudi Umrah Visa processing | Mandatory Saudi medical health insurance | Airport handling & baggage support",
+            inc2Title: "Haram Hotel Stays",
+            inc2Bullets:
+                "Verified Makkah hotel (walking or 24/7 shuttle) | Peaceful Madinah Munawwarah hotel near Markazia | Clean AC rooms with private attached baths | Choice of Sharing, Quad, Triple or Couple Double",
+            inc3Title: "Transport & Ziyarat",
+            inc3Bullets:
+                "Jeddah / Madinah Airport pickup & drop-off | Inter-city Makkah to Madinah luxury AC transfer | Guided Ziyarat of Makkah sacred landmarks | Guided Ziyarat of Madinah holy sites",
+            familyBannerTitle: "Traveling with Family, Elders, or a Private Group?",
+            familyBannerDesc:
+                "We customize hotel courtyard proximities, private GMC transport, and child discounts to match your family's exact budget."
+        },
+        visas: {
+            heroBadge: "Fast Processing & Embassy File Preparation",
+            heroTitle: "Worldwide Visas & Air Tickets",
+            heroSubtitle:
+                "Whether you need a rapid Saudi Umrah e-visa, UAE 30/60 days tourist visa, Turkey e-visa, or complex UK/USA/Schengen file preparation, our Islamabad visa desk delivers high approval rates with zero stress.",
+            flightHeading: "Domestic & International Air Ticket Booking",
+            flightDescription:
+                "We issue official e-tickets for all domestic routes across Pakistan and international flights to Saudi Arabia, UAE, UK, Europe, USA, and Far East with instant WhatsApp confirmations.",
+            flightBullets:
+                "Special Umrah Group & Family Fares on PIA, Saudia & Emirates | Domestic Flights: Islamabad to Karachi, Quetta, Gilgit, Skardu | Flexible Date Change, Baggage Extension & Refund Assistance",
+            partnerAirlines:
+                "PIA (Pakistan International), Saudia Airlines, Emirates, Qatar Airways, Airblue, Serene Air, Fly Jinnah",
+            step1Title: "Send Passports & Photos",
+            step1Desc:
+                "Share clear scans of your passport copy and white-background photographs via WhatsApp or drop them off at our Potohar Plaza Blue Area office.",
+            step2Title: "Document Verification",
+            step2Desc:
+                "Our experts check eligibility, prepare embassy cover letters, book biometric appointments, and process your online electronic visa file.",
+            step3Title: "Receive Approved Visa",
+            step3Desc:
+                "Receive your verified electronic PDF visa via WhatsApp and email, or collect your stamped physical passport from our office desk."
+        },
+        calculator: {
+            heroBadge: "Live Real-Time Cost Estimator",
+            heroTitle: "Umrah Package Budget Calculator",
+            heroSubtitle:
+                "Estimate your custom Umrah package in seconds! Select your stay duration, room sharing tier (Quad, Triple, Double, Sharing), hotel courtyard distance, and number of pilgrims.",
+            includedBullets:
+                "Direct or 1-Stop Return Airline Ticket from Islamabad | Umrah Visa with Comprehensive Saudi Health Insurance | Makkah & Madinah Hotel Accommodation + Transport | Dedicated Airport Pickups & Guided Ziyarat Tours"
+        },
+        contact: {
+            heroBadge: "Head Office: Blue Area, Islamabad",
+            heroTitle: "Contact Our Travel Desk",
+            heroSubtitle:
+                "We are always here to assist your spiritual journey and global travel. Visit our Blue Area office or speak directly with our manager and consultant via phone or WhatsApp."
+        }
+    };
+
     const FLYER_DEFAULTS = {
         site_config: {
             main_settings: {
@@ -51,7 +136,12 @@
                     quadPrice: 248000,
                     triplePrice: 268000,
                     doublePrice: 295000,
-                    autoCalculateTiers: true
+                    autoCalculateTiers: true,
+                    dur10NightsOffset: -18000,
+                    dur21NightsOffset: 35000,
+                    dur28NightsOffset: 65000,
+                    hotel3StarAddon: 45000,
+                    hotel5StarAddon: 115000
                 },
                 contacts: {
                     agencyName: "Zakir Travel & Tours",
@@ -64,14 +154,17 @@
                     secondaryPhone: "+92 343 4159182",
                     secondaryWhatsApp: "923434159182",
                     activeBookingWhatsApp: "923490558345",
-                    officeAddress: "Office No. 7 Ground Floor Potohar Plaza, Fazal-e-Haq Road Blue Area, Islamabad"
+                    officeAddress: "Office No. 7 Ground Floor Potohar Plaza, Fazal-e-Haq Road Blue Area, Islamabad",
+                    officeHours: "Monday to Saturday: 9:30 AM – 8:00 PM (Sunday Closed / WhatsApp Support Active)",
+                    officeEmail: "info@zakirtravels.com / inam@zakirtravels.com",
+                    mapEmbedUrl:
+                        "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3318.847503714243!2d73.0645624!3d33.7128613!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfbf9df175e11d%3A0xe54d6faeebdae812!2sPotohar%20Plaza%2C%20Fazal-e-Haq%20Rd%2C%20Blue%20Area%2C%20Islamabad!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s"
                 },
+                pageContent: JSON.parse(JSON.stringify(DEFAULT_PAGE_CONTENT)),
                 updatedAt: new Date().toISOString()
             }
         },
-        special_deals: [
-            { ...DEFAULT_PRIMARY_DEAL }
-        ],
+        special_deals: [{ ...DEFAULT_PRIMARY_DEAL }],
         umrah_packages: [
             {
                 id: "pkg_jan_saver",
@@ -227,6 +320,18 @@
         };
     }
 
+    function mergePageContent(baseContent, incomingContent) {
+        const base = baseContent || DEFAULT_PAGE_CONTENT;
+        const inc = incomingContent || {};
+        return {
+            home: { ...DEFAULT_PAGE_CONTENT.home, ...(base.home || {}), ...(inc.home || {}) },
+            umrah: { ...DEFAULT_PAGE_CONTENT.umrah, ...(base.umrah || {}), ...(inc.umrah || {}) },
+            visas: { ...DEFAULT_PAGE_CONTENT.visas, ...(base.visas || {}), ...(inc.visas || {}) },
+            calculator: { ...DEFAULT_PAGE_CONTENT.calculator, ...(base.calculator || {}), ...(inc.calculator || {}) },
+            contact: { ...DEFAULT_PAGE_CONTENT.contact, ...(base.contact || {}), ...(inc.contact || {}) }
+        };
+    }
+
     // ============================================================================
     // 3. DUAL-ENGINE DATABASE & AUTH LAYER (FIREBASE + LOCAL REAL-TIME SYNC)
     // ============================================================================
@@ -324,7 +429,6 @@
                     );
                 }
                 if (!localStorage.getItem(STORAGE_KEYS.SPECIAL_DEALS)) {
-                    // Seed initial special deal from current site_config.spotlight if present
                     const cfg = this.getLocalSiteConfig();
                     const initialDeal = {
                         ...DEFAULT_PRIMARY_DEAL,
@@ -450,7 +554,8 @@
                     if (snap.exists) {
                         const data = snap.data();
                         localStorage.setItem(STORAGE_KEYS.SITE_CONFIG, JSON.stringify(data));
-                        this.listeners.site_config.forEach((cb) => cb(data));
+                        const merged = this.getLocalSiteConfig();
+                        this.listeners.site_config.forEach((cb) => cb(merged));
                     }
                 });
 
@@ -570,7 +675,8 @@
                         contacts: {
                             ...FLYER_DEFAULTS.site_config.main_settings.contacts,
                             ...(parsed.contacts || {})
-                        }
+                        },
+                        pageContent: mergePageContent(DEFAULT_PAGE_CONTENT, parsed.pageContent)
                     };
                 }
             } catch (e) {
@@ -800,6 +906,7 @@
                     ...current.contacts,
                     ...(partialOrFullConfig.contacts || {})
                 },
+                pageContent: mergePageContent(current.pageContent, partialOrFullConfig.pageContent),
                 updatedAt: new Date().toISOString()
             };
 
@@ -817,7 +924,6 @@
 
             localStorage.setItem(STORAGE_KEYS.SITE_CONFIG, JSON.stringify(updated));
 
-            // Keep primary deal in special_deals in sync when spotlight is updated directly
             if (partialOrFullConfig.spotlight && !options.skipDealSync) {
                 const deals = this.getLocalSpecialDeals();
                 const primaryIdx = deals.findIndex((d) => d.isPrimary);
@@ -1264,7 +1370,10 @@
 
     const zakirDB = new ZakirBackendService();
 
+    window.formatPKR = formatPKR;
+    window.cleanWhatsAppDigits = cleanWhatsAppDigits;
     window.DEFAULT_PRIMARY_DEAL = DEFAULT_PRIMARY_DEAL;
+    window.DEFAULT_PAGE_CONTENT = DEFAULT_PAGE_CONTENT;
     window.FLYER_DEFAULTS = FLYER_DEFAULTS;
     window.calculateScaledTiers = calculateScaledTiers;
     window.zakirDB = zakirDB;

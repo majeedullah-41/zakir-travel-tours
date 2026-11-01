@@ -44,7 +44,6 @@
     </script>
 
     <style>
-        /* Custom Islamic Geometric & Mosque Silhouette Subtle Patterns */
         .islamic-bg {
             background-color: #f4fafe;
             background-image: radial-gradient(#0D8A9E 0.55px, transparent 0.55px), radial-gradient(#0B2D5B 0.55px, #f4fafe 0.55px);
@@ -74,7 +73,6 @@
             animation: floatingPriceShield 4s ease-in-out infinite;
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -90,7 +88,7 @@
         }
     </style>
 </head>
-<body class="font-sans text-slate-800 bg-slate-50 antialiased selection:bg-teal selection:text-white">
+<body data-page="home" class="font-sans text-slate-800 bg-slate-50 antialiased selection:bg-teal selection:text-white">
 
     <!-- Top Contact Bar (Real-Time Bound to site_config.contacts) -->
     <div class="bg-navy-dark text-white text-xs sm:text-sm py-2.5 px-4 border-b border-white/10">
@@ -121,13 +119,10 @@
     <!-- Main Navigation Header -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <!-- Custom SVG Logo Recreated from Flyer -->
-            <a href="#" class="flex items-center gap-3 group focus:outline-none">
+            <a href="index.html" class="flex items-center gap-3 group focus:outline-none">
                 <div class="relative w-12 h-12 flex items-center justify-center">
                     <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-sm">
-                        <!-- Stylized Navy 'Z' -->
                         <path d="M18 20 H82 L35 78 H85 V92 H12 L60 34 H18 Z" fill="#0B2D5B" />
-                        <!-- Teal Swoosh Cutting Through -->
                         <path d="M5 68 Q40 35 95 25 Q55 50 15 80 Z" fill="#0D8A9E" />
                     </svg>
                 </div>
@@ -189,8 +184,8 @@
         </div>
     </header>
 
-    <!-- Hero Section with Interactive Multi-Tab Search Widget -->
-    <section id="home" class="relative overflow-hidden hero-gradient text-white pt-12 pb-24 lg:py-24">
+    <!-- 1. Hero Section with Interactive Multi-Tab Search Widget (Editable from Admin Tab 1) -->
+    <section id="home" class="relative overflow-hidden hero-gradient text-white pt-12 pb-20 lg:py-24">
         <div class="absolute inset-0 opacity-10 pointer-events-none">
             <svg class="w-full h-full" viewBox="0 0 1440 600" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
                 <path d="M-100 500 C 400 400, 800 200, 1300 80" stroke="white" stroke-width="4" stroke-dasharray="12 12"/>
@@ -206,47 +201,48 @@
                 <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
                     <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-teal-accent">
                         <i class="fa-solid fa-kaaba text-amber-300"></i>
-                        <span>Trusted Travel Partner in Blue Area, Islamabad</span>
+                        <span id="homeHeroBadge">Trusted Travel Partner in Blue Area, Islamabad</span>
                     </div>
 
                     <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
-                        Your Spiritual & Global Journey, <span id="heroTaglineSecondary" class="text-transparent bg-clip-text bg-gradient-to-r from-teal-light to-sky-200">Our Responsibility.</span>
+                        <span id="homeHeroHeadingMain">Your Spiritual & Global Journey,</span>
+                        <span id="heroTaglineSecondary" class="text-transparent bg-clip-text bg-gradient-to-r from-teal-light to-sky-200">Our Responsibility.</span>
                     </h1>
 
-                    <p class="text-base sm:text-lg text-slate-200 max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
-                        From hassle-free <strong>Umrah packages</strong> with luxury stays near Haram to fast-track <strong>worldwide visas</strong> and the lowest <strong>domestic & international flight fares</strong>.
+                    <p id="homeHeroDescription" class="text-base sm:text-lg text-slate-200 max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
+                        From hassle-free Umrah packages with luxury stays near Haram to fast-track worldwide visas and the lowest domestic & international flight fares.
                     </p>
 
                     <!-- Highlights Badges -->
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 max-w-2xl mx-auto lg:mx-0">
-                        <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-3 flex items-center gap-3">
+                        <a href="visa-services.html#flights-section" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/15 rounded-xl p-3 flex items-center gap-3 transition-all">
                             <i class="fa-solid fa-plane-departure text-2xl text-teal-light"></i>
                             <div class="text-left">
                                 <div class="text-xs text-slate-300">Air Tickets</div>
                                 <div class="text-sm font-bold">Best Fares</div>
                             </div>
-                        </div>
-                        <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-3 flex items-center gap-3">
+                        </a>
+                        <a href="visa-services.html" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/15 rounded-xl p-3 flex items-center gap-3 transition-all">
                             <i class="fa-solid fa-passport text-2xl text-teal-light"></i>
                             <div class="text-left">
                                 <div class="text-xs text-slate-300">Visa Service</div>
                                 <div class="text-sm font-bold">Fast Approval</div>
                             </div>
-                        </div>
-                        <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-3 flex items-center gap-3">
+                        </a>
+                        <a href="umrah-packages.html" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/15 rounded-xl p-3 flex items-center gap-3 transition-all">
                             <i class="fa-solid fa-hotel text-2xl text-teal-light"></i>
                             <div class="text-left">
                                 <div class="text-xs text-slate-300">Hotels</div>
                                 <div class="text-sm font-bold">Near Haram</div>
                             </div>
-                        </div>
-                        <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-3 flex items-center gap-3">
-                            <i class="fa-solid fa-bus text-2xl text-teal-light"></i>
+                        </a>
+                        <a href="calculator.html" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/15 rounded-xl p-3 flex items-center gap-3 transition-all">
+                            <i class="fa-solid fa-calculator text-2xl text-teal-light"></i>
                             <div class="text-left">
-                                <div class="text-xs text-slate-300">Transport</div>
-                                <div class="text-sm font-bold">24/7 Luxury</div>
+                                <div class="text-xs text-slate-300">Estimator</div>
+                                <div class="text-sm font-bold">Live Rates</div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
@@ -303,7 +299,7 @@
                                 </div>
                             </div>
 
-                            <!-- Flights Fields (Hidden by default) -->
+                            <!-- Flights Fields -->
                             <div id="fields-flights" class="hidden space-y-3.5">
                                 <div class="grid grid-cols-2 gap-3">
                                     <div>
@@ -330,7 +326,7 @@
                                 </div>
                             </div>
 
-                            <!-- Visa Fields (Hidden by default) -->
+                            <!-- Visa Fields -->
                             <div id="fields-visa" class="hidden space-y-3.5">
                                 <div>
                                     <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Country Required</label>
@@ -361,63 +357,49 @@
         </div>
     </section>
 
-    <!-- Featured Flyer Spotlight Section (Real-Time Bound to site_config.spotlight & umrah_packages) -->
+    <!-- 2. Featured Flyer Deal Spotlight (Managed from Admin Tab 1) -->
     <section id="umrah-spotlight" class="py-16 lg:py-24 islamic-bg relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            
-            <!-- Section Header matching Flyer Typography -->
             <div class="text-center max-w-3xl mx-auto mb-8">
                 <span id="spotlightMonthLabel" class="font-script text-3xl sm:text-4xl text-teal block mb-1">January & Upcoming</span>
                 <h2 class="text-3xl sm:text-5xl font-black tracking-tight uppercase">
                     <span id="spotlightTitlePrimary" class="text-navy">UMRAH</span> <span id="spotlightTitleSecondary" class="text-teal">PACKAGE</span>
                 </h2>
                 <div class="w-28 h-1.5 bg-gradient-to-r from-navy to-teal mx-auto mt-3 rounded-full"></div>
-                <p class="text-slate-600 mt-4 text-sm sm:text-base">
+                <p id="spotlightSubtitleCopy" class="text-slate-600 mt-4 text-sm sm:text-base">
                     Complete spiritual peace of mind with our all-inclusive featured <span id="spotlightDurationCopy" class="font-bold text-navy">14 Nights</span> Umrah package. Everything handled from Islamabad to Haramain.
                 </p>
             </div>
 
-            <!-- Interactive Deal Switcher / Filter Bar (Visible when multiple Special Deals are active) -->
+            <!-- Interactive Deal Switcher / Filter Bar -->
             <div id="specialDealsFilterBar" class="hidden text-center mb-8"></div>
 
-            <!-- Dynamic Multi-Deal Special Flyer Showcases Container (Bound in real-time to special_deals CRUD) -->
+            <!-- Dynamic Multi-Deal Special Flyer Showcases Container -->
             <div id="specialDealsShowcaseContainer" class="space-y-12">
-                <!-- Populated dynamically by js/homepage-live.js (renderSpecialDealsShowcase) -->
+                <!-- Populated dynamically by js/homepage-live.js -->
             </div>
 
-            <!-- Dynamic Umrah Packages Collection Grid (Bound to umrah_packages) -->
-            <div class="mt-16">
-                <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-3">
-                    <div>
-                        <span class="text-xs font-bold uppercase tracking-widest text-teal">All Available Tiers</span>
-                        <h3 class="text-2xl sm:text-3xl font-black text-navy mt-1">Compare Umrah Packages</h3>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <a href="umrah-packages.html" class="inline-flex items-center gap-2 bg-navy hover:bg-navy-light text-white font-bold text-xs sm:text-sm py-2.5 px-4 rounded-xl shadow transition-all">
-                            <span>View All Umrah Packages</span>
-                            <i class="fa-solid fa-arrow-right text-teal-light"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div id="umrahPackagesGrid" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- Populated in real-time by js/homepage-live.js -->
-                </div>
+            <!-- Link to Dedicated Umrah Packages Page -->
+            <div class="mt-10 text-center">
+                <a href="umrah-packages.html" class="inline-flex items-center gap-2.5 bg-navy hover:bg-navy-light text-white font-extrabold px-8 py-4 rounded-2xl shadow-xl hover:-translate-y-0.5 transition-all text-sm sm:text-base">
+                    <i class="fa-solid fa-kaaba text-teal-light"></i>
+                    <span>Explore All Umrah Packages & Compare Room Tiers</span>
+                    <i class="fa-solid fa-arrow-right text-teal-light"></i>
+                </a>
             </div>
-
         </div>
     </section>
 
-    <!-- Core Services Section (Visas, Tickets, Umrah, Hotels) -->
-    <section id="services" class="py-16 lg:py-24 bg-white">
+    <!-- 3. Core Services Overview (Managed from Admin Tab 1, Links to Dedicated Pages) -->
+    <section id="services" class="py-16 lg:py-24 bg-white border-t border-slate-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
                 <div>
-                    <span class="text-xs font-bold uppercase tracking-widest text-teal">What We Offer</span>
+                    <span class="text-xs font-bold uppercase tracking-widest text-teal">Dedicated Travel Portals</span>
                     <h2 class="text-3xl sm:text-4xl font-black text-navy mt-1">Complete Travel & Visa Solutions</h2>
                 </div>
                 <p class="text-slate-600 max-w-md mt-3 md:mt-0 text-sm sm:text-base">
-                    Whether you are travelling for Umrah, business, family vacation, or study, <span id="servicesAgencyName">Zakir Travel & Tours</span> provides reliable end-to-end assistance.
+                    Whether you are travelling for Umrah, business, family vacation, or study, <span id="servicesAgencyName" class="font-bold text-navy">Zakir Travel & Tours</span> provides reliable end-to-end assistance.
                 </p>
             </div>
 
@@ -428,8 +410,8 @@
                         <div class="w-14 h-14 rounded-2xl bg-navy text-white flex items-center justify-center text-2xl mb-5 group-hover:bg-teal transition-colors">
                             <i class="fa-solid fa-kaaba"></i>
                         </div>
-                        <h3 class="text-xl font-extrabold text-navy mb-2">Umrah & Ziyarat Packages</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                        <h3 id="homeSrv1Title" class="text-xl font-extrabold text-navy mb-2">Umrah & Ziyarat Packages</h3>
+                        <p id="homeSrv1Desc" class="text-slate-600 text-sm leading-relaxed mb-4">
                             Economy, Star, and VIP Customized Umrah packages for individuals, families, and groups with guided assistance.
                         </p>
                         <ul class="space-y-2 text-xs font-semibold text-slate-700 mb-6">
@@ -438,8 +420,8 @@
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal"></i> Makkah & Madinah Ziyarat</li>
                         </ul>
                     </div>
-                    <a href="umrah-packages.html" class="w-full py-2.5 px-4 rounded-xl bg-white border border-navy text-navy font-bold text-sm text-center group-hover:bg-navy group-hover:text-white transition-all block">
-                        View Umrah Packages <i class="fa-solid fa-arrow-right ml-1"></i>
+                    <a href="umrah-packages.html" class="w-full py-3 px-4 rounded-xl bg-white border border-navy text-navy font-bold text-sm text-center group-hover:bg-navy group-hover:text-white transition-all block">
+                        Open Umrah Page <i class="fa-solid fa-arrow-right ml-1"></i>
                     </a>
                 </div>
 
@@ -449,8 +431,8 @@
                         <div class="w-14 h-14 rounded-2xl bg-navy text-white flex items-center justify-center text-2xl mb-5 group-hover:bg-teal transition-colors">
                             <i class="fa-solid fa-plane-up"></i>
                         </div>
-                        <h3 class="text-xl font-extrabold text-navy mb-2">Flight Tickets</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                        <h3 id="homeSrv2Title" class="text-xl font-extrabold text-navy mb-2">Flight Tickets</h3>
+                        <p id="homeSrv2Desc" class="text-slate-600 text-sm leading-relaxed mb-4">
                             Guaranteed lowest fares on all major domestic and international airlines with instant e-ticket confirmation.
                         </p>
                         <ul class="space-y-2 text-xs font-semibold text-slate-700 mb-6">
@@ -459,8 +441,8 @@
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal"></i> Date Change & Refund Support</li>
                         </ul>
                     </div>
-                    <a href="visa-services.html#flights-section" class="w-full py-2.5 px-4 rounded-xl bg-white border border-navy text-navy font-bold text-sm text-center group-hover:bg-navy group-hover:text-white transition-all block">
-                        Check Ticket Fares <i class="fa-solid fa-arrow-right ml-1"></i>
+                    <a href="visa-services.html#flights-section" class="w-full py-3 px-4 rounded-xl bg-white border border-navy text-navy font-bold text-sm text-center group-hover:bg-navy group-hover:text-white transition-all block">
+                        Open Flights Desk <i class="fa-solid fa-arrow-right ml-1"></i>
                     </a>
                 </div>
 
@@ -470,8 +452,8 @@
                         <div class="w-14 h-14 rounded-2xl bg-navy text-white flex items-center justify-center text-2xl mb-5 group-hover:bg-teal transition-colors">
                             <i class="fa-solid fa-passport"></i>
                         </div>
-                        <h3 class="text-xl font-extrabold text-navy mb-2">Visa Consultancy</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                        <h3 id="homeSrv3Title" class="text-xl font-extrabold text-navy mb-2">Visa Consultancy</h3>
+                        <p id="homeSrv3Desc" class="text-slate-600 text-sm leading-relaxed mb-4">
                             Expert visa documentation, appointment scheduling, and fast e-visa processing for top global destinations.
                         </p>
                         <ul class="space-y-2 text-xs font-semibold text-slate-700 mb-6">
@@ -480,19 +462,19 @@
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal"></i> UK, Schengen & USA File Prep</li>
                         </ul>
                     </div>
-                    <a href="visa-services.html" class="w-full py-2.5 px-4 rounded-xl bg-white border border-navy text-navy font-bold text-sm text-center group-hover:bg-navy group-hover:text-white transition-all block">
-                        Apply for Visa <i class="fa-solid fa-arrow-right ml-1"></i>
+                    <a href="visa-services.html" class="w-full py-3 px-4 rounded-xl bg-white border border-navy text-navy font-bold text-sm text-center group-hover:bg-navy group-hover:text-white transition-all block">
+                        Open Visa Portal <i class="fa-solid fa-arrow-right ml-1"></i>
                     </a>
                 </div>
 
-                <!-- Service 4: Hotels & Transport -->
+                <!-- Service 4: Budget Calculator & Office -->
                 <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200/80 hover:border-teal hover:shadow-xl transition-all flex flex-col justify-between group">
                     <div>
                         <div class="w-14 h-14 rounded-2xl bg-navy text-white flex items-center justify-center text-2xl mb-5 group-hover:bg-teal transition-colors">
                             <i class="fa-solid fa-hotel"></i>
                         </div>
-                        <h3 class="text-xl font-extrabold text-navy mb-2">Hotel & Transport</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                        <h3 id="homeSrv4Title" class="text-xl font-extrabold text-navy mb-2">Hotel & Transport</h3>
+                        <p id="homeSrv4Desc" class="text-slate-600 text-sm leading-relaxed mb-4">
                             Worldwide hotel reservations and dedicated private GMC, H1, Coaster, and luxury bus transport in Saudi Arabia.
                         </p>
                         <ul class="space-y-2 text-xs font-semibold text-slate-700 mb-6">
@@ -501,207 +483,36 @@
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-teal"></i> Travel Insurance Coverage</li>
                         </ul>
                     </div>
-                    <a href="contact.html" class="w-full py-2.5 px-4 rounded-xl bg-white border border-navy text-navy font-bold text-sm text-center group-hover:bg-navy group-hover:text-white transition-all block">
-                        Contact Office <i class="fa-solid fa-arrow-right ml-1"></i>
+                    <a href="calculator.html" class="w-full py-3 px-4 rounded-xl bg-white border border-navy text-navy font-bold text-sm text-center group-hover:bg-navy group-hover:text-white transition-all block">
+                        Try Cost Estimator <i class="fa-solid fa-arrow-right ml-1"></i>
                     </a>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- Interactive Umrah Package Calculator Section (Bound to site_config.calculatorRates) -->
-    <section id="calculator" class="py-16 lg:py-24 bg-navy text-white relative overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="grid lg:grid-cols-12 gap-10 items-center">
-                
-                <div class="lg:col-span-5 space-y-4">
-                    <span class="bg-teal/30 border border-teal-light/40 text-teal-accent text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full">
-                        Interactive Estimator
-                    </span>
-                    <h2 class="text-3xl sm:text-4xl font-black leading-tight">
-                        Calculate Your Custom Umrah Package Budget
-                    </h2>
-                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
-                        Adjust your duration, room sharing preference, and number of pilgrims to get an instant estimated cost based on our current <strong id="calcIntroBasePrice" class="text-teal-light">PKR 232,000</strong> base package.
-                    </p>
-                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2 text-xs text-slate-300">
-                        <div class="flex items-center gap-2 font-semibold text-white">
-                            <i class="fa-solid fa-circle-info text-teal-light"></i>
-                            <span>What's included in every estimate:</span>
-                        </div>
-                        <p>• Direct or 1-Stop Return Airline Ticket from Islamabad</p>
-                        <p>• Umrah Visa with Comprehensive Saudi Health Insurance</p>
-                        <p>• Makkah & Madinah Hotel Accommodation + Transport</p>
+            <!-- Quick Navigation Banner to Calculator & Contact Pages -->
+            <div class="mt-14 grid md:grid-cols-2 gap-6">
+                <div class="bg-gradient-to-br from-navy to-navy-light rounded-3xl p-8 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl">
+                    <div>
+                        <span class="bg-teal/30 text-teal-accent text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">Interactive Tool</span>
+                        <h3 class="text-2xl font-black mt-2">Umrah Cost Calculator</h3>
+                        <p class="text-slate-300 text-xs sm:text-sm mt-1">Calculate Sharing, Quad, Triple, or Double room rates for your group in seconds.</p>
                     </div>
+                    <a href="calculator.html" class="shrink-0 bg-teal hover:bg-teal-light text-white font-extrabold px-5 py-3 rounded-xl shadow transition-all text-xs sm:text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-calculator"></i>
+                        <span>Calculate Now</span>
+                    </a>
                 </div>
 
-                <div class="lg:col-span-7">
-                    <div class="bg-white text-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
-                        <div class="grid sm:grid-cols-2 gap-6">
-                            
-                            <!-- Duration Selection -->
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-slate-500 mb-2">1. Package Duration</label>
-                                <select id="calcDuration" onchange="updateCalculator()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-navy focus:outline-none focus:border-teal">
-                                    <option value="0">14 Nights (Standard Flyer Deal)</option>
-                                    <option value="-18000">10 Nights (Short Stay)</option>
-                                    <option value="35000">21 Nights (Extended Stay)</option>
-                                    <option value="65000">28 Nights (Full Month Umrah)</option>
-                                </select>
-                            </div>
-
-                            <!-- Room Type Selection (Bound to site_config.calculatorRates) -->
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-slate-500 mb-2">2. Room Sharing Type</label>
-                                <select id="calcRoom" onchange="updateCalculator()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-navy focus:outline-none focus:border-teal">
-                                    <option value="232000">Sharing Room (PKR 232,000/person)</option>
-                                    <option value="248000">Quad Room - 4 Bed (PKR 248,000/person)</option>
-                                    <option value="268000">Triple Room - 3 Bed (PKR 268,000/person)</option>
-                                    <option value="295000">Double Room - 2 Bed (PKR 295,000/person)</option>
-                                </select>
-                            </div>
-
-                            <!-- Hotel Category -->
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-slate-500 mb-2">3. Hotel Category</label>
-                                <select id="calcHotel" onchange="updateCalculator()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-navy focus:outline-none focus:border-teal">
-                                    <option value="0">Standard Economy (Shuttle / 600m)</option>
-                                    <option value="45000">3-Star Plus (350m Walking Distance)</option>
-                                    <option value="115000">5-Star Near Haram Courtyard</option>
-                                </select>
-                            </div>
-
-                            <!-- Number of Pilgrims -->
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-slate-500 mb-2">4. Number of Travelers: <span id="paxCountLabel" class="text-teal font-extrabold">2 Persons</span></label>
-                                <input type="range" id="calcPax" min="1" max="15" value="2" oninput="updateCalculator()" class="w-full accent-teal h-2 bg-slate-200 rounded-lg cursor-pointer mt-3">
-                                <div class="flex justify-between text-[11px] text-slate-400 font-semibold mt-1">
-                                    <span>1 Person</span>
-                                    <span>5 Persons</span>
-                                    <span>10 Persons</span>
-                                    <span>15 Persons</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Total Output Banner -->
-                        <div class="mt-8 bg-gradient-to-r from-navy to-teal rounded-2xl p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div>
-                                <span class="text-xs uppercase tracking-wider text-teal-accent font-semibold">Estimated Total Package</span>
-                                <div class="text-3xl sm:text-4xl font-black mt-0.5" id="calcTotalDisplay">PKR 464,000</div>
-                                <span class="text-xs text-slate-200" id="calcPerPersonDisplay">PKR 232,000 per person (All-Inclusive)</span>
-                            </div>
-                            <button type="button" onclick="sendCalculatorToWhatsApp()" class="w-full sm:w-auto bg-white text-navy hover:bg-teal-accent font-extrabold px-6 py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
-                                <i class="fa-brands fa-whatsapp text-emerald-600 text-lg"></i>
-                                <span>Lock This Rate</span>
-                            </button>
-                        </div>
+                <div class="bg-gradient-to-br from-teal-dark to-navy rounded-3xl p-8 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl">
+                    <div>
+                        <span class="bg-white/15 text-teal-accent text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">Blue Area Islamabad</span>
+                        <h3 class="text-2xl font-black mt-2">Visit Our Head Office</h3>
+                        <p class="text-slate-200 text-xs sm:text-sm mt-1">Potohar Plaza, Fazal-e-Haq Road — Direct support from Inam Khan & Sadiq Ullah.</p>
                     </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Popular Visa & Ticket Destinations Filter (Real-Time Bound to visa_services Collection) -->
-    <section id="visas" class="py-16 bg-slate-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-10">
-                <span class="text-xs font-bold uppercase tracking-widest text-teal">Fast Processing</span>
-                <h2 class="text-3xl font-black text-navy mt-1">Top Visa & Ticket Destinations</h2>
-                <p class="text-slate-600 text-sm mt-2">Live visa processing times, requirements, and starting fees updated by our visa desk.</p>
-            </div>
-
-            <div id="visaServicesGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Populated in real-time by js/homepage-live.js -->
-            </div>
-
-            <div class="mt-10 text-center">
-                <a href="visa-services.html" class="inline-flex items-center gap-2 bg-navy hover:bg-navy-light text-white font-bold px-7 py-3.5 rounded-xl shadow-lg transition-all text-xs sm:text-sm">
-                    <span>View All Countries, Document Checklists & Flight Fares</span>
-                    <i class="fa-solid fa-arrow-right text-teal-light"></i>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact & Islamabad Office Section (Real-Time Bound to site_config.contacts) -->
-    <section id="contact" class="py-16 lg:py-20 bg-white border-t border-slate-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-gradient-to-br from-navy-dark via-navy to-teal rounded-3xl p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden">
-                <div class="grid lg:grid-cols-12 gap-8 items-center">
-                    
-                    <div class="lg:col-span-7 space-y-4">
-                        <span class="bg-white/15 text-teal-accent text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">
-                            Visit Our Blue Area Office
-                        </span>
-                        <h2 id="contactSectionAgencyName" class="text-3xl sm:text-4xl font-black">Zakir Travel & Tours</h2>
-                        <p id="contactSectionTagline" class="text-teal-accent font-medium text-lg italic">"Your Journey Our Responsibility"</p>
-                        
-                        <div class="pt-2 space-y-3 text-sm sm:text-base text-slate-200">
-                            <div class="flex items-start gap-3">
-                                <i class="fa-solid fa-location-dot text-teal-light text-xl mt-1"></i>
-                                <div>
-                                    <strong class="text-white block">Head Office Address:</strong>
-                                    <span id="contactSectionAddress">Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad.</span>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <i class="fa-regular fa-clock text-teal-light text-xl"></i>
-                                <div>
-                                    <strong class="text-white">Office Hours:</strong> Monday – Saturday (9:30 AM to 8:00 PM)
-                                </div>
-                            </div>
-                            <div class="pt-2">
-                                <a href="contact.html" class="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 text-white font-bold px-4 py-2 rounded-xl text-xs transition-colors">
-                                    <i class="fa-solid fa-map-location-dot text-teal-accent"></i>
-                                    <span>View Directions & Interactive Map</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Direct Contact Cards for Inam Khan & Sadiq Ullah -->
-                    <div class="lg:col-span-5 space-y-4">
-                        <!-- Manager Card -->
-                        <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 flex items-center justify-between gap-4">
-                            <div>
-                                <span class="text-xs font-bold uppercase tracking-wider text-teal-accent">Manager</span>
-                                <h3 id="contactCardManagerName" class="text-xl font-extrabold text-white">Inam Khan</h3>
-                                <a id="contactCardManagerTel1" href="tel:+923490558345" class="text-base font-bold text-sky-200 hover:underline block mt-0.5">
-                                    <span id="contactCardManagerPhone">+92 349 0558345</span>
-                                </a>
-                            </div>
-                            <div class="flex gap-2">
-                                <a id="contactCardManagerTel2" href="tel:+923490558345" class="w-11 h-11 rounded-xl bg-white text-navy hover:bg-teal-accent flex items-center justify-center shadow transition-colors" title="Call Manager">
-                                    <i class="fa-solid fa-phone"></i>
-                                </a>
-                                <a id="contactCardManagerWA" href="https://wa.me/923490558345" target="_blank" rel="noopener noreferrer" class="w-11 h-11 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 flex items-center justify-center shadow transition-colors" title="WhatsApp Manager">
-                                    <i class="fa-brands fa-whatsapp text-xl"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Sadiq Ullah Card -->
-                        <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 flex items-center justify-between gap-4">
-                            <div>
-                                <span class="text-xs font-bold uppercase tracking-wider text-teal-accent">Travel Consultant</span>
-                                <h3 id="contactCardSecondaryName" class="text-xl font-extrabold text-white">Sadiq Ullah</h3>
-                                <a id="contactCardSecondaryTel1" href="tel:+923434159182" class="text-base font-bold text-sky-200 hover:underline block mt-0.5">
-                                    <span id="contactCardSecondaryPhone">+92 343 4159182</span>
-                                </a>
-                            </div>
-                            <div class="flex gap-2">
-                                <a id="contactCardSecondaryTel2" href="tel:+923434159182" class="w-11 h-11 rounded-xl bg-white text-navy hover:bg-teal-accent flex items-center justify-center shadow transition-colors" title="Call Consultant">
-                                    <i class="fa-solid fa-phone"></i>
-                                </a>
-                                <a id="contactCardSecondaryWA" href="https://wa.me/923434159182" target="_blank" rel="noopener noreferrer" class="w-11 h-11 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 flex items-center justify-center shadow transition-colors" title="WhatsApp Consultant">
-                                    <i class="fa-brands fa-whatsapp text-xl"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
+                    <a href="contact.html" class="shrink-0 bg-white text-navy hover:bg-teal-accent font-extrabold px-5 py-3 rounded-xl shadow transition-all text-xs sm:text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-location-dot text-teal"></i>
+                        <span>Contact & Map</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -784,10 +595,8 @@
                 <h3 class="text-xl font-black text-navy">Zakir Travel & Tours Flyer</h3>
             </div>
 
-            <!-- Custom Uploaded Flyer Image (if set in Admin) -->
             <img id="flyerModalCustomImage" src="" alt="Promotional Umrah Flyer" class="w-full rounded-2xl border border-slate-200 shadow-md hidden mb-4">
 
-            <!-- Dynamic Digital Flyer Card (when no custom image URL is set) -->
             <div id="flyerModalDigitalPreview" class="bg-gradient-to-br from-navy-dark via-navy to-teal rounded-2xl p-6 text-white text-center space-y-4 shadow-inner mb-5">
                 <div class="font-script text-2xl text-teal-light" id="flyerPreviewMonth">January</div>
                 <div class="text-2xl font-black tracking-tight uppercase" id="flyerPreviewTitle">UMRAH PACKAGE</div>
@@ -828,7 +637,6 @@
         <div id="adminPortalMount"></div>
     </div>
 
-    <!-- Mobile Menu Toggle Script -->
     <script>
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const mobileMenu = document.getElementById('mobileMenu');
@@ -839,7 +647,7 @@
         }
     </script>
 
-    <!-- Firebase v10 Compat SDKs (Works on both file:// and https://) -->
+    <!-- Firebase v10 Compat SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -851,4 +659,3 @@
     <script src="./js/homepage-live.js"></script>
 </body>
 </html>
-

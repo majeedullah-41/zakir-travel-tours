@@ -174,6 +174,122 @@
         setText("heroTaglineSecondary", `${taglineSecondary}.`);
         setText("servicesAgencyName", agencyName);
 
+        const pContent = config.pageContent || {};
+        const pHome = pContent.home || {};
+        const pUmrah = pContent.umrah || {};
+        const pVisas = pContent.visas || {};
+        const pCalc = pContent.calculator || {};
+        const pContact = pContent.contact || {};
+
+        // --- Page-Specific Content: HOME PAGE ---
+        if (pHome.heroBadge) setText("homeHeroBadge", pHome.heroBadge);
+        if (pHome.heroHeadingMain) setText("homeHeroHeadingMain", pHome.heroHeadingMain);
+        if (pHome.heroDescription) setText("homeHeroDescription", pHome.heroDescription);
+        if (pHome.srv1Title) setText("homeSrv1Title", pHome.srv1Title);
+        if (pHome.srv1Desc) setText("homeSrv1Desc", pHome.srv1Desc);
+        if (pHome.srv2Title) setText("homeSrv2Title", pHome.srv2Title);
+        if (pHome.srv2Desc) setText("homeSrv2Desc", pHome.srv2Desc);
+        if (pHome.srv3Title) setText("homeSrv3Title", pHome.srv3Title);
+        if (pHome.srv3Desc) setText("homeSrv3Desc", pHome.srv3Desc);
+        if (pHome.srv4Title) setText("homeSrv4Title", pHome.srv4Title);
+        if (pHome.srv4Desc) setText("homeSrv4Desc", pHome.srv4Desc);
+
+        // --- Page-Specific Content: UMRAH PACKAGES PAGE ---
+        if (pUmrah.heroBadge) setText("umrahHeroBadge", pUmrah.heroBadge);
+        if (pUmrah.heroTitle) setText("umrahHeroTitle", pUmrah.heroTitle);
+        if (pUmrah.heroSubtitle) setText("umrahHeroSubtitle", pUmrah.heroSubtitle);
+        if (pUmrah.inc1Title) setText("umrahInc1Title", pUmrah.inc1Title);
+        if (pUmrah.inc2Title) setText("umrahInc2Title", pUmrah.inc2Title);
+        if (pUmrah.inc3Title) setText("umrahInc3Title", pUmrah.inc3Title);
+        if (pUmrah.familyBannerTitle) setText("umrahFamilyBannerTitle", pUmrah.familyBannerTitle);
+        if (pUmrah.familyBannerDesc) setText("umrahFamilyBannerDesc", pUmrah.familyBannerDesc);
+
+        const renderCheckBullets = (listId, rawLines) => {
+            const listEl = document.getElementById(listId);
+            if (!listEl || !rawLines) return;
+            const lines = String(rawLines)
+                .split(/\r?\n/)
+                .map((l) => l.trim())
+                .filter(Boolean);
+            if (!lines.length) return;
+            listEl.innerHTML = lines
+                .map(
+                    (line) =>
+                        `<li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-teal mt-1"></i> <span>${escapeHtmlAttr(line)}</span></li>`
+                )
+                .join("");
+        };
+
+        renderCheckBullets("umrahInc1List", pUmrah.inc1Bullets);
+        renderCheckBullets("umrahInc2List", pUmrah.inc2Bullets);
+        renderCheckBullets("umrahInc3List", pUmrah.inc3Bullets);
+
+        // --- Page-Specific Content: VISAS & FLIGHTS PAGE ---
+        if (pVisas.heroBadge) setText("visaHeroBadge", pVisas.heroBadge);
+        if (pVisas.heroTitle) setText("visaHeroTitle", pVisas.heroTitle);
+        if (pVisas.heroSubtitle) setText("visaHeroSubtitle", pVisas.heroSubtitle);
+        if (pVisas.flightHeading) setText("visaFlightHeading", pVisas.flightHeading);
+        if (pVisas.flightDescription) setText("visaFlightDescription", pVisas.flightDescription);
+        if (pVisas.step1Title) setText("visaStep1Title", pVisas.step1Title);
+        if (pVisas.step1Desc) setText("visaStep1Desc", pVisas.step1Desc);
+        if (pVisas.step2Title) setText("visaStep2Title", pVisas.step2Title);
+        if (pVisas.step2Desc) setText("visaStep2Desc", pVisas.step2Desc);
+        if (pVisas.step3Title) setText("visaStep3Title", pVisas.step3Title);
+        if (pVisas.step3Desc) setText("visaStep3Desc", pVisas.step3Desc);
+
+        const flightBulletsEl = document.getElementById("visaFlightBulletsList");
+        if (flightBulletsEl && pVisas.flightBullets) {
+            const fLines = String(pVisas.flightBullets)
+                .split(/\r?\n/)
+                .map((l) => l.trim())
+                .filter(Boolean);
+            if (fLines.length) {
+                flightBulletsEl.innerHTML = fLines
+                    .map(
+                        (line) => `
+                        <div class="flex items-center gap-3 text-xs sm:text-sm text-slate-700 font-semibold">
+                            <div class="w-8 h-8 rounded-lg bg-teal-accent text-teal flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <span>${escapeHtmlAttr(line)}</span>
+                        </div>`
+                    )
+                    .join("");
+            }
+        }
+
+        const partnerAirlinesEl = document.getElementById("visaPartnerAirlinesList");
+        if (partnerAirlinesEl && pVisas.partnerAirlines) {
+            const airlines = String(pVisas.partnerAirlines)
+                .split(",")
+                .map((a) => a.trim())
+                .filter(Boolean);
+            if (airlines.length) {
+                partnerAirlinesEl.innerHTML = airlines
+                    .map(
+                        (airline) =>
+                            `<span class="bg-slate-100 px-4 py-2 rounded-xl border border-slate-200">${escapeHtmlAttr(airline)}</span>`
+                    )
+                    .join("");
+            }
+        }
+
+        // --- Page-Specific Content: CALCULATOR PAGE ---
+        if (pCalc.heroBadge) setText("calcHeroBadge", pCalc.heroBadge);
+        if (pCalc.heroTitle) setText("calcHeroTitle", pCalc.heroTitle);
+        if (pCalc.heroSubtitle) setText("calcHeroSubtitle", pCalc.heroSubtitle);
+
+        const calcBulletsEl = document.getElementById("calcIncludedBulletsList");
+        if (calcBulletsEl && pCalc.includedBullets) {
+            const cLines = String(pCalc.includedBullets)
+                .split(/\r?\n/)
+                .map((l) => l.trim())
+                .filter(Boolean);
+            if (cLines.length) {
+                calcBulletsEl.innerHTML = cLines.map((line) => `<p>• ${escapeHtmlAttr(line)}</p>`).join("");
+            }
+        }
+
         const heroRoomSelect = document.getElementById("umrahRoom");
         if (heroRoomSelect) {
             const currentVal = heroRoomSelect.value;
@@ -189,16 +305,35 @@
         }
 
         // --- Calculator Section ---
-        setText("calcIntroBasePrice", `PKR ${formatPKR(r.sharingPrice || s.startingPrice || 232000)}`);
+        const sharingVal = Number(r.sharingPrice || s.startingPrice || 232000);
+        const quadVal = Number(r.quadPrice || 248000);
+        const tripleVal = Number(r.triplePrice || 268000);
+        const doubleVal = Number(r.doublePrice || 295000);
+
+        setText("calcIntroBasePrice", `PKR ${formatPKR(sharingVal)}`);
+        setText("calcCardSharingPrice", `PKR ${formatPKR(sharingVal)} / Person`);
+        setText("calcCardQuadPrice", `PKR ${formatPKR(quadVal)} / Person`);
+        setText("calcCardTriplePrice", `PKR ${formatPKR(tripleVal)} / Person`);
+        setText("calcCardDoublePrice", `PKR ${formatPKR(doubleVal)} / Person`);
+
+        const calcDurationSelect = document.getElementById("calcDuration");
+        if (calcDurationSelect) {
+            const prevDurIdx = calcDurationSelect.selectedIndex >= 0 ? calcDurationSelect.selectedIndex : 0;
+            const dur10 = Number(r.dur10NightsOffset !== undefined ? r.dur10NightsOffset : -18000);
+            const dur21 = Number(r.dur21NightsOffset !== undefined ? r.dur21NightsOffset : 35000);
+            const dur28 = Number(r.dur28NightsOffset !== undefined ? r.dur28NightsOffset : 65000);
+            calcDurationSelect.innerHTML = `
+                <option value="0">14 Nights (Standard Flyer Deal)</option>
+                <option value="${dur10}">10 Nights (${dur10 >= 0 ? "+" : ""}PKR ${formatPKR(dur10)})</option>
+                <option value="${dur21}">21 Nights (+PKR ${formatPKR(dur21)})</option>
+                <option value="${dur28}">28 Nights - Full Month (+PKR ${formatPKR(dur28)})</option>
+            `;
+            calcDurationSelect.selectedIndex = Math.min(prevDurIdx, calcDurationSelect.options.length - 1);
+        }
 
         const calcRoomSelect = document.getElementById("calcRoom");
         if (calcRoomSelect) {
             const prevIndex = calcRoomSelect.selectedIndex >= 0 ? calcRoomSelect.selectedIndex : 0;
-            const sharingVal = Number(r.sharingPrice || s.startingPrice || 232000);
-            const quadVal = Number(r.quadPrice || 248000);
-            const tripleVal = Number(r.triplePrice || 268000);
-            const doubleVal = Number(r.doublePrice || 295000);
-
             calcRoomSelect.innerHTML = `
                 <option value="${sharingVal}">Sharing Room (PKR ${formatPKR(sharingVal)}/person)</option>
                 <option value="${quadVal}">Quad Room - 4 Bed (PKR ${formatPKR(quadVal)}/person)</option>
@@ -208,10 +343,34 @@
             calcRoomSelect.selectedIndex = Math.min(prevIndex, calcRoomSelect.options.length - 1);
         }
 
+        const calcHotelSelect = document.getElementById("calcHotel");
+        if (calcHotelSelect) {
+            const prevHotelIdx = calcHotelSelect.selectedIndex >= 0 ? calcHotelSelect.selectedIndex : 0;
+            const h3Addon = Number(r.hotel3StarAddon !== undefined ? r.hotel3StarAddon : 45000);
+            const h5Addon = Number(r.hotel5StarAddon !== undefined ? r.hotel5StarAddon : 115000);
+            calcHotelSelect.innerHTML = `
+                <option value="0">Standard Economy (Shuttle / 600m)</option>
+                <option value="${h3Addon}">3-Star Plus (+PKR ${formatPKR(h3Addon)}/person)</option>
+                <option value="${h5Addon}">5-Star Near Haram (+PKR ${formatPKR(h5Addon)}/person)</option>
+            `;
+            calcHotelSelect.selectedIndex = Math.min(prevHotelIdx, calcHotelSelect.options.length - 1);
+        }
+
         // --- Contact & Islamabad Office Section ---
+        if (pContact.heroBadge) setText("contactHeroBadge", pContact.heroBadge);
+        if (pContact.heroTitle) setText("contactHeroTitle", pContact.heroTitle);
+        if (pContact.heroSubtitle) setText("contactHeroSubtitle", pContact.heroSubtitle);
+
         setText("contactSectionAgencyName", agencyName);
         setText("contactSectionTagline", `"${taglineSecondary}"`);
         setText("contactSectionAddress", officeAddress);
+        if (c.officeHours) setText("contactSectionHours", c.officeHours);
+        if (c.officeEmail) setText("contactSectionEmail", c.officeEmail);
+
+        const mapIframe = document.getElementById("contactMapIframe");
+        if (mapIframe && c.mapEmbedUrl && mapIframe.src !== c.mapEmbedUrl) {
+            mapIframe.src = c.mapEmbedUrl;
+        }
 
         setText("contactCardManagerName", c.managerName || "Inam Khan");
         setText("contactCardManagerPhone", c.managerPhone || "+92 349 0558345");
@@ -926,6 +1085,18 @@
                 onCloseDrawer: () => closeAdminPortalDrawer()
             });
         }
+
+        const currentPage = document.body.getAttribute("data-page");
+        const pageTabMap = {
+            home: "spotlight",
+            umrah: "umrah",
+            visas: "visas",
+            calculator: "calculator",
+            contact: "contacts"
+        };
+        if (currentPage && pageTabMap[currentPage] && adminDrawerInstance && typeof adminDrawerInstance._switchTab === "function") {
+            adminDrawerInstance._switchTab(pageTabMap[currentPage]);
+        }
     }
 
     function closeAdminPortalDrawer() {
@@ -998,6 +1169,27 @@
 
         const message = encodeURIComponent(
             `Assalam-o-Alaikum ${agencyName}!\n\n${details}\n- Client Contact: ${clientInfo}\n\nPlease share the best rates and details.`
+        );
+        window.open(`https://wa.me/${activeWA}?text=${message}`, "_blank");
+    };
+
+    window.handleStandaloneFlightSubmit = function (e) {
+        e.preventDefault();
+        const clientEl = document.getElementById("clientPhone");
+        const clientInfo = clientEl ? clientEl.value.trim() : "";
+        const activeWA = getResolvedActiveWhatsApp(liveSiteConfig);
+        const agencyName =
+            (liveSiteConfig && liveSiteConfig.contacts && liveSiteConfig.contacts.agencyName) ||
+            "Zakir Travel & Tours";
+
+        const from = (document.getElementById("flightFrom") && document.getElementById("flightFrom").value) || "Islamabad";
+        const to = (document.getElementById("flightTo") && document.getElementById("flightTo").value) || "Not specified";
+        const type = (document.getElementById("flightType") && document.getElementById("flightType").value) || "Round Trip";
+        const date = (document.getElementById("flightDate") && document.getElementById("flightDate").value) || "Flexible";
+
+        const details = `*Flight Ticket Inquiry*\n- Route: ${from} to ${to}\n- Type: ${type}\n- Date: ${date}`;
+        const message = encodeURIComponent(
+            `Assalam-o-Alaikum ${agencyName}!\n\n${details}\n- Client Contact: ${clientInfo}\n\nPlease share the best flight fares and availability.`
         );
         window.open(`https://wa.me/${activeWA}?text=${message}`, "_blank");
     };

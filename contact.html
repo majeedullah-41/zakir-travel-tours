@@ -71,7 +71,7 @@
         }
     </style>
 </head>
-<body class="font-sans text-slate-800 bg-slate-50 antialiased selection:bg-teal selection:text-white">
+<body data-page="contact" class="font-sans text-slate-800 bg-slate-50 antialiased selection:bg-teal selection:text-white">
 
     <!-- Top Contact Bar (Real-Time Bound to site_config.contacts) -->
     <div class="bg-navy-dark text-white text-xs sm:text-sm py-2.5 px-4 border-b border-white/10">
@@ -172,12 +172,12 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
             <span class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-teal-accent mb-4">
                 <i class="fa-solid fa-building-flag text-amber-300"></i>
-                <span>Head Office: Blue Area, Islamabad</span>
+                <span id="contactHeroBadge">Head Office: Blue Area, Islamabad</span>
             </span>
-            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight uppercase">
-                Contact <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-light to-sky-200">Our Travel Desk</span>
+            <h1 id="contactHeroTitle" class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight uppercase">
+                Contact Our Travel Desk
             </h1>
-            <p class="mt-4 text-base sm:text-lg text-slate-200 max-w-3xl mx-auto font-normal leading-relaxed">
+            <p id="contactHeroSubtitle" class="mt-4 text-base sm:text-lg text-slate-200 max-w-3xl mx-auto font-normal leading-relaxed">
                 We are always here to assist your spiritual journey and global travel. Visit our Blue Area office or speak directly with our manager and consultant via phone or WhatsApp.
             </p>
         </div>
@@ -208,7 +208,7 @@
                                 <i class="fa-regular fa-clock text-teal text-2xl mt-0.5 shrink-0"></i>
                                 <div>
                                     <strong class="text-navy block font-bold">Office Hours:</strong>
-                                    <span>Monday to Saturday: 9:30 AM – 8:00 PM (Sunday Closed / WhatsApp Support Active)</span>
+                                    <span id="contactSectionHours">Monday to Saturday: 9:30 AM – 8:00 PM (Sunday Closed / WhatsApp Support Active)</span>
                                 </div>
                             </div>
 
@@ -216,7 +216,7 @@
                                 <i class="fa-solid fa-envelope text-teal text-2xl mt-0.5 shrink-0"></i>
                                 <div>
                                     <strong class="text-navy block font-bold">Official Email:</strong>
-                                    <span>info@zakirtravels.com / inam@zakirtravels.com</span>
+                                    <span id="contactSectionEmail">info@zakirtravels.com / inam@zakirtravels.com</span>
                                 </div>
                             </div>
                         </div>
@@ -345,6 +345,7 @@
                 
                 <div class="w-full h-80 sm:h-96 rounded-3xl overflow-hidden border-2 border-slate-200 shadow-md">
                     <iframe 
+                        id="contactMapIframe"
                         title="Zakir Travel Potohar Plaza Blue Area Islamabad"
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3318.847503714243!2d73.0645624!3d33.7128613!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfbf9df175e11d%3A0xe54d6faeebdae812!2sPotohar%20Plaza%2C%20Fazal-e-Haq%20Rd%2C%20Blue%20Area%2C%20Islamabad!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s" 
                         class="w-full h-full border-0" 
@@ -405,3 +406,4 @@
     <script src="./js/homepage-live.js"></script>
 </body>
 </html>
+

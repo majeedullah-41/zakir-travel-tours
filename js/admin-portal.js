@@ -360,31 +360,36 @@
                         </section>
 
                         <!-- ========================================================== -->
-                        <!-- 4 ORGANIZED MANAGEMENT TABS NAVIGATION                     -->
+                        <!-- 5 PAGE-DEDICATED MANAGEMENT TABS NAVIGATION                -->
                         <!-- ========================================================== -->
-                        <nav class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 bg-white p-2 rounded-2xl shadow-md border border-slate-200/80">
-                            <button type="button" data-tab="spotlight" class="admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#16437E] text-white font-extrabold text-xs sm:text-sm py-3.5 px-3 rounded-xl flex items-center justify-center gap-2 shadow-md transition-all">
-                                <i class="fa-solid fa-fire-flame-curved text-amber-300"></i>
-                                <span>1. Special Flyer Deals</span>
+                        <nav class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 bg-white p-2 rounded-2xl shadow-md border border-slate-200/80">
+                            <button type="button" data-tab="spotlight" class="admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#16437E] text-white font-extrabold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-md transition-all">
+                                <i class="fa-solid fa-house-chimney text-amber-300"></i>
+                                <span>1. Home & Deals</span>
                                 <span id="tabBadgeDeals" class="bg-white/20 text-white text-[10px] font-black px-2 py-0.5 rounded-full">1</span>
                             </button>
-                            <button type="button" data-tab="crud" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3.5 px-3 rounded-xl flex items-center justify-center gap-2 transition-all">
-                                <i class="fa-solid fa-cubes text-[#0D8A9E]"></i>
-                                <span>2. Packages & Visas</span>
-                                <span id="tabBadgePkgsVisas" class="bg-slate-200 text-slate-700 text-[10px] font-black px-2 py-0.5 rounded-full">10</span>
+                            <button type="button" data-tab="umrah" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all">
+                                <i class="fa-solid fa-kaaba text-[#0D8A9E]"></i>
+                                <span>2. Umrah Page</span>
+                                <span id="tabBadgePkgs" class="bg-slate-200 text-slate-700 text-[10px] font-black px-2 py-0.5 rounded-full">4</span>
                             </button>
-                            <button type="button" data-tab="media" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3.5 px-3 rounded-xl flex items-center justify-center gap-2 transition-all">
-                                <i class="fa-solid fa-wand-magic-sparkles text-[#0D8A9E]"></i>
-                                <span>3. Calculator & Media</span>
+                            <button type="button" data-tab="visas" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all">
+                                <i class="fa-solid fa-passport text-[#0D8A9E]"></i>
+                                <span>3. Visas & Flights</span>
+                                <span id="tabBadgeVisas" class="bg-slate-200 text-slate-700 text-[10px] font-black px-2 py-0.5 rounded-full">6</span>
                             </button>
-                            <button type="button" data-tab="contacts" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3.5 px-3 rounded-xl flex items-center justify-center gap-2 transition-all">
+                            <button type="button" data-tab="calculator" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all">
+                                <i class="fa-solid fa-calculator text-[#0D8A9E]"></i>
+                                <span>4. Calculator Page</span>
+                            </button>
+                            <button type="button" data-tab="contacts" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all col-span-2 sm:col-span-1">
                                 <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i>
-                                <span>4. Contacts & Routing</span>
+                                <span>5. Contact & Office</span>
                             </button>
                         </nav>
 
                         <!-- ========================================================== -->
-                        <!-- TAB 1: SPECIAL FLYER DEALS (MULTI-DEAL CRUD)               -->
+                        <!-- TAB 1: HOME PAGE & SPECIAL FLYER DEALS (MULTI-DEAL CRUD)   -->
                         <!-- ========================================================== -->
                         <div id="admin-panel-spotlight" class="admin-tab-panel space-y-6 anim-fade-up">
                             
@@ -393,13 +398,13 @@
                                 <div>
                                     <div class="flex items-center gap-2">
                                         <span class="bg-amber-100 text-amber-800 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
-                                            Dynamic Flyer Showcase CRUD
+                                            Home & Umrah Flyer Showcase CRUD
                                         </span>
-                                        <span class="text-xs font-bold text-[#0D8A9E]">• Live on Homepage</span>
+                                        <span class="text-xs font-bold text-[#0D8A9E]">• Live on Home & Umrah Pages</span>
                                     </div>
                                     <h3 class="text-xl font-black text-[#0B2D5B] mt-1">Manage Special Flyer Deals & Offers</h3>
                                     <p class="text-xs text-slate-500 mt-0.5">
-                                        Add multiple large visual Flyer Deals (e.g. January Umrah, Ramzan Special, Rabi-ul-Awal Deal). Each deal renders its own dual-frame showcase card on the homepage!
+                                        Add multiple visual Flyer Deals (e.g. January Umrah, Ramzan Special, Rabi-ul-Awal Deal). Each deal renders its own dual-frame showcase card!
                                     </p>
                                 </div>
 
@@ -417,54 +422,322 @@
 
                             <!-- Special Flyer Deals Visual CRUD Grid -->
                             <div id="crudSpecialDealsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+
+                            <!-- Home Page Hero, 4 Core Service Cards & Primary Flyer Media Editor -->
+                            <form id="homePageContentForm" class="grid lg:grid-cols-12 gap-6">
+                                <!-- Left Column: Home Hero & 4 Service Cards -->
+                                <div class="lg:col-span-7 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
+                                    <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                                        <div>
+                                            <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">index.html Content Manager</span>
+                                            <h3 class="text-lg font-black text-[#0B2D5B]">Home Page Hero & 4 Core Service Cards</h3>
+                                        </div>
+                                        <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">Home Page</span>
+                                    </div>
+
+                                    <div class="grid sm:grid-cols-2 gap-3.5">
+                                        <div>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Hero Top Badge Text</label>
+                                            <input type="text" id="homeHeroBadgeInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Hero Main Heading</label>
+                                            <input type="text" id="homeHeroHeadingMainInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                        </div>
+                                        <div class="sm:col-span-2">
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Hero Intro Description</label>
+                                            <textarea id="homeHeroDescriptionInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-700"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-t border-slate-100 pt-4">
+                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B] mb-3">4 Core Travel Service Cards on Home Page</h4>
+                                        <div class="grid sm:grid-cols-2 gap-3">
+                                            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+                                                <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Service Card 1 (Umrah)</span>
+                                                <input type="text" id="homeSrv1TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                <textarea id="homeSrv1DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                            </div>
+                                            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+                                                <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Service Card 2 (Visas)</span>
+                                                <input type="text" id="homeSrv2TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                <textarea id="homeSrv2DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                            </div>
+                                            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+                                                <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Service Card 3 (Flights)</span>
+                                                <input type="text" id="homeSrv3TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                <textarea id="homeSrv3DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                            </div>
+                                            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+                                                <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Service Card 4 (Hotels & Transport)</span>
+                                                <input type="text" id="homeSrv4TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                <textarea id="homeSrv4DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+                                        <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
+                                        <span>Save Home Page Content</span>
+                                    </button>
+                                </div>
+
+                                <!-- Right Column: Primary Deal Media & Monthly Flyer Popup Uploader -->
+                                <div class="lg:col-span-5 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5 flex flex-col justify-between">
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                                            <div>
+                                                <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Spotlight Frames & Flyer</span>
+                                                <h3 class="text-lg font-black text-[#0B2D5B]">Primary Deal Images & Monthly Flyer</h3>
+                                            </div>
+                                            <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">Phone Upload</span>
+                                        </div>
+
+                                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                            <!-- Madinah -->
+                                            <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200 flex flex-col justify-between space-y-2">
+                                                <div>
+                                                    <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Madinah Frame</span>
+                                                    <div class="h-28 rounded-xl overflow-hidden border border-[#0D8A9E] bg-slate-200 mt-1">
+                                                        <img id="previewMadinahImg" src="" alt="Madinah" class="w-full h-full object-cover">
+                                                    </div>
+                                                    <input type="text" id="inputMadinahUrl" placeholder="Image URL..." class="mt-2 w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px]">
+                                                </div>
+                                                <label class="w-full bg-white hover:bg-[#0B2D5B] hover:text-white text-[#0B2D5B] border border-slate-200 font-bold text-[11px] py-1.5 px-2 rounded-xl cursor-pointer flex items-center justify-center gap-1 transition-colors">
+                                                    <i class="fa-solid fa-camera"></i> Upload
+                                                    <input type="file" accept="image/*" data-upload-target="inputMadinahUrl" data-preview-target="previewMadinahImg" class="hidden">
+                                                </label>
+                                            </div>
+
+                                            <!-- Makkah -->
+                                            <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200 flex flex-col justify-between space-y-2">
+                                                <div>
+                                                    <span class="text-[10px] font-bold uppercase text-[#0B2D5B]">Makkah Frame</span>
+                                                    <div class="h-28 rounded-xl overflow-hidden border border-[#0B2D5B] bg-slate-200 mt-1">
+                                                        <img id="previewMakkahImg" src="" alt="Makkah" class="w-full h-full object-cover">
+                                                    </div>
+                                                    <input type="text" id="inputMakkahUrl" placeholder="Image URL..." class="mt-2 w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px]">
+                                                </div>
+                                                <label class="w-full bg-white hover:bg-[#0B2D5B] hover:text-white text-[#0B2D5B] border border-slate-200 font-bold text-[11px] py-1.5 px-2 rounded-xl cursor-pointer flex items-center justify-center gap-1 transition-colors">
+                                                    <i class="fa-solid fa-camera"></i> Upload
+                                                    <input type="file" accept="image/*" data-upload-target="inputMakkahUrl" data-preview-target="previewMakkahImg" class="hidden">
+                                                </label>
+                                            </div>
+
+                                            <!-- Promotional Flyer -->
+                                            <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200 flex flex-col justify-between space-y-2">
+                                                <div>
+                                                    <span class="text-[10px] font-bold uppercase text-emerald-700">Flyer Popup</span>
+                                                    <div class="h-28 rounded-xl overflow-hidden border border-dashed border-[#0D8A9E] bg-white mt-1 flex items-center justify-center">
+                                                        <img id="previewFlyerImg" src="" alt="Flyer" class="w-full h-full object-cover hidden">
+                                                        <div id="previewFlyerPlaceholder" class="text-center p-2 text-[10px] text-slate-400">
+                                                            <i class="fa-solid fa-file-image text-lg text-[#0D8A9E] block mb-1"></i>
+                                                            Digital Flyer
+                                                        </div>
+                                                    </div>
+                                                    <input type="text" id="inputFlyerUrl" placeholder="Flyer URL (Opt)" class="mt-2 w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px]">
+                                                </div>
+                                                <label class="w-full bg-white hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 font-bold text-[11px] py-1.5 px-2 rounded-xl cursor-pointer flex items-center justify-center gap-1 transition-colors">
+                                                    <i class="fa-solid fa-upload"></i> Upload
+                                                    <input type="file" accept="image/*" data-upload-target="inputFlyerUrl" data-preview-target="previewFlyerImg" class="hidden">
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <label class="flex items-center gap-2 cursor-pointer pt-2">
+                                            <input type="checkbox" id="chkShowFlyerButton" class="w-4 h-4 accent-[#0D8A9E] rounded">
+                                            <span class="text-xs font-bold text-[#0B2D5B]">Show "View Latest Flyer" button on Deal Cards</span>
+                                        </label>
+                                    </div>
+
+                                    <button type="submit" class="w-full bg-[#0D8A9E] hover:bg-[#096979] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                                        <span>Save Media & Home Settings</span>
+                                    </button>
+                                </div>
+                            </form>
                         </div>
 
                         <!-- ========================================================== -->
-                        <!-- TAB 2: PACKAGES & VISAS (CRUD) TAB                         -->
+                        <!-- TAB 2: UMRAH PACKAGES PAGE (CRUD + PAGE CONTENT)           -->
                         <!-- ========================================================== -->
-                        <div id="admin-panel-crud" class="admin-tab-panel hidden space-y-6 anim-fade-up">
+                        <div id="admin-panel-umrah" class="admin-tab-panel hidden space-y-6 anim-fade-up">
                             
-                            <!-- Sub-toggle between Umrah Packages and Visa Services -->
-                            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-sm">
-                                <div class="flex gap-2">
-                                    <button type="button" data-crud-subtab="packages" class="crud-subtab-btn bg-[#0B2D5B] text-white font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow transition-all">
-                                        <i class="fa-solid fa-kaaba mr-1.5"></i>Comparison Umrah Packages
-                                    </button>
-                                    <button type="button" data-crud-subtab="visas" class="crud-subtab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all">
-                                        <i class="fa-solid fa-passport mr-1.5"></i>Country Visa Cards
-                                    </button>
+                            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+                                <div>
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-[#0D8A9E]">umrah-packages.html Manager</span>
+                                    <h3 class="text-xl font-black text-[#0B2D5B]">Comparison Umrah Packages (CRUD)</h3>
+                                    <p class="text-xs text-slate-500">Add, edit, reorder, or hide Umrah package cards displayed on the Umrah Packages page.</p>
                                 </div>
-
-                                <div class="flex gap-2">
-                                    <button type="button" data-action="open-pkg-modal" class="bg-[#0D8A9E] hover:bg-[#096979] text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow flex items-center gap-1.5 transition-all">
-                                        <i class="fa-solid fa-plus"></i> Add Package Card
-                                    </button>
-                                    <button type="button" data-action="open-visa-modal" class="bg-[#0B2D5B] hover:bg-[#16437E] text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow flex items-center gap-1.5 transition-all">
-                                        <i class="fa-solid fa-plus"></i> Add Country Visa
-                                    </button>
-                                </div>
+                                <button type="button" data-action="open-pkg-modal" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 transition-all">
+                                    <i class="fa-solid fa-plus"></i> Add Umrah Package Card
+                                </button>
                             </div>
 
                             <!-- Umrah Packages List -->
                             <div id="crudPackagesContainer" class="grid md:grid-cols-2 gap-4"></div>
 
-                            <!-- Country Visas List -->
-                            <div id="crudVisasContainer" class="hidden grid md:grid-cols-2 gap-4"></div>
+                            <!-- Umrah Page Hero, 3 Inclusions Cards & Family Banner Editor -->
+                            <form id="umrahPageContentForm" class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                                    <div>
+                                        <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Page Text & Inclusions Editor</span>
+                                        <h3 class="text-lg font-black text-[#0B2D5B]">Umrah Page Banner, Inclusions & Family CTA</h3>
+                                    </div>
+                                    <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">umrah-packages.html</span>
+                                </div>
+
+                                <div class="grid sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Top Badge</label>
+                                        <input type="text" id="umrahHeroBadgeInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Main Heading</label>
+                                        <input type="text" id="umrahHeroTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Subtitle</label>
+                                        <textarea id="umrahHeroSubtitleInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="grid md:grid-cols-3 gap-4 pt-2">
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Inclusion Card 1 (Flights & Visas)</span>
+                                        <input type="text" id="umrahInc1TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                        <label class="block text-[10px] font-semibold text-slate-500">Bullet Points (1 per line)</label>
+                                        <textarea id="umrahInc1BulletsInput" rows="4" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-600"></textarea>
+                                    </div>
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Inclusion Card 2 (Hotels)</span>
+                                        <input type="text" id="umrahInc2TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                        <label class="block text-[10px] font-semibold text-slate-500">Bullet Points (1 per line)</label>
+                                        <textarea id="umrahInc2BulletsInput" rows="4" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-600"></textarea>
+                                    </div>
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Inclusion Card 3 (Transport & Ziyarat)</span>
+                                        <input type="text" id="umrahInc3TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                        <label class="block text-[10px] font-semibold text-slate-500">Bullet Points (1 per line)</label>
+                                        <textarea id="umrahInc3BulletsInput" rows="4" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-600"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="grid sm:grid-cols-2 gap-4 pt-2">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Family Umrah Banner Heading</label>
+                                        <input type="text" id="umrahFamilyTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Family Umrah Banner Description</label>
+                                        <input type="text" id="umrahFamilyDescInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-700">
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="w-full sm:w-auto bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold px-8 py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+                                    <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
+                                    <span>Save Umrah Page Content</span>
+                                </button>
+                            </form>
                         </div>
 
                         <!-- ========================================================== -->
-                        <!-- TAB 3: CALCULATOR TIER RATES & MEDIA UPLOADER TAB          -->
+                        <!-- TAB 3: VISAS & FLIGHTS PAGE (CRUD + PAGE CONTENT)          -->
                         <!-- ========================================================== -->
-                        <div id="admin-panel-media" class="admin-tab-panel hidden space-y-6 anim-fade-up">
+                        <div id="admin-panel-visas" class="admin-tab-panel hidden space-y-6 anim-fade-up">
+                            
+                            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+                                <div>
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-[#0D8A9E]">visa-services.html Manager</span>
+                                    <h3 class="text-xl font-black text-[#0B2D5B]">Country Visa Cards (CRUD)</h3>
+                                    <p class="text-xs text-slate-500">Add, edit, reorder, or hide Country Visa destinations and starting fees.</p>
+                                </div>
+                                <button type="button" data-action="open-visa-modal" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 transition-all">
+                                    <i class="fa-solid fa-plus"></i> Add Country Visa
+                                </button>
+                            </div>
+
+                            <!-- Country Visas List -->
+                            <div id="crudVisasContainer" class="grid md:grid-cols-2 gap-4"></div>
+
+                            <!-- Visas & Flights Page Content Editor -->
+                            <form id="visaPageContentForm" class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                                    <div>
+                                        <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Visas, Flights & 3-Step Process Editor</span>
+                                        <h3 class="text-lg font-black text-[#0B2D5B]">Manage Visas & Air Tickets Page Content</h3>
+                                    </div>
+                                    <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">visa-services.html</span>
+                                </div>
+
+                                <div class="grid sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Top Badge</label>
+                                        <input type="text" id="visaHeroBadgeInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Main Heading</label>
+                                        <input type="text" id="visaHeroTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Subtitle</label>
+                                        <textarea id="visaHeroSubtitleInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="grid sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Flights Section Heading</label>
+                                        <input type="text" id="visaFlightHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mt-3 mb-1">Flights Description</label>
+                                        <textarea id="visaFlightDescInput" rows="3" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Flight Highlights (1 per line)</label>
+                                        <textarea id="visaFlightBulletsInput" rows="3" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mt-3 mb-1">Partner Airlines (Comma Separated)</label>
+                                        <input type="text" id="visaPartnerAirlinesInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                </div>
+
+                                <div class="grid md:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Visa Step 1</span>
+                                        <input type="text" id="visaStep1TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                        <textarea id="visaStep1DescInput" rows="3" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-600"></textarea>
+                                    </div>
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Visa Step 2</span>
+                                        <input type="text" id="visaStep2TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                        <textarea id="visaStep2DescInput" rows="3" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-600"></textarea>
+                                    </div>
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Visa Step 3</span>
+                                        <input type="text" id="visaStep3TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                        <textarea id="visaStep3DescInput" rows="3" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-600"></textarea>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="w-full sm:w-auto bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold px-8 py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+                                    <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
+                                    <span>Save Visas & Flights Page Content</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- ========================================================== -->
+                        <!-- TAB 4: CALCULATOR PAGE (TIER RATES, ADDONS & PAGE CONTENT) -->
+                        <!-- ========================================================== -->
+                        <div id="admin-panel-calculator" class="admin-tab-panel hidden space-y-6 anim-fade-up">
                             <form id="spotlightAndCalcForm" class="grid lg:grid-cols-12 gap-6">
                                 
-                                <!-- Left Column: Calculator Tier Pricing & Auto-Scale -->
-                                <div class="lg:col-span-5 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between space-y-5">
+                                <!-- Left Column: Calculator Room Tier Pricing & Auto-Scale -->
+                                <div class="lg:col-span-6 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between space-y-5">
                                     <div class="space-y-4">
                                         <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                                             <div>
                                                 <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Interactive Estimator Math</span>
-                                                <h3 class="text-lg font-black text-[#0B2D5B]">Calculator Room Tier Rates</h3>
+                                                <h3 class="text-lg font-black text-[#0B2D5B]">Room Sharing Tier Rates & Add-Ons</h3>
                                             </div>
                                             <div class="w-10 h-10 rounded-2xl bg-[#E6F6F8] text-[#0D8A9E] flex items-center justify-center text-lg">
                                                 <i class="fa-solid fa-calculator"></i>
@@ -480,7 +753,7 @@
                                             </div>
                                         </label>
 
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div class="grid grid-cols-2 gap-3">
                                             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
                                                 <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Sharing Room (PKR)</label>
                                                 <input type="number" id="rateSharing" min="1000" step="500" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-black text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
@@ -496,6 +769,32 @@
                                             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
                                                 <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Double Room - 2 Bed (PKR)</label>
                                                 <input type="number" id="rateDouble" min="1000" step="500" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-black text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
+                                            </div>
+                                        </div>
+
+                                        <div class="border-t border-slate-100 pt-3">
+                                            <span class="text-[10px] font-black uppercase text-[#0D8A9E] block mb-2">Duration & Hotel Star Add-On Modifiers (PKR)</span>
+                                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                                                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                                                    <label class="block text-[10px] font-bold text-slate-500 mb-1">10 Nights Offset</label>
+                                                    <input type="number" id="rateDur10" step="500" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                </div>
+                                                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                                                    <label class="block text-[10px] font-bold text-slate-500 mb-1">21 Nights Add-on</label>
+                                                    <input type="number" id="rateDur21" step="500" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                </div>
+                                                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                                                    <label class="block text-[10px] font-bold text-slate-500 mb-1">28 Nights Add-on</label>
+                                                    <input type="number" id="rateDur28" step="500" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                </div>
+                                                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                                                    <label class="block text-[10px] font-bold text-slate-500 mb-1">3-Star Hotel Add-on</label>
+                                                    <input type="number" id="rateHotel3Star" step="500" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                </div>
+                                                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 sm:col-span-2">
+                                                    <label class="block text-[10px] font-bold text-slate-500 mb-1">5-Star Near Haram Add-on</label>
+                                                    <input type="number" id="rateHotel5Star" step="500" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                </div>
                                             </div>
                                         </div>
 
@@ -515,96 +814,59 @@
 
                                     <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
                                         <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
-                                        <span>Save Calculator Tier Rates</span>
+                                        <span>Save Calculator Rates</span>
                                     </button>
                                 </div>
 
-                                <!-- Right Column: Primary Deal Media & Flyer Uploader -->
-                                <div class="lg:col-span-7 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
-                                    <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                                <!-- Right Column: Calculator Page Text & Included Bullets -->
+                                <div class="lg:col-span-6 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between space-y-5">
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                                            <div>
+                                                <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">calculator.html Manager</span>
+                                                <h3 class="text-lg font-black text-[#0B2D5B]">Calculator Page Banner & Inclusions</h3>
+                                            </div>
+                                            <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">calculator.html</span>
+                                        </div>
+
                                         <div>
-                                            <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Default Spotlight Frames & Flyer</span>
-                                            <h3 class="text-lg font-black text-[#0B2D5B]">Primary Deal Images & Monthly Flyer</h3>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Calculator Hero Top Badge</label>
+                                            <input type="text" id="calcHeroBadgeInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
                                         </div>
-                                        <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">Phone Upload Ready</span>
-                                    </div>
-
-                                    <div class="grid sm:grid-cols-3 gap-4">
-                                        <!-- Madinah -->
-                                        <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200 flex flex-col justify-between space-y-3">
-                                            <div>
-                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Madinah Frame</span>
-                                                <div class="h-32 rounded-xl overflow-hidden border border-[#0D8A9E] bg-slate-200 mt-1.5">
-                                                    <img id="previewMadinahImg" src="" alt="Madinah" class="w-full h-full object-cover">
-                                                </div>
-                                                <input type="text" id="inputMadinahUrl" placeholder="Image URL..." class="mt-2 w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px]">
-                                            </div>
-                                            <label class="w-full bg-white hover:bg-[#0B2D5B] hover:text-white text-[#0B2D5B] border border-slate-200 font-bold text-[11px] py-2 px-2.5 rounded-xl cursor-pointer flex items-center justify-center gap-1.5 transition-colors">
-                                                <i class="fa-solid fa-camera"></i> Upload Photo
-                                                <input type="file" accept="image/*" data-upload-target="inputMadinahUrl" data-preview-target="previewMadinahImg" class="hidden">
-                                            </label>
+                                        <div>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Calculator Hero Heading</label>
+                                            <input type="text" id="calcHeroTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
                                         </div>
-
-                                        <!-- Makkah -->
-                                        <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200 flex flex-col justify-between space-y-3">
-                                            <div>
-                                                <span class="text-[10px] font-bold uppercase text-[#0B2D5B]">Makkah Frame</span>
-                                                <div class="h-32 rounded-xl overflow-hidden border border-[#0B2D5B] bg-slate-200 mt-1.5">
-                                                    <img id="previewMakkahImg" src="" alt="Makkah" class="w-full h-full object-cover">
-                                                </div>
-                                                <input type="text" id="inputMakkahUrl" placeholder="Image URL..." class="mt-2 w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px]">
-                                            </div>
-                                            <label class="w-full bg-white hover:bg-[#0B2D5B] hover:text-white text-[#0B2D5B] border border-slate-200 font-bold text-[11px] py-2 px-2.5 rounded-xl cursor-pointer flex items-center justify-center gap-1.5 transition-colors">
-                                                <i class="fa-solid fa-camera"></i> Upload Photo
-                                                <input type="file" accept="image/*" data-upload-target="inputMakkahUrl" data-preview-target="previewMakkahImg" class="hidden">
-                                            </label>
+                                        <div>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Calculator Hero Subtitle</label>
+                                            <textarea id="calcHeroSubtitleInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
                                         </div>
-
-                                        <!-- Promotional Flyer -->
-                                        <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200 flex flex-col justify-between space-y-3">
-                                            <div>
-                                                <span class="text-[10px] font-bold uppercase text-emerald-700">Monthly Flyer Popup</span>
-                                                <div class="h-32 rounded-xl overflow-hidden border border-dashed border-[#0D8A9E] bg-white mt-1.5 flex items-center justify-center">
-                                                    <img id="previewFlyerImg" src="" alt="Flyer" class="w-full h-full object-cover hidden">
-                                                    <div id="previewFlyerPlaceholder" class="text-center p-2 text-[10px] text-slate-400">
-                                                        <i class="fa-solid fa-file-image text-xl text-[#0D8A9E] block mb-1"></i>
-                                                        Live Digital Flyer Active
-                                                    </div>
-                                                </div>
-                                                <input type="text" id="inputFlyerUrl" placeholder="Custom Flyer URL (Optional)" class="mt-2 w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px]">
-                                            </div>
-                                            <label class="w-full bg-white hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 font-bold text-[11px] py-2 px-2.5 rounded-xl cursor-pointer flex items-center justify-center gap-1.5 transition-colors">
-                                                <i class="fa-solid fa-upload"></i> Upload Flyer
-                                                <input type="file" accept="image/*" data-upload-target="inputFlyerUrl" data-preview-target="previewFlyerImg" class="hidden">
-                                            </label>
+                                        <div>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">What Is Included in Every Estimate (1 bullet per line)</label>
+                                            <textarea id="calcIncludedBulletsInput" rows="4" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
                                         </div>
                                     </div>
 
-                                    <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
-                                        <label class="flex items-center gap-2 cursor-pointer">
-                                            <input type="checkbox" id="chkShowFlyerButton" class="w-4 h-4 accent-[#0D8A9E] rounded">
-                                            <span class="text-xs font-bold text-[#0B2D5B]">Show "View Latest Flyer" button on Deal Cards</span>
-                                        </label>
-                                        <button type="submit" class="bg-[#0D8A9E] hover:bg-[#096979] text-white font-extrabold px-6 py-3 rounded-xl shadow text-xs flex items-center gap-2">
-                                            <i class="fa-solid fa-cloud-arrow-up"></i> Save Media & Rates
-                                        </button>
-                                    </div>
+                                    <button type="submit" class="w-full bg-[#0D8A9E] hover:bg-[#096979] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                                        <span>Save Calculator Page & Rates</span>
+                                    </button>
                                 </div>
                             </form>
                         </div>
 
                         <!-- ========================================================== -->
-                        <!-- TAB 4: CONTACTS & WHATSAPP ROUTING TAB                     -->
+                        <!-- TAB 5: CONTACT & OFFICE PAGE (ROUTING, DETAILS & MAP)      -->
                         <!-- ========================================================== -->
                         <div id="admin-panel-contacts" class="admin-tab-panel hidden space-y-6 anim-fade-up">
                             <form id="contactsForm" class="grid lg:grid-cols-12 gap-6">
                                 
-                                <!-- Left Column: Active WhatsApp Lead Routing + Staff Numbers -->
+                                <!-- Left Column: Active WhatsApp Lead Routing + Staff Numbers + Contact Page Banner -->
                                 <div class="lg:col-span-7 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
                                     <div class="border-b border-slate-100 pb-4">
                                         <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600">Instant Lead Distribution</span>
                                         <h3 class="text-lg font-black text-[#0B2D5B]">Active WhatsApp Booking Routing</h3>
-                                        <p class="text-xs text-slate-500 mt-0.5">Choose which staff member receives automated inquiries from the Hero Widget, Special Deal Cards, Umrah Calculator, and Visa CTA buttons.</p>
+                                        <p class="text-xs text-slate-500 mt-0.5">Choose which staff member receives automated inquiries from the Hero Widget, Special Deal Cards, Umrah Calculator, and Visa CTA buttons across all pages.</p>
                                     </div>
 
                                     <div>
@@ -658,12 +920,31 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <!-- Contact Page Hero Banner Fields -->
+                                    <div class="border-t border-slate-100 pt-4 space-y-3">
+                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E] block">contact.html Hero Banner Text</span>
+                                        <div class="grid sm:grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Hero Badge</label>
+                                                <input type="text" id="contactHeroBadgeInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Hero Heading</label>
+                                                <input type="text" id="contactHeroTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div class="sm:col-span-2">
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Hero Subtitle</label>
+                                                <textarea id="contactHeroSubtitleInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <!-- Right Column: Agency Branding, Office Address & Safety Reset -->
+                                <!-- Right Column: Agency Branding, Office Address, Hours, Email, Map & Safety Reset -->
                                 <div class="lg:col-span-5 space-y-6">
-                                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
-                                        <h3 class="text-lg font-black text-[#0B2D5B]">Agency Details & Address</h3>
+                                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-3.5">
+                                        <h3 class="text-lg font-black text-[#0B2D5B]">Agency Details, Office Hours & Map</h3>
                                         <div>
                                             <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Agency Name</label>
                                             <input type="text" id="contactAgencyName" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B]">
@@ -682,9 +963,21 @@
                                             <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Islamabad Office Address</label>
                                             <textarea id="contactOfficeAddress" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-bold text-[#0B2D5B]"></textarea>
                                         </div>
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Office Hours</label>
+                                            <input type="text" id="contactOfficeHours" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-[#0B2D5B]">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Official Email(s)</label>
+                                            <input type="text" id="contactOfficeEmail" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-[#0B2D5B]">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Google Maps Embed URL</label>
+                                            <input type="text" id="contactMapEmbedUrl" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-[11px] text-slate-600">
+                                        </div>
                                         <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
                                             <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
-                                            <span>Save Contacts & Push to Website</span>
+                                            <span>Save Contact Page & Push Live</span>
                                         </button>
                                     </div>
 
@@ -698,7 +991,7 @@
                                             <i class="fa-solid fa-shield-halved text-xl text-rose-500"></i>
                                         </div>
                                         <p class="text-xs text-slate-500">
-                                            Restore all Special Deals, prices, dates, packages, visas, and contacts back to the original <strong>January Flyer Defaults (PKR 232,000)</strong>.
+                                            Restore all Special Deals, prices, dates, packages, visas, page text, and contacts back to the original <strong>January Flyer Defaults (PKR 232,000)</strong>.
                                         </p>
                                         <div class="flex flex-col sm:flex-row gap-2.5">
                                             <button type="button" data-action="reset-flyer-defaults" class="flex-1 bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 font-extrabold py-3 px-4 rounded-xl text-xs transition-all flex items-center justify-center gap-2">
@@ -1032,9 +1325,14 @@
             const dealBadge = this.container.querySelector("#tabBadgeDeals");
             if (dealBadge) dealBadge.textContent = String((this.specialDeals || []).length);
 
-            const pkgVisaBadge = this.container.querySelector("#tabBadgePkgsVisas");
-            if (pkgVisaBadge) {
-                pkgVisaBadge.textContent = String((this.packages || []).length + (this.visas || []).length);
+            const pkgBadge = this.container.querySelector("#tabBadgePkgs");
+            if (pkgBadge) {
+                pkgBadge.textContent = String((this.packages || []).length);
+            }
+
+            const visaBadge = this.container.querySelector("#tabBadgeVisas");
+            if (visaBadge) {
+                visaBadge.textContent = String((this.visas || []).length);
             }
         }
 
@@ -1141,6 +1439,11 @@
             setVal("#rateQuad", r.quadPrice ?? 248000);
             setVal("#rateTriple", r.triplePrice ?? 268000);
             setVal("#rateDouble", r.doublePrice ?? 295000);
+            setVal("#rateDur10", r.dur10NightsOffset ?? -18000);
+            setVal("#rateDur21", r.dur21NightsOffset ?? 35000);
+            setVal("#rateDur28", r.dur28NightsOffset ?? 65000);
+            setVal("#rateHotel3Star", r.hotel3StarAddon ?? 45000);
+            setVal("#rateHotel5Star", r.hotel5StarAddon ?? 115000);
 
             setVal("#inputMadinahUrl", s.madinahImageUrl || "");
             setVal("#inputMakkahUrl", s.makkahImageUrl || "");
@@ -1176,6 +1479,65 @@
             setVal("#contactSecondaryPhone", c.secondaryPhone || "+92 343 4159182");
             setVal("#contactSecondaryWA", c.secondaryWhatsApp || "923434159182");
             setVal("#contactOfficeAddress", c.officeAddress || "");
+            setVal("#contactOfficeHours", c.officeHours || "Monday to Saturday: 9:30 AM – 8:00 PM (Sunday Closed / WhatsApp Support Active)");
+            setVal("#contactOfficeEmail", c.officeEmail || "info@zakirtravels.com / inam@zakirtravels.com");
+            setVal("#contactMapEmbedUrl", c.mapEmbedUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3318.847503714243!2d73.0645624!3d33.7128613!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfbf9df175e11d%3A0xe54d6faeebdae812!2sPotohar%20Plaza%2C%20Fazal-e-Haq%20Rd%2C%20Blue%20Area%2C%20Islamabad!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s");
+
+            // Populate Page-Specific Content Fields
+            const pc = (this.siteConfig && this.siteConfig.pageContent) || window.DEFAULT_PAGE_CONTENT || {};
+            const pHome = pc.home || {};
+            const pUmrah = pc.umrah || {};
+            const pVisas = pc.visas || {};
+            const pCalc = pc.calculator || {};
+            const pContact = pc.contact || {};
+
+            setVal("#homeHeroBadgeInput", pHome.heroBadge || "Islamabad's Trusted Umrah & Global Travel Partner");
+            setVal("#homeHeroHeadingMainInput", pHome.heroHeadingMain || "Your Journey, Our Priority.");
+            setVal("#homeHeroDescriptionInput", pHome.heroDescription || "");
+            setVal("#homeSrv1TitleInput", pHome.srv1Title || "Umrah Packages");
+            setVal("#homeSrv1DescInput", pHome.srv1Desc || "");
+            setVal("#homeSrv2TitleInput", pHome.srv2Title || "Global Visa Assistance");
+            setVal("#homeSrv2DescInput", pHome.srv2Desc || "");
+            setVal("#homeSrv3TitleInput", pHome.srv3Title || "Air Ticket Booking");
+            setVal("#homeSrv3DescInput", pHome.srv3Desc || "");
+            setVal("#homeSrv4TitleInput", pHome.srv4Title || "Hotels & Transport");
+            setVal("#homeSrv4DescInput", pHome.srv4Desc || "");
+
+            setVal("#umrahHeroBadgeInput", pUmrah.heroBadge || "Direct Departures from Islamabad (ISB)");
+            setVal("#umrahHeroTitleInput", pUmrah.heroTitle || "All-Inclusive Umrah Packages");
+            setVal("#umrahHeroSubtitleInput", pUmrah.heroSubtitle || "");
+            setVal("#umrahInc1TitleInput", pUmrah.inc1Title || "Flights & Visas");
+            setVal("#umrahInc1BulletsInput", pUmrah.inc1Bullets || "");
+            setVal("#umrahInc2TitleInput", pUmrah.inc2Title || "Haram Hotel Stays");
+            setVal("#umrahInc2BulletsInput", pUmrah.inc2Bullets || "");
+            setVal("#umrahInc3TitleInput", pUmrah.inc3Title || "Transport & Ziyarat");
+            setVal("#umrahInc3BulletsInput", pUmrah.inc3Bullets || "");
+            setVal("#umrahFamilyTitleInput", pUmrah.familyBannerTitle || "Traveling with Family, Elders, or a Private Group?");
+            setVal("#umrahFamilyDescInput", pUmrah.familyBannerDesc || "");
+
+            setVal("#visaHeroBadgeInput", pVisas.heroBadge || "Fast Processing & Embassy File Preparation");
+            setVal("#visaHeroTitleInput", pVisas.heroTitle || "Worldwide Visas & Air Tickets");
+            setVal("#visaHeroSubtitleInput", pVisas.heroSubtitle || "");
+            setVal("#visaFlightHeadingInput", pVisas.flightHeading || "Domestic & International Air Ticket Booking");
+            setVal("#visaFlightDescInput", pVisas.flightDescription || "");
+            setVal("#visaFlightBulletsInput", pVisas.flightBullets || "");
+            setVal("#visaPartnerAirlinesInput", pVisas.partnerAirlines || "");
+            setVal("#visaStep1TitleInput", pVisas.step1Title || "Send Passports & Photos");
+            setVal("#visaStep1DescInput", pVisas.step1Desc || "");
+            setVal("#visaStep2TitleInput", pVisas.step2Title || "Document Verification");
+            setVal("#visaStep2DescInput", pVisas.step2Desc || "");
+            setVal("#visaStep3TitleInput", pVisas.step3Title || "Receive Approved Visa");
+            setVal("#visaStep3DescInput", pVisas.step3Desc || "");
+
+            setVal("#calcHeroBadgeInput", pCalc.heroBadge || "Live Real-Time Cost Estimator");
+            setVal("#calcHeroTitleInput", pCalc.heroTitle || "Umrah Package Budget Calculator");
+            setVal("#calcHeroSubtitleInput", pCalc.heroSubtitle || "");
+            setVal("#calcIncludedBulletsInput", pCalc.includedBullets || "");
+
+            setVal("#contactHeroBadgeInput", pContact.heroBadge || "Head Office: Blue Area, Islamabad");
+            setVal("#contactHeroTitleInput", pContact.heroTitle || "Contact Our Travel Desk");
+            setVal("#contactHeroSubtitleInput", pContact.heroSubtitle || "");
+
             this._updateLivePreviewBadges();
         }
 
@@ -1371,15 +1733,20 @@
             const quickMonth = this.container.querySelector("#quickMonthLabel").value.trim();
             const quickDep = this.container.querySelector("#quickDepartureDate").value.trim();
 
+            const getVal = (sel, fallback = "") => {
+                const el = this.container.querySelector(sel);
+                return el ? el.value.trim() : fallback;
+            };
+
             await db.updateSiteConfig({
                 spotlight: {
-                    monthLabel: quickMonth || this.container.querySelector("#spotMonthLabel").value.trim(),
-                    title: this.container.querySelector("#spotTitle").value.trim() || "UMRAH PACKAGE",
+                    monthLabel: quickMonth || getVal("#spotMonthLabel", "January"),
+                    title: getVal("#spotTitle", "UMRAH PACKAGE") || "UMRAH PACKAGE",
                     startingPrice,
-                    priceUnit: this.container.querySelector("#spotPriceUnit").value.trim() || "PER PERSON (SHARING)",
-                    departureDate: quickDep || this.container.querySelector("#spotDepartureDate").value.trim(),
-                    returnDate: this.container.querySelector("#spotReturnDate").value.trim() || "Nov 10, 2026",
-                    duration: this.container.querySelector("#spotDuration").value.trim() || "14 Nights",
+                    priceUnit: getVal("#spotPriceUnit", "PER PERSON (SHARING)") || "PER PERSON (SHARING)",
+                    departureDate: quickDep || getVal("#spotDepartureDate", "Jan 26, 2026"),
+                    returnDate: getVal("#spotReturnDate", "Nov 10, 2026") || "Nov 10, 2026",
+                    duration: getVal("#spotDuration", "14 Nights") || "14 Nights",
                     madinahImageUrl: madinahImageUrl || this.siteConfig.spotlight.madinahImageUrl,
                     makkahImageUrl: makkahImageUrl || this.siteConfig.spotlight.makkahImageUrl,
                     promotionalFlyerUrl,
@@ -1396,20 +1763,82 @@
                     sharingPrice,
                     quadPrice,
                     triplePrice,
-                    doublePrice
+                    doublePrice,
+                    dur10NightsOffset: Number(getVal("#rateDur10", "-18000")),
+                    dur21NightsOffset: Number(getVal("#rateDur21", "35000")),
+                    dur28NightsOffset: Number(getVal("#rateDur28", "65000")),
+                    hotel3StarAddon: Number(getVal("#rateHotel3Star", "45000")),
+                    hotel5StarAddon: Number(getVal("#rateHotel5Star", "115000"))
                 },
                 contacts: {
-                    agencyName: this.container.querySelector("#contactAgencyName").value.trim(),
-                    taglinePrimary: this.container.querySelector("#contactTagline1").value.trim(),
-                    taglineSecondary: this.container.querySelector("#contactTagline2").value.trim(),
-                    managerName: this.container.querySelector("#contactManagerName").value.trim(),
+                    agencyName: getVal("#contactAgencyName", "Zakir Travel & Tours"),
+                    taglinePrimary: getVal("#contactTagline1", "Your Journey Our Priority"),
+                    taglineSecondary: getVal("#contactTagline2", "Your Journey Our Responsibility"),
+                    managerName: getVal("#contactManagerName", "Inam Khan (Manager)"),
                     managerPhone,
                     managerWhatsApp,
-                    secondaryName: this.container.querySelector("#contactSecondaryName").value.trim(),
+                    secondaryName: getVal("#contactSecondaryName", "Sadiq Ullah"),
                     secondaryPhone,
                     secondaryWhatsApp,
                     activeBookingWhatsApp,
-                    officeAddress: this.container.querySelector("#contactOfficeAddress").value.trim()
+                    officeAddress: getVal("#contactOfficeAddress", ""),
+                    officeHours: getVal("#contactOfficeHours", "Monday to Saturday: 9:30 AM – 8:00 PM (Sunday Closed / WhatsApp Support Active)"),
+                    officeEmail: getVal("#contactOfficeEmail", "info@zakirtravels.com / inam@zakirtravels.com"),
+                    mapEmbedUrl: getVal("#contactMapEmbedUrl", "")
+                },
+                pageContent: {
+                    home: {
+                        heroBadge: getVal("#homeHeroBadgeInput"),
+                        heroHeadingMain: getVal("#homeHeroHeadingMainInput"),
+                        heroDescription: getVal("#homeHeroDescriptionInput"),
+                        srv1Title: getVal("#homeSrv1TitleInput"),
+                        srv1Desc: getVal("#homeSrv1DescInput"),
+                        srv2Title: getVal("#homeSrv2TitleInput"),
+                        srv2Desc: getVal("#homeSrv2DescInput"),
+                        srv3Title: getVal("#homeSrv3TitleInput"),
+                        srv3Desc: getVal("#homeSrv3DescInput"),
+                        srv4Title: getVal("#homeSrv4TitleInput"),
+                        srv4Desc: getVal("#homeSrv4DescInput")
+                    },
+                    umrah: {
+                        heroBadge: getVal("#umrahHeroBadgeInput"),
+                        heroTitle: getVal("#umrahHeroTitleInput"),
+                        heroSubtitle: getVal("#umrahHeroSubtitleInput"),
+                        inc1Title: getVal("#umrahInc1TitleInput"),
+                        inc1Bullets: getVal("#umrahInc1BulletsInput"),
+                        inc2Title: getVal("#umrahInc2TitleInput"),
+                        inc2Bullets: getVal("#umrahInc2BulletsInput"),
+                        inc3Title: getVal("#umrahInc3TitleInput"),
+                        inc3Bullets: getVal("#umrahInc3BulletsInput"),
+                        familyBannerTitle: getVal("#umrahFamilyTitleInput"),
+                        familyBannerDesc: getVal("#umrahFamilyDescInput")
+                    },
+                    visas: {
+                        heroBadge: getVal("#visaHeroBadgeInput"),
+                        heroTitle: getVal("#visaHeroTitleInput"),
+                        heroSubtitle: getVal("#visaHeroSubtitleInput"),
+                        flightHeading: getVal("#visaFlightHeadingInput"),
+                        flightDescription: getVal("#visaFlightDescInput"),
+                        flightBullets: getVal("#visaFlightBulletsInput"),
+                        partnerAirlines: getVal("#visaPartnerAirlinesInput"),
+                        step1Title: getVal("#visaStep1TitleInput"),
+                        step1Desc: getVal("#visaStep1DescInput"),
+                        step2Title: getVal("#visaStep2TitleInput"),
+                        step2Desc: getVal("#visaStep2DescInput"),
+                        step3Title: getVal("#visaStep3TitleInput"),
+                        step3Desc: getVal("#visaStep3DescInput")
+                    },
+                    calculator: {
+                        heroBadge: getVal("#calcHeroBadgeInput"),
+                        heroTitle: getVal("#calcHeroTitleInput"),
+                        heroSubtitle: getVal("#calcHeroSubtitleInput"),
+                        includedBullets: getVal("#calcIncludedBulletsInput")
+                    },
+                    contact: {
+                        heroBadge: getVal("#contactHeroBadgeInput"),
+                        heroTitle: getVal("#contactHeroTitleInput"),
+                        heroSubtitle: getVal("#contactHeroSubtitleInput")
+                    }
                 }
             });
 
@@ -1536,12 +1965,13 @@
             this.activeTab = tabName;
             this.container.querySelectorAll(".admin-tab-btn").forEach((btn) => {
                 const isMatch = btn.getAttribute("data-tab") === tabName;
+                const extraColSpan = btn.getAttribute("data-tab") === "contacts" ? " col-span-2 sm:col-span-1" : "";
                 btn.className = isMatch
-                    ? "admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#16437E] text-white font-extrabold text-xs sm:text-sm py-3.5 px-3 rounded-xl flex items-center justify-center gap-2 shadow-md transition-all"
-                    : "admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3.5 px-3 rounded-xl flex items-center justify-center gap-2 transition-all";
+                    ? `admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#16437E] text-white font-extrabold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-md transition-all${extraColSpan}`
+                    : `admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all${extraColSpan}`;
             });
 
-            ["spotlight", "crud", "media", "contacts"].forEach((t) => {
+            ["spotlight", "umrah", "visas", "calculator", "contacts"].forEach((t) => {
                 const panel = this.container.querySelector(`#admin-panel-${t}`);
                 if (panel) {
                     panel.classList.toggle("hidden", t !== tabName);
@@ -1550,19 +1980,10 @@
         }
 
         _switchCrudSubtab(subtab) {
-            this.activeCrudSubtab = subtab;
-            this.container.querySelectorAll(".crud-subtab-btn").forEach((btn) => {
-                const isMatch = btn.getAttribute("data-crud-subtab") === subtab;
-                btn.className = isMatch
-                    ? "crud-subtab-btn bg-[#0B2D5B] text-white font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow transition-all"
-                    : "crud-subtab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all";
-            });
-
-            const pkgWrap = this.container.querySelector("#crudPackagesContainer");
-            const visaWrap = this.container.querySelector("#crudVisasContainer");
-            if (pkgWrap && visaWrap) {
-                pkgWrap.classList.toggle("hidden", subtab !== "packages");
-                visaWrap.classList.toggle("hidden", subtab !== "visas");
+            if (subtab === "packages") {
+                this._switchTab("umrah");
+            } else if (subtab === "visas") {
+                this._switchTab("visas");
             }
         }
 
@@ -1646,6 +2067,17 @@
                     await this.saveAllPortalChanges();
                 });
             }
+
+            // Home, Umrah & Visa Page Content Forms Submit
+            ["#homePageContentForm", "#umrahPageContentForm", "#visaPageContentForm"].forEach((formSel) => {
+                const formEl = this.container.querySelector(formSel);
+                if (formEl) {
+                    formEl.addEventListener("submit", async (e) => {
+                        e.preventDefault();
+                        await this.saveAllPortalChanges();
+                    });
+                }
+            });
 
             // Media File Uploads (Tab 3)
             this.container.querySelectorAll("input[type='file'][data-upload-target]").forEach((fileInput) => {

@@ -71,7 +71,7 @@
         }
     </style>
 </head>
-<body class="font-sans text-slate-800 bg-slate-50 antialiased selection:bg-teal selection:text-white">
+<body data-page="calculator" class="font-sans text-slate-800 bg-slate-50 antialiased selection:bg-teal selection:text-white">
 
     <!-- Top Contact Bar (Real-Time Bound to site_config.contacts) -->
     <div class="bg-navy-dark text-white text-xs sm:text-sm py-2.5 px-4 border-b border-white/10">
@@ -172,12 +172,12 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
             <span class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-teal-accent mb-4">
                 <i class="fa-solid fa-calculator text-amber-300"></i>
-                <span>Live Real-Time Cost Estimator</span>
+                <span id="calcHeroBadge">Live Real-Time Cost Estimator</span>
             </span>
-            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight uppercase">
-                Umrah Package <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-light to-sky-200">Budget Calculator</span>
+            <h1 id="calcHeroTitle" class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight uppercase">
+                Umrah Package Budget Calculator
             </h1>
-            <p class="mt-4 text-base sm:text-lg text-slate-200 max-w-3xl mx-auto font-normal leading-relaxed">
+            <p id="calcHeroSubtitle" class="mt-4 text-base sm:text-lg text-slate-200 max-w-3xl mx-auto font-normal leading-relaxed">
                 Estimate your custom Umrah package in seconds! Select your stay duration, room sharing tier (Quad, Triple, Double, Sharing), hotel courtyard distance, and number of pilgrims.
             </p>
         </div>
@@ -204,10 +204,12 @@
                             <i class="fa-solid fa-circle-check text-teal-light text-base"></i>
                             <span>What is included in every calculated estimate:</span>
                         </div>
-                        <p>• Direct or 1-Stop Return Airline Ticket from Islamabad</p>
-                        <p>• Umrah Visa with Comprehensive Saudi Health Insurance</p>
-                        <p>• Makkah & Madinah Hotel Accommodation + Transport</p>
-                        <p>• Dedicated Airport Pickups & Guided Ziyarat Tours</p>
+                        <div id="calcIncludedBulletsList" class="space-y-2">
+                            <p>• Direct or 1-Stop Return Airline Ticket from Islamabad</p>
+                            <p>• Umrah Visa with Comprehensive Saudi Health Insurance</p>
+                            <p>• Makkah & Madinah Hotel Accommodation + Transport</p>
+                            <p>• Dedicated Airport Pickups & Guided Ziyarat Tours</p>
+                        </div>
                     </div>
 
                     <div class="pt-2 flex items-center gap-3 text-xs text-slate-400">
@@ -298,7 +300,8 @@
                 <div class="bg-slate-50 border border-slate-200 rounded-3xl p-6 flex flex-col justify-between hover:border-teal transition-all">
                     <div>
                         <span class="text-xs font-bold uppercase tracking-wider text-teal">Most Economical</span>
-                        <h3 class="text-xl font-extrabold text-navy mt-1 mb-2">Sharing Room</h3>
+                        <h3 class="text-xl font-extrabold text-navy mt-1 mb-1">Sharing Room</h3>
+                        <div id="calcCardSharingPrice" class="text-sm font-black text-teal mb-2">PKR 232,000 / Person</div>
                         <p class="text-xs text-slate-500 mb-4 leading-relaxed">
                             Shared with other individual pilgrims (4 to 6 beds per room). Ideal for solo travelers seeking the lowest possible rate.
                         </p>
@@ -312,7 +315,8 @@
                 <div class="bg-slate-50 border border-slate-200 rounded-3xl p-6 flex flex-col justify-between hover:border-teal transition-all">
                     <div>
                         <span class="text-xs font-bold uppercase tracking-wider text-teal">Popular for Families</span>
-                        <h3 class="text-xl font-extrabold text-navy mt-1 mb-2">Quad Room (4-Bed)</h3>
+                        <h3 class="text-xl font-extrabold text-navy mt-1 mb-1">Quad Room (4-Bed)</h3>
+                        <div id="calcCardQuadPrice" class="text-sm font-black text-teal mb-2">PKR 248,000 / Person</div>
                         <p class="text-xs text-slate-500 mb-4 leading-relaxed">
                             4 separate single beds in one private room. Perfect for a family of 4 or 4 friends traveling together with complete privacy.
                         </p>
@@ -326,7 +330,8 @@
                 <div class="bg-slate-50 border border-slate-200 rounded-3xl p-6 flex flex-col justify-between hover:border-teal transition-all">
                     <div>
                         <span class="text-xs font-bold uppercase tracking-wider text-teal">Comfort & Value</span>
-                        <h3 class="text-xl font-extrabold text-navy mt-1 mb-2">Triple Room (3-Bed)</h3>
+                        <h3 class="text-xl font-extrabold text-navy mt-1 mb-1">Triple Room (3-Bed)</h3>
+                        <div id="calcCardTriplePrice" class="text-sm font-black text-teal mb-2">PKR 268,000 / Person</div>
                         <p class="text-xs text-slate-500 mb-4 leading-relaxed">
                             3 comfortable single beds in a spacious private room. Suitable for parents with a child or three relatives.
                         </p>
@@ -340,7 +345,8 @@
                 <div class="bg-slate-50 border border-slate-200 rounded-3xl p-6 flex flex-col justify-between hover:border-teal transition-all">
                     <div>
                         <span class="text-xs font-bold uppercase tracking-wider text-teal">Maximum Privacy</span>
-                        <h3 class="text-xl font-extrabold text-navy mt-1 mb-2">Double Room (Couple)</h3>
+                        <h3 class="text-xl font-extrabold text-navy mt-1 mb-1">Double Room (Couple)</h3>
+                        <div id="calcCardDoublePrice" class="text-sm font-black text-teal mb-2">PKR 295,000 / Person</div>
                         <p class="text-xs text-slate-500 mb-4 leading-relaxed">
                             1 King bed or 2 twin beds dedicated exclusively to husband and wife or two companions seeking absolute privacy.
                         </p>
@@ -446,3 +452,4 @@
     <script src="./js/homepage-live.js"></script>
 </body>
 </html>
+
