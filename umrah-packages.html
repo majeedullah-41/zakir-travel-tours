@@ -10,7 +10,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kaushan+Script&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Kaushan+Script&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
@@ -21,7 +21,7 @@
                     colors: {
                         navy: {
                             DEFAULT: '#0B2D5B',
-                            dark: '#071E3E',
+                            dark: '#05162E',
                             light: '#16437E'
                         },
                         teal: {
@@ -29,15 +29,22 @@
                             dark: '#096979',
                             light: '#15B2CB',
                             accent: '#E6F6F8'
+                        },
+                        gold: {
+                            DEFAULT: '#D4AF37',
+                            light: '#FDE68A',
+                            soft: '#FEF3C7'
                         }
                     },
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'Georgia', 'serif'],
                         script: ['Kaushan Script', 'cursive']
                     },
                     boxShadow: {
+                        'executive': '0 24px 60px -15px rgba(5, 22, 46, 0.12)',
                         'flyer': '0 20px 50px rgba(11, 45, 91, 0.15)',
-                        'glow': '0 0 25px rgba(13, 138, 158, 0.4)'
+                        'glow': '0 0 30px rgba(13, 138, 158, 0.35)'
                     }
                 }
             }
@@ -45,33 +52,133 @@
     </script>
 
     <style>
+        .executive-mesh-bg {
+            background-color: #05162E;
+            background-image:
+                radial-gradient(at 15% 20%, rgba(13, 138, 158, 0.35) 0px, transparent 50%),
+                radial-gradient(at 85% 15%, rgba(212, 175, 55, 0.16) 0px, transparent 45%),
+                radial-gradient(at 50% 90%, rgba(22, 67, 126, 0.5) 0px, transparent 55%);
+        }
+
+        .subtle-grid-pattern {
+            background-image: linear-gradient(to right, rgba(11, 45, 91, 0.035) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(11, 45, 91, 0.035) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
         .islamic-bg {
             background-color: #f4fafe;
             background-image: radial-gradient(#0D8A9E 0.55px, transparent 0.55px), radial-gradient(#0B2D5B 0.55px, #f4fafe 0.55px);
             background-size: 24px 24px;
             background-position: 0 0, 12px 12px;
         }
-        
-        .hero-gradient {
-            background: linear-gradient(135deg, rgba(7, 30, 62, 0.94) 0%, rgba(11, 45, 91, 0.88) 50%, rgba(13, 138, 158, 0.85) 100%);
+
+        /* Ambient Floating Aurora Orbs */
+        @keyframes auroraDrift {
+            0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+            33% { transform: translate3d(30px, -25px, 0) scale(1.08); }
+            66% { transform: translate3d(-20px, 20px, 0) scale(0.95); }
+        }
+        .aurora-orb-1 {
+            animation: auroraDrift 14s ease-in-out infinite;
+        }
+        .aurora-orb-2 {
+            animation: auroraDrift 18s ease-in-out infinite reverse;
         }
 
-        .flyer-badge {
-            background: linear-gradient(180deg, #0B2D5B 0%, #0D8A9E 50%, #0B2D5B 100%);
+        /* Cinematic Ken Burns Photo Zoom */
+        @keyframes kenBurnsSlow {
+            0% { transform: scale(1) translate(0, 0); }
+            50% { transform: scale(1.09) translate(-1%, -1%); }
+            100% { transform: scale(1) translate(0, 0); }
+        }
+        .ken-burns {
+            animation: kenBurnsSlow 22s ease-in-out infinite;
         }
 
-        @keyframes zakirDealCardEntrance {
-            0% { opacity: 0; transform: translateY(24px) scale(0.99); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
+        /* Gentle Floating */
         @keyframes floatingPriceShield {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-7px); }
         }
-
         .floating-price-shield {
             animation: floatingPriceShield 4s ease-in-out infinite;
+        }
+
+        /* Flowing Gradient Headline Text */
+        @keyframes textGradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .animated-gradient-text {
+            background-size: 220% auto;
+            animation: textGradientFlow 6s ease infinite;
+        }
+
+        /* Glossy Button Shimmer Sweep */
+        @keyframes shimmerSweep {
+            0% { transform: translateX(-120%) skewX(-20deg); }
+            100% { transform: translateX(220%) skewX(-20deg); }
+        }
+        .btn-shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-shimmer::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 45%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+            transform: translateX(-120%) skewX(-20deg);
+            animation: shimmerSweep 4.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+            pointer-events: none;
+        }
+
+        @keyframes radarPulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55); }
+            70% { box-shadow: 0 0 0 14px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .pulse-emerald-ring {
+            animation: radarPulse 2.2s infinite;
+        }
+
+        .card-hover-lift {
+            position: relative;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+            will-change: transform, box-shadow;
+        }
+        .card-hover-lift::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(13, 138, 158, 0.08), transparent 40%);
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            pointer-events: none;
+        }
+        .card-hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 28px 55px -12px rgba(11, 45, 91, 0.16), 0 0 24px -4px rgba(13, 138, 158, 0.12);
+        }
+        .card-hover-lift:hover::before {
+            opacity: 1;
+        }
+
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+            transition-delay: var(--reveal-delay, 0ms);
+        }
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* Custom Scrollbar */
@@ -218,35 +325,66 @@
         </div>
     </header>
 
-    <!-- Page Hero Banner -->
-    <section class="hero-gradient text-white py-14 sm:py-20 relative overflow-hidden">
-        <div class="absolute inset-0 opacity-10 pointer-events-none">
-            <svg class="w-full h-full" viewBox="0 0 1440 400" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                <circle cx="200" cy="80" r="240" stroke="white" stroke-width="2" stroke-dasharray="8 8" />
-                <circle cx="1200" cy="300" r="260" stroke="white" stroke-width="2" />
-            </svg>
-        </div>
+    <!-- Page Hero Banner: Executive Mesh Background with Ambient Floating Orbs & Ken Burns Motion -->
+    <section class="relative overflow-hidden executive-mesh-bg text-white pt-14 pb-16 lg:py-20 border-b border-white/10">
+        <!-- Subtle Architectural Photography Overlay with Ken Burns Slow Motion -->
+        <div class="absolute inset-0 opacity-15 bg-[url('https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=1800&q=80')] bg-cover bg-center mix-blend-luminosity pointer-events-none ken-burns"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-[#05162E] via-[#05162E]/95 to-[#05162E]/80 pointer-events-none"></div>
+        
+        <!-- Ambient Floating Aurora Orbs -->
+        <div class="aurora-orb-1 absolute -top-24 -left-24 w-96 h-96 rounded-full bg-teal/20 blur-3xl pointer-events-none"></div>
+        <div class="aurora-orb-2 absolute bottom-0 right-10 w-80 h-80 rounded-full bg-amber-400/10 blur-3xl pointer-events-none"></div>
+
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <span class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-teal-accent mb-4">
+            <div class="inline-flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/15 px-4 py-2 rounded-full text-xs sm:text-sm font-bold text-sky-100 shadow-sm mb-4">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
                 <i class="fa-solid fa-kaaba text-amber-300"></i>
-                <span id="umrahHeroBadge">Direct Departures from Islamabad (ISB)</span>
-            </span>
-            <h1 id="umrahHeroTitle" class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight uppercase">
-                All-Inclusive Umrah Packages
+                <span id="umrahHeroBadge">Direct Departures from Islamabad (ISB) • Swat Head Office Booking</span>
+            </div>
+
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight uppercase leading-[1.15]">
+                <span id="umrahHeroTitle" class="block">All-Inclusive Umrah Packages</span>
+                <span class="font-serif italic font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-teal-light to-sky-200 animated-gradient-text block mt-1 text-2xl sm:text-4xl lg:text-5xl">Sacred Journey, Pure Peace.</span>
             </h1>
-            <p id="umrahHeroSubtitle" class="mt-4 text-base sm:text-lg text-slate-200 max-w-3xl mx-auto font-normal leading-relaxed">
-                Experience spiritual peace with complete ease. From verified walking-distance Makkah and Madinah hotels to fast-track Saudi Umrah visas, return airline tickets, luxury AC ground transport, and guided historical Ziyarat.
+
+            <p id="umrahHeroSubtitle" class="mt-4 text-base sm:text-lg text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed">
+                Experience spiritual peace with complete ease. From verified walking-distance Makkah and Madinah hotels to fast-track Saudi Umrah visas, return airline tickets, luxury AC ground transport, and guided historical Ziyarat — supervised by our Swat Matta Head Office.
             </p>
-            <div class="mt-8 flex flex-wrap justify-center gap-3 text-xs sm:text-sm font-bold">
-                <a href="#special-deals" class="bg-teal hover:bg-teal-dark text-white px-6 py-3 rounded-xl shadow-lg transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-fire text-amber-300"></i> Featured Flyer Deals
+
+            <!-- Executive Action Buttons -->
+            <div class="mt-8 flex flex-wrap justify-center gap-3.5 text-xs sm:text-sm font-bold">
+                <a href="#special-deals" class="btn-shimmer bg-gradient-to-r from-teal to-teal-light hover:opacity-95 hover:-translate-y-0.5 text-white px-7 py-3.5 rounded-xl shadow-lg shadow-teal/25 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-amber-300"></i>
+                    <span>Featured Flyer Deals</span>
                 </a>
-                <a href="#all-tiers" class="bg-white/10 hover:bg-white/20 text-white border border-white/25 px-6 py-3 rounded-xl transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-layer-group text-teal-light"></i> Compare All Packages
+                <a href="#all-tiers" class="bg-white/10 hover:bg-white/15 hover:-translate-y-0.5 backdrop-blur-md border border-white/20 text-white px-6 py-3.5 rounded-xl transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-teal-light"></i>
+                    <span>Compare All Packages</span>
                 </a>
-                <a href="calculator.html" class="bg-navy hover:bg-navy-light text-white px-6 py-3 rounded-xl shadow transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-calculator text-teal-light"></i> Custom Cost Estimator
+                <a href="calculator.html" class="bg-white/10 hover:bg-white/15 hover:-translate-y-0.5 backdrop-blur-md border border-white/20 text-white px-6 py-3.5 rounded-xl transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-calculator text-amber-300"></i>
+                    <span>Package Estimator</span>
                 </a>
+            </div>
+
+            <!-- Executive Trust Strip -->
+            <div class="mt-10 pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-4xl mx-auto text-center">
+                <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
+                    <div class="text-xl sm:text-2xl font-extrabold text-amber-300">100K+</div>
+                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Pilgrims Served</div>
+                </div>
+                <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
+                    <div class="text-xl sm:text-2xl font-extrabold text-teal-light">Swat Matta</div>
+                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Central Head Office</div>
+                </div>
+                <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
+                    <div class="text-xl sm:text-2xl font-extrabold text-white">Verified</div>
+                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Near Haram Hotels</div>
+                </div>
+                <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
+                    <div class="text-xl sm:text-2xl font-extrabold text-emerald-400">24/7</div>
+                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Haramain Support</div>
+                </div>
             </div>
         </div>
     </section>
@@ -362,26 +500,86 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-navy-dark text-slate-400 py-10 border-t border-white/10 text-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-lg bg-white p-1 flex items-center justify-center shadow-sm">
-                    <img src="./assets/logo-mark.png" alt="Zakir Travel & Tours Logo" class="w-full h-full object-contain">
+    <!-- Executive Corporate Footer -->
+    <footer class="bg-navy-dark text-slate-400 pt-16 pb-12 border-t border-white/10 text-sm executive-mesh-bg relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 pb-12 border-b border-white/10">
+                <!-- Col 1: Brand Identity & Direct Management Contact -->
+                <div class="lg:col-span-4 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shadow-md shrink-0">
+                            <img src="./assets/logo-mark.png" alt="Zakir Travel & Tours Logo" class="w-full h-full object-contain">
+                        </div>
+                        <div>
+                            <span id="footerAgencyName" class="font-extrabold text-white text-lg block leading-none">Zakir Travel & Tours</span>
+                            <span id="footerTaglinePrimary" class="text-[11px] uppercase tracking-widest text-teal-light font-semibold">Your Journey Our Priority</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed max-w-sm">
+                        Headquartered in Swat Matta and trusted by over 100,000+ pilgrims and travelers for Umrah & Ziyarat packages, domestic & international air ticketing, and global visa consultancy.
+                    </p>
+                    <div class="pt-1 space-y-2 text-xs">
+                        <div class="text-[11px] font-extrabold uppercase tracking-widest text-white">Direct Management Desk</div>
+                        <div class="flex flex-col gap-1.5">
+                            <a id="topBarManagerLink" href="tel:+923490558345" class="inline-flex items-center gap-2 text-slate-300 hover:text-teal-light transition-colors font-medium">
+                                <i class="fa-solid fa-phone-volume text-teal-light"></i>
+                                <span><span id="topBarManagerName">Inam Khan</span>: <strong id="topBarManagerPhone" class="text-white">+92 349 0558345</strong></span>
+                            </a>
+                            <a id="topBarSecondaryLink" href="tel:+923434159182" class="inline-flex items-center gap-2 text-slate-300 hover:text-teal-light transition-colors font-medium">
+                                <i class="fa-solid fa-phone-volume text-teal-light"></i>
+                                <span><span id="topBarSecondaryName">Sadiq Ullah</span>: <strong id="topBarSecondaryPhone" class="text-white">+92 343 4159182</strong></span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <span id="footerAgencyName" class="font-bold text-white">Zakir Travel & Tours</span> — <span id="footerTaglinePrimary">Your Journey Our Priority</span>
+
+                <!-- Col 2: Dedicated Portals -->
+                <div class="lg:col-span-3 space-y-3">
+                    <h4 class="text-xs font-extrabold uppercase tracking-widest text-white">Dedicated Portals</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="index.html" class="hover:text-teal-light transition-colors">Home — Agency Overview</a></li>
+                        <li><a href="umrah-packages.html" class="hover:text-teal-light transition-colors">Umrah Packages &amp; Flyer Deals</a></li>
+                        <li><a href="visa-services.html" class="hover:text-teal-light transition-colors">Worldwide Visas &amp; Air Tickets</a></li>
+                        <li><a href="calculator.html" class="hover:text-teal-light transition-colors">Interactive Umrah Estimator</a></li>
+                        <li><a href="contact.html" class="hover:text-teal-light transition-colors">Office Locations &amp; Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Swat Head Office & Islamabad Branch -->
+                <div class="lg:col-span-5 space-y-3">
+                    <h4 class="text-xs font-extrabold uppercase tracking-widest text-white">Head Office &amp; Branch Location</h4>
+                    <div class="grid sm:grid-cols-2 gap-4 text-xs">
+                        <div class="bg-white/10 rounded-2xl p-3.5 border border-teal/40">
+                            <strong class="text-amber-300 block mb-1">Swat Head Office (Matta)</strong>
+                            <p id="topBarOfficeAddress" class="text-white font-medium leading-relaxed">Fazal Banda Rd, Swat Matta, Khyber Pakhtunkhwa, Pakistan</p>
+                        </div>
+                        <div class="bg-white/5 rounded-2xl p-3.5 border border-white/10">
+                            <strong class="text-teal-light block mb-1">Islamabad Branch</strong>
+                            <p class="text-slate-300 leading-relaxed">Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="flex flex-wrap items-center justify-center gap-4 text-xs">
-                <button type="button" onclick="openAdminPortalDrawer()" class="text-teal-light hover:underline font-semibold flex items-center gap-1">
-                    <i class="fa-solid fa-lock"></i> Admin Portal
-                </button>
-                <a href="admin.html" class="text-slate-400 hover:text-white transition-colors">/admin</a>
-                <span>© 2026 <span id="footerCopyrightAgency">Zakir Travel & Tours</span>, Blue Area Islamabad.</span>
+
+            <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+                <div>
+                    © 2026 <span id="footerCopyrightAgency" class="text-white font-semibold">Zakir Travel & Tours</span>. All rights reserved.
+                </div>
+                <div class="flex flex-wrap items-center gap-4">
+                    <button type="button" onclick="openAdminPortalDrawer()" class="text-teal-light hover:underline font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-lock"></i> Staff Control Center
+                    </button>
+                    <a href="admin.html" class="text-slate-400 hover:text-white transition-colors">/admin</a>
+                </div>
             </div>
         </div>
     </footer>
+
+    <!-- Floating WhatsApp Quick-Connect Button -->
+    <a href="https://wa.me/923490558345?text=Assalam-o-Alaikum%20Zakir%20Travel%20%26%20Tours!%20I%20would%20like%20to%20inquire%20about%20your%20Umrah%20packages." target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-40 group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-3.5 rounded-full shadow-2xl transition-all hover:scale-105 pulse-emerald-ring">
+        <i class="fa-brands fa-whatsapp text-2xl"></i>
+        <span class="hidden sm:inline text-xs font-extrabold tracking-wide pr-1">Chat with Swat Head Office</span>
+    </a>
 
     <!-- Interactive Booking / Inquiry Modal -->
     <div id="bookingModal" class="fixed inset-0 z-50 hidden bg-navy-dark/75 backdrop-blur-sm flex items-center justify-center p-4">
@@ -485,7 +683,7 @@
         <div id="adminPortalMount"></div>
     </div>
 
-    <!-- Mobile Menu Toggle Script -->
+    <!-- Mobile Menu Toggle & Interactive Card Spotlight Script -->
     <script>
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const mobileMenu = document.getElementById('mobileMenu');
@@ -494,6 +692,42 @@
                 mobileMenu.classList.toggle('hidden');
             });
         }
+
+        // Scroll-Triggered Reveal Animations & Interactive Card Spotlight
+        document.addEventListener('DOMContentLoaded', () => {
+            const targets = document.querySelectorAll(
+                'section .card-hover-lift, #special-deals .special-deal-showcase-card, #all-tiers > div, section .grid > div'
+            );
+            targets.forEach((el, idx) => {
+                el.classList.add('reveal-on-scroll');
+                el.style.setProperty('--reveal-delay', `${(idx % 4) * 80}ms`);
+            });
+
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add('is-visible');
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    },
+                    { threshold: 0.08, rootMargin: '0px 0px -30px 0px' }
+                );
+                targets.forEach((el) => observer.observe(el));
+            } else {
+                targets.forEach((el) => el.classList.add('is-visible'));
+            }
+
+            document.querySelectorAll('.card-hover-lift').forEach((card) => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+                    card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+                });
+            });
+        });
     </script>
 
     <!-- Firebase v10 Compat SDKs -->
