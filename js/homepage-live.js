@@ -729,34 +729,34 @@
                         </div>
 
                         <!-- Dedicated Hotel Name Boxes for Both Locations (Madinah & Makkah) -->
-                        <div class="mt-2.5 sm:mt-4 grid grid-cols-2 gap-2 sm:gap-6 lg:gap-10">
+                        <div class="mt-2.5 sm:mt-4 grid grid-cols-2 gap-2 sm:gap-6 lg:gap-10 items-stretch">
                             <!-- Left Hotel Box: Madinah Hotel -->
-                            <div class="bg-gradient-to-r from-[#F0FAFC] via-white to-[#F0FAFC] border-2 border-teal/40 hover:border-teal rounded-xl sm:rounded-2xl p-2 sm:p-3.5 shadow-sm flex items-center gap-2 sm:gap-3.5 transition-all">
-                                <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-teal text-white flex items-center justify-center shrink-0 shadow-sm text-xs sm:text-lg">
+                            <div class="bg-gradient-to-r from-[#F0FAFC] via-white to-[#F0FAFC] border-2 border-teal/40 hover:border-teal rounded-xl sm:rounded-2xl p-2 sm:p-3.5 shadow-sm flex items-start sm:items-center gap-2 sm:gap-3.5 transition-all h-full">
+                                <div class="w-7 h-7 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-teal text-white flex items-center justify-center shrink-0 shadow-sm text-xs sm:text-lg mt-0.5 sm:mt-0">
                                     <i class="fa-solid fa-hotel"></i>
                                 </div>
                                 <div class="min-w-0 flex-1">
                                     <div class="flex items-center gap-1 text-[8.5px] sm:text-[11px] font-black uppercase tracking-wider text-teal">
-                                        <i class="fa-solid fa-mosque text-[8px] sm:text-[10px]"></i>
-                                        <span class="truncate">Madinah Hotel</span>
+                                        <i class="fa-solid fa-mosque text-[8px] sm:text-[10px] shrink-0"></i>
+                                        <span>Madinah Hotel</span>
                                     </div>
-                                    <div class="text-[11px] sm:text-sm lg:text-base font-extrabold text-navy leading-snug truncate" title="${escapeHtmlAttr(madinahHotelName)}">
+                                    <div class="text-[10.5px] sm:text-sm lg:text-base font-extrabold text-navy leading-snug break-words mt-0.5">
                                         ${escapeHtmlAttr(madinahHotelName)}
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Right Hotel Box: Makkah Hotel -->
-                            <div class="bg-gradient-to-r from-[#F3F6FB] via-white to-[#F3F6FB] border-2 border-navy/30 hover:border-navy rounded-xl sm:rounded-2xl p-2 sm:p-3.5 shadow-sm flex items-center gap-2 sm:gap-3.5 transition-all">
-                                <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-navy text-white flex items-center justify-center shrink-0 shadow-sm text-xs sm:text-lg">
+                            <div class="bg-gradient-to-r from-[#F3F6FB] via-white to-[#F3F6FB] border-2 border-navy/30 hover:border-navy rounded-xl sm:rounded-2xl p-2 sm:p-3.5 shadow-sm flex items-start sm:items-center gap-2 sm:gap-3.5 transition-all h-full">
+                                <div class="w-7 h-7 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-navy text-white flex items-center justify-center shrink-0 shadow-sm text-xs sm:text-lg mt-0.5 sm:mt-0">
                                     <i class="fa-solid fa-kaaba text-amber-300"></i>
                                 </div>
                                 <div class="min-w-0 flex-1">
                                     <div class="flex items-center gap-1 text-[8.5px] sm:text-[11px] font-black uppercase tracking-wider text-navy">
-                                        <i class="fa-solid fa-hotel text-[8px] sm:text-[10px] text-teal"></i>
-                                        <span class="truncate">Makkah Hotel</span>
+                                        <i class="fa-solid fa-hotel text-[8px] sm:text-[10px] text-teal shrink-0"></i>
+                                        <span>Makkah Hotel</span>
                                     </div>
-                                    <div class="text-[11px] sm:text-sm lg:text-base font-extrabold text-navy leading-snug truncate" title="${escapeHtmlAttr(makkahHotelName)}">
+                                    <div class="text-[10.5px] sm:text-sm lg:text-base font-extrabold text-navy leading-snug break-words mt-0.5">
                                         ${escapeHtmlAttr(makkahHotelName)}
                                     </div>
                                 </div>
@@ -934,73 +934,114 @@
                 );
 
                 return `
-                <div class="bg-white rounded-3xl p-6 border-2 ${pkg.isFeatured ? "border-teal shadow-flyer" : "border-slate-200/90 shadow-md"} hover:border-teal hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
+                <div class="bg-white rounded-3xl p-5 sm:p-6 border-2 ${pkg.isFeatured ? "border-teal shadow-flyer pt-8 sm:pt-8" : "border-slate-200/90 shadow-md pt-6"} hover:border-teal hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 flex flex-col justify-between relative overflow-hidden h-full">
                     ${
                         pkg.isFeatured
-                            ? `<div class="absolute top-0 right-0 bg-gradient-to-r from-navy to-teal text-white text-[10px] font-black uppercase tracking-wider px-3.5 py-1 rounded-bl-2xl">
+                            ? `<div class="absolute top-0 right-0 bg-gradient-to-r from-navy to-teal text-white text-[10px] font-black uppercase tracking-wider px-3.5 py-1 rounded-bl-2xl shadow-sm">
                                 <i class="fa-solid fa-star text-amber-300 mr-1"></i>Featured Deal
                                </div>`
                             : ""
                     }
-                    <div>
-                        <div class="flex items-center justify-between gap-2 mb-3">
-                            <span class="bg-teal-accent text-teal text-xs font-extrabold uppercase px-3 py-1 rounded-full">
-                                ${pkg.badgeText || "Umrah Deal"}
+                    <div class="flex-1 flex flex-col">
+                        <!-- Top Meta Row: Badge & Duration (Never wraps awkwardly) -->
+                        <div class="flex flex-wrap items-center justify-between gap-1.5 mb-2.5">
+                            <span class="bg-teal-accent text-teal text-[10.5px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full whitespace-nowrap">
+                                ${escapeHtmlAttr(pkg.badgeText || "Umrah Deal")}
                             </span>
-                            <span class="text-xs font-bold text-slate-500">
-                                <i class="fa-regular fa-clock text-teal mr-1"></i>${pkg.duration}
+                            <span class="text-[11px] font-bold text-slate-500 whitespace-nowrap flex items-center gap-1">
+                                <i class="fa-regular fa-clock text-teal"></i>
+                                <span>${escapeHtmlAttr(pkg.duration)}</span>
                             </span>
                         </div>
 
-                        <h3 class="text-xl font-black text-navy mb-2">${pkg.title}</h3>
+                        <!-- Package Title -->
+                        <h3 class="text-lg sm:text-[19px] font-black text-navy leading-snug mb-3 min-h-[2.75rem] flex items-center break-words">
+                            ${escapeHtmlAttr(pkg.title)}
+                        </h3>
 
-                        <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-100 mb-4 flex items-baseline justify-between">
-                            <div>
-                                <span class="text-[10px] font-bold uppercase text-slate-400 block">Starting From</span>
-                                <div class="text-2xl font-black text-teal">PKR ${formatPKR(pkg.price)}</div>
+                        <!-- Structured Price & Room Tier Box (Self-adjusting, never splits PKR and amount) -->
+                        <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200/80 mb-4">
+                            <div class="flex items-center justify-between gap-2 mb-1">
+                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Starting From</span>
+                                <span class="text-[10px] font-bold text-teal bg-teal-accent/70 px-2 py-0.5 rounded-md whitespace-nowrap">Per Person</span>
                             </div>
-                            <span class="text-xs font-bold text-navy bg-white px-2.5 py-1 rounded-lg border border-slate-200">${pkg.roomType}</span>
+                            <div class="text-2xl font-black text-teal tracking-tight leading-none my-1 whitespace-nowrap">
+                                PKR ${formatPKR(pkg.price)}
+                            </div>
+                            <div class="mt-2.5 pt-2 border-t border-slate-200/70 flex items-center justify-between gap-2">
+                                <span class="text-[10.5px] font-bold uppercase tracking-wide text-slate-400 shrink-0">Room Type</span>
+                                <span class="text-[11px] font-extrabold text-navy bg-white px-2.5 py-1 rounded-lg border border-slate-200 text-right leading-tight break-words">
+                                    ${escapeHtmlAttr(pkg.roomType)}
+                                </span>
+                            </div>
                         </div>
 
+                        <!-- Schedule & Self-Adjusting Hotel Boxes -->
                         <div class="space-y-2 text-xs text-slate-600 mb-4">
-                            <div class="flex items-center justify-between py-1 border-b border-slate-100">
-                                <span class="font-semibold text-slate-500"><i class="fa-solid fa-plane-departure text-teal w-4"></i> Departure:</span>
-                                <span class="font-bold text-navy">${pkg.departureDate}</span>
+                            <!-- Departure & Return Rows -->
+                            <div class="bg-slate-50/70 border border-slate-200/70 rounded-xl p-2.5 space-y-1.5">
+                                <div class="flex items-start justify-between gap-2 pb-1.5 border-b border-slate-200/60">
+                                    <span class="font-bold text-slate-500 whitespace-nowrap shrink-0 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-plane-departure text-teal w-3.5 text-center"></i>
+                                        <span>Departure</span>
+                                    </span>
+                                    <span class="font-extrabold text-navy text-right leading-snug break-words">${escapeHtmlAttr(pkg.departureDate)}</span>
+                                </div>
+                                <div class="flex items-start justify-between gap-2 pt-0.5">
+                                    <span class="font-bold text-slate-500 whitespace-nowrap shrink-0 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-plane-arrival text-teal w-3.5 text-center"></i>
+                                        <span>Return</span>
+                                    </span>
+                                    <span class="font-extrabold text-navy text-right leading-snug break-words">${escapeHtmlAttr(pkg.returnDate)}</span>
+                                </div>
                             </div>
-                            <div class="flex items-center justify-between py-1 border-b border-slate-100">
-                                <span class="font-semibold text-slate-500"><i class="fa-solid fa-plane-arrival text-teal w-4"></i> Return:</span>
-                                <span class="font-bold text-navy">${pkg.returnDate}</span>
+
+                            <!-- Makkah Hotel Box (Auto-adjusts height cleanly when text is long) -->
+                            <div class="bg-[#F4F7FB] border border-navy/15 rounded-xl p-2.5">
+                                <div class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-navy/75 mb-0.5">
+                                    <i class="fa-solid fa-kaaba text-teal text-[11px] shrink-0"></i>
+                                    <span>Makkah Hotel</span>
+                                </div>
+                                <div class="text-xs font-extrabold text-navy leading-snug break-words pl-5">
+                                    ${escapeHtmlAttr(pkg.makkahHotelDist)}
+                                </div>
                             </div>
-                            <div class="flex items-center justify-between py-1 border-b border-slate-100">
-                                <span class="font-semibold text-slate-500"><i class="fa-solid fa-kaaba text-teal w-4"></i> Makkah Hotel:</span>
-                                <span class="font-bold text-navy">${pkg.makkahHotelDist}</span>
-                            </div>
-                            <div class="flex items-center justify-between py-1">
-                                <span class="font-semibold text-slate-500"><i class="fa-solid fa-mosque text-teal w-4"></i> Madinah Hotel:</span>
-                                <span class="font-bold text-navy">${pkg.madinahHotelDist}</span>
+
+                            <!-- Madinah Hotel Box (Auto-adjusts height cleanly when text is long) -->
+                            <div class="bg-[#F0FAFC] border border-teal/25 rounded-xl p-2.5">
+                                <div class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-teal mb-0.5">
+                                    <i class="fa-solid fa-mosque text-teal text-[11px] shrink-0"></i>
+                                    <span>Madinah Hotel</span>
+                                </div>
+                                <div class="text-xs font-extrabold text-navy leading-snug break-words pl-5">
+                                    ${escapeHtmlAttr(pkg.madinahHotelDist)}
+                                </div>
                             </div>
                         </div>
 
-                        <div class="flex flex-wrap gap-1.5 mb-6">
+                        <!-- Included Services (Uniform Full-Width Self-Adjusting Rows) -->
+                        <div class="space-y-1.5 mb-5 mt-auto">
                             ${servicesList
                                 .map(
                                     (srv) =>
-                                        `<span class="bg-slate-100 text-slate-700 text-[11px] font-semibold px-2.5 py-1 rounded-lg flex items-center gap-1">
-                                            <i class="fa-solid fa-check text-teal text-[10px]"></i> ${srv}
-                                         </span>`
+                                        `<div class="bg-slate-50 border border-slate-200/75 text-slate-700 text-[11.5px] font-bold px-3 py-1.5 rounded-xl flex items-start gap-2 leading-snug break-words">
+                                            <i class="fa-solid fa-circle-check text-teal text-xs mt-0.5 shrink-0"></i>
+                                            <span class="flex-1">${escapeHtmlAttr(srv)}</span>
+                                         </div>`
                                 )
                                 .join("")}
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5 pt-2 border-t border-slate-100">
-                        <button type="button" onclick="openBookingModal('${pkg.title.replace(/'/g, "\\'")} (PKR ${formatPKR(pkg.price)})')" class="bg-navy hover:bg-navy-light text-white font-bold text-xs py-3 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-paper-plane text-teal-light"></i>
+                    <!-- Action Buttons (Single-line clean buttons) -->
+                    <div class="grid grid-cols-2 gap-2 pt-3 border-t border-slate-100">
+                        <button type="button" onclick="openBookingModal('${escapeHtmlAttr(pkg.title.replace(/'/g, "\\'"))} (PKR ${formatPKR(pkg.price)})')" class="bg-navy hover:bg-navy-light text-white font-extrabold text-[11.5px] py-3 px-2.5 rounded-xl shadow-sm hover:shadow transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
+                            <i class="fa-solid fa-paper-plane text-teal-light text-[11px]"></i>
                             <span>Quick Book</span>
                         </button>
-                        <a href="https://wa.me/${activeWA}?text=${waText}" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-3 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5">
+                        <a href="https://wa.me/${activeWA}?text=${waText}" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[11.5px] py-3 px-2.5 rounded-xl shadow-sm hover:shadow transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
                             <i class="fa-brands fa-whatsapp text-sm"></i>
-                            <span>Book via WhatsApp</span>
+                            <span>WhatsApp</span>
                         </a>
                     </div>
                 </div>
