@@ -503,8 +503,10 @@
                     "https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?auto=format&fit=crop&w=900&q=80",
                 leftFrameBadge: "Ziyarat & Stay",
                 leftFrameTitle: "Madinah Munawwarah",
+                madinahHotel: s.madinahHotel || "Al Eiman Taibah / Similar (Near Markazia)",
                 rightFrameBadge: "Haram View Options",
                 rightFrameTitle: "Makkah Mukarramah",
+                makkahHotel: s.makkahHotel || "Emaar Al Khalil / Similar (Shuttle / Walk)",
                 promotionalFlyerUrl: s.promotionalFlyerUrl || "",
                 showFlyerButton: s.showFlyerOnHomepage !== false,
                 servicesIncluded: s.servicesIncluded || {
@@ -613,9 +615,12 @@
                 const firstWord = titleWords[0] || "UMRAH";
                 const restWords = titleWords.slice(1).join(" ") || "PACKAGE";
 
+                const madinahHotelName = deal.madinahHotel || "Al Eiman Taibah / Similar (Near Markazia)";
+                const makkahHotelName = deal.makkahHotel || "Emaar Al Khalil / Similar (Shuttle / Walk)";
+
                 const bookingLabel = `${deal.monthLabel || "Special"} ${deal.title || "Umrah Package"} (${deal.duration || "14 Nights"} - PKR ${formatPKR(deal.startingPrice || 232000)})`;
                 const waText = encodeURIComponent(
-                    `Assalam-o-Alaikum ${agencyName}!\n\nI am interested in your Special Offer:\n*${deal.monthLabel || "Special"} ${deal.title || "UMRAH PACKAGE"}*\n- Starting Price: PKR ${formatPKR(deal.startingPrice || 232000)} (${deal.priceUnit || "PER PERSON SHARING"})\n- Duration: ${deal.duration || "14 Nights"}\n- Departure: ${deal.departureDate || "Flexible"}\n- Return: ${deal.returnDate || "Scheduled"}\n\nPlease share seat availability and booking details.`
+                    `Assalam-o-Alaikum ${agencyName}!\n\nI am interested in your Special Offer:\n*${deal.monthLabel || "Special"} ${deal.title || "UMRAH PACKAGE"}*\n- Starting Price: PKR ${formatPKR(deal.startingPrice || 232000)} (${deal.priceUnit || "PER PERSON SHARING"})\n- Duration: ${deal.duration || "14 Nights"}\n- Departure: ${deal.departureDate || "Flexible"}\n- Return: ${deal.returnDate || "Scheduled"}\n- Madinah Hotel: ${madinahHotelName}\n- Makkah Hotel: ${makkahHotelName}\n\nPlease share seat availability and booking details.`
                 );
 
                 const srvClass = (isInc) =>
@@ -624,14 +629,14 @@
                         : "bg-slate-50 border border-slate-200 opacity-40 grayscale line-through";
 
                 return `
-                <div class="special-deal-showcase-card bg-white rounded-3xl shadow-flyer border-2 ${
+                <div class="special-deal-showcase-card bg-white rounded-2xl sm:rounded-3xl shadow-flyer border-2 ${
                     deal.isPrimary ? "border-teal/35" : "border-navy/15"
                 } overflow-hidden transition-all duration-500 hover:shadow-2xl" style="animation: zakirDealCardEntrance 0.55s cubic-bezier(0.16, 1, 0.3, 1) ${idx * 0.12}s both;">
                     
-                    <!-- Deal Top Ribbon Header (Always shown when multiple deals exist or for clear deal branding) -->
-                    <div class="bg-gradient-to-r from-slate-50 via-teal-accent/40 to-slate-50 px-6 sm:px-10 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div class="flex flex-wrap items-center gap-3">
-                            <span class="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full shadow-sm ${
+                    <!-- Deal Top Ribbon Header (Compact on phone, spacious on desktop) -->
+                    <div class="bg-gradient-to-r from-slate-50 via-teal-accent/40 to-slate-50 px-3.5 sm:px-8 lg:px-10 py-3 sm:py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                            <span class="inline-flex items-center gap-1 text-[9.5px] sm:text-[11px] font-black uppercase tracking-wider px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full shadow-sm ${
                                 deal.isPrimary
                                     ? "bg-gradient-to-r from-navy to-teal text-white"
                                     : "bg-navy/10 text-navy"
@@ -639,13 +644,13 @@
                                 <i class="fa-solid ${deal.isPrimary ? "fa-crown text-amber-300" : "fa-bolt text-teal"}"></i>
                                 ${escapeHtmlAttr(deal.badgeTag || (deal.isPrimary ? "Primary Spotlight Deal" : "Limited Time Offer"))}
                             </span>
-                            <span class="font-script text-2xl sm:text-3xl text-teal">${escapeHtmlAttr(deal.monthLabel || "January")}</span>
-                            <h3 class="text-xl sm:text-2xl font-black tracking-tight uppercase">
+                            <span class="font-script text-xl sm:text-3xl text-teal">${escapeHtmlAttr(deal.monthLabel || "January")}</span>
+                            <h3 class="text-base sm:text-2xl font-black tracking-tight uppercase">
                                 <span class="text-navy">${escapeHtmlAttr(firstWord)}</span>
                                 <span class="text-teal">${escapeHtmlAttr(restWords)}</span>
                             </h3>
                         </div>
-                        <div class="flex items-center gap-2 text-xs font-bold text-slate-500">
+                        <div class="hidden sm:flex items-center gap-2 text-xs font-bold text-slate-500">
                             <span class="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-slate-200 text-navy shadow-sm">
                                 <i class="fa-regular fa-calendar-check text-teal"></i>
                                 Dep: <strong class="text-teal">${escapeHtmlAttr(deal.departureDate || "Jan 26, 2026")}</strong>
@@ -657,12 +662,12 @@
                         </div>
                     </div>
 
-                    <div class="p-6 sm:p-10 lg:p-12">
-                        <!-- Dual Framed Images (Madinah & Makkah) with Animated Floating Center Price Shield -->
-                        <div class="relative grid md:grid-cols-2 gap-6 lg:gap-12 items-center">
+                    <div class="p-3 sm:p-8 lg:p-10">
+                        <!-- Dual Framed Images (Side-by-Side on BOTH Phone & Laptop) with Center Overlapping Price Shield -->
+                        <div class="relative grid grid-cols-2 gap-2 sm:gap-6 lg:gap-10 items-center">
                             
                             <!-- Left Frame: Masjid an-Nabawi (Madinah) -->
-                            <div class="group relative rounded-2xl overflow-hidden border-4 border-teal shadow-lg h-64 sm:h-80">
+                            <div class="group relative rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 border-teal shadow-md sm:shadow-lg h-36 sm:h-64 lg:h-72">
                                 <img src="${escapeHtmlAttr(
                                     deal.madinahImageUrl ||
                                         "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=900&q=80"
@@ -670,29 +675,29 @@
                                      onerror="this.src='https://placehold.co/800x600/0B2D5B/FFFFFF?text=Masjid+an-Nabawi+Madinah'"
                                      alt="${escapeHtmlAttr(deal.leftFrameTitle || "Madinah Munawwarah")}" 
                                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
-                                <div class="absolute inset-0 bg-gradient-to-t from-navy/85 via-navy/20 to-transparent"></div>
-                                <div class="absolute bottom-4 left-4 text-white">
-                                    <span class="bg-teal text-xs font-bold uppercase px-2.5 py-1 rounded-md shadow">${escapeHtmlAttr(
+                                <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/25 to-transparent"></div>
+                                <div class="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 text-white max-w-[78%] sm:max-w-[70%]">
+                                    <span class="bg-teal text-[8px] sm:text-xs font-bold uppercase px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded shadow inline-block">${escapeHtmlAttr(
                                         deal.leftFrameBadge || "Ziyarat & Stay"
                                     )}</span>
-                                    <h4 class="text-xl font-bold mt-1.5 drop-shadow">${escapeHtmlAttr(
+                                    <h4 class="text-xs sm:text-xl font-bold mt-0.5 sm:mt-1.5 drop-shadow leading-tight">${escapeHtmlAttr(
                                         deal.leftFrameTitle || "Madinah Munawwarah"
                                     )}</h4>
                                 </div>
                             </div>
 
-                            <!-- Center Overlapping Price Badge (Animated Floating Flyer Shield) -->
-                            <div class="md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-20 flex justify-center my-2 md:my-0">
-                                <div class="flyer-badge floating-price-shield text-white p-1.5 rounded-3xl shadow-2xl border-4 border-white text-center w-64 sm:w-72 transform hover:scale-105 transition-transform duration-300">
-                                    <div class="border-2 border-teal-light/60 rounded-2xl py-5 px-4 bg-navy/40 backdrop-blur-sm">
-                                        <span class="text-[11px] font-bold uppercase tracking-widest text-sky-200 block">STARTING FROM</span>
-                                        <div class="text-3xl sm:text-4xl font-black tracking-tight my-1 text-white drop-shadow">
+                            <!-- Center Overlapping Price Badge (Centered on Both Mobile & Laptop) -->
+                            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex justify-center pointer-events-auto">
+                                <div class="flyer-badge floating-price-shield text-white p-1 sm:p-1.5 rounded-2xl sm:rounded-3xl shadow-2xl border-2 sm:border-4 border-white text-center w-36 sm:w-64 lg:w-72 transform hover:scale-105 transition-transform duration-300">
+                                    <div class="border border-teal-light/60 sm:border-2 rounded-xl sm:rounded-2xl py-2 px-1.5 sm:py-4 sm:px-4 bg-navy/45 backdrop-blur-sm">
+                                        <span class="text-[7.5px] sm:text-[11px] font-bold uppercase tracking-widest text-sky-200 block leading-none">STARTING FROM</span>
+                                        <div class="text-lg sm:text-3xl lg:text-4xl font-black tracking-tight my-0.5 sm:my-1 text-white drop-shadow leading-tight">
                                             ${formatPKR(deal.startingPrice || 232000)}
                                         </div>
-                                        <span class="text-xs font-semibold uppercase tracking-wider text-teal-accent block">PKR ${escapeHtmlAttr(
+                                        <span class="text-[7.5px] sm:text-xs font-semibold uppercase tracking-wider text-teal-accent block leading-tight">PKR ${escapeHtmlAttr(
                                             deal.priceUnit || "PER PERSON (SHARING)"
                                         )}</span>
-                                        <div class="mt-2 inline-flex items-center gap-1 text-[11px] bg-white/15 px-2.5 py-0.5 rounded-full">
+                                        <div class="mt-1 sm:mt-2 inline-flex items-center gap-1 text-[7.5px] sm:text-[11px] bg-white/15 px-2 sm:px-2.5 py-0.5 rounded-full">
                                             <i class="fa-solid fa-mosque text-amber-300"></i> ${escapeHtmlAttr(
                                                 deal.badgeTag || "All-Inclusive Deal"
                                             )}
@@ -702,7 +707,7 @@
                             </div>
 
                             <!-- Right Frame: Holy Kaaba (Makkah) -->
-                            <div class="group relative rounded-2xl overflow-hidden border-4 border-navy shadow-lg h-64 sm:h-80">
+                            <div class="group relative rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 border-navy shadow-md sm:shadow-lg h-36 sm:h-64 lg:h-72">
                                 <img src="${escapeHtmlAttr(
                                     deal.makkahImageUrl ||
                                         "https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?auto=format&fit=crop&w=900&q=80"
@@ -710,12 +715,12 @@
                                      onerror="this.src='https://placehold.co/800x600/0D8A9E/FFFFFF?text=Makkah+Mukarramah'"
                                      alt="${escapeHtmlAttr(deal.rightFrameTitle || "Makkah Mukarramah")}" 
                                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
-                                <div class="absolute inset-0 bg-gradient-to-t from-navy/85 via-navy/20 to-transparent"></div>
-                                <div class="absolute bottom-4 left-4 md:left-auto md:right-4 md:text-right text-white">
-                                    <span class="bg-navy text-xs font-bold uppercase px-2.5 py-1 rounded-md shadow">${escapeHtmlAttr(
+                                <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/25 to-transparent"></div>
+                                <div class="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 text-right text-white max-w-[78%] sm:max-w-[70%] ml-auto">
+                                    <span class="bg-navy text-[8px] sm:text-xs font-bold uppercase px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded shadow inline-block">${escapeHtmlAttr(
                                         deal.rightFrameBadge || "Haram View Options"
                                     )}</span>
-                                    <h4 class="text-xl font-bold mt-1.5 drop-shadow">${escapeHtmlAttr(
+                                    <h4 class="text-xs sm:text-xl font-bold mt-0.5 sm:mt-1.5 drop-shadow leading-tight">${escapeHtmlAttr(
                                         deal.rightFrameTitle || "Makkah Mukarramah"
                                     )}</h4>
                                 </div>
@@ -723,101 +728,139 @@
 
                         </div>
 
-                        <!-- Schedule Strip (Departures | Return | Duration) -->
-                        <div class="mt-10 border-2 border-teal rounded-2xl bg-slate-50 p-4 sm:p-6 grid grid-cols-1 md:grid-cols-3 gap-4 divide-y md:divide-y-0 md:divide-x divide-teal/30">
-                            <div class="flex items-center justify-center gap-4 pt-2 md:pt-0">
-                                <div class="w-12 h-12 rounded-xl bg-navy/10 text-navy flex items-center justify-center text-2xl">
-                                    <i class="fa-solid fa-plane-departure"></i>
+                        <!-- Dedicated Hotel Name Boxes for Both Locations (Madinah & Makkah) -->
+                        <div class="mt-2.5 sm:mt-4 grid grid-cols-2 gap-2 sm:gap-6 lg:gap-10">
+                            <!-- Left Hotel Box: Madinah Hotel -->
+                            <div class="bg-gradient-to-r from-[#F0FAFC] via-white to-[#F0FAFC] border-2 border-teal/40 hover:border-teal rounded-xl sm:rounded-2xl p-2 sm:p-3.5 shadow-sm flex items-center gap-2 sm:gap-3.5 transition-all">
+                                <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-teal text-white flex items-center justify-center shrink-0 shadow-sm text-xs sm:text-lg">
+                                    <i class="fa-solid fa-hotel"></i>
                                 </div>
-                                <div>
-                                    <div class="text-xs font-bold uppercase tracking-wider text-navy">Departures</div>
-                                    <div class="text-lg sm:text-xl font-extrabold text-teal">
-                                        <span>${escapeHtmlAttr(deal.departureDate || "Jan 26, 2026")}</span>
-                                        <span class="text-xs font-normal text-slate-500 block sm:inline">(Weekly Batches)</span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-1 text-[8.5px] sm:text-[11px] font-black uppercase tracking-wider text-teal">
+                                        <i class="fa-solid fa-mosque text-[8px] sm:text-[10px]"></i>
+                                        <span class="truncate">Madinah Hotel</span>
+                                    </div>
+                                    <div class="text-[11px] sm:text-sm lg:text-base font-extrabold text-navy leading-snug truncate" title="${escapeHtmlAttr(madinahHotelName)}">
+                                        ${escapeHtmlAttr(madinahHotelName)}
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="flex items-center justify-center gap-4 pt-4 md:pt-0">
-                                <div class="w-12 h-12 rounded-xl bg-navy/10 text-navy flex items-center justify-center text-2xl">
-                                    <i class="fa-solid fa-plane-arrival"></i>
+                            <!-- Right Hotel Box: Makkah Hotel -->
+                            <div class="bg-gradient-to-r from-[#F3F6FB] via-white to-[#F3F6FB] border-2 border-navy/30 hover:border-navy rounded-xl sm:rounded-2xl p-2 sm:p-3.5 shadow-sm flex items-center gap-2 sm:gap-3.5 transition-all">
+                                <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-navy text-white flex items-center justify-center shrink-0 shadow-sm text-xs sm:text-lg">
+                                    <i class="fa-solid fa-kaaba text-amber-300"></i>
                                 </div>
-                                <div>
-                                    <div class="text-xs font-bold uppercase tracking-wider text-navy">Return / Schedule</div>
-                                    <div class="text-lg sm:text-xl font-extrabold text-teal">${escapeHtmlAttr(
-                                        deal.returnDate || "Nov 10, 2026"
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-1 text-[8.5px] sm:text-[11px] font-black uppercase tracking-wider text-navy">
+                                        <i class="fa-solid fa-hotel text-[8px] sm:text-[10px] text-teal"></i>
+                                        <span class="truncate">Makkah Hotel</span>
+                                    </div>
+                                    <div class="text-[11px] sm:text-sm lg:text-base font-extrabold text-navy leading-snug truncate" title="${escapeHtmlAttr(makkahHotelName)}">
+                                        ${escapeHtmlAttr(makkahHotelName)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Schedule Strip (Left: Departures | Center: Duration | Right: Return / Schedule) -->
+                        <div class="mt-3 sm:mt-6 border-2 border-teal rounded-xl sm:rounded-2xl bg-slate-50 p-2.5 sm:p-5 grid grid-cols-3 gap-1 sm:gap-4 divide-x divide-teal/30">
+                            <!-- 1. Left: Departures -->
+                            <div class="flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 sm:gap-3.5 px-1 sm:px-2">
+                                <div class="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-navy/10 text-navy flex items-center justify-center text-xs sm:text-2xl shrink-0">
+                                    <i class="fa-solid fa-plane-departure"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-[8.5px] sm:text-xs font-bold uppercase tracking-wider text-navy leading-tight">Departures</div>
+                                    <div class="text-[11px] sm:text-lg lg:text-xl font-extrabold text-teal leading-tight mt-0.5">
+                                        <span>${escapeHtmlAttr(deal.departureDate || "Jan 26, 2026")}</span>
+                                        <span class="text-[8px] sm:text-xs font-normal text-slate-500 block lg:inline">(Weekly Batches)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2. Center: Duration -->
+                            <div class="flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 sm:gap-3.5 px-1 sm:px-2">
+                                <div class="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-teal/15 text-teal flex items-center justify-center text-xs sm:text-2xl shrink-0">
+                                    <i class="fa-regular fa-clock"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-[8.5px] sm:text-xs font-bold uppercase tracking-wider text-navy leading-tight">Duration</div>
+                                    <div class="text-[11px] sm:text-lg lg:text-xl font-extrabold text-teal leading-tight mt-0.5">${escapeHtmlAttr(
+                                        deal.duration || "14 Nights"
                                     )}</div>
                                 </div>
                             </div>
 
-                            <div class="flex items-center justify-center gap-4 pt-4 md:pt-0">
-                                <div class="w-12 h-12 rounded-xl bg-navy/10 text-navy flex items-center justify-center text-2xl">
-                                    <i class="fa-regular fa-clock"></i>
+                            <!-- 3. Right: Return / Schedule -->
+                            <div class="flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 sm:gap-3.5 px-1 sm:px-2">
+                                <div class="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-navy/10 text-navy flex items-center justify-center text-xs sm:text-2xl shrink-0">
+                                    <i class="fa-solid fa-plane-arrival"></i>
                                 </div>
-                                <div>
-                                    <div class="text-xs font-bold uppercase tracking-wider text-navy">Duration</div>
-                                    <div class="text-lg sm:text-xl font-extrabold text-teal">${escapeHtmlAttr(
-                                        deal.duration || "14 Nights"
+                                <div class="min-w-0">
+                                    <div class="text-[8.5px] sm:text-xs font-bold uppercase tracking-wider text-navy leading-tight">Return / Schedule</div>
+                                    <div class="text-[11px] sm:text-lg lg:text-xl font-extrabold text-teal leading-tight mt-0.5">${escapeHtmlAttr(
+                                        deal.returnDate || "Nov 10, 2026"
                                     )}</div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Services Included Banner -->
-                        <div class="mt-10 text-center">
-                            <div class="inline-flex items-center gap-3 bg-gradient-to-r from-navy via-teal to-navy text-white font-extrabold uppercase tracking-wider px-8 py-2.5 rounded-full shadow-md text-sm sm:text-base">
-                                <span class="text-xs">◆</span>
+                        <!-- Services Included Banner (4-Column Compact Row on Mobile & Desktop) -->
+                        <div class="mt-3.5 sm:mt-7 text-center">
+                            <div class="inline-flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-navy via-teal to-navy text-white font-extrabold uppercase tracking-wider px-5 sm:px-8 py-1.5 sm:py-2.5 rounded-full shadow-md text-[10px] sm:text-sm">
+                                <span class="text-[9px] sm:text-xs">◆</span>
                                 <span>SERVICES INCLUDED</span>
-                                <span class="text-xs">◆</span>
+                                <span class="text-[9px] sm:text-xs">◆</span>
                             </div>
 
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mt-8 max-w-4xl mx-auto">
-                                <div class="${srvClass(srv.roundTrip)} rounded-2xl p-5 flex flex-col items-center transition-all duration-300 group">
-                                    <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-2xl mb-3 transition-all">
+                            <div class="grid grid-cols-4 gap-1.5 sm:gap-5 mt-3 sm:mt-6 max-w-4xl mx-auto">
+                                <div class="${srvClass(srv.roundTrip)} rounded-xl sm:rounded-2xl p-2 sm:p-5 flex flex-col items-center transition-all duration-300 group">
+                                    <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all">
                                         <i class="fa-solid fa-earth-americas"></i>
                                     </div>
-                                    <h4 class="font-extrabold text-navy text-base">Round Trip</h4>
-                                    <p class="text-xs text-slate-500 mt-1">Return Air Ticket Included</p>
+                                    <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">Round Trip</h4>
+                                    <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">Return Air Ticket</p>
                                 </div>
 
-                                <div class="${srvClass(srv.visa)} rounded-2xl p-5 flex flex-col items-center transition-all duration-300 group">
-                                    <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-2xl mb-3 transition-all">
+                                <div class="${srvClass(srv.visa)} rounded-xl sm:rounded-2xl p-2 sm:p-5 flex flex-col items-center transition-all duration-300 group">
+                                    <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all">
                                         <i class="fa-solid fa-id-card-clip"></i>
                                     </div>
-                                    <h4 class="font-extrabold text-navy text-base">Umrah Visa</h4>
-                                    <p class="text-xs text-slate-500 mt-1">Fast E-Visa & Insurance</p>
+                                    <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">Umrah Visa</h4>
+                                    <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">E-Visa & Insurance</p>
                                 </div>
 
-                                <div class="${srvClass(srv.hotel)} rounded-2xl p-5 flex flex-col items-center transition-all duration-300 group">
-                                    <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-2xl mb-3 transition-all">
+                                <div class="${srvClass(srv.hotel)} rounded-xl sm:rounded-2xl p-2 sm:p-5 flex flex-col items-center transition-all duration-300 group">
+                                    <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all">
                                         <i class="fa-solid fa-hotel"></i>
                                     </div>
-                                    <h4 class="font-extrabold text-navy text-base">Hotel Stay</h4>
-                                    <p class="text-xs text-slate-500 mt-1">Makkah & Madinah Hotels</p>
+                                    <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">Hotel Stay</h4>
+                                    <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">Makkah & Madinah</p>
                                 </div>
 
-                                <div class="${srvClass(srv.transport)} rounded-2xl p-5 flex flex-col items-center transition-all duration-300 group">
-                                    <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-2xl mb-3 transition-all">
+                                <div class="${srvClass(srv.transport)} rounded-xl sm:rounded-2xl p-2 sm:p-5 flex flex-col items-center transition-all duration-300 group">
+                                    <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all">
                                         <i class="fa-solid fa-bus-simple"></i>
                                     </div>
-                                    <h4 class="font-extrabold text-navy text-base">Transport</h4>
-                                    <p class="text-xs text-slate-500 mt-1">Luxury AC Ground Transport</p>
+                                    <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">Transport</h4>
+                                    <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">Luxury AC Transport</p>
                                 </div>
                             </div>
 
-                            <!-- Action Buttons -->
-                            <div class="mt-8 flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4">
-                                <button type="button" onclick="openBookingModal('${escapeHtmlAttr(bookingLabel.replace(/'/g, "\\'"))}')" class="w-full sm:w-auto bg-navy hover:bg-navy-light text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                            <!-- Action Buttons (Compact side-by-side row on Mobile & Laptop) -->
+                            <div class="mt-4 sm:mt-7 flex flex-wrap items-center justify-center gap-2 sm:gap-4">
+                                <button type="button" onclick="openBookingModal('${escapeHtmlAttr(bookingLabel.replace(/'/g, "\\'"))}')" class="bg-navy hover:bg-navy-light text-white font-bold px-3.5 sm:px-8 py-2.5 sm:py-3.5 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
                                     <i class="fa-solid fa-calendar-check text-teal-light"></i>
                                     <span>Reserve Your Seat Now</span>
                                 </button>
-                                <a href="https://wa.me/${activeWA}?text=${waText}" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto bg-teal hover:bg-teal-dark text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
-                                    <i class="fa-brands fa-whatsapp text-xl"></i>
+                                <a href="https://wa.me/${activeWA}?text=${waText}" target="_blank" rel="noopener noreferrer" class="bg-teal hover:bg-teal-dark text-white font-bold px-3.5 sm:px-8 py-2.5 sm:py-3.5 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
+                                    <i class="fa-brands fa-whatsapp text-sm sm:text-xl"></i>
                                     <span>Book via WhatsApp</span>
                                 </a>
                                 ${
                                     deal.showFlyerButton !== false
-                                        ? `<button type="button" onclick="openPromotionalFlyerModal('${escapeHtmlAttr(deal.id)}')" class="w-full sm:w-auto bg-slate-100 hover:bg-teal-accent text-navy font-bold px-6 py-4 rounded-xl border border-teal/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                                        ? `<button type="button" onclick="openPromotionalFlyerModal('${escapeHtmlAttr(deal.id)}')" class="bg-slate-100 hover:bg-teal-accent text-navy font-bold px-3.5 sm:px-6 py-2.5 sm:py-3.5 rounded-xl border border-teal/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
                                             <i class="fa-solid fa-file-image text-teal"></i>
                                             <span>View Latest Flyer</span>
                                            </button>`

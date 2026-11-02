@@ -1163,21 +1163,22 @@
                                     <input type="text" id="dealEditDep" required placeholder="Jan 26, 2026" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B]">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Return / Schedule</label>
-                                    <input type="text" id="dealEditRet" required placeholder="Nov 10, 2026" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B]">
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Duration (Center)</label>
+                                    <input type="text" id="dealEditDuration" required placeholder="14 Nights" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B]">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Duration</label>
-                                    <input type="text" id="dealEditDuration" required placeholder="14 Nights" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B]">
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Return / Schedule (Right)</label>
+                                    <input type="text" id="dealEditRet" required placeholder="Nov 10, 2026" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B]">
                                 </div>
                             </div>
 
-                            <!-- Left & Right Frame Customization -->
+                            <!-- Left & Right Frame + Hotel Name Customization -->
                             <div class="grid sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                                 <div class="space-y-2">
-                                    <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Left Frame (Madinah / Destination 1)</span>
+                                    <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Left Frame &amp; Hotel (Madinah / Destination 1)</span>
                                     <input type="text" id="dealEditLeftTitle" required placeholder="Madinah Munawwarah" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
                                     <input type="text" id="dealEditLeftBadge" required placeholder="Ziyarat & Stay" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                    <input type="text" id="dealEditMadinahHotel" required placeholder="Madinah Hotel Name (e.g. Al Eiman Taibah / Similar)" class="w-full bg-[#F0FAFC] border border-[#0D8A9E]/40 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
                                     <div class="flex gap-2">
                                         <input type="text" id="dealEditMadinahUrl" required placeholder="Left Image URL" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
                                         <label class="bg-[#0D8A9E] hover:bg-[#096979] text-white text-xs font-bold px-3 py-2 rounded-xl cursor-pointer flex items-center gap-1 shrink-0">
@@ -1188,9 +1189,10 @@
                                 </div>
 
                                 <div class="space-y-2">
-                                    <span class="text-[10px] font-black uppercase text-[#0B2D5B]">Right Frame (Makkah / Destination 2)</span>
+                                    <span class="text-[10px] font-black uppercase text-[#0B2D5B]">Right Frame &amp; Hotel (Makkah / Destination 2)</span>
                                     <input type="text" id="dealEditRightTitle" required placeholder="Makkah Mukarramah" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
                                     <input type="text" id="dealEditRightBadge" required placeholder="Haram View Options" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                    <input type="text" id="dealEditMakkahHotel" required placeholder="Makkah Hotel Name (e.g. Emaar Al Khalil / Similar)" class="w-full bg-[#F3F6FB] border border-[#0B2D5B]/30 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
                                     <div class="flex gap-2">
                                         <input type="text" id="dealEditMakkahUrl" required placeholder="Right Image URL" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
                                         <label class="bg-[#0B2D5B] hover:bg-[#16437E] text-white text-xs font-bold px-3 py-2 rounded-xl cursor-pointer flex items-center gap-1 shrink-0">
@@ -2310,9 +2312,11 @@
                         duration: this.container.querySelector("#dealEditDuration").value.trim(),
                         leftFrameTitle: this.container.querySelector("#dealEditLeftTitle").value.trim(),
                         leftFrameBadge: this.container.querySelector("#dealEditLeftBadge").value.trim(),
+                        madinahHotel: this.container.querySelector("#dealEditMadinahHotel").value.trim(),
                         madinahImageUrl: this.container.querySelector("#dealEditMadinahUrl").value.trim(),
                         rightFrameTitle: this.container.querySelector("#dealEditRightTitle").value.trim(),
                         rightFrameBadge: this.container.querySelector("#dealEditRightBadge").value.trim(),
+                        makkahHotel: this.container.querySelector("#dealEditMakkahHotel").value.trim(),
                         makkahImageUrl: this.container.querySelector("#dealEditMakkahUrl").value.trim(),
                         servicesIncluded: {
                             roundTrip: this.container.querySelector("#dealSrvRoundTrip").checked,
@@ -2477,10 +2481,12 @@
                         duration: "20 Nights",
                         leftFrameTitle: "Madinah Munawwarah",
                         leftFrameBadge: "Markazia Walking Stay",
+                        madinahHotel: "Al Eiman Royal / Similar (150m Markazia)",
                         madinahImageUrl:
                             "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=900&q=80",
                         rightFrameTitle: "Makkah Mukarramah",
                         rightFrameBadge: "Near Haram Iftar Options",
+                        makkahHotel: "Swissotel / Le Meridien Towers / Similar",
                         makkahImageUrl:
                             "https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?auto=format&fit=crop&w=900&q=80",
                         servicesIncluded: { roundTrip: true, visa: true, hotel: true, transport: true },
@@ -2587,6 +2593,8 @@
                 (deal && deal.leftFrameTitle) || "Madinah Munawwarah";
             this.container.querySelector("#dealEditLeftBadge").value =
                 (deal && deal.leftFrameBadge) || "Ziyarat & Stay";
+            this.container.querySelector("#dealEditMadinahHotel").value =
+                (deal && deal.madinahHotel) || "Al Eiman Taibah / Similar (Near Markazia)";
             this.container.querySelector("#dealEditMadinahUrl").value =
                 (deal && deal.madinahImageUrl) ||
                 "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=900&q=80";
@@ -2595,6 +2603,8 @@
                 (deal && deal.rightFrameTitle) || "Makkah Mukarramah";
             this.container.querySelector("#dealEditRightBadge").value =
                 (deal && deal.rightFrameBadge) || "Haram View Options";
+            this.container.querySelector("#dealEditMakkahHotel").value =
+                (deal && deal.makkahHotel) || "Emaar Al Khalil / Similar (Shuttle / Walk)";
             this.container.querySelector("#dealEditMakkahUrl").value =
                 (deal && deal.makkahImageUrl) ||
                 "https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?auto=format&fit=crop&w=900&q=80";
