@@ -930,10 +930,10 @@
                                     <div class="space-y-4">
                                         <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                                             <div>
-                                                <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">calculator.html Manager</span>
-                                                <h3 class="text-lg font-black text-[#0B2D5B]">Calculator Page Banner & Inclusions</h3>
+                                                <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Package Estimator Manager</span>
+                                                <h3 class="text-lg font-black text-[#0B2D5B]">Package Estimator Banner &amp; Inclusions</h3>
                                             </div>
-                                            <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">calculator.html</span>
+                                            <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">umrah-packages.html</span>
                                         </div>
 
                                         <div>
