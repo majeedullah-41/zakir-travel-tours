@@ -313,12 +313,18 @@
                 .map((a) => a.trim())
                 .filter(Boolean);
             if (airlines.length) {
-                partnerAirlinesEl.innerHTML = airlines
+                const renderCards = (list, isAriaHidden) => list
                     .map(
                         (airline) =>
-                            `<span class="bg-slate-100 px-4 py-2 rounded-xl border border-slate-200">${escapeHtmlAttr(airline)}</span>`
+                            `<div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer"${isAriaHidden ? ' aria-hidden="true"' : ''}>
+                                <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
+                                    <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
+                                </span>
+                                <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">${escapeHtmlAttr(airline)}</span>
+                            </div>`
                     )
                     .join("");
+                partnerAirlinesEl.innerHTML = renderCards(airlines, false) + renderCards(airlines, true);
             }
         }
 
@@ -1305,6 +1311,27 @@
         window.open(`https://wa.me/${activeWA}?text=${message}`, "_blank");
     };
 
+    window.toggleFlightReturnDate = function () {
+        const typeEl = document.getElementById("flightType");
+        const returnBox = document.getElementById("flightReturnBox");
+        const grid = document.getElementById("flightDatesGrid");
+        if (!typeEl || !returnBox) return;
+        const isRoundTrip = typeEl.value === "Round Trip";
+        if (isRoundTrip) {
+            returnBox.classList.remove("hidden");
+            if (grid) {
+                grid.classList.remove("sm:grid-cols-2");
+                grid.classList.add("sm:grid-cols-3");
+            }
+        } else {
+            returnBox.classList.add("hidden");
+            if (grid) {
+                grid.classList.remove("sm:grid-cols-3");
+                grid.classList.add("sm:grid-cols-2");
+            }
+        }
+    };
+
     window.handleStandaloneFlightSubmit = function (e) {
         e.preventDefault();
         const clientEl = document.getElementById("clientPhone");
@@ -1318,8 +1345,14 @@
         const to = (document.getElementById("flightTo") && document.getElementById("flightTo").value) || "Not specified";
         const type = (document.getElementById("flightType") && document.getElementById("flightType").value) || "Round Trip";
         const date = (document.getElementById("flightDate") && document.getElementById("flightDate").value) || "Flexible";
+        const returnDate = (document.getElementById("flightReturnDate") && document.getElementById("flightReturnDate").value) || "";
 
-        const details = `*Flight Ticket Inquiry*\n- Route: ${from} to ${to}\n- Type: ${type}\n- Date: ${date}`;
+        let dateDetails = `- Departure Date: ${date}`;
+        if (type === "Round Trip" && returnDate) {
+            dateDetails += `\n- Return Date: ${returnDate}`;
+        }
+
+        const details = `*Flight Ticket Inquiry*\n- Route: ${from} to ${to}\n- Type: ${type}\n${dateDetails}`;
         const message = encodeURIComponent(
             `Assalam-o-Alaikum ${agencyName}!\n\n${details}\n- Client Contact: ${clientInfo}\n\nPlease share the best flight fares and availability.`
         );

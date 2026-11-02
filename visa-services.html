@@ -138,6 +138,20 @@
             animation: radarPulse 2.2s infinite;
         }
 
+        /* Continuous Smooth Airline Marquee */
+        @keyframes airlineScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .airline-marquee-track {
+            display: flex;
+            width: max-content;
+            animation: airlineScroll 32s linear infinite;
+        }
+        .airline-marquee-track:hover {
+            animation-play-state: paused;
+        }
+
         .card-hover-lift {
             position: relative;
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
@@ -443,17 +457,21 @@
                                 </div>
                             </div>
 
-                            <div class="grid sm:grid-cols-2 gap-4">
+                            <div class="grid sm:grid-cols-3 gap-4" id="flightDatesGrid">
                                 <div>
                                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Trip Type</label>
-                                    <select id="flightType" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-navy focus:outline-none focus:border-teal">
+                                    <select id="flightType" onchange="toggleFlightReturnDate()" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-navy focus:outline-none focus:border-teal">
                                         <option value="Round Trip">Round Trip</option>
                                         <option value="One Way">One Way</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Preferred Date</label>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Departure Date</label>
                                     <input type="date" id="flightDate" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-navy focus:outline-none focus:border-teal">
+                                </div>
+                                <div id="flightReturnBox">
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Return Date</label>
+                                    <input type="date" id="flightReturnDate" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-navy focus:outline-none focus:border-teal">
                                 </div>
                             </div>
 
@@ -474,61 +492,101 @@
 
             <!-- Partner Airlines Logo Strip -->
             <div class="mt-16 pt-8 border-t border-slate-100 text-center">
-                <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Partner & Ticketed Airlines</span>
-                <div id="visaPartnerAirlinesList" class="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mt-6 text-slate-600 font-extrabold text-sm sm:text-base">
-                    <span class="bg-slate-100 px-4 py-2 rounded-xl border border-slate-200">PIA (Pakistan International)</span>
-                    <span class="bg-slate-100 px-4 py-2 rounded-xl border border-slate-200">Saudia Airlines</span>
-                    <span class="bg-slate-100 px-4 py-2 rounded-xl border border-slate-200">Emirates</span>
-                    <span class="bg-slate-100 px-4 py-2 rounded-xl border border-slate-200">Qatar Airways</span>
-                    <span class="bg-slate-100 px-4 py-2 rounded-xl border border-slate-200">Airblue</span>
-                    <span class="bg-slate-100 px-4 py-2 rounded-xl border border-slate-200">Serene Air</span>
-                    <span class="bg-slate-100 px-4 py-2 rounded-xl border border-slate-200">Fly Jinnah</span>
-                </div>
-            </div>
-        </div>
-    </section>
+                <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Partner &amp; Ticketed Airlines</span>
+                <div class="relative w-full overflow-hidden mt-6 py-2">
+                    <!-- Edge Glow Fades -->
+                    <div class="absolute left-0 inset-y-0 w-16 sm:w-28 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+                    <div class="absolute right-0 inset-y-0 w-16 sm:w-28 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+                    
+                    <div id="visaPartnerAirlinesList" class="airline-marquee-track flex items-center gap-4 sm:gap-6">
+                        <!-- Set 1 -->
+                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer">
+                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
+                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
+                            </span>
+                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">PIA (Pakistan International)</span>
+                        </div>
+                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer">
+                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
+                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
+                            </span>
+                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Saudia Airlines</span>
+                        </div>
+                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer">
+                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
+                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
+                            </span>
+                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Emirates</span>
+                        </div>
+                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer">
+                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
+                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
+                            </span>
+                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Qatar Airways</span>
+                        </div>
+                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer">
+                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
+                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
+                            </span>
+                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Airblue</span>
+                        </div>
+                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer">
+                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
+                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
+                            </span>
+                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Serene Air</span>
+                        </div>
+                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer">
+                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
+                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
+                            </span>
+                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Fly Jinnah</span>
+                        </div>
 
-    <!-- 3-Step Simple Visa Process -->
-    <section class="py-16 bg-slate-50 border-t border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-12">
-                <span class="text-xs font-bold uppercase tracking-widest text-teal">How It Works</span>
-                <h2 class="text-3xl font-black text-navy mt-1">Simple 3-Step Visa Application</h2>
-                <p class="text-slate-600 text-sm mt-2">We take care of the embassy paperwork so you can prepare for your trip with peace of mind.</p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm relative">
-                    <span class="absolute -top-4 left-6 bg-teal text-white w-8 h-8 rounded-full font-black text-sm flex items-center justify-center shadow">1</span>
-                    <div class="w-12 h-12 rounded-2xl bg-teal-accent text-teal text-2xl flex items-center justify-center mb-4 mt-2">
-                        <i class="fa-solid fa-file-invoice"></i>
+                        <!-- Duplicate Set for continuous infinite marquee -->
+                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer" aria-hidden="true">
+                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
+                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
+                            </span>
+                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">PIA (Pakistan International)</span>
+                        </div>
+                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer" aria-hidden="true">
+                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
+                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
+                            </span>
+                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Saudia Airlines</span>
+                        </div>
+                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer" aria-hidden="true">
+                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
+                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
+                            </span>
+                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Emirates</span>
+                        </div>
+                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer" aria-hidden="true">
+                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
+                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
+                            </span>
+                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Qatar Airways</span>
+                        </div>
+                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer" aria-hidden="true">
+                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
+                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
+                            </span>
+                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Airblue</span>
+                        </div>
+                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer" aria-hidden="true">
+                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
+                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
+                            </span>
+                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Serene Air</span>
+                        </div>
+                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer" aria-hidden="true">
+                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
+                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
+                            </span>
+                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Fly Jinnah</span>
+                        </div>
                     </div>
-                    <h3 id="visaStep1Title" class="text-xl font-extrabold text-navy mb-2">Send Passports & Photos</h3>
-                    <p id="visaStep1Desc" class="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                        Share clear scans of your passport copy and white-background photographs via WhatsApp or drop them off at our Potohar Plaza Blue Area office.
-                    </p>
-                </div>
-
-                <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm relative">
-                    <span class="absolute -top-4 left-6 bg-teal text-white w-8 h-8 rounded-full font-black text-sm flex items-center justify-center shadow">2</span>
-                    <div class="w-12 h-12 rounded-2xl bg-teal-accent text-teal text-2xl flex items-center justify-center mb-4 mt-2">
-                        <i class="fa-solid fa-gears"></i>
-                    </div>
-                    <h3 id="visaStep2Title" class="text-xl font-extrabold text-navy mb-2">Document Verification</h3>
-                    <p id="visaStep2Desc" class="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                        Our experts check eligibility, prepare embassy cover letters, book biometric appointments, and process your online electronic visa file.
-                    </p>
-                </div>
-
-                <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm relative">
-                    <span class="absolute -top-4 left-6 bg-teal text-white w-8 h-8 rounded-full font-black text-sm flex items-center justify-center shadow">3</span>
-                    <div class="w-12 h-12 rounded-2xl bg-teal-accent text-teal text-2xl flex items-center justify-center mb-4 mt-2">
-                        <i class="fa-solid fa-stamp"></i>
-                    </div>
-                    <h3 id="visaStep3Title" class="text-xl font-extrabold text-navy mb-2">Receive Approved Visa</h3>
-                    <p id="visaStep3Desc" class="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                        Receive your verified electronic PDF visa via WhatsApp and email, or collect your stamped physical passport from our office desk.
-                    </p>
                 </div>
             </div>
         </div>
