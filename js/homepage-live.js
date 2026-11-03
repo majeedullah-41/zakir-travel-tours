@@ -125,9 +125,11 @@
         const agencyName = c.agencyName || "Zakir Travel & Tours";
         const taglinePrimary = c.taglinePrimary || "Your Journey Our Priority";
         const taglineSecondary = c.taglineSecondary || "Your Journey Our Responsibility";
-        const officeAddress =
-            c.officeAddress ||
-            "Fazal Banda Rd, Swat Matta, Khyber Pakhtunkhwa, Pakistan";
+        const rawOffice = (c && c.officeAddress) || "";
+        const isInvalidOrLegacyOffice = !rawOffice || /fazal banda/i.test(rawOffice) || /potohar|blue area|islamabad/i.test(rawOffice);
+        const officeAddress = isInvalidOrLegacyOffice
+            ? "2nd Floor, Hayat Market, Matta Swat, Khyber Pakhtunkhwa, Pakistan"
+            : rawOffice;
 
         document.title = `${agencyName} | ${taglinePrimary}`;
 
@@ -205,10 +207,12 @@
             setText("heroBranch1Title", pHome.branch1Title);
             setText("homeBranch1CardTitle", pHome.branch1Title);
         }
-        if (pHome.branch1Address) {
-            setText("heroBranch1Address", pHome.branch1Address);
-            setText("homeBranch1CardAddress", pHome.branch1Address);
-        }
+        const rawBranch1 = pHome.branch1Address || "";
+        const branch1Address = (!rawBranch1 || /fazal banda/i.test(rawBranch1) || /potohar|blue area|islamabad/i.test(rawBranch1))
+            ? "2nd Floor, Hayat Market, Matta Swat, Khyber Pakhtunkhwa, Pakistan"
+            : rawBranch1;
+        setText("heroBranch1Address", branch1Address);
+        setText("homeBranch1CardAddress", branch1Address);
         if (pHome.branch1Desc) setText("homeBranch1CardDesc", pHome.branch1Desc);
         if (pHome.branch2Title) {
             setText("heroBranch2Title", pHome.branch2Title);

@@ -59,11 +59,11 @@
             heroBadge: "Swat's Trusted Travel & Umrah Partner",
             heroHeadingMain: "Your Spiritual & Global Journey,",
             heroDescription:
-                "Headquartered on Fazal Banda Rd, Swat Matta with a branch office in Islamabad, Zakir Travel & Tours has proudly served over 100,000+ happy pilgrims and travelers. We specialize in Umrah & Ziyarat pilgrimages, domestic & international air ticketing, and worldwide visa consultancy.",
+                "Headquartered on 2nd Floor, Hayat Market, Matta Swat with a branch office in Islamabad, Zakir Travel & Tours has proudly served over 100,000+ happy pilgrims and travelers. We specialize in Umrah & Ziyarat pilgrimages, domestic & international air ticketing, and worldwide visa consultancy.",
             aboutBadge: "About Zakir Travel & Tours",
             aboutHeading: "Swat's Trusted Partner for Spiritual & Worldwide Travel",
             aboutDescription:
-                "Headquartered on Fazal Banda Rd, Swat Matta, Zakir Travel & Tours is a full-service travel agency dedicated to making your Umrah pilgrimage, global visa applications, and domestic & international air ticketing completely seamless, transparent, and stress-free — supported by our branch office in Islamabad.",
+                "Headquartered on 2nd Floor, Hayat Market, Matta Swat, Zakir Travel & Tours is a full-service travel agency dedicated to making your Umrah pilgrimage, global visa applications, and domestic & international air ticketing completely seamless, transparent, and stress-free — supported by our branch office in Islamabad.",
             missionTitle: "Our Mission & Promise",
             missionDesc:
                 "To serve every pilgrim, family, and traveler with complete honesty, transparent guidance, and reliable arrangements from departure to safe return.",
@@ -71,7 +71,7 @@
             visionDesc:
                 "Serving families and pilgrims right from our Swat Matta Head Office with direct walk-in support, backed by our Islamabad branch and 24/7 WhatsApp assistance.",
             branch1Title: "Swat Head Office (Matta)",
-            branch1Address: "Fazal Banda Rd, Swat Matta, Khyber Pakhtunkhwa, Pakistan",
+            branch1Address: "2nd Floor, Hayat Market, Matta Swat, Khyber Pakhtunkhwa, Pakistan",
             branch1Desc:
                 "Our central headquarters in Swat Matta providing families, elders, and travelers across Swat and Malakand Division with direct walk-in Umrah bookings, air ticketing, and visa consultancy.",
             branch2Title: "Islamabad Branch Office",
@@ -85,7 +85,7 @@
             stat3Number: "50+",
             stat3Label: "Global Airlines & Destinations",
             stat4Number: "Swat Matta",
-            stat4Label: "Central Head Office (Fazal Banda Rd)",
+            stat4Label: "Central Head Office (Matta Swat)",
             why1Title: "Transparent & Honest Guidance",
             why1Desc:
                 "Zero hidden charges. Every travel plan shared at our Swat Matta Head Office includes clear, honest breakdowns of flights, visas, and hotels.",
@@ -191,7 +191,7 @@
                     secondaryPhone: "+92 343 4159182",
                     secondaryWhatsApp: "923434159182",
                     activeBookingWhatsApp: "923490558345",
-                    officeAddress: "Fazal Banda Rd, Swat Matta, Khyber Pakhtunkhwa, Pakistan",
+                    officeAddress: "2nd Floor, Hayat Market, Matta Swat, Khyber Pakhtunkhwa, Pakistan",
                     officeHours: "Monday to Saturday: 9:30 AM – 8:00 PM (Sunday Closed / WhatsApp Support Active)",
                     officeEmail: "info@zakirtravels.com / inam@zakirtravels.com",
                     mapEmbedUrl:

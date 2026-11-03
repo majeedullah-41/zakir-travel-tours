@@ -499,7 +499,7 @@
                                             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
                                                 <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Stat Box 4</span>
                                                 <input type="text" id="homeStat4NumInput" required placeholder="Swat Matta" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
-                                                <input type="text" id="homeStat4LblInput" required placeholder="Central Head Office (Fazal Banda Rd)" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                                <input type="text" id="homeStat4LblInput" required placeholder="Central Head Office (Matta Swat)" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
                                             </div>
                                         </div>
                                     </div>
@@ -1112,7 +1112,7 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Islamabad Office Address</label>
+                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Swat Head Office Address (Central Headquarters)</label>
                                             <textarea id="contactOfficeAddress" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-bold text-[#0B2D5B]"></textarea>
                                         </div>
                                         <div>
@@ -1632,7 +1632,9 @@
             setVal("#contactSecondaryName", c.secondaryName || "Sadiq Ullah");
             setVal("#contactSecondaryPhone", c.secondaryPhone || "+92 343 4159182");
             setVal("#contactSecondaryWA", c.secondaryWhatsApp || "923434159182");
-            setVal("#contactOfficeAddress", c.officeAddress || "");
+            const rawOffice = c.officeAddress || "";
+            const isInvalidOrLegacyOffice = !rawOffice || /fazal banda/i.test(rawOffice) || /potohar|blue area|islamabad/i.test(rawOffice);
+            setVal("#contactOfficeAddress", isInvalidOrLegacyOffice ? "2nd Floor, Hayat Market, Matta Swat, Khyber Pakhtunkhwa, Pakistan" : rawOffice);
             setVal("#contactOfficeHours", c.officeHours || "Monday to Saturday: 9:30 AM – 8:00 PM (Sunday Closed / WhatsApp Support Active)");
             setVal("#contactOfficeEmail", c.officeEmail || "info@zakirtravels.com / inam@zakirtravels.com");
             setVal("#contactMapEmbedUrl", c.mapEmbedUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3318.847503714243!2d73.0645624!3d33.7128613!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfbf9df175e11d%3A0xe54d6faeebdae812!2sPotohar%20Plaza%2C%20Fazal-e-Haq%20Rd%2C%20Blue%20Area%2C%20Islamabad!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s");
@@ -1656,7 +1658,9 @@
             setVal("#homeVisionTitleInput", pHome.visionTitle || "Rooted in Swat, Connected Nationwide");
             setVal("#homeVisionDescInput", pHome.visionDesc || "");
             setVal("#homeBranch1TitleInput", pHome.branch1Title || "Swat Head Office (Matta)");
-            setVal("#homeBranch1AddrInput", pHome.branch1Address || "Fazal Banda Rd, Swat Matta, Khyber Pakhtunkhwa, Pakistan");
+            const rawBranch1 = pHome.branch1Address || "";
+            const isInvalidOrLegacyBranch1 = !rawBranch1 || /fazal banda/i.test(rawBranch1) || /potohar|blue area|islamabad/i.test(rawBranch1);
+            setVal("#homeBranch1AddrInput", isInvalidOrLegacyBranch1 ? "2nd Floor, Hayat Market, Matta Swat, Khyber Pakhtunkhwa, Pakistan" : rawBranch1);
             setVal("#homeBranch1DescInput", pHome.branch1Desc || "");
             setVal("#homeBranch2TitleInput", pHome.branch2Title || "Islamabad Branch Office");
             setVal("#homeBranch2AddrInput", pHome.branch2Address || "Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad");
@@ -1668,7 +1672,7 @@
             setVal("#homeStat3NumInput", pHome.stat3Number || "50+");
             setVal("#homeStat3LblInput", pHome.stat3Label || "Global Airlines & Destinations");
             setVal("#homeStat4NumInput", pHome.stat4Number || "Swat Matta");
-            setVal("#homeStat4LblInput", pHome.stat4Label || "Central Head Office (Fazal Banda Rd)");
+            setVal("#homeStat4LblInput", pHome.stat4Label || "Central Head Office (Matta Swat)");
             setVal("#homeWhy1TitleInput", pHome.why1Title || "Authorized & Transparent Pricing");
             setVal("#homeWhy1DescInput", pHome.why1Desc || "");
             setVal("#homeWhy2TitleInput", pHome.why2Title || "Dedicated Personal Consultants");
