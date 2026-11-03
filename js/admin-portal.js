@@ -17,6 +17,20 @@
         return String(str || "").replace(/[^0-9]/g, "");
     }
 
+    // About Us page team members (ids must match data-team-photo attributes in contact.html)
+    const TEAM_MEMBERS = [
+        { id: "ceo", name: "Zakir Ullah", role: "CEO", initials: "ZU" },
+        { id: "inam", name: "Inam Ullah", role: "Manager", initials: "IU" },
+        { id: "hafizullah", name: "Hafizullah", role: "Visa Officer", initials: "HU" },
+        { id: "fida", name: "Fida Hussain", role: "Umrah Officer", initials: "FH" },
+        { id: "sadiq", name: "Sadiq", role: "Visa Consultant", initials: "S" },
+        { id: "faisal", name: "Faisal", role: "Visa Processing", initials: "F" },
+        { id: "suliman", name: "Suliman", role: "Umrah Visa Officer", initials: "S" },
+        { id: "mazhar", name: "Mazhar", role: "Accountant", initials: "M" },
+        { id: "saad", name: "Saad Khan", role: "Social Media Manager", initials: "SK" },
+        { id: "salim", name: "Salim", role: "Office Boy", initials: "S" }
+    ];
+
     // Inject sleek animations and modern glassmorphic styles
     function ensureAdminAnimationsStyle() {
         if (document.getElementById("zakir-admin-animations-css")) return;
@@ -1030,7 +1044,7 @@
 
                                     <!-- Contact Page Hero Banner Fields -->
                                     <div class="border-t border-slate-100 pt-4 space-y-3">
-                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E] block">contact.html Hero Banner Text</span>
+                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E] block">About Us &amp; Contact Page (contact.html) Hero Banner Text</span>
                                         <div class="grid sm:grid-cols-2 gap-3">
                                             <div>
                                                 <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Hero Badge</label>
@@ -1044,6 +1058,37 @@
                                                 <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Hero Subtitle</label>
                                                 <textarea id="contactHeroSubtitleInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700"></textarea>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- About Us: Team Member Photos -->
+                                    <div class="border-t border-slate-100 pt-4 space-y-3">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-[10px] font-black uppercase text-[#0D8A9E] block"><i class="fa-solid fa-users mr-1"></i>About Us — Team Member Photos</span>
+                                            <span class="text-[10px] font-bold text-slate-400">Upload, then click Save &amp; Push</span>
+                                        </div>
+                                        <div id="teamPhotosAdminGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                            ${TEAM_MEMBERS.map((m) => `
+                                            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex flex-col items-center text-center gap-2">
+                                                <div class="relative w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-[#0B2D5B] to-[#0D8A9E] flex items-center justify-center text-white font-black text-sm">
+                                                    <span id="teamPhotoInitials-${m.id}">${m.initials}</span>
+                                                    <img id="teamPhotoPreview-${m.id}" alt="${m.name}" class="hidden absolute inset-0 w-full h-full object-cover">
+                                                </div>
+                                                <div class="leading-tight">
+                                                    <div class="text-xs font-black text-[#0B2D5B]">${m.name}</div>
+                                                    <div class="text-[10px] font-bold text-[#0D8A9E]">${m.role}</div>
+                                                </div>
+                                                <input type="hidden" id="teamPhotoUrl-${m.id}" data-team-photo-key="${m.id}">
+                                                <div class="flex items-center gap-1.5">
+                                                    <label class="cursor-pointer bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-colors">
+                                                        <i class="fa-solid fa-upload mr-1"></i>Upload
+                                                        <input type="file" accept="image/*" class="hidden" data-team-photo-upload="${m.id}">
+                                                    </label>
+                                                    <button type="button" data-team-photo-remove="${m.id}" class="bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors" title="Remove photo">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>`).join("")}
                                         </div>
                                     </div>
                                 </div>
@@ -1670,11 +1715,39 @@
             setVal("#calcHeroSubtitleInput", pCalc.heroSubtitle || "");
             setVal("#calcIncludedBulletsInput", pCalc.includedBullets || "");
 
-            setVal("#contactHeroBadgeInput", pContact.heroBadge || "Head Office: Blue Area, Islamabad");
-            setVal("#contactHeroTitleInput", pContact.heroTitle || "Contact Our Travel Desk");
-            setVal("#contactHeroSubtitleInput", pContact.heroSubtitle || "");
+            const legacyBadges = ["Head Office: Blue Area, Islamabad", "Swat Head Office (Matta) • Islamabad Branch Office"];
+            const aboutBadge = pContact.heroBadge && !legacyBadges.includes(pContact.heroBadge) ? pContact.heroBadge : "About Us • Our People • Contact";
+            const aboutTitle = pContact.heroTitle && pContact.heroTitle !== "Contact Our Travel Desk" ? pContact.heroTitle : "Meet Zakir Travel & Tours";
+            const aboutSubtitle =
+                pContact.heroSubtitle && !/^We are always here to assist your spiritual journey/i.test(pContact.heroSubtitle)
+                    ? pContact.heroSubtitle
+                    : "Led from our Swat Matta Head Office with a branch in Islamabad, our dedicated team of visa, Umrah and ticketing professionals personally handles every file — from your first inquiry until you return home safely.";
+            setVal("#contactHeroBadgeInput", aboutBadge);
+            setVal("#contactHeroTitleInput", aboutTitle);
+            setVal("#contactHeroSubtitleInput", aboutSubtitle);
+
+            // About Us — Team Member Photos
+            const teamPhotos = (this.siteConfig && this.siteConfig.teamPhotos) || {};
+            TEAM_MEMBERS.forEach((m) => this._setTeamPhotoPreview(m.id, teamPhotos[m.id] || ""));
 
             this._updateLivePreviewBadges();
+        }
+
+        _setTeamPhotoPreview(memberId, url) {
+            const urlInput = this.container.querySelector(`#teamPhotoUrl-${memberId}`);
+            const img = this.container.querySelector(`#teamPhotoPreview-${memberId}`);
+            const initials = this.container.querySelector(`#teamPhotoInitials-${memberId}`);
+            if (urlInput) urlInput.value = url || "";
+            if (img) {
+                if (url) {
+                    img.src = url;
+                    img.classList.remove("hidden");
+                } else {
+                    img.removeAttribute("src");
+                    img.classList.add("hidden");
+                }
+            }
+            if (initials) initials.classList.toggle("hidden", !!url);
         }
 
         // --------------------------------------------------------------------
@@ -1874,7 +1947,14 @@
                 return el ? el.value.trim() : fallback;
             };
 
+            const teamPhotoInputs = this.container.querySelectorAll("input[data-team-photo-key]");
+            const teamPhotos = { ...((this.siteConfig && this.siteConfig.teamPhotos) || {}) };
+            teamPhotoInputs.forEach((inp) => {
+                teamPhotos[inp.getAttribute("data-team-photo-key")] = inp.value.trim();
+            });
+
             await db.updateSiteConfig({
+                teamPhotos,
                 spotlight: {
                     monthLabel: quickMonth || getVal("#spotMonthLabel", "January"),
                     title: getVal("#spotTitle", "UMRAH PACKAGE") || "UMRAH PACKAGE",
@@ -2268,6 +2348,31 @@
                     } catch (err) {
                         this.showToast(err.message || "Failed to upload image.", "error");
                     }
+                });
+            });
+
+            // About Us — Team Member Photo Uploads
+            this.container.querySelectorAll("input[type='file'][data-team-photo-upload]").forEach((fileInput) => {
+                fileInput.addEventListener("change", async (e) => {
+                    const file = e.target.files && e.target.files[0];
+                    if (!file) return;
+                    const memberId = fileInput.getAttribute("data-team-photo-upload");
+                    try {
+                        this.showToast("Uploading & optimizing team photo...", "warning");
+                        const url = await db.uploadMediaFile(file, "zakir_team");
+                        this._setTeamPhotoPreview(memberId, url);
+                        this.showToast("Photo ready! Click Save & Push to Website.");
+                    } catch (err) {
+                        this.showToast(err.message || "Failed to upload photo.", "error");
+                    } finally {
+                        fileInput.value = "";
+                    }
+                });
+            });
+            this.container.querySelectorAll("[data-team-photo-remove]").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    this._setTeamPhotoPreview(btn.getAttribute("data-team-photo-remove"), "");
+                    this.showToast("Photo removed. Click Save & Push to Website.", "warning");
                 });
             });
 

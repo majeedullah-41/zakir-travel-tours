@@ -410,11 +410,34 @@
             calcHotelSelect.selectedIndex = Math.min(prevHotelIdx, calcHotelSelect.options.length - 1);
         }
 
-        // --- Contact & Islamabad Office Section ---
-        if (pContact.heroBadge) setText("contactHeroBadge", pContact.heroBadge);
-        if (pContact.heroTitle) setText("contactHeroTitle", pContact.heroTitle);
-        if (pContact.heroSubtitle) setText("contactHeroSubtitle", pContact.heroSubtitle);
+        // --- About Us & Contact Page Hero (skip legacy contact-only defaults) ---
+        const legacyContactBadges = ["Head Office: Blue Area, Islamabad", "Swat Head Office (Matta) • Islamabad Branch Office"];
+        const legacyContactTitles = ["Contact Our Travel Desk"];
+        const isLegacyContactSubtitle = /^We are always here to assist your spiritual journey/i.test(pContact.heroSubtitle || "");
+        if (pContact.heroBadge && !legacyContactBadges.includes(pContact.heroBadge)) setText("contactHeroBadge", pContact.heroBadge);
+        if (pContact.heroTitle && !legacyContactTitles.includes(pContact.heroTitle)) setText("contactHeroTitle", pContact.heroTitle);
+        if (pContact.heroSubtitle && !isLegacyContactSubtitle) setText("contactHeroSubtitle", pContact.heroSubtitle);
 
+        // --- About Us: Team Member Photos (uploaded by Admin, keyed by member id) ---
+        const teamPhotos = config.teamPhotos || {};
+        document.querySelectorAll("[data-team-photo]").forEach((slot) => {
+            const key = slot.getAttribute("data-team-photo");
+            const url = teamPhotos[key];
+            const img = slot.querySelector(".team-photo-img");
+            const placeholder = slot.querySelector(".team-photo-placeholder");
+            if (!img) return;
+            if (url) {
+                if (img.getAttribute("src") !== url) img.src = url;
+                img.classList.remove("hidden");
+                if (placeholder) placeholder.classList.add("hidden");
+            } else {
+                img.removeAttribute("src");
+                img.classList.add("hidden");
+                if (placeholder) placeholder.classList.remove("hidden");
+            }
+        });
+
+        // --- Contact & Islamabad Office Section ---
         setText("contactSectionAgencyName", agencyName);
         setText("contactSectionTagline", `"${taglineSecondary}"`);
         setText("contactSectionAddress", officeAddress);

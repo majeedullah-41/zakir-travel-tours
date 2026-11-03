@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us & Office Location | Zakir Travel & Tours</title>
+    <title>About Us, Our Team & Contact | Zakir Travel & Tours</title>
     <link rel="icon" type="image/png" href="./assets/logo-mark.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -250,13 +250,13 @@
 
                     <div class="h-7 w-[1px] bg-slate-300/80"></div>
 
-                    <!-- 4. Contact Us (Active Solid Blue Pill) -->
+                    <!-- 4. About & Contact (Active Solid Blue Pill) -->
                     <a href="contact.html" class="flex flex-col items-center justify-center px-4 xl:px-5 py-1.5 rounded-[18px] bg-gradient-to-b from-[#0E56B5] to-[#083574] text-white shadow-[0_4px_12px_-2px_rgba(14,86,181,0.45)] transition-all">
                         <svg class="w-4 h-4 mb-0.5 stroke-current" fill="none" stroke-width="1.8" viewBox="0 0 24 24">
                             <rect x="3" y="5" width="18" height="14" rx="2" />
                             <path d="M3 7l9 6 9-6" />
                         </svg>
-                        <span class="text-[10.5px] xl:text-[11px] font-extrabold leading-[1.1] text-center">Contact<br>Us</span>
+                        <span class="text-[10.5px] xl:text-[11px] font-extrabold leading-[1.1] text-center">About &amp;<br>Contact</span>
                     </a>
                 </nav>
 
@@ -290,7 +290,7 @@
             <a href="index.html" class="block py-2 px-3.5 rounded-xl font-semibold text-navy hover:bg-slate-50 text-sm">Home (Agency Overview)</a>
             <a href="umrah-packages.html" class="block py-2 px-3.5 rounded-xl font-semibold text-navy hover:bg-slate-50 text-sm">Umrah Packages</a>
             <a href="visa-services.html" class="block py-2 px-3.5 rounded-xl font-semibold text-navy hover:bg-slate-50 text-sm">Visas &amp; Air Tickets</a>
-            <a href="contact.html" class="block py-2 px-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-[#0E56B5] to-[#083574] text-sm">Contact Us</a>
+            <a href="contact.html" class="block py-2 px-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-[#0E56B5] to-[#083574] text-sm">About Us &amp; Contact</a>
             <button type="button" onclick="openAdminPortalDrawer()" class="w-full text-left py-2 px-3.5 rounded-xl font-bold text-navy hover:bg-slate-100 flex items-center gap-2 text-sm">
                 <i class="fa-regular fa-user"></i> Admin Portal
             </button>
@@ -316,17 +316,28 @@
             <div class="inline-flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/15 px-4 py-2 rounded-full text-xs sm:text-sm font-bold text-sky-100 shadow-sm mb-4">
                 <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
                 <i class="fa-solid fa-building-flag text-amber-300"></i>
-                <span id="contactHeroBadge">Swat Head Office (Matta) • Islamabad Branch Office</span>
+                <span id="contactHeroBadge">About Us • Our People • Contact</span>
             </div>
 
             <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight uppercase leading-[1.15]">
-                <span id="contactHeroTitle" class="block">Contact Our Travel Desk</span>
-                <span class="font-serif italic font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-teal-light to-sky-200 animated-gradient-text block mt-1 text-2xl sm:text-4xl lg:text-5xl">Direct Management Oversight, 24/7 Support.</span>
+                <span id="contactHeroTitle" class="block">Meet Zakir Travel &amp; Tours</span>
+                <span class="font-serif italic font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-teal-light to-sky-200 animated-gradient-text block mt-1 text-2xl sm:text-4xl lg:text-5xl">The People Behind Your Journey.</span>
             </h1>
 
             <p id="contactHeroSubtitle" class="mt-4 text-base sm:text-lg text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed">
-                We are always here to assist your spiritual journey and global travel. Visit our Swat Matta Head Office, our Islamabad branch, or speak directly with our management team on WhatsApp.
+                Led from our Swat Matta Head Office with a branch in Islamabad, our dedicated team of visa, Umrah and ticketing professionals personally handles every file — from your first inquiry until you return home safely.
             </p>
+
+            <div class="mt-7 flex flex-wrap justify-center gap-3.5 text-xs sm:text-sm font-bold">
+                <a href="#our-leadership" class="btn-shimmer bg-gradient-to-r from-teal to-teal-light hover:-translate-y-0.5 text-white px-7 py-3.5 rounded-xl shadow-lg shadow-teal/25 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-users text-amber-300"></i>
+                    <span>Meet Our Team</span>
+                </a>
+                <a href="#contact-us" class="bg-white/10 hover:bg-white/15 hover:-translate-y-0.5 backdrop-blur-md border border-white/20 text-white px-6 py-3.5 rounded-xl transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-location-dot text-teal-light"></i>
+                    <span>Contact &amp; Office Locations</span>
+                </a>
+            </div>
 
             <!-- Executive Trust Strip -->
             <div class="mt-10 pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-4xl mx-auto text-center">
@@ -350,8 +361,193 @@
         </div>
     </section>
 
+    <!-- ================= ABOUT US: CEO / LEADERSHIP ================= -->
+    <!-- Team photos are bound to site_config.teamPhotos (uploaded from Admin Portal → Contacts tab) -->
+    <section id="our-leadership" class="py-16 lg:py-24 bg-white relative overflow-hidden scroll-mt-28">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span class="bg-teal-accent text-teal text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block">About Our Agency</span>
+                <h2 class="text-3xl sm:text-4xl font-black text-navy mt-3">Leadership &amp; Vision</h2>
+                <p class="text-slate-600 text-sm sm:text-base mt-2">Built on honesty, transparency and personal care for every pilgrim and traveler.</p>
+            </div>
+
+            <!-- CEO Feature Card -->
+            <div class="card-hover-lift bg-gradient-to-br from-navy-dark via-navy to-teal-dark rounded-[2rem] p-6 sm:p-10 shadow-executive text-white grid md:grid-cols-12 gap-8 items-center overflow-hidden relative">
+                <div class="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-amber-400/10 blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -left-16 w-72 h-72 rounded-full bg-teal-light/20 blur-3xl pointer-events-none"></div>
+
+                <!-- CEO Photo Slot -->
+                <div class="md:col-span-5 lg:col-span-4 relative">
+                    <div data-team-photo="ceo" class="team-photo-slot relative aspect-[4/5] w-full max-w-xs mx-auto rounded-3xl overflow-hidden border-4 border-white/15 shadow-2xl bg-white/5">
+                        <img alt="Zakir Ullah - CEO" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover">
+                        <div class="team-photo-placeholder absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-white/10 to-white/0">
+                            <div class="w-24 h-24 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 text-navy-dark flex items-center justify-center text-3xl font-black shadow-lg">ZU</div>
+                            <span class="text-[11px] uppercase tracking-widest text-slate-300 font-bold"><i class="fa-regular fa-image mr-1"></i>Photo Coming Soon</span>
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-amber-400 text-navy-dark text-[11px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg whitespace-nowrap">
+                        <i class="fa-solid fa-crown mr-1"></i>Founder &amp; CEO
+                    </div>
+                </div>
+
+                <!-- CEO Message -->
+                <div class="md:col-span-7 lg:col-span-8 space-y-4 relative">
+                    <span class="text-xs font-bold uppercase tracking-widest text-teal-light">Chief Executive Officer</span>
+                    <h3 class="text-3xl sm:text-4xl font-black leading-tight">Zakir Ullah</h3>
+                    <div class="h-1 w-16 rounded-full bg-gradient-to-r from-amber-300 to-teal-light"></div>
+                    <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
+                        <i class="fa-solid fa-quote-left text-amber-300 mr-1"></i>
+                        Our mission has always been simple — to serve every pilgrim, family and traveler as if they were our own. From our Head Office in Swat Matta, we built Zakir Travel &amp; Tours on honesty, transparent pricing and complete personal responsibility, so that every journey — whether to the Haramain or across the world — is peaceful and worry-free.
+                    </p>
+                    <div class="flex flex-wrap gap-3 pt-2 text-xs font-bold">
+                        <span class="bg-white/10 border border-white/15 px-3.5 py-2 rounded-xl flex items-center gap-2"><i class="fa-solid fa-building-flag text-amber-300"></i>Swat Matta Head Office</span>
+                        <span class="bg-white/10 border border-white/15 px-3.5 py-2 rounded-xl flex items-center gap-2"><i class="fa-solid fa-kaaba text-teal-light"></i>Umrah &amp; Ziyarat</span>
+                        <span class="bg-white/10 border border-white/15 px-3.5 py-2 rounded-xl flex items-center gap-2"><i class="fa-solid fa-earth-asia text-sky-300"></i>Global Visas &amp; Tickets</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= ABOUT US: OUR EXPERTS ================= -->
+    <section id="our-experts" class="py-16 lg:py-20 bg-slate-50 subtle-grid-pattern relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span class="bg-teal-accent text-teal text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block">Senior Professionals</span>
+                <h2 class="text-3xl sm:text-4xl font-black text-navy mt-3">Our Experts</h2>
+                <p class="text-slate-600 text-sm sm:text-base mt-2">Experienced specialists who oversee every Umrah, visa and ticketing file personally.</p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
+                <!-- Inam Ullah -->
+                <div class="card-hover-lift group bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div data-team-photo="inam" class="team-photo-slot relative aspect-[4/3] bg-gradient-to-br from-navy to-teal overflow-hidden">
+                        <img alt="Inam Ullah - Manager" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <div class="team-photo-placeholder absolute inset-0 flex flex-col items-center justify-center gap-2">
+                            <div class="w-20 h-20 rounded-full bg-white/15 border-2 border-white/30 text-white flex items-center justify-center text-2xl font-black group-hover:scale-110 transition-transform duration-500">IU</div>
+                            <span class="text-[10px] uppercase tracking-widest text-white/70 font-bold"><i class="fa-regular fa-image mr-1"></i>Photo Coming Soon</span>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-black text-navy">Inam Ullah</h3>
+                        <span class="inline-flex items-center gap-1.5 mt-2 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-extrabold px-3 py-1 rounded-full"><i class="fa-solid fa-user-tie"></i>Manager</span>
+                    </div>
+                </div>
+
+                <!-- Hafizullah -->
+                <div class="card-hover-lift group bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div data-team-photo="hafizullah" class="team-photo-slot relative aspect-[4/3] bg-gradient-to-br from-navy to-teal overflow-hidden">
+                        <img alt="Hafizullah - Visa Officer" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <div class="team-photo-placeholder absolute inset-0 flex flex-col items-center justify-center gap-2">
+                            <div class="w-20 h-20 rounded-full bg-white/15 border-2 border-white/30 text-white flex items-center justify-center text-2xl font-black group-hover:scale-110 transition-transform duration-500">HU</div>
+                            <span class="text-[10px] uppercase tracking-widest text-white/70 font-bold"><i class="fa-regular fa-image mr-1"></i>Photo Coming Soon</span>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-black text-navy">Hafizullah</h3>
+                        <span class="inline-flex items-center gap-1.5 mt-2 bg-teal-accent text-teal border border-teal/20 text-xs font-extrabold px-3 py-1 rounded-full"><i class="fa-solid fa-passport"></i>Visa Officer</span>
+                    </div>
+                </div>
+
+                <!-- Fida Hussain -->
+                <div class="card-hover-lift group bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div data-team-photo="fida" class="team-photo-slot relative aspect-[4/3] bg-gradient-to-br from-navy to-teal overflow-hidden">
+                        <img alt="Fida Hussain - Umrah Officer" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <div class="team-photo-placeholder absolute inset-0 flex flex-col items-center justify-center gap-2">
+                            <div class="w-20 h-20 rounded-full bg-white/15 border-2 border-white/30 text-white flex items-center justify-center text-2xl font-black group-hover:scale-110 transition-transform duration-500">FH</div>
+                            <span class="text-[10px] uppercase tracking-widest text-white/70 font-bold"><i class="fa-regular fa-image mr-1"></i>Photo Coming Soon</span>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-black text-navy">Fida Hussain</h3>
+                        <span class="inline-flex items-center gap-1.5 mt-2 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-extrabold px-3 py-1 rounded-full"><i class="fa-solid fa-kaaba"></i>Umrah Officer</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= ABOUT US: OUR TEAM ================= -->
+    <section id="our-team" class="py-16 lg:py-20 bg-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span class="bg-teal-accent text-teal text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block">Behind Every File</span>
+                <h2 class="text-3xl sm:text-4xl font-black text-navy mt-3">Our Team</h2>
+                <p class="text-slate-600 text-sm sm:text-base mt-2">The dedicated people who process, manage and support your travel every single day.</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
+                <!-- Sadiq -->
+                <div class="card-hover-lift group bg-slate-50 rounded-3xl border border-slate-200 p-4 sm:p-5 text-center">
+                    <div data-team-photo="sadiq" class="team-photo-slot relative w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-navy to-teal ring-4 ring-white shadow-md group-hover:ring-teal/30 transition-all">
+                        <img alt="Sadiq - Visa Consultant" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover">
+                        <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">S</div>
+                    </div>
+                    <h3 class="mt-4 text-base font-black text-navy">Sadiq</h3>
+                    <p class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Visa Consultant</p>
+                </div>
+
+                <!-- Faisal -->
+                <div class="card-hover-lift group bg-slate-50 rounded-3xl border border-slate-200 p-4 sm:p-5 text-center">
+                    <div data-team-photo="faisal" class="team-photo-slot relative w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-navy to-teal ring-4 ring-white shadow-md group-hover:ring-teal/30 transition-all">
+                        <img alt="Faisal - Visa Processing" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover">
+                        <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">F</div>
+                    </div>
+                    <h3 class="mt-4 text-base font-black text-navy">Faisal</h3>
+                    <p class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Visa Processing</p>
+                </div>
+
+                <!-- Suliman -->
+                <div class="card-hover-lift group bg-slate-50 rounded-3xl border border-slate-200 p-4 sm:p-5 text-center">
+                    <div data-team-photo="suliman" class="team-photo-slot relative w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-navy to-teal ring-4 ring-white shadow-md group-hover:ring-teal/30 transition-all">
+                        <img alt="Suliman - Umrah Visa Officer" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover">
+                        <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">S</div>
+                    </div>
+                    <h3 class="mt-4 text-base font-black text-navy">Suliman</h3>
+                    <p class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Umrah Visa Officer</p>
+                </div>
+
+                <!-- Mazhar -->
+                <div class="card-hover-lift group bg-slate-50 rounded-3xl border border-slate-200 p-4 sm:p-5 text-center">
+                    <div data-team-photo="mazhar" class="team-photo-slot relative w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-navy to-teal ring-4 ring-white shadow-md group-hover:ring-teal/30 transition-all">
+                        <img alt="Mazhar - Accountant" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover">
+                        <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">M</div>
+                    </div>
+                    <h3 class="mt-4 text-base font-black text-navy">Mazhar</h3>
+                    <p class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Accountant</p>
+                </div>
+
+                <!-- Saad Khan -->
+                <div class="card-hover-lift group bg-slate-50 rounded-3xl border border-slate-200 p-4 sm:p-5 text-center">
+                    <div data-team-photo="saad" class="team-photo-slot relative w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-navy to-teal ring-4 ring-white shadow-md group-hover:ring-teal/30 transition-all">
+                        <img alt="Saad Khan - Social Media Manager" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover">
+                        <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">SK</div>
+                    </div>
+                    <h3 class="mt-4 text-base font-black text-navy">Saad Khan</h3>
+                    <p class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Social Media Manager</p>
+                </div>
+
+                <!-- Salim -->
+                <div class="card-hover-lift group bg-slate-50 rounded-3xl border border-slate-200 p-4 sm:p-5 text-center">
+                    <div data-team-photo="salim" class="team-photo-slot relative w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-navy to-teal ring-4 ring-white shadow-md group-hover:ring-teal/30 transition-all">
+                        <img alt="Salim - Office Boy" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover">
+                        <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">S</div>
+                    </div>
+                    <h3 class="mt-4 text-base font-black text-navy">Salim</h3>
+                    <p class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Office Boy</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= CONTACT US ================= -->
     <!-- Office Details & Direct Contacts (Real-Time Bound to site_config.contacts) -->
-    <section class="py-16 lg:py-24 bg-slate-50 subtle-grid-pattern relative">
+    <section id="contact-us" class="py-16 lg:py-24 bg-slate-50 subtle-grid-pattern relative scroll-mt-28">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12">
+            <span class="bg-teal-accent text-teal text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block">Get In Touch</span>
+            <h2 class="text-3xl sm:text-4xl font-black text-navy mt-3">Contact Us</h2>
+            <p class="text-slate-600 text-sm sm:text-base mt-2">Visit our offices, call our desk, or message us directly on WhatsApp.</p>
+        </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid lg:grid-cols-12 gap-10">
                 
@@ -596,7 +792,7 @@
                         <li><a href="umrah-packages.html" class="hover:text-teal-light transition-colors">Umrah Packages &amp; Flyer Deals</a></li>
                         <li><a href="visa-services.html" class="hover:text-teal-light transition-colors">Worldwide Visas &amp; Air Tickets</a></li>
                         <li><a href="umrah-packages.html#package-estimator" class="hover:text-teal-light transition-colors">Interactive Umrah Estimator</a></li>
-                        <li><a href="contact.html" class="hover:text-teal-light transition-colors">Office Locations &amp; Contact</a></li>
+                        <li><a href="contact.html" class="hover:text-teal-light transition-colors">About Us, Team &amp; Contact</a></li>
                     </ul>
                 </div>
 
