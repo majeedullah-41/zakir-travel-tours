@@ -731,15 +731,33 @@
             <div class="mt-16 pt-8 border-t border-slate-200">
                 <div class="text-center max-w-xl mx-auto mb-6">
                     <span class="text-xs font-bold uppercase tracking-widest text-teal">Map Directions</span>
-                    <h3 class="text-2xl font-black text-navy mt-1">Our Branch Location</h3>
-                    <p class="text-slate-500 text-xs sm:text-sm mt-1">Serving clients at our Central Head Office on 2nd Floor, Hayat Market, Matta Swat, and at Potohar Plaza Blue Area Islamabad.</p>
+                    <h3 id="mapHeadingTitle" class="text-2xl sm:text-3xl font-black text-navy mt-1">Swat Head Office Location</h3>
+                    <p id="mapHeadingSubtitle" class="text-slate-600 text-xs sm:text-sm mt-1">2nd Floor, Hayat Market, Matta Swat, Khyber Pakhtunkhwa, Pakistan</p>
+                    
+                    <!-- Quick Branch Map Switcher -->
+                    <div class="mt-4 inline-flex items-center p-1.5 bg-slate-100 rounded-2xl border border-slate-200 gap-1 text-xs font-bold">
+                        <button type="button" onclick="switchMapBranch('swat')" id="btnMapSwat" class="px-4 py-2 rounded-xl bg-navy text-white shadow-sm transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-building-columns text-amber-300"></i>
+                            <span>Swat Head Office (Matta)</span>
+                        </button>
+                        <button type="button" onclick="switchMapBranch('islamabad')" id="btnMapIslamabad" class="px-4 py-2 rounded-xl text-slate-600 hover:text-navy hover:bg-white/80 transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-location-dot text-teal"></i>
+                            <span>Islamabad Branch</span>
+                        </button>
+                    </div>
                 </div>
                 
-                <div class="w-full h-80 sm:h-96 rounded-3xl overflow-hidden border-2 border-slate-200 shadow-md">
+                <div class="relative w-full h-80 sm:h-96 rounded-3xl overflow-hidden border-2 border-slate-200 shadow-md">
+                    <!-- Open in Maps External Floating Button -->
+                    <a id="openInMapsBtn" href="https://www.google.com/maps/search/?api=1&query=Hayat+Market,+Matta,+Swat" target="_blank" rel="noopener noreferrer" class="absolute top-4 left-4 z-10 bg-white/95 hover:bg-white text-navy font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-md border border-slate-200 flex items-center gap-1.5 transition-all">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-teal"></i>
+                        <span>Open in Google Maps</span>
+                    </a>
+
                     <iframe 
                         id="contactMapIframe"
-                        title="Zakir Travel Potohar Plaza Blue Area Islamabad"
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3318.847503714243!2d73.0645624!3d33.7128613!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfbf9df175e11d%3A0xe54d6faeebdae812!2sPotohar%20Plaza%2C%20Fazal-e-Haq%20Rd%2C%20Blue%20Area%2C%20Islamabad!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s" 
+                        title="Zakir Travel Swat Head Office - Hayat Market Matta Swat"
+                        src="https://maps.google.com/maps?q=Hayat+Market,+Matta,+Swat,+Pakistan&t=&z=16&ie=UTF8&iwloc=&output=embed" 
                         class="w-full h-full border-0" 
                         allowfullscreen="" 
                         loading="lazy" 

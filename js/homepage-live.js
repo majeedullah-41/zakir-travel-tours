@@ -449,8 +449,15 @@
         if (c.officeEmail) setText("contactSectionEmail", c.officeEmail);
 
         const mapIframe = document.getElementById("contactMapIframe");
-        if (mapIframe && c.mapEmbedUrl && mapIframe.src !== c.mapEmbedUrl) {
-            mapIframe.src = c.mapEmbedUrl;
+        if (mapIframe && !mapIframe.getAttribute("data-switched")) {
+            const rawMapUrl = c.mapEmbedUrl || "";
+            const isLegacyIslamabadMap = !rawMapUrl || /potohar/i.test(rawMapUrl) || /fazal-e-haq/i.test(rawMapUrl);
+            const activeMapUrl = isLegacyIslamabadMap
+                ? "https://maps.google.com/maps?q=Hayat+Market,+Matta,+Swat,+Pakistan&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                : rawMapUrl;
+            if (mapIframe.src !== activeMapUrl) {
+                mapIframe.src = activeMapUrl;
+            }
         }
 
         setText("contactCardManagerName", c.managerName || "Inam Khan");
@@ -1336,6 +1343,34 @@
             `Assalam-o-Alaikum ${agencyName}!\n\n${details}\n- Client Contact: ${clientInfo}\n\nPlease share the best rates and details.`
         );
         window.open(`https://wa.me/${activeWA}?text=${message}`, "_blank");
+    };
+
+    window.switchMapBranch = function (branch) {
+        const iframe = document.getElementById("contactMapIframe");
+        const heading = document.getElementById("mapHeadingTitle");
+        const subtitle = document.getElementById("mapHeadingSubtitle");
+        const btnSwat = document.getElementById("btnMapSwat");
+        const btnIsb = document.getElementById("btnMapIslamabad");
+        const openBtn = document.getElementById("openInMapsBtn");
+        if (!iframe) return;
+
+        iframe.setAttribute("data-switched", "true");
+
+        if (branch === "islamabad") {
+            iframe.src = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3318.847503714243!2d73.0645624!3d33.7128613!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfbf9df175e11d%3A0xe54d6faeebdae812!2sPotohar%20Plaza%2C%20Fazal-e-Haq%20Rd%2C%20Blue%20Area%2C%20Islamabad!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s";
+            if (heading) heading.textContent = "Islamabad Branch Location";
+            if (subtitle) subtitle.textContent = "Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad";
+            if (openBtn) openBtn.href = "https://www.google.com/maps/search/?api=1&query=Potohar+Plaza,+Blue+Area,+Islamabad";
+            if (btnSwat) btnSwat.className = "px-4 py-2 rounded-xl text-slate-600 hover:text-navy hover:bg-white/80 transition-all flex items-center gap-1.5";
+            if (btnIsb) btnIsb.className = "px-4 py-2 rounded-xl bg-navy text-white shadow-sm transition-all flex items-center gap-1.5";
+        } else {
+            iframe.src = "https://maps.google.com/maps?q=Hayat+Market,+Matta,+Swat,+Pakistan&t=&z=16&ie=UTF8&iwloc=&output=embed";
+            if (heading) heading.textContent = "Swat Head Office Location";
+            if (subtitle) subtitle.textContent = "2nd Floor, Hayat Market, Matta Swat, Khyber Pakhtunkhwa, Pakistan";
+            if (openBtn) openBtn.href = "https://www.google.com/maps/search/?api=1&query=Hayat+Market,+Matta,+Swat";
+            if (btnSwat) btnSwat.className = "px-4 py-2 rounded-xl bg-navy text-white shadow-sm transition-all flex items-center gap-1.5";
+            if (btnIsb) btnIsb.className = "px-4 py-2 rounded-xl text-slate-600 hover:text-navy hover:bg-white/80 transition-all flex items-center gap-1.5";
+        }
     };
 
     window.toggleFlightReturnDate = function () {

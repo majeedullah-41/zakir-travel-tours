@@ -1637,7 +1637,9 @@
             setVal("#contactOfficeAddress", isInvalidOrLegacyOffice ? "2nd Floor, Hayat Market, Matta Swat, Khyber Pakhtunkhwa, Pakistan" : rawOffice);
             setVal("#contactOfficeHours", c.officeHours || "Monday to Saturday: 9:30 AM – 8:00 PM (Sunday Closed / WhatsApp Support Active)");
             setVal("#contactOfficeEmail", c.officeEmail || "info@zakirtravels.com / inam@zakirtravels.com");
-            setVal("#contactMapEmbedUrl", c.mapEmbedUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3318.847503714243!2d73.0645624!3d33.7128613!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfbf9df175e11d%3A0xe54d6faeebdae812!2sPotohar%20Plaza%2C%20Fazal-e-Haq%20Rd%2C%20Blue%20Area%2C%20Islamabad!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s");
+            const rawMap = c.mapEmbedUrl || "";
+            const isLegacyMap = !rawMap || /potohar/i.test(rawMap) || /fazal-e-haq/i.test(rawMap);
+            setVal("#contactMapEmbedUrl", isLegacyMap ? "https://maps.google.com/maps?q=Hayat+Market,+Matta,+Swat,+Pakistan&t=&z=16&ie=UTF8&iwloc=&output=embed" : rawMap);
 
             // Populate Page-Specific Content Fields
             const pc = (this.siteConfig && this.siteConfig.pageContent) || window.DEFAULT_PAGE_CONTENT || {};
