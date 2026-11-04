@@ -95,6 +95,25 @@
 
         checkAdminHashRoute();
         window.addEventListener("hashchange", checkAdminHashRoute);
+
+        document.addEventListener("click", (e) => {
+            const target = e.target instanceof Element ? e.target : null;
+            if (!target) return;
+            const filterBtn = target.closest("[data-deal-filter]");
+            if (filterBtn) {
+                window.filterSpecialDealsShowcase(filterBtn.getAttribute("data-deal-filter"));
+                return;
+            }
+            const flyerBtn = target.closest("[data-open-flyer]");
+            if (flyerBtn) {
+                window.openPromotionalFlyerModal(flyerBtn.getAttribute("data-open-flyer"));
+                return;
+            }
+            const bookBtn = target.closest("[data-book-service]");
+            if (bookBtn) {
+                window.openBookingModal(bookBtn.getAttribute("data-book-service"));
+            }
+        });
     }
 
     // ============================================================================
@@ -504,8 +523,8 @@
         const modalAgentSelect = document.getElementById("modalAgentPhone");
         if (modalAgentSelect) {
             modalAgentSelect.innerHTML = `
-                <option value="${managerWA}">${c.managerName || "Inam Khan (Manager)"} - ${c.managerPhone || "+92 349 0558345"}</option>
-                <option value="${secondaryWA}">${c.secondaryName || "Sadiq Ullah"} - ${c.secondaryPhone || "+92 343 4159182"}</option>
+                <option value="${escapeHtmlAttr(managerWA)}">${escapeHtmlAttr(c.managerName || "Inam Khan (Manager)")} - ${escapeHtmlAttr(c.managerPhone || "+92 349 0558345")}</option>
+                <option value="${escapeHtmlAttr(secondaryWA)}">${escapeHtmlAttr(c.secondaryName || "Sadiq Ullah")} - ${escapeHtmlAttr(c.secondaryPhone || "+92 343 4159182")}</option>
             `;
             modalAgentSelect.value = activeWA;
         }
@@ -608,7 +627,7 @@
                 filterBar.classList.remove("hidden");
                 filterBar.innerHTML = `
                     <div class="inline-flex flex-wrap items-center justify-center gap-2 bg-white/90 backdrop-blur-md p-2 rounded-2xl shadow-md border border-teal/20">
-                        <button type="button" onclick="filterSpecialDealsShowcase('ALL')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all flex items-center gap-2 ${
+                            <button type="button" data-deal-filter="ALL" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all flex items-center gap-2 ${
                             selectedSpecialDealFilter === "ALL"
                                 ? "bg-gradient-to-r from-navy to-teal text-white shadow-md scale-[1.02]"
                                 : "text-slate-600 hover:text-navy hover:bg-slate-100"
@@ -619,7 +638,7 @@
                         ${activeDeals
                             .map(
                                 (deal) => `
-                            <button type="button" onclick="filterSpecialDealsShowcase('${escapeHtmlAttr(deal.id)}')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all flex items-center gap-2 ${
+                            <button type="button" data-deal-filter="${escapeHtmlAttr(deal.id)}" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all flex items-center gap-2 ${
                                     selectedSpecialDealFilter === deal.id
                                         ? "bg-gradient-to-r from-navy to-teal text-white shadow-md scale-[1.02]"
                                         : "text-slate-600 hover:text-navy hover:bg-slate-100"
@@ -890,7 +909,7 @@
 
                             <!-- Action Buttons (Compact side-by-side row on Mobile & Laptop) -->
                             <div class="mt-4 sm:mt-7 flex flex-wrap items-center justify-center gap-2 sm:gap-4">
-                                <button type="button" onclick="openBookingModal('${escapeHtmlAttr(bookingLabel.replace(/'/g, "\\'"))}')" class="bg-navy hover:bg-navy-light text-white font-bold px-3.5 sm:px-8 py-2.5 sm:py-3.5 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
+                                <button type="button" data-book-service="${escapeHtmlAttr(bookingLabel)}" class="bg-navy hover:bg-navy-light text-white font-bold px-3.5 sm:px-8 py-2.5 sm:py-3.5 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
                                     <i class="fa-solid fa-calendar-check text-teal-light"></i>
                                     <span>Reserve Your Seat Now</span>
                                 </button>
@@ -900,7 +919,7 @@
                                 </a>
                                 ${
                                     deal.showFlyerButton !== false
-                                        ? `<button type="button" onclick="openPromotionalFlyerModal('${escapeHtmlAttr(deal.id)}')" class="bg-slate-100 hover:bg-teal-accent text-navy font-bold px-3.5 sm:px-6 py-2.5 sm:py-3.5 rounded-xl border border-teal/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
+                                        ? `<button type="button" data-open-flyer="${escapeHtmlAttr(deal.id)}" class="bg-slate-100 hover:bg-teal-accent text-navy font-bold px-3.5 sm:px-6 py-2.5 sm:py-3.5 rounded-xl border border-teal/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
                                             <i class="fa-solid fa-file-image text-teal"></i>
                                             <span>View Latest Flyer</span>
                                            </button>`
@@ -1075,7 +1094,7 @@
 
                     <!-- Action Buttons (Single-line clean buttons) -->
                     <div class="grid grid-cols-2 gap-2 pt-3 border-t border-slate-100">
-                        <button type="button" onclick="openBookingModal('${escapeHtmlAttr(pkg.title.replace(/'/g, "\\'"))} (PKR ${formatPKR(pkg.price)})')" class="bg-navy hover:bg-navy-light text-white font-extrabold text-[11.5px] py-3 px-2.5 rounded-xl shadow-sm hover:shadow transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
+                        <button type="button" data-book-service="${escapeHtmlAttr(`${pkg.title} (PKR ${formatPKR(pkg.price)})`)}" class="bg-navy hover:bg-navy-light text-white font-extrabold text-[11.5px] py-3 px-2.5 rounded-xl shadow-sm hover:shadow transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
                             <i class="fa-solid fa-paper-plane text-teal-light text-[11px]"></i>
                             <span>Quick Book</span>
                         </button>
@@ -1104,7 +1123,7 @@
         select.innerHTML = activeVisas
             .map(
                 (v) =>
-                    `<option value="${v.countryName} (${v.visaType} - PKR ${formatPKR(v.pricePKR)})">${v.flagEmoji || "🌍"} ${v.countryName} — ${v.visaType} (PKR ${formatPKR(v.pricePKR)})</option>`
+                    `<option value="${escapeHtmlAttr(`${v.countryName} (${v.visaType} - PKR ${formatPKR(v.pricePKR)})`)}">${escapeHtmlAttr(v.flagEmoji || "🌍")} ${escapeHtmlAttr(v.countryName)} — ${escapeHtmlAttr(v.visaType)} (PKR ${formatPKR(v.pricePKR)})</option>`
             )
             .join("");
     }
@@ -1136,11 +1155,11 @@
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-center gap-3.5">
                                 <div class="w-12 h-12 rounded-2xl bg-teal-accent text-2xl flex items-center justify-center shrink-0 shadow-sm">
-                                    ${v.flagEmoji || "🌍"}
+                                    ${escapeHtmlAttr(v.flagEmoji || "🌍")}
                                 </div>
                                 <div>
-                                    <h4 class="font-extrabold text-navy text-base">${v.countryName}</h4>
-                                    <span class="inline-block bg-slate-100 text-teal font-bold text-[11px] px-2.5 py-0.5 rounded-md mt-0.5">${v.visaType}</span>
+                                    <h4 class="font-extrabold text-navy text-base">${escapeHtmlAttr(v.countryName)}</h4>
+                                    <span class="inline-block bg-slate-100 text-teal font-bold text-[11px] px-2.5 py-0.5 rounded-md mt-0.5">${escapeHtmlAttr(v.visaType)}</span>
                                 </div>
                             </div>
                             <div class="text-right">
@@ -1152,16 +1171,16 @@
                         <div class="mt-3.5 pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-600">
                             <div class="flex items-center justify-between">
                                 <span class="text-slate-400 font-semibold"><i class="fa-regular fa-clock text-teal mr-1"></i>Processing:</span>
-                                <span class="font-bold text-navy">${v.processingTime}</span>
+                                <span class="font-bold text-navy">${escapeHtmlAttr(v.processingTime)}</span>
                             </div>
                             <p class="text-[11px] text-slate-500 leading-relaxed pt-1">
-                                <strong class="text-slate-700">Docs:</strong> ${v.requirementsSummary}
+                                <strong class="text-slate-700">Docs:</strong> ${escapeHtmlAttr(v.requirementsSummary)}
                             </p>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-2 pt-2">
-                        <button type="button" onclick="openBookingModal('${v.countryName.replace(/'/g, "\\'")} - ${v.visaType.replace(/'/g, "\\'")} (PKR ${formatPKR(v.pricePKR)})')" class="flex-1 text-navy hover:bg-navy hover:text-white font-bold text-xs py-2.5 px-3 rounded-xl bg-slate-100 transition-colors">
+                        <button type="button" data-book-service="${escapeHtmlAttr(`${v.countryName} - ${v.visaType} (PKR ${formatPKR(v.pricePKR)})`)}" class="flex-1 text-navy hover:bg-navy hover:text-white font-bold text-xs py-2.5 px-3 rounded-xl bg-slate-100 transition-colors">
                             Apply / Inquire
                         </button>
                         <a href="https://wa.me/${activeWA}?text=${waMsg}" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 px-3.5 rounded-xl transition-colors flex items-center gap-1.5" title="Inquire on WhatsApp">
@@ -1241,6 +1260,10 @@
     }
 
     function openAdminPortalDrawer() {
+        if (!AdminPortalManager) {
+            window.location.href = "admin.html";
+            return;
+        }
         const drawer = document.getElementById("adminPortalDrawer");
         const mountNode = document.getElementById("adminPortalMount");
         if (!drawer || !mountNode) {

@@ -17,6 +17,15 @@
         return String(str || "").replace(/[^0-9]/g, "");
     }
 
+    function escapeHtml(str) {
+        return String(str == null ? "" : str)
+            .replace(/&/g, "&amp;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+    }
+
     // About Us page team members (ids must match data-team-photo attributes in contact.html)
     const TEAM_MEMBERS = [
         { id: "ceo", name: "Zakir Ullah", role: "CEO", initials: "ZU" },
@@ -177,8 +186,10 @@
             toast.className = `${bgClass} text-white px-4 py-3.5 rounded-2xl shadow-2xl border flex items-center gap-3 text-sm font-bold transform transition-all duration-300 translate-y-2 opacity-0`;
             toast.innerHTML = `
                 <i class="fa-solid ${iconClass} text-lg"></i>
-                <span>${message}</span>
+                <span></span>
             `;
+            const toastLabel = toast.querySelector("span");
+            if (toastLabel) toastLabel.textContent = String(message == null ? "" : message);
             toastContainer.appendChild(toast);
 
             requestAnimationFrame(() => {
@@ -224,30 +235,22 @@
 
                         <div class="bg-gradient-to-r from-[#E6F6F8] to-sky-50 border border-[#0D8A9E]/30 rounded-2xl p-4 mb-5 text-xs text-[#0B2D5B]">
                             <div class="font-extrabold flex items-center gap-1.5 mb-1">
-                                <i class="fa-solid fa-bolt text-amber-500"></i>
-                                <span>10-Second Mobile Quick Portal</span>
+                                <i class="fa-solid fa-shield-halved text-amber-500"></i>
+                                <span>Secure Admin Access</span>
                             </div>
                             <p class="text-slate-600 leading-relaxed">
-                                Tap a staff profile below or enter your credentials to manage Special Flyer Deals, Umrah Packages, Visas, and WhatsApp lead routing.
+                                Sign in with your authorized email and password to manage Special Flyer Deals, Umrah Packages, Visas, and WhatsApp lead routing.
                             </p>
-                            <div class="grid grid-cols-2 gap-2 mt-3">
-                                <button type="button" data-action="quick-fill-login" data-email="inam@zakirtravels.com" data-pass="Zakir2026!" class="bg-white hover:bg-[#0B2D5B] hover:text-white text-[#0B2D5B] border border-[#0B2D5B]/20 font-bold py-2 px-3 rounded-xl text-[11px] transition-all flex items-center justify-center gap-1.5 shadow-sm">
-                                    <i class="fa-solid fa-user-tie"></i> Inam Khan
-                                </button>
-                                <button type="button" data-action="quick-fill-login" data-email="sadiq@zakirtravels.com" data-pass="Zakir2026!" class="bg-white hover:bg-[#0D8A9E] hover:text-white text-[#0D8A9E] border border-[#0D8A9E]/20 font-bold py-2 px-3 rounded-xl text-[11px] transition-all flex items-center justify-center gap-1.5 shadow-sm">
-                                    <i class="fa-solid fa-user-check"></i> Sadiq Ullah
-                                </button>
-                            </div>
                         </div>
 
                         <form id="adminLoginForm" class="space-y-4">
                             <div>
                                 <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Staff Email Address</label>
-                                <input type="email" id="adminLoginEmail" required value="inam@zakirtravels.com" placeholder="inam@zakirtravels.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#0D8A9E] focus:ring-2 focus:ring-[#0D8A9E]/20 transition-all">
+                                <input type="email" id="adminLoginEmail" required placeholder="you@zakirtravels.com" autocomplete="username" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#0D8A9E] focus:ring-2 focus:ring-[#0D8A9E]/20 transition-all">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Password</label>
-                                <input type="password" id="adminLoginPassword" required value="Zakir2026!" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#0D8A9E] focus:ring-2 focus:ring-[#0D8A9E]/20 transition-all">
+                                <input type="password" id="adminLoginPassword" required placeholder="Enter your password" autocomplete="current-password" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#0D8A9E] focus:ring-2 focus:ring-[#0D8A9E]/20 transition-all">
                             </div>
                             <div id="adminLoginError" class="hidden text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl p-3"></div>
                             <button type="submit" class="w-full bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-extrabold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
@@ -1532,8 +1535,8 @@
             const secWA = cleanWhatsAppDigits((secWAInput && secWAInput.value) || c.secondaryWhatsApp || "923434159182");
 
             routingSelect.innerHTML = `
-                <option value="manager">Primary: ${mgrName} — ${mgrWA}</option>
-                <option value="secondary">Secondary: ${secName} — ${secWA}</option>
+                <option value="manager">Primary: ${escapeHtml(mgrName)} — ${escapeHtml(mgrWA)}</option>
+                <option value="secondary">Secondary: ${escapeHtml(secName)} — ${escapeHtml(secWA)}</option>
             `;
             routingSelect.value = this.selectedRoutingRole === "secondary" ? "secondary" : "manager";
 
@@ -1785,14 +1788,14 @@
                             <!-- Dual Image Mini Banner with Floating Price Shield -->
                             <div class="relative grid grid-cols-2 gap-1 bg-slate-900 h-40 overflow-hidden">
                                 <div class="relative h-full overflow-hidden">
-                                    <img src="${deal.madinahImageUrl}" onerror="this.src='https://placehold.co/600x400/0B2D5B/FFFFFF?text=Madinah'" class="w-full h-full object-cover opacity-90">
+                                    <img src="${escapeHtml(deal.madinahImageUrl)}" onerror="this.src='https://placehold.co/600x400/0B2D5B/FFFFFF?text=Madinah'" class="w-full h-full object-cover opacity-90">
                                     <div class="absolute inset-0 bg-gradient-to-t from-[#071E3E]/90 via-transparent to-transparent"></div>
-                                    <span class="absolute bottom-2 left-2.5 text-[10px] font-bold text-white">${deal.leftFrameTitle || "Madinah"}</span>
+                                    <span class="absolute bottom-2 left-2.5 text-[10px] font-bold text-white">${escapeHtml(deal.leftFrameTitle || "Madinah")}</span>
                                 </div>
                                 <div class="relative h-full overflow-hidden">
-                                    <img src="${deal.makkahImageUrl}" onerror="this.src='https://placehold.co/600x400/0D8A9E/FFFFFF?text=Makkah'" class="w-full h-full object-cover opacity-90">
+                                    <img src="${escapeHtml(deal.makkahImageUrl)}" onerror="this.src='https://placehold.co/600x400/0D8A9E/FFFFFF?text=Makkah'" class="w-full h-full object-cover opacity-90">
                                     <div class="absolute inset-0 bg-gradient-to-t from-[#071E3E]/90 via-transparent to-transparent"></div>
-                                    <span class="absolute bottom-2 right-2.5 text-[10px] font-bold text-white">${deal.rightFrameTitle || "Makkah"}</span>
+                                    <span class="absolute bottom-2 right-2.5 text-[10px] font-bold text-white">${escapeHtml(deal.rightFrameTitle || "Makkah")}</span>
                                 </div>
 
                                 <!-- Top Left Status Badges -->
@@ -1819,7 +1822,7 @@
                                     <div class="bg-gradient-to-b from-[#0B2D5B] via-[#0D8A9E] to-[#0B2D5B] text-white px-4 py-2 rounded-2xl border-2 border-white shadow-2xl text-center">
                                         <span class="text-[8px] font-bold uppercase tracking-widest text-sky-200 block">STARTING FROM</span>
                                         <div class="text-lg font-black leading-tight">PKR ${formatPKR(deal.startingPrice)}</div>
-                                        <span class="text-[8px] font-bold uppercase text-teal-100 block">${deal.priceUnit || "PER PERSON"}</span>
+                                        <span class="text-[8px] font-bold uppercase text-teal-100 block">${escapeHtml(deal.priceUnit || "PER PERSON")}</span>
                                     </div>
                                 </div>
                             </div>
@@ -1828,11 +1831,11 @@
                             <div class="p-5 space-y-3">
                                 <div class="flex items-start justify-between gap-2">
                                     <div>
-                                        <span class="text-xs font-extrabold text-[#0D8A9E] block">${deal.monthLabel}</span>
-                                        <h4 class="text-lg font-black text-[#0B2D5B] uppercase tracking-tight">${deal.title}</h4>
+                                        <span class="text-xs font-extrabold text-[#0D8A9E] block">${escapeHtml(deal.monthLabel)}</span>
+                                        <h4 class="text-lg font-black text-[#0B2D5B] uppercase tracking-tight">${escapeHtml(deal.title)}</h4>
                                     </div>
                                     <span class="bg-[#E6F6F8] text-[#0D8A9E] text-[10px] font-extrabold px-2.5 py-1 rounded-lg">
-                                        ${deal.badgeTag || "All-Inclusive"}
+                                        ${escapeHtml(deal.badgeTag || "All-Inclusive")}
                                     </span>
                                 </div>
 
@@ -1840,15 +1843,15 @@
                                 <div class="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-2xl border border-slate-200/80 text-center text-xs">
                                     <div>
                                         <span class="text-[10px] text-slate-400 font-bold uppercase block">Departure</span>
-                                        <strong class="text-[#0B2D5B] font-extrabold">${deal.departureDate}</strong>
+                                        <strong class="text-[#0B2D5B] font-extrabold">${escapeHtml(deal.departureDate)}</strong>
                                     </div>
                                     <div class="border-x border-slate-200">
                                         <span class="text-[10px] text-slate-400 font-bold uppercase block">Return</span>
-                                        <strong class="text-[#0B2D5B] font-extrabold">${deal.returnDate}</strong>
+                                        <strong class="text-[#0B2D5B] font-extrabold">${escapeHtml(deal.returnDate)}</strong>
                                     </div>
                                     <div>
                                         <span class="text-[10px] text-slate-400 font-bold uppercase block">Duration</span>
-                                        <strong class="text-[#0D8A9E] font-extrabold">${deal.duration}</strong>
+                                        <strong class="text-[#0D8A9E] font-extrabold">${escapeHtml(deal.duration)}</strong>
                                     </div>
                                 </div>
 
@@ -1873,18 +1876,18 @@
                         <!-- CRUD Action Bar -->
                         <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
                             <div class="flex items-center gap-1.5">
-                                <button type="button" data-action="move-deal" data-id="${deal.id}" data-dir="up" ${idx === 0 ? "disabled" : ""} class="w-8 h-8 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs" title="Move Up">
+                                <button type="button" data-action="move-deal" data-id="${escapeHtml(deal.id)}" data-dir="up" ${idx === 0 ? "disabled" : ""} class="w-8 h-8 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs" title="Move Up">
                                     <i class="fa-solid fa-arrow-up"></i>
                                 </button>
-                                <button type="button" data-action="move-deal" data-id="${deal.id}" data-dir="down" ${idx === this.specialDeals.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs" title="Move Down">
+                                <button type="button" data-action="move-deal" data-id="${escapeHtml(deal.id)}" data-dir="down" ${idx === this.specialDeals.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs" title="Move Down">
                                     <i class="fa-solid fa-arrow-down"></i>
                                 </button>
-                                <button type="button" data-action="toggle-deal-active" data-id="${deal.id}" class="px-3 py-1.5 rounded-xl text-xs font-bold border ${deal.isActive ? "bg-white text-emerald-700 border-emerald-200 hover:bg-emerald-50" : "bg-slate-200 text-slate-700 border-slate-300"}">
+                                <button type="button" data-action="toggle-deal-active" data-id="${escapeHtml(deal.id)}" class="px-3 py-1.5 rounded-xl text-xs font-bold border ${deal.isActive ? "bg-white text-emerald-700 border-emerald-200 hover:bg-emerald-50" : "bg-slate-200 text-slate-700 border-slate-300"}">
                                     ${deal.isActive ? "Visible" : "Hidden"}
                                 </button>
                                 ${
                                     !deal.isPrimary
-                                        ? `<button type="button" data-action="set-primary-deal" data-id="${deal.id}" class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200" title="Set as Primary Deal">
+                                        ? `<button type="button" data-action="set-primary-deal" data-id="${escapeHtml(deal.id)}" class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200" title="Set as Primary Deal">
                                             <i class="fa-regular fa-star mr-1"></i>Set Primary
                                            </button>`
                                         : ""
@@ -1892,13 +1895,13 @@
                             </div>
 
                             <div class="flex items-center gap-1.5">
-                                <button type="button" data-action="duplicate-deal" data-id="${deal.id}" class="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold" title="Duplicate Deal">
+                                <button type="button" data-action="duplicate-deal" data-id="${escapeHtml(deal.id)}" class="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold" title="Duplicate Deal">
                                     <i class="fa-regular fa-copy mr-1"></i>Clone
                                 </button>
-                                <button type="button" data-action="edit-deal" data-id="${deal.id}" class="px-3.5 py-1.5 rounded-xl bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-xs font-bold transition-colors shadow-sm">
+                                <button type="button" data-action="edit-deal" data-id="${escapeHtml(deal.id)}" class="px-3.5 py-1.5 rounded-xl bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-xs font-bold transition-colors shadow-sm">
                                     <i class="fa-solid fa-pen mr-1"></i>Edit Deal
                                 </button>
-                                <button type="button" data-action="delete-deal" data-id="${deal.id}" class="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors" title="Delete Deal">
+                                <button type="button" data-action="delete-deal" data-id="${escapeHtml(deal.id)}" class="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors" title="Delete Deal">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </div>
@@ -2112,37 +2115,37 @@
                         <div class="flex flex-wrap items-center justify-between gap-2">
                             <div class="flex items-center gap-1.5">
                                 <span class="bg-[#0B2D5B] text-white text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full">#${idx + 1}</span>
-                                <span class="bg-[#E6F6F8] text-[#0D8A9E] text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full">${pkg.badgeText || "Package"}</span>
+                                <span class="bg-[#E6F6F8] text-[#0D8A9E] text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full">${escapeHtml(pkg.badgeText || "Package")}</span>
                                 ${pkg.isFeatured ? `<span class="bg-amber-100 text-amber-800 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-star mr-1"></i>Featured</span>` : ""}
                             </div>
                             <span class="text-lg font-black text-[#0D8A9E]">PKR ${formatPKR(pkg.price)}</span>
                         </div>
-                        <h4 class="text-base font-black text-[#0B2D5B]">${pkg.title}</h4>
+                        <h4 class="text-base font-black text-[#0B2D5B]">${escapeHtml(pkg.title)}</h4>
                         <div class="text-xs text-slate-500 grid grid-cols-2 gap-1.5 bg-slate-50 p-3 rounded-2xl">
-                            <span><i class="fa-solid fa-bed text-[#0D8A9E] mr-1"></i>${pkg.roomType}</span>
-                            <span><i class="fa-regular fa-clock text-[#0D8A9E] mr-1"></i>${pkg.duration}</span>
-                            <span><i class="fa-solid fa-plane-departure text-[#0D8A9E] mr-1"></i>${pkg.departureDate}</span>
-                            <span><i class="fa-solid fa-kaaba text-[#0D8A9E] mr-1"></i>${pkg.makkahHotelDist}</span>
+                            <span><i class="fa-solid fa-bed text-[#0D8A9E] mr-1"></i>${escapeHtml(pkg.roomType)}</span>
+                            <span><i class="fa-regular fa-clock text-[#0D8A9E] mr-1"></i>${escapeHtml(pkg.duration)}</span>
+                            <span><i class="fa-solid fa-plane-departure text-[#0D8A9E] mr-1"></i>${escapeHtml(pkg.departureDate)}</span>
+                            <span><i class="fa-solid fa-kaaba text-[#0D8A9E] mr-1"></i>${escapeHtml(pkg.makkahHotelDist)}</span>
                         </div>
                     </div>
 
                     <div class="flex flex-wrap items-center justify-between gap-1.5 pt-2 border-t border-slate-100">
                         <div class="flex items-center gap-1">
-                            <button type="button" data-action="move-pkg" data-id="${pkg.id}" data-dir="up" ${idx === 0 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
+                            <button type="button" data-action="move-pkg" data-id="${escapeHtml(pkg.id)}" data-dir="up" ${idx === 0 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
                                 <i class="fa-solid fa-arrow-up"></i>
                             </button>
-                            <button type="button" data-action="move-pkg" data-id="${pkg.id}" data-dir="down" ${idx === this.packages.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
+                            <button type="button" data-action="move-pkg" data-id="${escapeHtml(pkg.id)}" data-dir="down" ${idx === this.packages.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
                                 <i class="fa-solid fa-arrow-down"></i>
                             </button>
-                            <button type="button" data-action="toggle-pkg-active" data-id="${pkg.id}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${pkg.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-200 text-slate-700"}">
+                            <button type="button" data-action="toggle-pkg-active" data-id="${escapeHtml(pkg.id)}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${pkg.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-200 text-slate-700"}">
                                 ${pkg.isActive ? "Active" : "Hidden"}
                             </button>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <button type="button" data-action="edit-pkg" data-id="${pkg.id}" class="px-3.5 py-1.5 rounded-lg bg-[#0B2D5B] text-white hover:bg-[#0D8A9E] text-xs font-bold transition-colors">
+                            <button type="button" data-action="edit-pkg" data-id="${escapeHtml(pkg.id)}" class="px-3.5 py-1.5 rounded-lg bg-[#0B2D5B] text-white hover:bg-[#0D8A9E] text-xs font-bold transition-colors">
                                 <i class="fa-solid fa-pen mr-1"></i>Edit
                             </button>
-                            <button type="button" data-action="delete-pkg" data-id="${pkg.id}" class="w-8 h-8 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors">
+                            <button type="button" data-action="delete-pkg" data-id="${escapeHtml(pkg.id)}" class="w-8 h-8 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -2169,37 +2172,37 @@
                     <div class="flex items-start justify-between gap-3">
                         <div class="flex items-start gap-3.5">
                             <div class="w-12 h-12 rounded-2xl bg-[#E6F6F8] text-2xl flex items-center justify-center shrink-0">
-                                ${v.flagEmoji || "🌍"}
+                                ${escapeHtml(v.flagEmoji || "🌍")}
                             </div>
                             <div>
-                                <h4 class="text-base font-black text-[#0B2D5B]">${v.countryName}</h4>
-                                <span class="bg-slate-100 text-slate-700 text-[10px] font-bold uppercase px-2 py-0.5 rounded-md">${v.visaType}</span>
-                                <p class="text-[11px] text-slate-500 mt-2">${v.requirementsSummary}</p>
+                                <h4 class="text-base font-black text-[#0B2D5B]">${escapeHtml(v.countryName)}</h4>
+                                <span class="bg-slate-100 text-slate-700 text-[10px] font-bold uppercase px-2 py-0.5 rounded-md">${escapeHtml(v.visaType)}</span>
+                                <p class="text-[11px] text-slate-500 mt-2">${escapeHtml(v.requirementsSummary)}</p>
                             </div>
                         </div>
                         <div class="text-right shrink-0">
                             <span class="text-sm font-black text-[#0D8A9E] block">PKR ${formatPKR(v.pricePKR)}</span>
-                            <span class="text-[10px] text-slate-400 font-semibold">${v.processingTime}</span>
+                            <span class="text-[10px] text-slate-400 font-semibold">${escapeHtml(v.processingTime)}</span>
                         </div>
                     </div>
 
                     <div class="flex flex-wrap items-center justify-between gap-1.5 pt-2 border-t border-slate-100">
                         <div class="flex items-center gap-1">
-                            <button type="button" data-action="move-visa" data-id="${v.id}" data-dir="up" ${idx === 0 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
+                            <button type="button" data-action="move-visa" data-id="${escapeHtml(v.id)}" data-dir="up" ${idx === 0 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
                                 <i class="fa-solid fa-arrow-up"></i>
                             </button>
-                            <button type="button" data-action="move-visa" data-id="${v.id}" data-dir="down" ${idx === this.visas.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
+                            <button type="button" data-action="move-visa" data-id="${escapeHtml(v.id)}" data-dir="down" ${idx === this.visas.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
                                 <i class="fa-solid fa-arrow-down"></i>
                             </button>
-                            <button type="button" data-action="toggle-visa-active" data-id="${v.id}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${v.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-200 text-slate-700"}">
+                            <button type="button" data-action="toggle-visa-active" data-id="${escapeHtml(v.id)}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${v.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-200 text-slate-700"}">
                                 ${v.isActive ? "Active" : "Hidden"}
                             </button>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <button type="button" data-action="edit-visa" data-id="${v.id}" class="px-3.5 py-1.5 rounded-lg bg-[#0B2D5B] text-white hover:bg-[#0D8A9E] text-xs font-bold transition-colors">
+                            <button type="button" data-action="edit-visa" data-id="${escapeHtml(v.id)}" class="px-3.5 py-1.5 rounded-lg bg-[#0B2D5B] text-white hover:bg-[#0D8A9E] text-xs font-bold transition-colors">
                                 <i class="fa-solid fa-pen mr-1"></i>Edit
                             </button>
-                            <button type="button" data-action="delete-visa" data-id="${v.id}" class="w-8 h-8 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors">
+                            <button type="button" data-action="delete-visa" data-id="${escapeHtml(v.id)}" class="w-8 h-8 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -2537,9 +2540,6 @@
 
                 if (action === "save-push-all") {
                     await this.saveAllPortalChanges();
-                } else if (action === "quick-fill-login") {
-                    this.container.querySelector("#adminLoginEmail").value = actionEl.getAttribute("data-email");
-                    this.container.querySelector("#adminLoginPassword").value = actionEl.getAttribute("data-pass");
                 } else if (action === "logout") {
                     await db.logout();
                     this.showToast("Admin session locked.", "warning");

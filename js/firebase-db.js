@@ -391,29 +391,9 @@
         SPECIAL_DEALS: "zakir_db_special_deals_v1",
         UMRAH_PACKAGES: "zakir_db_umrah_packages_v1",
         VISA_SERVICES: "zakir_db_visa_services_v1",
-        AUTH_SESSION: "zakir_auth_session_v1"
+        AUTH_SESSION: "zakir_auth_session_v1",
+        LOCAL_ADMIN_PASS: "zakir_db_local_admin_pass_v1"
     };
-
-    const STAFF_ACCOUNTS = [
-        {
-            email: "inam@zakirtravels.com",
-            password: "Zakir2026!",
-            displayName: "Inam Khan (Manager)",
-            role: "Manager"
-        },
-        {
-            email: "sadiq@zakirtravels.com",
-            password: "Zakir2026!",
-            displayName: "Sadiq Ullah",
-            role: "Travel Consultant"
-        },
-        {
-            email: "admin@zakirtravels.com",
-            password: "admin123",
-            displayName: "Zakir Travels Admin",
-            role: "Administrator"
-        }
-    ];
 
     class ZakirBackendService {
         constructor() {
@@ -1331,8 +1311,25 @@
             };
         }
 
+        hasLocalAdminPassphrase() {
+            try {
+                return Boolean(localStorage.getItem(STORAGE_KEYS.LOCAL_ADMIN_PASS));
+            } catch (_) {
+                return false;
+            }
+        }
+
+        setLocalAdminPassphrase(passphrase) {
+            const value = String(passphrase || "");
+            if (value.length < 8) {
+                throw new Error("Local admin passphrase must be at least 8 characters.");
+            }
+            localStorage.setItem(STORAGE_KEYS.LOCAL_ADMIN_PASS, value);
+        }
+
         getCurrentUser() {
-            if (this.mode === "firebase" && this.auth && this.auth.currentUser) {
+            if (this.mode === "firebase") {
+                if (!this.auth || !this.auth.currentUser) return null;
                 const u = this.auth.currentUser;
                 return {
                     email: u.email,
@@ -1340,6 +1337,7 @@
                     role: "Admin"
                 };
             }
+            if (!this.hasLocalAdminPassphrase()) return null;
             try {
                 const raw = localStorage.getItem(STORAGE_KEYS.AUTH_SESSION);
                 return raw ? JSON.parse(raw) : null;
@@ -1352,45 +1350,34 @@
             const cleanEmail = String(email || "").trim().toLowerCase();
             const cleanPass = String(password || "");
 
-            if (!cleanEmail || !cleanPass) {
-                throw new Error("Please enter both email and password.");
+            if (!cleanPass) {
+                throw new Error("Please enter your password.");
             }
 
             if (this.mode === "firebase" && this.auth) {
-                try {
-                    const cred = await this.auth.signInWithEmailAndPassword(cleanEmail, cleanPass);
-                    const userObj = {
-                        email: cred.user.email,
-                        displayName: cred.user.displayName || cred.user.email,
-                        role: "Admin",
-                        loggedInAt: new Date().toISOString()
-                    };
-                    localStorage.setItem(STORAGE_KEYS.AUTH_SESSION, JSON.stringify(userObj));
-                    this._notifyAuthListeners(userObj);
-                    this._broadcastChange("AUTH_UPDATED");
-                    return userObj;
-                } catch (fbErr) {
-                    const staffMatch = STAFF_ACCOUNTS.find(
-                        (a) => a.email.toLowerCase() === cleanEmail && a.password === cleanPass
-                    );
-                    if (!staffMatch) {
-                        throw new Error(fbErr.message || "Invalid login credentials.");
-                    }
-                }
+                const cred = await this.auth.signInWithEmailAndPassword(cleanEmail, cleanPass);
+                const userObj = {
+                    email: cred.user.email,
+                    displayName: cred.user.displayName || cred.user.email,
+                    role: "Admin",
+                    loggedInAt: new Date().toISOString()
+                };
+                localStorage.setItem(STORAGE_KEYS.AUTH_SESSION, JSON.stringify(userObj));
+                this._notifyAuthListeners(userObj);
+                this._broadcastChange("AUTH_UPDATED");
+                return userObj;
             }
 
-            const matched = STAFF_ACCOUNTS.find(
-                (a) => a.email.toLowerCase() === cleanEmail && a.password === cleanPass
-            );
-
-            if (!matched) {
-                throw new Error("Invalid email or password. Use Inam Khan or Sadiq Ullah's staff credentials.");
+            if (!this.hasLocalAdminPassphrase()) {
+                this.setLocalAdminPassphrase(cleanPass);
+            } else if (localStorage.getItem(STORAGE_KEYS.LOCAL_ADMIN_PASS) !== cleanPass) {
+                throw new Error("Incorrect local admin passphrase.");
             }
 
             const sessionUser = {
-                email: matched.email,
-                displayName: matched.displayName,
-                role: matched.role,
+                email: cleanEmail || "local-admin@zakirtravels.local",
+                displayName: cleanEmail || "Local Admin",
+                role: "Local Admin",
                 loggedInAt: new Date().toISOString()
             };
 
