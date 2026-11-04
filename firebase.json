@@ -1,18 +1,4 @@
 {
-  "hosting": {
-    "public": ".",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "/admin",
-        "destination": "/admin.html"
-      }
-    ]
-  },
   "firestore": {
     "rules": "firestore.rules"
   },
@@ -20,4 +6,3 @@
     "rules": "storage.rules"
   }
 }
-

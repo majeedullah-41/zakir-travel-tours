@@ -8,10 +8,12 @@
     { "source": "/umrah-packages", "destination": "/umrah-packages.html" },
     { "source": "/visas", "destination": "/visa-services.html" },
     { "source": "/visa-services", "destination": "/visa-services.html" },
-    { "source": "/calculator", "destination": "/calculator.html" },
-    { "source": "/estimator", "destination": "/calculator.html" },
     { "source": "/contact", "destination": "/contact.html" },
     { "source": "/contact-us", "destination": "/contact.html" }
+  ],
+  "redirects": [
+    { "source": "/calculator", "destination": "/umrah-packages#package-estimator", "permanent": false },
+    { "source": "/estimator", "destination": "/umrah-packages#package-estimator", "permanent": false }
   ],
   "headers": [
     {
