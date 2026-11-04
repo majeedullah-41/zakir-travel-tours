@@ -91,6 +91,14 @@
                 transform: translateY(-3px);
                 box-shadow: 0 16px 35px -10px rgba(11, 45, 91, 0.14);
             }
+            textarea {
+                field-sizing: content;
+                overflow-y: hidden;
+                resize: vertical;
+            }
+            input[type="text"] {
+                field-sizing: content;
+            }
         `;
         document.head.appendChild(style);
     }
@@ -518,75 +526,6 @@
                         <!-- ========================================================== -->
                         <div id="admin-panel-umrah" class="admin-tab-panel hidden space-y-6 anim-fade-up">
 
-                            <!-- Primary Umrah Flyer Deal Quick Update -->
-                            <section class="bg-white rounded-3xl shadow-card border border-slate-200/80 overflow-hidden">
-                                <div class="bg-gradient-to-r from-[#0B2D5B] via-[#16437E] to-[#0D8A9E] px-5 sm:px-6 py-4 text-white flex flex-wrap items-center justify-between gap-3">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center">
-                                            <i class="fa-solid fa-bolt text-[#FDE68A]"></i>
-                                        </div>
-                                        <div>
-                                            <span class="text-[10px] font-black uppercase tracking-widest text-[#BFEFF6] block">Primary Flyer Deal</span>
-                                            <h3 class="text-base sm:text-lg font-black leading-tight">Quick Update Umrah Offer</h3>
-                                        </div>
-                                    </div>
-                                    <div class="bg-white/10 border border-white/15 rounded-xl px-3.5 py-1.5 flex items-center gap-2">
-                                        <i class="fa-solid fa-tag text-[#15B2CB]"></i>
-                                        <div>
-                                            <span class="text-[9px] uppercase tracking-wider text-[#BFEFF6] block leading-none">Live Price</span>
-                                            <span id="livePreviewPriceBadge" class="text-xs sm:text-sm font-black text-white">PKR 232,000</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <form id="quickUpdateForm" class="p-5 sm:p-6 space-y-4">
-                                    <p class="text-xs text-slate-500 leading-relaxed">
-                                        Update the headline price, departure date, and season label for the primary Umrah flyer deal. The homepage and room rates update automatically when you publish.
-                                    </p>
-
-                                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
-                                        <div class="sm:col-span-4">
-                                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
-                                                Starting Price (PKR)
-                                            </label>
-                                            <div class="relative">
-                                                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-[#0B2D5B]">PKR</span>
-                                                <input type="number" id="quickStartingPrice" min="1000" step="500" required
-                                                    class="w-full bg-slate-50 border border-slate-200 text-[#0B2D5B] font-black text-base rounded-xl pl-12 pr-3.5 py-3 focus:outline-none focus:border-[#0D8A9E] focus:ring-2 focus:ring-[#0D8A9E]/20 transition-all">
-                                            </div>
-                                        </div>
-
-                                        <div class="sm:col-span-3">
-                                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
-                                                Next Departure Date
-                                            </label>
-                                            <input type="text" id="quickDepartureDate" required placeholder="e.g. Jan 26, 2026"
-                                                class="w-full bg-slate-50 border border-slate-200 text-[#0B2D5B] font-extrabold text-sm rounded-xl px-3.5 py-3.5 focus:outline-none focus:border-[#0D8A9E] focus:ring-2 focus:ring-[#0D8A9E]/20 transition-all">
-                                        </div>
-
-                                        <div class="sm:col-span-2">
-                                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
-                                                Season / Month
-                                            </label>
-                                            <input type="text" id="quickMonthLabel" required placeholder="e.g. Ramzan"
-                                                class="w-full bg-slate-50 border border-slate-200 text-[#0B2D5B] font-extrabold text-sm rounded-xl px-3.5 py-3.5 focus:outline-none focus:border-[#0D8A9E] focus:ring-2 focus:ring-[#0D8A9E]/20 transition-all">
-                                        </div>
-
-                                        <div class="sm:col-span-3">
-                                            <button type="submit" class="w-full bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black py-3.5 px-4 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 text-sm">
-                                                <i class="fa-solid fa-circle-check"></i>
-                                                <span>Publish Update</span>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex items-center gap-2 text-[11px] font-bold text-[#0D8A9E]">
-                                        <i class="fa-solid fa-arrows-rotate"></i>
-                                        <span id="quickUpdateTierHint">Room rates adjust automatically with the main deal price</span>
-                                    </div>
-                                </form>
-                            </section>
-
                             <!-- Header Bar for Special Flyer Deals CRUD -->
                             <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-card border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div>
@@ -603,10 +542,6 @@
                                 </div>
 
                                 <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-                                    <button type="button" data-action="quick-add-ramzan-deal" class="bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#8A6D0B] border border-[#D4AF37]/30 font-extrabold text-xs px-4 py-3 rounded-2xl transition-all flex items-center gap-1.5 shadow-sm">
-                                        <i class="fa-solid fa-moon text-[#8A6D0B]"></i>
-                                        <span>+ Quick Add Ramzan Deal</span>
-                                    </button>
                                     <button type="button" data-action="open-deal-modal" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg transition-all active:scale-95 flex items-center gap-2">
                                         <i class="fa-solid fa-plus"></i>
                                         <span>Add New Special Deal</span>
@@ -1484,6 +1419,7 @@
                     modeBadge.innerHTML =
                         `<span class="w-1.5 h-1.5 rounded-full bg-[#15B2CB] animate-ping"></span> Live`;
                 }
+                this._autoGrowFields(dashView);
             } else {
                 authView.classList.remove("hidden");
                 dashView.classList.add("hidden");
@@ -1520,11 +1456,6 @@
         }
 
         _updateLivePreviewBadges() {
-            const s = (this.siteConfig && this.siteConfig.spotlight) || {};
-            const badge = this.container.querySelector("#livePreviewPriceBadge");
-            if (badge) {
-                badge.textContent = `PKR ${formatPKR(s.startingPrice || 232000)} (${s.monthLabel || "January"})`;
-            }
             this._syncRoutingSelectOptions();
         }
 
@@ -1544,10 +1475,6 @@
                 const el = this.container.querySelector(sel);
                 if (el) el.checked = Boolean(val);
             };
-
-            setVal("#quickStartingPrice", s.startingPrice ?? 232000);
-            setVal("#quickDepartureDate", s.departureDate ?? "Jan 26, 2026");
-            setVal("#quickMonthLabel", s.monthLabel ?? "January");
 
             setVal("#spotMonthLabel", s.monthLabel ?? "January");
             setVal("#spotTitle", s.title ?? "UMRAH PACKAGE");
@@ -1711,6 +1638,7 @@
             TEAM_MEMBERS.forEach((m) => this._setTeamPhotoPreview(m.id, teamPhotos[m.id] || ""));
 
             this._updateLivePreviewBadges();
+            this._autoGrowFields();
         }
 
         _setTeamPhotoPreview(memberId, url) {
@@ -1886,7 +1814,7 @@
         async saveAllPortalChanges() {
             const db = window.zakirDB;
 
-            const startingPrice = Number(this.container.querySelector("#quickStartingPrice").value || this.container.querySelector("#spotStartingPrice").value);
+            const startingPrice = Number(this.container.querySelector("#spotStartingPrice").value);
             const sharingPrice = Number(this.container.querySelector("#rateSharing").value);
             const quadPrice = Number(this.container.querySelector("#rateQuad").value);
             const triplePrice = Number(this.container.querySelector("#rateTriple").value);
@@ -1919,9 +1847,6 @@
             const promotionalFlyerUrl = this.container.querySelector("#inputFlyerUrl").value.trim();
             const showFlyerOnHomepage = this.container.querySelector("#chkShowFlyerButton").checked;
 
-            const quickMonth = this.container.querySelector("#quickMonthLabel").value.trim();
-            const quickDep = this.container.querySelector("#quickDepartureDate").value.trim();
-
             const getVal = (sel, fallback = "") => {
                 const el = this.container.querySelector(sel);
                 return el ? el.value.trim() : fallback;
@@ -1936,11 +1861,11 @@
             await db.updateSiteConfig({
                 teamPhotos,
                 spotlight: {
-                    monthLabel: quickMonth || getVal("#spotMonthLabel", "January"),
+                    monthLabel: getVal("#spotMonthLabel", "January"),
                     title: getVal("#spotTitle", "UMRAH PACKAGE") || "UMRAH PACKAGE",
                     startingPrice,
                     priceUnit: getVal("#spotPriceUnit", "PER PERSON (SHARING)") || "PER PERSON (SHARING)",
-                    departureDate: quickDep || getVal("#spotDepartureDate", "Jan 26, 2026"),
+                    departureDate: getVal("#spotDepartureDate", "Jan 26, 2026"),
                     returnDate: getVal("#spotReturnDate", "Nov 10, 2026") || "Nov 10, 2026",
                     duration: getVal("#spotDuration", "14 Nights") || "14 Nights",
                     madinahImageUrl: madinahImageUrl || this.siteConfig.spotlight.madinahImageUrl,
@@ -2184,6 +2109,16 @@
                 .join("");
         }
 
+        _autoGrowFields(root) {
+            const scope = root || this.container;
+            if (!scope || !scope.querySelectorAll) return;
+            scope.querySelectorAll("textarea").forEach((el) => {
+                if (!el.offsetParent) return;
+                el.style.height = "auto";
+                el.style.height = `${el.scrollHeight}px`;
+            });
+        }
+
         _switchTab(tabName) {
             this.activeTab = tabName;
             this.container.querySelectorAll(".admin-tab-btn").forEach((btn) => {
@@ -2200,6 +2135,8 @@
                     panel.classList.toggle("hidden", t !== tabName);
                 }
             });
+
+            this._autoGrowFields(this.container.querySelector(`#admin-panel-${tabName}`));
         }
 
         _switchCrudSubtab(subtab) {
@@ -2212,6 +2149,14 @@
 
         _bindGlobalEvents() {
             const db = window.zakirDB;
+
+            this.container.addEventListener("input", (e) => {
+                const target = e.target;
+                if (target && target.tagName === "TEXTAREA") {
+                    target.style.height = "auto";
+                    target.style.height = `${target.scrollHeight}px`;
+                }
+            });
 
             const loginForm = this.container.querySelector("#adminLoginForm");
             if (loginForm) {
@@ -2231,8 +2176,7 @@
                 });
             }
 
-            // Sync Quick Update Bar with Calculator Tiers
-            const quickPriceEl = this.container.querySelector("#quickStartingPrice");
+            // Keep Calculator Tiers in sync with the primary deal price
             const spotPriceInput = this.container.querySelector("#spotStartingPrice");
             const autoScaleChk = this.container.querySelector("#calcAutoScaleToggle");
 
@@ -2246,14 +2190,8 @@
                 }
             };
 
-            if (quickPriceEl) {
-                quickPriceEl.addEventListener("input", () => {
-                    if (spotPriceInput) spotPriceInput.value = quickPriceEl.value;
-                    syncScaledInputs(quickPriceEl.value);
-                });
-            }
-            if (autoScaleChk && quickPriceEl) {
-                autoScaleChk.addEventListener("change", () => syncScaledInputs(quickPriceEl.value));
+            if (autoScaleChk && spotPriceInput) {
+                autoScaleChk.addEventListener("change", () => syncScaledInputs(spotPriceInput.value));
             }
 
             // Live sync the Routing Dropdown options whenever Manager/Secondary Name or WhatsApp is edited
@@ -2272,15 +2210,6 @@
                     }
                 }
             );
-
-            // Quick Update Form Submit
-            const quickForm = this.container.querySelector("#quickUpdateForm");
-            if (quickForm) {
-                quickForm.addEventListener("submit", async (e) => {
-                    e.preventDefault();
-                    await this.saveAllPortalChanges();
-                });
-            }
 
             // Calculator & Media Form Submit
             const spotForm = this.container.querySelector("#spotlightAndCalcForm");
@@ -2551,31 +2480,6 @@
                     } catch (err) {
                         this.showToast(err.message, "error");
                     }
-                } else if (action === "quick-add-ramzan-deal") {
-                    await db.saveSpecialDeal({
-                        monthLabel: "Ramzan Ashra Special",
-                        title: "RAMZAN UMRAH DEAL",
-                        badgeTag: "Limited VIP Seats",
-                        startingPrice: 315000,
-                        priceUnit: "PER PERSON (SHARING)",
-                        departureDate: "1st Ramzan 2026",
-                        returnDate: "20th Ramzan / Eid",
-                        duration: "20 Nights",
-                        leftFrameTitle: "Madinah Munawwarah",
-                        leftFrameBadge: "Markazia Walking Stay",
-                        madinahHotel: "Al Eiman Royal / Similar (150m Markazia)",
-                        madinahImageUrl:
-                            "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=900&q=80",
-                        rightFrameTitle: "Makkah Mukarramah",
-                        rightFrameBadge: "Near Haram Iftar Options",
-                        makkahHotel: "Swissotel / Le Meridien Towers / Similar",
-                        makkahImageUrl:
-                            "https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?auto=format&fit=crop&w=900&q=80",
-                        servicesIncluded: { roundTrip: true, visa: true, hotel: true, transport: true },
-                        isActive: true,
-                        isPrimary: false
-                    });
-                    this.showToast("Ramzan Special Flyer Deal added & live on website!");
                 } else if (action === "open-pkg-modal") {
                     this._openPkgModal(null);
                 } else if (action === "close-pkg-modal") {
@@ -2676,7 +2580,9 @@
             this.container.querySelector("#dealEditActive").checked = deal ? Boolean(deal.isActive) : true;
             this.container.querySelector("#dealEditPrimary").checked = deal ? Boolean(deal.isPrimary) : false;
 
-            this.container.querySelector("#dealCrudModal").classList.remove("hidden");
+            const dealModal = this.container.querySelector("#dealCrudModal");
+            dealModal.classList.remove("hidden");
+            this._autoGrowFields(dealModal);
         }
 
         _openPkgModal(pkg) {
@@ -2703,7 +2609,9 @@
             this.container.querySelector("#pkgEditActive").checked = pkg ? Boolean(pkg.isActive) : true;
             this.container.querySelector("#pkgEditFeatured").checked = pkg ? Boolean(pkg.isFeatured) : false;
 
-            this.container.querySelector("#pkgCrudModal").classList.remove("hidden");
+            const pkgModal = this.container.querySelector("#pkgCrudModal");
+            pkgModal.classList.remove("hidden");
+            this._autoGrowFields(pkgModal);
         }
 
         _openVisaModal(visa) {
@@ -2723,7 +2631,9 @@
                 (visa && visa.requirementsSummary) || "Passport Scan, CNIC Copy, White Background Photo";
             this.container.querySelector("#visaEditActive").checked = visa ? Boolean(visa.isActive) : true;
 
-            this.container.querySelector("#visaCrudModal").classList.remove("hidden");
+            const visaModal = this.container.querySelector("#visaCrudModal");
+            visaModal.classList.remove("hidden");
+            this._autoGrowFields(visaModal);
         }
     }
 
