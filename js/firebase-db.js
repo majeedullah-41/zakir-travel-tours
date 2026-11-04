@@ -539,7 +539,14 @@
                 }
                 this.auth = window.firebase.auth();
                 this.db = window.firebase.firestore();
-                this.storage = window.firebase.storage ? window.firebase.storage() : null;
+                this.storage = null;
+                if (window.firebase.storage) {
+                    try {
+                        this.storage = window.firebase.storage();
+                    } catch (_) {
+                        this.storage = null;
+                    }
+                }
                 this.mode = "firebase";
 
                 await this._ensureFirestoreSeed();
@@ -1365,6 +1372,9 @@
                 localStorage.setItem(STORAGE_KEYS.AUTH_SESSION, JSON.stringify(userObj));
                 this._notifyAuthListeners(userObj);
                 this._broadcastChange("AUTH_UPDATED");
+                try {
+                    await this._ensureFirestoreSeed();
+                } catch (_) {}
                 return userObj;
             }
 
