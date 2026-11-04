@@ -59,8 +59,8 @@
                 50% { transform: translateY(-5px); }
             }
             @keyframes zakirPulseGlow {
-                0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45); }
-                50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+                0%, 100% { box-shadow: 0 0 0 0 rgba(13, 138, 158, 0.45); }
+                50% { box-shadow: 0 0 0 10px rgba(13, 138, 158, 0); }
             }
             @keyframes zakirShimmerBg {
                 0% { background-position: 0% 50%; }
@@ -76,11 +76,11 @@
             .anim-float {
                 animation: zakirFloatBadge 3.4s ease-in-out infinite;
             }
-            .anim-pulse-emerald {
+            .anim-pulse-teal {
                 animation: zakirPulseGlow 2.2s infinite;
             }
             .admin-gradient-animated {
-                background: linear-gradient(125deg, #071E3E, #0B2D5B, #0D8A9E, #0B2D5B);
+                background: linear-gradient(125deg, #05162E, #0B2D5B, #0D8A9E, #0B2D5B);
                 background-size: 260% 260%;
                 animation: zakirShimmerBg 10s ease infinite;
             }
@@ -174,8 +174,8 @@
                 type === "error"
                     ? "bg-rose-600 border-rose-400"
                     : type === "warning"
-                    ? "bg-amber-600 border-amber-400"
-                    : "bg-emerald-600 border-emerald-400";
+                    ? "bg-[#B8860B] border-[#D4AF37]"
+                    : "bg-[#0D8A9E] border-[#15B2CB]";
             const iconClass =
                 type === "error"
                     ? "fa-circle-exclamation"
@@ -218,7 +218,7 @@
                                     <img src="./assets/logo-mark.png" alt="Zakir Travel Logo" class="w-full h-full object-contain">
                                 </div>
                                 <div>
-                                    <span class="text-[10px] font-extrabold uppercase tracking-widest text-[#0D8A9E] block">Cloud Control Center</span>
+                                    <span class="text-[10px] font-extrabold uppercase tracking-widest text-[#0D8A9E] block">Admin Portal</span>
                                     <h1 class="text-xl font-black text-[#0B2D5B]">Zakir Travel Admin</h1>
                                 </div>
                             </div>
@@ -233,13 +233,13 @@
                             }
                         </div>
 
-                        <div class="bg-gradient-to-r from-[#E6F6F8] to-sky-50 border border-[#0D8A9E]/30 rounded-2xl p-4 mb-5 text-xs text-[#0B2D5B]">
+                        <div class="bg-gradient-to-r from-[#E6F6F8] to-white border border-[#0D8A9E]/30 rounded-2xl p-4 mb-5 text-xs text-[#0B2D5B]">
                             <div class="font-extrabold flex items-center gap-1.5 mb-1">
-                                <i class="fa-solid fa-shield-halved text-amber-500"></i>
+                                <i class="fa-solid fa-shield-halved text-[#D4AF37]"></i>
                                 <span>Secure Admin Access</span>
                             </div>
                             <p class="text-slate-600 leading-relaxed">
-                                Sign in with your authorized email and password to manage Special Flyer Deals, Umrah Packages, Visas, and WhatsApp lead routing.
+                                Sign in with your authorized email and password to manage website offers, packages, visas, and enquiries.
                             </p>
                         </div>
 
@@ -254,8 +254,8 @@
                             </div>
                             <div id="adminLoginError" class="hidden text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl p-3"></div>
                             <button type="submit" class="w-full bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-extrabold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-unlock-keyhole"></i>
-                                <span>Unlock Admin Dashboard</span>
+                                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                                <span>Sign In</span>
                             </button>
                         </form>
                     </div>
@@ -264,47 +264,47 @@
                 <!-- ============================================================== -->
                 <!-- 2. AUTHENTICATED MOBILE-FIRST ADMIN DASHBOARD                  -->
                 <!-- ============================================================== -->
-                <div id="adminDashboardView" class="hidden min-h-screen bg-slate-100/90 pb-24">
+                <div id="adminDashboardView" class="hidden min-h-screen pb-24">
                     
-                    <!-- Sticky Glassmorphic Top Admin Header -->
-                    <header class="sticky top-0 z-40 bg-[#071E3E]/95 backdrop-blur-md text-white shadow-xl border-b border-white/10">
+                    <!-- Sticky Top Admin Header -->
+                    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md text-[#0B2D5B] shadow-card border-b border-slate-200">
                         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
                             <div class="flex items-center gap-3">
-                                <div class="w-11 h-11 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-lg">
+                                <div class="w-11 h-11 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-sm border border-slate-200">
                                     <img src="./assets/logo-mark.png" alt="Zakir Travel Logo" class="w-full h-full object-contain">
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <h1 class="font-black text-base sm:text-lg tracking-tight leading-none">Zakir Control Center</h1>
-                                        <span id="dbModeBadge" class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-1">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Live Sync
+                                        <h1 class="font-black text-base sm:text-lg tracking-tight leading-none text-[#0B2D5B]">Zakir Travel Admin</h1>
+                                        <span id="dbModeBadge" class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#E6F6F8] text-[#0D8A9E] border border-[#0D8A9E]/20 flex items-center gap-1">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-[#0D8A9E] animate-ping"></span> Live
                                         </span>
                                     </div>
-                                    <p id="adminActiveUserLabel" class="text-[11px] text-slate-300 mt-0.5">Signed in as Inam Khan</p>
+                                    <p id="adminActiveUserLabel" class="text-[11px] text-slate-500 mt-0.5">Signed in as Inam Khan</p>
                                 </div>
                             </div>
 
                             <!-- Action Buttons -->
                             <div class="flex flex-wrap items-center gap-2 sm:gap-2.5 ml-auto">
                                 <!-- Save & Push to Website Button -->
-                                <button type="button" id="headerSavePushBtn" data-action="save-push-all" class="anim-pulse-emerald bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-lg transition-all active:scale-95">
-                                    <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
+                                <button type="button" id="headerSavePushBtn" data-action="save-push-all" class="anim-pulse-teal bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-lg transition-all active:scale-95">
+                                    <i class="fa-solid fa-circle-check text-sm"></i>
                                     <span>Save & Push to Website</span>
                                 </button>
 
                                 ${
                                     this.isDrawer
-                                        ? `<button type="button" data-action="close-drawer" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition-all">
-                                            <i class="fa-solid fa-eye text-[#15B2CB]"></i>
+                                        ? `<button type="button" data-action="close-drawer" class="bg-[#E6F6F8] hover:bg-[#D7F0F4] border border-[#0D8A9E]/20 text-[#0B2D5B] text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition-all">
+                                            <i class="fa-solid fa-eye text-[#0D8A9E]"></i>
                                             <span class="hidden sm:inline">View Live Page</span>
                                            </button>`
-                                        : `<a href="index.html" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition-all">
-                                            <i class="fa-solid fa-eye text-[#15B2CB]"></i>
+                                        : `<a href="index.html" class="bg-[#E6F6F8] hover:bg-[#D7F0F4] border border-[#0D8A9E]/20 text-[#0B2D5B] text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition-all">
+                                            <i class="fa-solid fa-eye text-[#0D8A9E]"></i>
                                             <span class="hidden sm:inline">Live Website</span>
                                            </a>`
                                 }
 
-                                <button type="button" data-action="logout" class="bg-rose-500/20 hover:bg-rose-600 border border-rose-400/30 text-rose-200 hover:text-white text-xs font-bold px-3 py-2.5 rounded-xl flex items-center gap-1.5 transition-all" title="Lock / Logout">
+                                <button type="button" data-action="logout" class="bg-slate-100 hover:bg-slate-200 border border-slate-200 text-[#0B2D5B] text-xs font-bold px-3 py-2.5 rounded-xl flex items-center gap-1.5 transition-all" title="Lock / Logout">
                                     <i class="fa-solid fa-lock"></i>
                                     <span class="hidden sm:inline">Lock</span>
                                 </button>
@@ -317,28 +317,28 @@
                         <!-- ========================================================== -->
                         <!-- 5 PAGE-DEDICATED MANAGEMENT TABS NAVIGATION                -->
                         <!-- ========================================================== -->
-                        <nav class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 bg-white p-2 rounded-2xl shadow-md border border-slate-200/80">
-                            <button type="button" data-tab="spotlight" class="admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#16437E] text-white font-extrabold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-md transition-all">
-                                <i class="fa-solid fa-house-chimney text-amber-300"></i>
+                        <nav class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 bg-white p-2 rounded-2xl shadow-card border border-slate-200/80">
+                            <button type="button" data-tab="spotlight" class="admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] text-white font-extrabold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-md transition-all">
+                                <i class="fa-solid fa-house text-[#FDE68A]"></i>
                                 <span>1. Home Page</span>
                             </button>
-                            <button type="button" data-tab="umrah" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all">
+                            <button type="button" data-tab="umrah" class="admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all">
                                 <i class="fa-solid fa-kaaba text-[#0D8A9E]"></i>
                                 <span>2. Umrah Page</span>
-                                <span id="tabBadgeDeals" class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded-full" title="Special Flyer Deals">1</span>
-                                <span id="tabBadgePkgs" class="bg-slate-200 text-slate-700 text-[10px] font-black px-2 py-0.5 rounded-full" title="Comparison Packages">4</span>
+                                <span id="tabBadgeDeals" class="bg-[#FEF3C7] text-[#8A6D0B] text-[10px] font-black px-2 py-0.5 rounded-full" title="Special Flyer Deals">1</span>
+                                <span id="tabBadgePkgs" class="bg-[#E6F6F8] text-[#0D8A9E] text-[10px] font-black px-2 py-0.5 rounded-full" title="Comparison Packages">4</span>
                             </button>
-                            <button type="button" data-tab="visas" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all">
+                            <button type="button" data-tab="visas" class="admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all">
                                 <i class="fa-solid fa-passport text-[#0D8A9E]"></i>
                                 <span>3. Visas & Flights</span>
-                                <span id="tabBadgeVisas" class="bg-slate-200 text-slate-700 text-[10px] font-black px-2 py-0.5 rounded-full">6</span>
+                                <span id="tabBadgeVisas" class="bg-[#E6F6F8] text-[#0D8A9E] text-[10px] font-black px-2 py-0.5 rounded-full">6</span>
                             </button>
-                            <button type="button" data-tab="calculator" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all">
+                            <button type="button" data-tab="calculator" class="admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all">
                                 <i class="fa-solid fa-calculator text-[#0D8A9E]"></i>
-                                <span>4. Calculator Page</span>
+                                <span>4. Estimator</span>
                             </button>
-                            <button type="button" data-tab="contacts" class="admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all col-span-2 sm:col-span-1">
-                                <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i>
+                            <button type="button" data-tab="contacts" class="admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all col-span-2 sm:col-span-1">
+                                <i class="fa-brands fa-whatsapp text-[#128C7E] text-base"></i>
                                 <span>5. Contact & Office</span>
                             </button>
                         </nav>
@@ -349,10 +349,10 @@
                         <div id="admin-panel-spotlight" class="admin-tab-panel space-y-6 anim-fade-up">
                             <form id="homePageContentForm" class="grid lg:grid-cols-12 gap-6">
                                 <!-- Left Column: Home Hero, About Our Agency & 4 Key Stats -->
-                                <div class="lg:col-span-6 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
+                                <div class="lg:col-span-6 bg-white rounded-3xl p-6 shadow-card border border-slate-200/80 space-y-5">
                                     <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                                         <div>
-                                            <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">index.html General Agency Info</span>
+                                            <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Home Page Content</span>
                                             <h3 class="text-lg font-black text-[#0B2D5B]">Home Hero, About Agency & 4 Key Stats</h3>
                                         </div>
                                         <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">Home Page</span>
@@ -447,14 +447,14 @@
                                 </div>
 
                                 <!-- Right Column: 3 Why Choose Us Pillars & 4 Core Service Cards -->
-                                <div class="lg:col-span-6 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5 flex flex-col justify-between">
+                                <div class="lg:col-span-6 bg-white rounded-3xl p-6 shadow-card border border-slate-200/80 space-y-5 flex flex-col justify-between">
                                     <div class="space-y-5">
                                         <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                                             <div>
                                                 <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Trust Pillars & Services Overview</span>
                                                 <h3 class="text-lg font-black text-[#0B2D5B]">Why Choose Us & 4 Core Services</h3>
                                             </div>
-                                            <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">index.html</span>
+                                            <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">Home Page</span>
                                         </div>
 
                                         <div>
@@ -505,7 +505,7 @@
                                         </div>
                                     </div>
 
-                                    <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+                                    <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
                                         <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
                                         <span>Save Home Page General Info</span>
                                     </button>
@@ -519,21 +519,21 @@
                         <div id="admin-panel-umrah" class="admin-tab-panel hidden space-y-6 anim-fade-up">
 
                             <!-- Primary Umrah Flyer Deal Quick Update -->
-                            <section class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                            <section class="bg-white rounded-3xl shadow-card border border-slate-200/80 overflow-hidden">
                                 <div class="bg-gradient-to-r from-[#0B2D5B] via-[#16437E] to-[#0D8A9E] px-5 sm:px-6 py-4 text-white flex flex-wrap items-center justify-between gap-3">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center">
-                                            <i class="fa-solid fa-bolt text-amber-300"></i>
+                                            <i class="fa-solid fa-bolt text-[#FDE68A]"></i>
                                         </div>
                                         <div>
-                                            <span class="text-[10px] font-black uppercase tracking-widest text-sky-200 block">Primary Flyer Deal</span>
+                                            <span class="text-[10px] font-black uppercase tracking-widest text-[#BFEFF6] block">Primary Flyer Deal</span>
                                             <h3 class="text-base sm:text-lg font-black leading-tight">Quick Update Umrah Offer</h3>
                                         </div>
                                     </div>
                                     <div class="bg-white/10 border border-white/15 rounded-xl px-3.5 py-1.5 flex items-center gap-2">
                                         <i class="fa-solid fa-tag text-[#15B2CB]"></i>
                                         <div>
-                                            <span class="text-[9px] uppercase tracking-wider text-sky-200 block leading-none">Live Price</span>
+                                            <span class="text-[9px] uppercase tracking-wider text-[#BFEFF6] block leading-none">Live Price</span>
                                             <span id="livePreviewPriceBadge" class="text-xs sm:text-sm font-black text-white">PKR 232,000</span>
                                         </div>
                                     </div>
@@ -541,7 +541,7 @@
 
                                 <form id="quickUpdateForm" class="p-5 sm:p-6 space-y-4">
                                     <p class="text-xs text-slate-500 leading-relaxed">
-                                        Update the headline price, departure date, and season label for the primary Umrah flyer deal. The homepage spotlight and calculator tiers update automatically when you publish.
+                                        Update the headline price, departure date, and season label for the primary Umrah flyer deal. The homepage and room rates update automatically when you publish.
                                     </p>
 
                                     <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
@@ -573,38 +573,38 @@
                                         </div>
 
                                         <div class="sm:col-span-3">
-                                            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3.5 px-4 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 text-sm">
-                                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                            <button type="submit" class="w-full bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black py-3.5 px-4 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 text-sm">
+                                                <i class="fa-solid fa-circle-check"></i>
                                                 <span>Publish Update</span>
                                             </button>
                                         </div>
                                     </div>
 
                                     <div class="flex items-center gap-2 text-[11px] font-bold text-[#0D8A9E]">
-                                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                                        <span id="quickUpdateTierHint">Auto-scales the primary deal and calculator tiers</span>
+                                        <i class="fa-solid fa-arrows-rotate"></i>
+                                        <span id="quickUpdateTierHint">Room rates adjust automatically with the main deal price</span>
                                     </div>
                                 </form>
                             </section>
 
                             <!-- Header Bar for Special Flyer Deals CRUD -->
-                            <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200/90 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-card border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <span class="bg-amber-100 text-amber-800 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
-                                            Umrah Flyer Showcase CRUD
+                                        <span class="bg-[#FEF3C7] text-[#8A6D0B] text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
+                                            Umrah Flyer Deals
                                         </span>
-                                        <span class="text-xs font-bold text-[#0D8A9E]">• Live on umrah-packages.html</span>
+                                        <span class="text-xs font-bold text-[#0D8A9E]"><i class="fa-solid fa-circle text-[6px] mr-1"></i>Shown on the Umrah page</span>
                                     </div>
                                     <h3 class="text-xl font-black text-[#0B2D5B] mt-1">Manage Special Umrah Flyer Deals & Offers</h3>
                                     <p class="text-xs text-slate-500 mt-0.5">
-                                        Add multiple visual Flyer Deals (e.g. January Umrah, Ramzan Special, Rabi-ul-Awal Deal). Each deal renders its own dual-frame showcase card on the Umrah page!
+                                        Add multiple flyer deals (for example January Umrah, Ramzan Special, or Rabi-ul-Awal). Each deal appears as its own dual-frame showcase card on the Umrah page.
                                     </p>
                                 </div>
 
                                 <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-                                    <button type="button" data-action="quick-add-ramzan-deal" class="bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-extrabold text-xs px-4 py-3 rounded-2xl transition-all flex items-center gap-1.5 shadow-sm">
-                                        <i class="fa-solid fa-moon text-amber-600"></i>
+                                    <button type="button" data-action="quick-add-ramzan-deal" class="bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#8A6D0B] border border-[#D4AF37]/30 font-extrabold text-xs px-4 py-3 rounded-2xl transition-all flex items-center gap-1.5 shadow-sm">
+                                        <i class="fa-solid fa-moon text-[#8A6D0B]"></i>
                                         <span>+ Quick Add Ramzan Deal</span>
                                     </button>
                                     <button type="button" data-action="open-deal-modal" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg transition-all active:scale-95 flex items-center gap-2">
@@ -618,10 +618,10 @@
                             <div id="crudSpecialDealsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
 
                             <!-- Comparison Umrah Packages Header & Grid -->
-                            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+                            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-card">
                                 <div>
-                                    <span class="text-[10px] font-black uppercase tracking-wider text-[#0D8A9E]">umrah-packages.html Manager</span>
-                                    <h3 class="text-xl font-black text-[#0B2D5B]">Comparison Umrah Packages (CRUD)</h3>
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-[#0D8A9E]">Umrah Page Content</span>
+                                    <h3 class="text-xl font-black text-[#0B2D5B]">Comparison Umrah Packages</h3>
                                     <p class="text-xs text-slate-500">Add, edit, reorder, or hide Umrah package comparison cards displayed on the Umrah Packages page.</p>
                                 </div>
                                 <button type="button" data-action="open-pkg-modal" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 transition-all">
@@ -634,13 +634,13 @@
 
                             <!-- Umrah Page Hero, 3 Inclusions Cards, Family Banner & Primary Deal Media Editor -->
                             <form id="umrahPageContentForm" class="grid lg:grid-cols-12 gap-6">
-                                <div class="lg:col-span-7 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
+                                <div class="lg:col-span-7 bg-white rounded-3xl p-6 shadow-card border border-slate-200/80 space-y-5">
                                     <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                                         <div>
                                             <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Page Text & Inclusions Editor</span>
                                             <h3 class="text-lg font-black text-[#0B2D5B]">Umrah Page Banner, Inclusions & Family CTA</h3>
                                         </div>
-                                        <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">umrah-packages.html</span>
+                                        <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">Umrah Page</span>
                                     </div>
 
                                     <div class="grid sm:grid-cols-2 gap-4">
@@ -690,14 +690,14 @@
                                         </div>
                                     </div>
 
-                                    <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+                                    <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
                                         <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
                                         <span>Save Umrah Page Content</span>
                                     </button>
                                 </div>
 
                                 <!-- Right Column: Primary Deal Media & Monthly Flyer Popup Uploader -->
-                                <div class="lg:col-span-5 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5 flex flex-col justify-between">
+                                <div class="lg:col-span-5 bg-white rounded-3xl p-6 shadow-card border border-slate-200/80 space-y-5 flex flex-col justify-between">
                                     <div class="space-y-4">
                                         <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                                             <div>
@@ -715,7 +715,7 @@
                                                     <div class="h-28 rounded-xl overflow-hidden border border-[#0D8A9E] bg-slate-200 mt-1">
                                                         <img id="previewMadinahImg" src="" alt="Madinah" class="w-full h-full object-cover">
                                                     </div>
-                                                    <input type="text" id="inputMadinahUrl" placeholder="Image URL..." class="mt-2 w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px]">
+                                                    <input type="text" id="inputMadinahUrl" placeholder="Paste image link" class="mt-2 w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px]">
                                                 </div>
                                                 <label class="w-full bg-white hover:bg-[#0B2D5B] hover:text-white text-[#0B2D5B] border border-slate-200 font-bold text-[11px] py-1.5 px-2 rounded-xl cursor-pointer flex items-center justify-center gap-1 transition-colors">
                                                     <i class="fa-solid fa-camera"></i> Upload
@@ -730,7 +730,7 @@
                                                     <div class="h-28 rounded-xl overflow-hidden border border-[#0B2D5B] bg-slate-200 mt-1">
                                                         <img id="previewMakkahImg" src="" alt="Makkah" class="w-full h-full object-cover">
                                                     </div>
-                                                    <input type="text" id="inputMakkahUrl" placeholder="Image URL..." class="mt-2 w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px]">
+                                                    <input type="text" id="inputMakkahUrl" placeholder="Paste image link" class="mt-2 w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px]">
                                                 </div>
                                                 <label class="w-full bg-white hover:bg-[#0B2D5B] hover:text-white text-[#0B2D5B] border border-slate-200 font-bold text-[11px] py-1.5 px-2 rounded-xl cursor-pointer flex items-center justify-center gap-1 transition-colors">
                                                     <i class="fa-solid fa-camera"></i> Upload
@@ -741,7 +741,7 @@
                                             <!-- Promotional Flyer -->
                                             <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200 flex flex-col justify-between space-y-2">
                                                 <div>
-                                                    <span class="text-[10px] font-bold uppercase text-emerald-700">Flyer Popup</span>
+                                                    <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Flyer Popup</span>
                                                     <div class="h-28 rounded-xl overflow-hidden border border-dashed border-[#0D8A9E] bg-white mt-1 flex items-center justify-center">
                                                         <img id="previewFlyerImg" src="" alt="Flyer" class="w-full h-full object-cover hidden">
                                                         <div id="previewFlyerPlaceholder" class="text-center p-2 text-[10px] text-slate-400">
@@ -749,9 +749,9 @@
                                                             Digital Flyer
                                                         </div>
                                                     </div>
-                                                    <input type="text" id="inputFlyerUrl" placeholder="Flyer URL (Opt)" class="mt-2 w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px]">
+                                                    <input type="text" id="inputFlyerUrl" placeholder="Flyer image link (optional)" class="mt-2 w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px]">
                                                 </div>
-                                                <label class="w-full bg-white hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 font-bold text-[11px] py-1.5 px-2 rounded-xl cursor-pointer flex items-center justify-center gap-1 transition-colors">
+                                                <label class="w-full bg-white hover:bg-[#0D8A9E] hover:text-white text-[#0D8A9E] border border-[#0D8A9E]/30 font-bold text-[11px] py-1.5 px-2 rounded-xl cursor-pointer flex items-center justify-center gap-1 transition-colors">
                                                     <i class="fa-solid fa-upload"></i> Upload
                                                     <input type="file" accept="image/*" data-upload-target="inputFlyerUrl" data-preview-target="previewFlyerImg" class="hidden">
                                                 </label>
@@ -765,7 +765,7 @@
                                     </div>
 
                                     <button type="submit" class="w-full bg-[#0D8A9E] hover:bg-[#096979] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
-                                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                                        <i class="fa-solid fa-circle-check"></i>
                                         <span>Save Umrah Media & Flyer Settings</span>
                                     </button>
                                 </div>
@@ -777,10 +777,10 @@
                         <!-- ========================================================== -->
                         <div id="admin-panel-visas" class="admin-tab-panel hidden space-y-6 anim-fade-up">
                             
-                            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+                            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-card">
                                 <div>
-                                    <span class="text-[10px] font-black uppercase tracking-wider text-[#0D8A9E]">visa-services.html Manager</span>
-                                    <h3 class="text-xl font-black text-[#0B2D5B]">Country Visa Cards (CRUD)</h3>
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-[#0D8A9E]">Visa Page Content</span>
+                                    <h3 class="text-xl font-black text-[#0B2D5B]">Country Visa Cards</h3>
                                     <p class="text-xs text-slate-500">Add, edit, reorder, or hide Country Visa destinations and starting fees.</p>
                                 </div>
                                 <button type="button" data-action="open-visa-modal" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 transition-all">
@@ -792,13 +792,13 @@
                             <div id="crudVisasContainer" class="grid md:grid-cols-2 gap-4"></div>
 
                             <!-- Visas & Flights Page Content Editor -->
-                            <form id="visaPageContentForm" class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
+                            <form id="visaPageContentForm" class="bg-white rounded-3xl p-6 shadow-card border border-slate-200/80 space-y-5">
                                 <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                                     <div>
                                         <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Visas, Flights & 3-Step Process Editor</span>
                                         <h3 class="text-lg font-black text-[#0B2D5B]">Manage Visas & Air Tickets Page Content</h3>
                                     </div>
-                                    <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">visa-services.html</span>
+                                    <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">Visa Page</span>
                                 </div>
 
                                 <div class="grid sm:grid-cols-2 gap-4">
@@ -849,7 +849,7 @@
                                     </div>
                                 </div>
 
-                                <button type="submit" class="w-full sm:w-auto bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold px-8 py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+                                <button type="submit" class="w-full sm:w-auto bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold px-8 py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
                                     <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
                                     <span>Save Visas & Flights Page Content</span>
                                 </button>
@@ -863,12 +863,12 @@
                             <form id="spotlightAndCalcForm" class="grid lg:grid-cols-12 gap-6">
                                 
                                 <!-- Left Column: Calculator Room Tier Pricing & Auto-Scale -->
-                                <div class="lg:col-span-6 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between space-y-5">
+                                <div class="lg:col-span-6 bg-white rounded-3xl p-6 shadow-card border border-slate-200/80 flex flex-col justify-between space-y-5">
                                     <div class="space-y-4">
                                         <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                                             <div>
-                                                <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Interactive Estimator Math</span>
-                                                <h3 class="text-lg font-black text-[#0B2D5B]">Room Sharing Tier Rates & Add-Ons</h3>
+                                                <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Estimator Pricing</span>
+                                                <h3 class="text-lg font-black text-[#0B2D5B]">Room & Add-On Rates</h3>
                                             </div>
                                             <div class="w-10 h-10 rounded-2xl bg-[#E6F6F8] text-[#0D8A9E] flex items-center justify-center text-lg">
                                                 <i class="fa-solid fa-calculator"></i>
@@ -879,8 +879,8 @@
                                         <label class="flex items-start gap-3 bg-[#E6F6F8]/70 border border-[#0D8A9E]/30 rounded-2xl p-3.5 cursor-pointer">
                                             <input type="checkbox" id="calcAutoScaleToggle" class="w-5 h-5 accent-[#0B2D5B] mt-0.5 rounded">
                                             <div>
-                                                <span class="text-xs font-extrabold text-[#0B2D5B] block">Auto-scale tiers from Primary Deal price</span>
-                                                <span class="text-[11px] text-slate-600">Automatically scales Sharing, Quad (+16k), Triple (+36k), and Double (+63k) when the Primary Deal price changes.</span>
+                                                <span class="text-xs font-extrabold text-[#0B2D5B] block">Match room rates to the main deal price</span>
+                                                <span class="text-[11px] text-slate-600">Room rates adjust automatically whenever you update the main deal price.</span>
                                             </div>
                                         </label>
 
@@ -904,7 +904,7 @@
                                         </div>
 
                                         <div class="border-t border-slate-100 pt-3">
-                                            <span class="text-[10px] font-black uppercase text-[#0D8A9E] block mb-2">Duration & Hotel Star Add-On Modifiers (PKR)</span>
+                                            <span class="text-[10px] font-black uppercase text-[#0D8A9E] block mb-2">Duration & Hotel Add-On Rates (PKR)</span>
                                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                                                 <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
                                                     <label class="block text-[10px] font-bold text-slate-500 mb-1">10 Nights Offset</label>
@@ -943,44 +943,44 @@
                                         <input type="checkbox" id="srvTransport" class="hidden" checked>
                                     </div>
 
-                                    <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+                                    <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
                                         <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
-                                        <span>Save Calculator Rates</span>
+                                        <span>Save Rates</span>
                                     </button>
                                 </div>
 
                                 <!-- Right Column: Calculator Page Text & Included Bullets -->
-                                <div class="lg:col-span-6 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between space-y-5">
+                                <div class="lg:col-span-6 bg-white rounded-3xl p-6 shadow-card border border-slate-200/80 flex flex-col justify-between space-y-5">
                                     <div class="space-y-4">
                                         <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                                             <div>
-                                                <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Package Estimator Manager</span>
+                                                <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Estimator Page Content</span>
                                                 <h3 class="text-lg font-black text-[#0B2D5B]">Package Estimator Banner &amp; Inclusions</h3>
                                             </div>
-                                            <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">umrah-packages.html</span>
+                                            <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">Umrah Page</span>
                                         </div>
 
                                         <div>
-                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Calculator Hero Top Badge</label>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Estimator Hero Badge</label>
                                             <input type="text" id="calcHeroBadgeInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
                                         </div>
                                         <div>
-                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Calculator Hero Heading</label>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Estimator Hero Heading</label>
                                             <input type="text" id="calcHeroTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
                                         </div>
                                         <div>
-                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Calculator Hero Subtitle</label>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Estimator Hero Subtitle</label>
                                             <textarea id="calcHeroSubtitleInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
                                         </div>
                                         <div>
-                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">What Is Included in Every Estimate (1 bullet per line)</label>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">What's Included in Every Estimate (one per line)</label>
                                             <textarea id="calcIncludedBulletsInput" rows="4" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
                                         </div>
                                     </div>
 
                                     <button type="submit" class="w-full bg-[#0D8A9E] hover:bg-[#096979] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
-                                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                                        <span>Save Calculator Page & Rates</span>
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span>Save Estimator Content</span>
                                     </button>
                                 </div>
                             </form>
@@ -993,16 +993,16 @@
                             <form id="contactsForm" class="grid lg:grid-cols-12 gap-6">
                                 
                                 <!-- Left Column: Active WhatsApp Lead Routing + Staff Numbers + Contact Page Banner -->
-                                <div class="lg:col-span-7 bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-5">
+                                <div class="lg:col-span-7 bg-white rounded-3xl p-6 shadow-card border border-slate-200/80 space-y-5">
                                     <div class="border-b border-slate-100 pb-4">
-                                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600">Instant Lead Distribution</span>
+                                        <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Booking Enquiries</span>
                                         <h3 class="text-lg font-black text-[#0B2D5B]">Active WhatsApp Booking Routing</h3>
-                                        <p class="text-xs text-slate-500 mt-0.5">Choose which staff member receives automated inquiries from the Hero Widget, Special Deal Cards, Umrah Calculator, and Visa CTA buttons across all pages.</p>
+                                        <p class="text-xs text-slate-500 mt-0.5">Choose which team member receives booking enquiries from across the website.</p>
                                     </div>
 
                                     <div>
                                         <label class="block text-xs font-bold uppercase text-slate-600 mb-2">Route Website Booking Inquiries To:</label>
-                                        <select id="contactActiveRouting" class="w-full bg-emerald-50 border-2 border-emerald-500 rounded-2xl px-4 py-3.5 text-sm font-black text-[#0B2D5B] focus:outline-none">
+                                        <select id="contactActiveRouting" class="w-full bg-[#E6F6F8] border-2 border-[#0D8A9E] rounded-2xl px-4 py-3.5 text-sm font-black text-[#0B2D5B] focus:outline-none">
                                             <option value="manager">Primary Contact (Inam Khan)</option>
                                             <option value="secondary">Secondary Contact (Sadiq Ullah)</option>
                                         </select>
@@ -1012,7 +1012,7 @@
                                     <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-3">
                                         <div class="text-xs font-black uppercase text-[#0B2D5B] flex items-center justify-between">
                                             <span><i class="fa-solid fa-user-tie text-[#0D8A9E] mr-1.5"></i>Primary Contact (Manager)</span>
-                                            <span id="badgeRoutingManager" class="hidden bg-emerald-500 text-white text-[10px] px-2.5 py-0.5 rounded-full">Active Lead Receiver</span>
+                                            <span id="badgeRoutingManager" class="hidden bg-[#0D8A9E] text-white text-[10px] px-2.5 py-0.5 rounded-full">Active</span>
                                         </div>
                                         <div class="grid sm:grid-cols-3 gap-3">
                                             <div>
@@ -1025,7 +1025,7 @@
                                             </div>
                                             <div>
                                                 <label class="block text-[11px] font-bold text-slate-500 mb-1">WhatsApp (923...)</label>
-                                                <input type="text" id="contactManagerWA" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-emerald-700">
+                                                <input type="text" id="contactManagerWA" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0D8A9E]">
                                             </div>
                                         </div>
                                     </div>
@@ -1034,7 +1034,7 @@
                                     <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-3">
                                         <div class="text-xs font-black uppercase text-[#0B2D5B] flex items-center justify-between">
                                             <span><i class="fa-solid fa-headset text-[#0D8A9E] mr-1.5"></i>Secondary Contact (Consultant)</span>
-                                            <span id="badgeRoutingSecondary" class="hidden bg-emerald-500 text-white text-[10px] px-2.5 py-0.5 rounded-full">Active Lead Receiver</span>
+                                            <span id="badgeRoutingSecondary" class="hidden bg-[#0D8A9E] text-white text-[10px] px-2.5 py-0.5 rounded-full">Active</span>
                                         </div>
                                         <div class="grid sm:grid-cols-3 gap-3">
                                             <div>
@@ -1047,14 +1047,14 @@
                                             </div>
                                             <div>
                                                 <label class="block text-[11px] font-bold text-slate-500 mb-1">WhatsApp (923...)</label>
-                                                <input type="text" id="contactSecondaryWA" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-emerald-700">
+                                                <input type="text" id="contactSecondaryWA" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0D8A9E]">
                                             </div>
                                         </div>
                                     </div>
 
                                     <!-- Contact Page Hero Banner Fields -->
                                     <div class="border-t border-slate-100 pt-4 space-y-3">
-                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E] block">About Us &amp; Contact Page (contact.html) Hero Banner Text</span>
+                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E] block">About &amp; Contact Page Hero Text</span>
                                         <div class="grid sm:grid-cols-2 gap-3">
                                             <div>
                                                 <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Hero Badge</label>
@@ -1074,7 +1074,7 @@
                                     <!-- About Us: Team Member Photos -->
                                     <div class="border-t border-slate-100 pt-4 space-y-3">
                                         <div class="flex items-center justify-between">
-                                            <span class="text-[10px] font-black uppercase text-[#0D8A9E] block"><i class="fa-solid fa-users mr-1"></i>About Us — Team Member Photos</span>
+                                            <span class="text-[10px] font-black uppercase text-[#0D8A9E] block"><i class="fa-solid fa-users mr-1"></i>About Us - Team Member Photos</span>
                                             <span class="text-[10px] font-bold text-slate-400">Upload, then click Save &amp; Push</span>
                                         </div>
                                         <div id="teamPhotosAdminGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -1105,7 +1105,7 @@
 
                                 <!-- Right Column: Agency Branding, Office Address, Hours, Email, Map & Safety Reset -->
                                 <div class="lg:col-span-5 space-y-6">
-                                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-3.5">
+                                    <div class="bg-white rounded-3xl p-6 shadow-card border border-slate-200/80 space-y-3.5">
                                         <h3 class="text-lg font-black text-[#0B2D5B]">Agency Details, Office Hours & Map</h3>
                                         <div>
                                             <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Agency Name</label>
@@ -1134,37 +1134,31 @@
                                             <input type="text" id="contactOfficeEmail" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-[#0B2D5B]">
                                         </div>
                                         <div>
-                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Google Maps Embed URL</label>
+                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Google Maps Link</label>
                                             <input type="text" id="contactMapEmbedUrl" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-[11px] text-slate-600">
                                         </div>
-                                        <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+                                        <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
                                             <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
                                             <span>Save Contact Page & Push Live</span>
                                         </button>
                                     </div>
 
-                                    <!-- Safety Reset & Firebase Cloud Connection Card -->
-                                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-rose-200 space-y-4">
+                                    <!-- Reset Website Content Card -->
+                                    <div class="bg-white rounded-3xl p-6 shadow-card border border-slate-200 space-y-4">
                                         <div class="flex items-center justify-between">
                                             <div>
-                                                <span class="text-[10px] font-extrabold uppercase text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full">Safety Recovery</span>
-                                                <h4 class="text-sm font-black text-[#0B2D5B] mt-1">Reset or Configure Cloud DB</h4>
+                                                <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E] bg-[#E6F6F8] px-2.5 py-1 rounded-full">Content Recovery</span>
+                                                <h4 class="text-sm font-black text-[#0B2D5B] mt-1">Reset Website Content</h4>
                                             </div>
-                                            <i class="fa-solid fa-shield-halved text-xl text-rose-500"></i>
+                                            <i class="fa-solid fa-rotate-left text-xl text-[#0D8A9E]"></i>
                                         </div>
                                         <p class="text-xs text-slate-500">
-                                            Restore all Special Deals, prices, dates, packages, visas, page text, and contacts back to the original <strong>January Flyer Defaults (PKR 232,000)</strong>.
+                                            Restore all offers, prices, dates, packages, visas, page text, and contact details back to the original <strong>January Flyer Defaults (PKR 232,000)</strong>.
                                         </p>
-                                        <div class="flex flex-col sm:flex-row gap-2.5">
-                                            <button type="button" data-action="reset-flyer-defaults" class="flex-1 bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 font-extrabold py-3 px-4 rounded-xl text-xs transition-all flex items-center justify-center gap-2">
-                                                <i class="fa-solid fa-rotate-left"></i>
-                                                <span>Reset to January Flyer Defaults</span>
-                                            </button>
-                                            <button type="button" data-action="open-firebase-modal" class="bg-slate-100 hover:bg-slate-200 text-[#0B2D5B] font-bold py-3 px-4 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5">
-                                                <i class="fa-solid fa-database text-[#0D8A9E]"></i>
-                                                <span>Firebase Config</span>
-                                            </button>
-                                        </div>
+                                        <button type="button" data-action="reset-flyer-defaults" class="w-full bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold py-3 px-4 rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-sm">
+                                            <i class="fa-solid fa-rotate-left"></i>
+                                            <span>Restore Original Content</span>
+                                        </button>
                                     </div>
                                 </div>
                             </form>
@@ -1176,7 +1170,7 @@
                 <!-- ============================================================== -->
                 <!-- MODAL: ADD / EDIT SPECIAL FLYER DEAL (FULL CRUD)               -->
                 <!-- ============================================================== -->
-                <div id="dealCrudModal" class="fixed inset-0 z-[85] hidden bg-[#071E3E]/80 backdrop-blur-sm flex items-center justify-center p-4">
+                <div id="dealCrudModal" class="fixed inset-0 z-[85] hidden bg-[#05162E]/80 backdrop-blur-sm flex items-center justify-center p-4">
                     <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl max-h-[92vh] overflow-y-auto anim-scale-in">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
                             <div>
@@ -1202,7 +1196,7 @@
 
                                 <div>
                                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Starting Price (PKR)</label>
-                                    <input type="number" id="dealEditPrice" min="1000" step="500" required placeholder="232000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-black text-emerald-700">
+                                    <input type="number" id="dealEditPrice" min="1000" step="500" required placeholder="232000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-black text-[#0D8A9E]">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Price Unit Label</label>
@@ -1235,7 +1229,7 @@
                                     <input type="text" id="dealEditLeftBadge" required placeholder="Ziyarat & Stay" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
                                     <input type="text" id="dealEditMadinahHotel" required placeholder="Madinah Hotel Name (e.g. Al Eiman Taibah / Similar)" class="w-full bg-[#F0FAFC] border border-[#0D8A9E]/40 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
                                     <div class="flex gap-2">
-                                        <input type="text" id="dealEditMadinahUrl" required placeholder="Left Image URL" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                        <input type="text" id="dealEditMadinahUrl" required placeholder="Left Image Link" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
                                         <label class="bg-[#0D8A9E] hover:bg-[#096979] text-white text-xs font-bold px-3 py-2 rounded-xl cursor-pointer flex items-center gap-1 shrink-0">
                                             <i class="fa-solid fa-upload"></i>
                                             <input type="file" accept="image/*" data-deal-upload="dealEditMadinahUrl" class="hidden">
@@ -1249,8 +1243,8 @@
                                     <input type="text" id="dealEditRightBadge" required placeholder="Haram View Options" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
                                     <input type="text" id="dealEditMakkahHotel" required placeholder="Makkah Hotel Name (e.g. Emaar Al Khalil / Similar)" class="w-full bg-[#F3F6FB] border border-[#0B2D5B]/30 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
                                     <div class="flex gap-2">
-                                        <input type="text" id="dealEditMakkahUrl" required placeholder="Right Image URL" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
-                                        <label class="bg-[#0B2D5B] hover:bg-[#16437E] text-white text-xs font-bold px-3 py-2 rounded-xl cursor-pointer flex items-center gap-1 shrink-0">
+                                        <input type="text" id="dealEditMakkahUrl" required placeholder="Right Image Link" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                        <label class="bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-xs font-bold px-3 py-2 rounded-xl cursor-pointer flex items-center gap-1 shrink-0">
                                             <i class="fa-solid fa-upload"></i>
                                             <input type="file" accept="image/*" data-deal-upload="dealEditMakkahUrl" class="hidden">
                                         </label>
@@ -1287,8 +1281,8 @@
                                     <span class="text-xs font-bold text-[#0B2D5B]">Active (Show on Website)</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" id="dealEditPrimary" class="w-4 h-4 accent-amber-500">
-                                    <span class="text-xs font-bold text-[#0B2D5B]">Set as Primary Deal (Syncs with 10s Quick Bar & Calculator)</span>
+                                    <input type="checkbox" id="dealEditPrimary" class="w-4 h-4 accent-[#D4AF37]">
+                                    <span class="text-xs font-bold text-[#0B2D5B]">Set as Primary Deal (updates main price & estimator)</span>
                                 </label>
                             </div>
 
@@ -1297,7 +1291,7 @@
                                     Cancel
                                 </button>
                                 <button type="submit" class="flex-1 bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black py-3.5 px-6 rounded-xl shadow-lg text-sm flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    <i class="fa-solid fa-circle-check"></i>
                                     <span>Save & Publish Special Deal</span>
                                 </button>
                             </div>
@@ -1308,7 +1302,7 @@
                 <!-- ============================================================== -->
                 <!-- MODAL: ADD / EDIT UMRAH PACKAGE                                -->
                 <!-- ============================================================== -->
-                <div id="pkgCrudModal" class="fixed inset-0 z-[85] hidden bg-[#071E3E]/80 backdrop-blur-sm flex items-center justify-center p-4">
+                <div id="pkgCrudModal" class="fixed inset-0 z-[85] hidden bg-[#05162E]/80 backdrop-blur-sm flex items-center justify-center p-4">
                     <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto anim-scale-in">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
                             <h3 id="pkgModalTitle" class="text-lg font-black text-[#0B2D5B]">Add / Edit Umrah Package</h3>
@@ -1370,7 +1364,7 @@
                                     <span class="text-xs font-bold text-[#0B2D5B]">Featured Highlight</span>
                                 </label>
                             </div>
-                            <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold py-3.5 rounded-xl shadow-lg mt-2">
+                            <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold py-3.5 rounded-xl shadow-lg mt-2">
                                 Save Umrah Package
                             </button>
                         </form>
@@ -1380,7 +1374,7 @@
                 <!-- ============================================================== -->
                 <!-- MODAL: ADD / EDIT COUNTRY VISA SERVICE                         -->
                 <!-- ============================================================== -->
-                <div id="visaCrudModal" class="fixed inset-0 z-[85] hidden bg-[#071E3E]/80 backdrop-blur-sm flex items-center justify-center p-4">
+                <div id="visaCrudModal" class="fixed inset-0 z-[85] hidden bg-[#05162E]/80 backdrop-blur-sm flex items-center justify-center p-4">
                     <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto anim-scale-in">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
                             <h3 id="visaModalTitle" class="text-lg font-black text-[#0B2D5B]">Add / Edit Country Visa</h3>
@@ -1397,7 +1391,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Flag Emoji / Code</label>
-                                    <input type="text" id="visaEditFlag" required placeholder="🇸🇦" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+                                    <input type="text" id="visaEditFlag" required placeholder="e.g. Saudi Arabia flag" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Visa Type</label>
@@ -1412,7 +1406,7 @@
                                     <input type="number" id="visaEditPrice" min="0" step="500" required placeholder="34500" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-black text-[#0D8A9E]">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Image URL (Optional)</label>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Image Link (Optional)</label>
                                     <input type="text" id="visaEditImage" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
                                 </div>
                                 <div class="sm:col-span-2">
@@ -1424,7 +1418,7 @@
                                 <input type="checkbox" id="visaEditActive" checked class="w-4 h-4 accent-[#0D8A9E]">
                                 <span class="text-xs font-bold text-[#0B2D5B]">Active (Visible on Website)</span>
                             </label>
-                            <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold py-3.5 rounded-xl shadow-lg mt-2">
+                            <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold py-3.5 rounded-xl shadow-lg mt-2">
                                 Save Country Visa
                             </button>
                         </form>
@@ -1434,14 +1428,14 @@
                 <!-- ============================================================== -->
                 <!-- MODAL: RESET TO FLYER DEFAULTS CONFIRMATION                    -->
                 <!-- ============================================================== -->
-                <div id="resetConfirmModal" class="fixed inset-0 z-[90] hidden bg-[#071E3E]/80 backdrop-blur-sm flex items-center justify-center p-4">
+                <div id="resetConfirmModal" class="fixed inset-0 z-[90] hidden bg-[#05162E]/80 backdrop-blur-sm flex items-center justify-center p-4">
                     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl text-center space-y-4 anim-scale-in">
                         <div class="w-14 h-14 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl mx-auto">
                             <i class="fa-solid fa-rotate-left"></i>
                         </div>
                         <h3 class="text-xl font-black text-[#0B2D5B]">Reset to Original January Flyer Defaults?</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            This will restore the Featured Umrah Price to <strong>PKR 232,000</strong>, dates to <strong>Jan 26 – Nov 10, 2026 (14 Nights)</strong>, and reset all Special Deals, calculator tiers, packages, visas, and contacts.
+                            This will restore the Featured Umrah Price to <strong>PKR 232,000</strong>, dates to <strong>Jan 26 \u2013 Nov 10, 2026 (14 Nights)</strong>, and reset all offers, room rates, packages, visas, and contact details.
                         </p>
                         <div class="flex gap-3 pt-2">
                             <button type="button" data-action="cancel-reset-modal" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-xs">
@@ -1454,34 +1448,6 @@
                     </div>
                 </div>
 
-                <!-- ============================================================== -->
-                <!-- MODAL: FIREBASE CLOUD CONFIGURATION                            -->
-                <!-- ============================================================== -->
-                <div id="firebaseConfigModal" class="fixed inset-0 z-[90] hidden bg-[#071E3E]/80 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 anim-scale-in">
-                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                            <div>
-                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Cloud Backend</span>
-                                <h3 class="text-lg font-black text-[#0B2D5B]">Firebase Project Configuration</h3>
-                            </div>
-                            <button type="button" data-action="close-firebase-modal" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        </div>
-                        <p class="text-xs text-slate-600 leading-relaxed">
-                            By default, the app runs with instant real-time cross-tab synchronization. Paste your Firebase Web App JSON config below to connect directly to your live Google Firebase project.
-                        </p>
-                        <textarea id="firebaseConfigTextarea" rows="6" placeholder='{"apiKey": "AIza...", "authDomain": "...", "projectId": "...", "storageBucket": "..."}' class="w-full font-mono text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-[#0D8A9E]"></textarea>
-                        <div class="flex justify-between gap-3">
-                            <button type="button" data-action="disconnect-firebase" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 px-4 rounded-xl text-xs">
-                                Use Built-In Local Sync
-                            </button>
-                            <button type="button" data-action="save-firebase-config" class="bg-[#0B2D5B] hover:bg-[#16437E] text-white font-extrabold py-2.5 px-6 rounded-xl text-xs shadow">
-                                Connect Firebase Cloud
-                            </button>
-                        </div>
-                    </div>
-                </div>
             `;
         }
 
@@ -1516,9 +1482,7 @@
                 }
                 if (modeBadge) {
                     modeBadge.innerHTML =
-                        window.zakirDB.mode === "firebase"
-                            ? `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Firebase Cloud`
-                            : `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Live Sync`;
+                        `<span class="w-1.5 h-1.5 rounded-full bg-[#15B2CB] animate-ping"></span> Live`;
                 }
             } else {
                 authView.classList.remove("hidden");
@@ -1542,8 +1506,8 @@
             const secWA = cleanWhatsAppDigits((secWAInput && secWAInput.value) || c.secondaryWhatsApp || "923434159182");
 
             routingSelect.innerHTML = `
-                <option value="manager">Primary: ${escapeHtml(mgrName)} — ${escapeHtml(mgrWA)}</option>
-                <option value="secondary">Secondary: ${escapeHtml(secName)} — ${escapeHtml(secWA)}</option>
+                <option value="manager">Primary: ${escapeHtml(mgrName)} - ${escapeHtml(mgrWA)}</option>
+                <option value="secondary">Secondary: ${escapeHtml(secName)} - ${escapeHtml(secWA)}</option>
             `;
             routingSelect.value = this.selectedRoutingRole === "secondary" ? "secondary" : "manager";
 
@@ -1645,7 +1609,7 @@
             const rawOffice = c.officeAddress || "";
             const isInvalidOrLegacyOffice = !rawOffice || /fazal banda/i.test(rawOffice) || /potohar|blue area|islamabad/i.test(rawOffice);
             setVal("#contactOfficeAddress", isInvalidOrLegacyOffice ? "2nd Floor, Hayat Market, Matta Swat, Khyber Pakhtunkhwa, Pakistan" : rawOffice);
-            setVal("#contactOfficeHours", c.officeHours || "Monday to Saturday: 9:30 AM – 8:00 PM (Sunday Closed / WhatsApp Support Active)");
+            setVal("#contactOfficeHours", c.officeHours || "Monday to Saturday: 9:30 AM \u2013 8:00 PM (Sunday Closed / WhatsApp Support Active)");
             setVal("#contactOfficeEmail", c.officeEmail || "info@zakirtravels.com / inam@zakirtravels.com");
             const rawMap = c.mapEmbedUrl || "";
             const isLegacyMap = !rawMap || /potohar/i.test(rawMap) || /fazal-e-haq/i.test(rawMap);
@@ -1731,18 +1695,18 @@
             setVal("#calcHeroSubtitleInput", pCalc.heroSubtitle || "");
             setVal("#calcIncludedBulletsInput", pCalc.includedBullets || "");
 
-            const legacyBadges = ["Head Office: Blue Area, Islamabad", "Swat Head Office (Matta) • Islamabad Branch Office"];
-            const aboutBadge = pContact.heroBadge && !legacyBadges.includes(pContact.heroBadge) ? pContact.heroBadge : "About Us • Our People • Contact";
+            const legacyBadges = ["Head Office: Blue Area, Islamabad", "Swat Head Office (Matta) \u2022 Islamabad Branch Office"];
+            const aboutBadge = pContact.heroBadge && !legacyBadges.includes(pContact.heroBadge) ? pContact.heroBadge : "About Us \u2022 Our People \u2022 Contact";
             const aboutTitle = pContact.heroTitle && pContact.heroTitle !== "Contact Our Travel Desk" ? pContact.heroTitle : "Meet Zakir Travel & Tours";
             const aboutSubtitle =
                 pContact.heroSubtitle && !/^We are always here to assist your spiritual journey/i.test(pContact.heroSubtitle)
                     ? pContact.heroSubtitle
-                    : "Led from our Swat Matta Head Office with a branch in Islamabad, our dedicated team of visa, Umrah and ticketing professionals personally handles every file — from your first inquiry until you return home safely.";
+                    : "Led from our Swat Matta Head Office with a branch in Islamabad, our dedicated team of visa, Umrah and ticketing professionals personally handles every file \u2014 from your first inquiry until you return home safely.";
             setVal("#contactHeroBadgeInput", aboutBadge);
             setVal("#contactHeroTitleInput", aboutTitle);
             setVal("#contactHeroSubtitleInput", aboutSubtitle);
 
-            // About Us — Team Member Photos
+            // About Us - Team Member Photos
             const teamPhotos = (this.siteConfig && this.siteConfig.teamPhotos) || {};
             TEAM_MEMBERS.forEach((m) => this._setTeamPhotoPreview(m.id, teamPhotos[m.id] || ""));
 
@@ -1793,26 +1757,26 @@
                         
                         <div>
                             <!-- Dual Image Mini Banner with Floating Price Shield -->
-                            <div class="relative grid grid-cols-2 gap-1 bg-slate-900 h-40 overflow-hidden">
+                            <div class="relative grid grid-cols-2 gap-1 bg-gradient-to-br from-[#05162E] via-[#0B2D5B] to-[#0D8A9E] h-40 overflow-hidden">
                                 <div class="relative h-full overflow-hidden">
-                                    <img src="${escapeHtml(deal.madinahImageUrl)}" onerror="this.src='https://placehold.co/600x400/0B2D5B/FFFFFF?text=Madinah'" class="w-full h-full object-cover opacity-90">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-[#071E3E]/90 via-transparent to-transparent"></div>
+                                    <img src="${escapeHtml(deal.madinahImageUrl)}" onerror="this.style.display='none'" class="w-full h-full object-cover opacity-90">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-[#05162E]/90 via-transparent to-transparent"></div>
                                     <span class="absolute bottom-2 left-2.5 text-[10px] font-bold text-white">${escapeHtml(deal.leftFrameTitle || "Madinah")}</span>
                                 </div>
                                 <div class="relative h-full overflow-hidden">
-                                    <img src="${escapeHtml(deal.makkahImageUrl)}" onerror="this.src='https://placehold.co/600x400/0D8A9E/FFFFFF?text=Makkah'" class="w-full h-full object-cover opacity-90">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-[#071E3E]/90 via-transparent to-transparent"></div>
+                                    <img src="${escapeHtml(deal.makkahImageUrl)}" onerror="this.style.display='none'" class="w-full h-full object-cover opacity-90">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-[#05162E]/90 via-transparent to-transparent"></div>
                                     <span class="absolute bottom-2 right-2.5 text-[10px] font-bold text-white">${escapeHtml(deal.rightFrameTitle || "Makkah")}</span>
                                 </div>
 
                                 <!-- Top Left Status Badges -->
                                 <div class="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5 z-10">
-                                    <span class="bg-[#071E3E]/90 backdrop-blur-sm text-white text-[10px] font-black px-2.5 py-1 rounded-full">
+                                    <span class="bg-[#05162E]/90 backdrop-blur-sm text-white text-[10px] font-black px-2.5 py-1 rounded-full">
                                         Deal #${idx + 1}
                                     </span>
                                     ${
                                         deal.isPrimary
-                                            ? `<span class="bg-amber-400 text-[#071E3E] text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow flex items-center gap-1">
+                                            ? `<span class="bg-[#D4AF37] text-[#05162E] text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow flex items-center gap-1">
                                                 <i class="fa-solid fa-star"></i> Primary Flyer
                                                </span>`
                                             : ""
@@ -1820,14 +1784,14 @@
                                     ${
                                         !deal.isActive
                                             ? `<span class="bg-rose-600 text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full">Hidden</span>`
-                                            : `<span class="bg-emerald-500 text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full">Live</span>`
+                                            : `<span class="bg-[#0D8A9E] text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full">Live</span>`
                                     }
                                 </div>
 
                                 <!-- Center Price Shield -->
                                 <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
                                     <div class="bg-gradient-to-b from-[#0B2D5B] via-[#0D8A9E] to-[#0B2D5B] text-white px-4 py-2 rounded-2xl border-2 border-white shadow-2xl text-center">
-                                        <span class="text-[8px] font-bold uppercase tracking-widest text-sky-200 block">STARTING FROM</span>
+                                        <span class="text-[8px] font-bold uppercase tracking-widest text-[#BFEFF6] block">STARTING FROM</span>
                                         <div class="text-lg font-black leading-tight">PKR ${formatPKR(deal.startingPrice)}</div>
                                         <span class="text-[8px] font-bold uppercase text-teal-100 block">${escapeHtml(deal.priceUnit || "PER PERSON")}</span>
                                     </div>
@@ -1864,16 +1828,16 @@
 
                                 <!-- Services Included Pills -->
                                 <div class="flex flex-wrap gap-1.5 pt-1">
-                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${srv.roundTrip !== false ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-slate-100 text-slate-400 line-through"}">
+                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${srv.roundTrip !== false ? "bg-[#E6F6F8] text-[#0D8A9E] border border-[#0D8A9E]/20" : "bg-slate-100 text-slate-400 line-through"}">
                                         <i class="fa-solid fa-plane mr-1"></i>Round Trip
                                     </span>
-                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${srv.visa !== false ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-slate-100 text-slate-400 line-through"}">
+                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${srv.visa !== false ? "bg-[#E6F6F8] text-[#0D8A9E] border border-[#0D8A9E]/20" : "bg-slate-100 text-slate-400 line-through"}">
                                         <i class="fa-solid fa-passport mr-1"></i>Umrah Visa
                                     </span>
-                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${srv.hotel !== false ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-slate-100 text-slate-400 line-through"}">
+                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${srv.hotel !== false ? "bg-[#E6F6F8] text-[#0D8A9E] border border-[#0D8A9E]/20" : "bg-slate-100 text-slate-400 line-through"}">
                                         <i class="fa-solid fa-hotel mr-1"></i>Hotel Stay
                                     </span>
-                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${srv.transport !== false ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-slate-100 text-slate-400 line-through"}">
+                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${srv.transport !== false ? "bg-[#E6F6F8] text-[#0D8A9E] border border-[#0D8A9E]/20" : "bg-slate-100 text-slate-400 line-through"}">
                                         <i class="fa-solid fa-bus mr-1"></i>Transport
                                     </span>
                                 </div>
@@ -1889,12 +1853,12 @@
                                 <button type="button" data-action="move-deal" data-id="${escapeHtml(deal.id)}" data-dir="down" ${idx === this.specialDeals.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs" title="Move Down">
                                     <i class="fa-solid fa-arrow-down"></i>
                                 </button>
-                                <button type="button" data-action="toggle-deal-active" data-id="${escapeHtml(deal.id)}" class="px-3 py-1.5 rounded-xl text-xs font-bold border ${deal.isActive ? "bg-white text-emerald-700 border-emerald-200 hover:bg-emerald-50" : "bg-slate-200 text-slate-700 border-slate-300"}">
+                                <button type="button" data-action="toggle-deal-active" data-id="${escapeHtml(deal.id)}" class="px-3 py-1.5 rounded-xl text-xs font-bold border ${deal.isActive ? "bg-[#E6F6F8] text-[#0D8A9E] border-[#0D8A9E]/20 hover:bg-[#D7F0F4]" : "bg-slate-200 text-slate-700 border-slate-300"}">
                                     ${deal.isActive ? "Visible" : "Hidden"}
                                 </button>
                                 ${
                                     !deal.isPrimary
-                                        ? `<button type="button" data-action="set-primary-deal" data-id="${escapeHtml(deal.id)}" class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200" title="Set as Primary Deal">
+                                        ? `<button type="button" data-action="set-primary-deal" data-id="${escapeHtml(deal.id)}" class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#8A6D0B] border border-[#D4AF37]/30" title="Set as Primary Deal">
                                             <i class="fa-regular fa-star mr-1"></i>Set Primary
                                            </button>`
                                         : ""
@@ -1929,7 +1893,7 @@
             const doublePrice = Number(this.container.querySelector("#rateDouble").value);
 
             if ([startingPrice, sharingPrice, quadPrice, triplePrice, doublePrice].some((p) => !p || p <= 0)) {
-                this.showToast("All package and calculator prices must be greater than 0 PKR.", "error");
+                this.showToast("All package and room prices must be greater than 0 PKR.", "error");
                 return false;
             }
 
@@ -2014,7 +1978,7 @@
                     secondaryWhatsApp,
                     activeBookingWhatsApp,
                     officeAddress: getVal("#contactOfficeAddress", ""),
-                    officeHours: getVal("#contactOfficeHours", "Monday to Saturday: 9:30 AM – 8:00 PM (Sunday Closed / WhatsApp Support Active)"),
+                    officeHours: getVal("#contactOfficeHours", "Monday to Saturday: 9:30 AM \u2013 8:00 PM (Sunday Closed / WhatsApp Support Active)"),
                     officeEmail: getVal("#contactOfficeEmail", "info@zakirtravels.com / inam@zakirtravels.com"),
                     mapEmbedUrl: getVal("#contactMapEmbedUrl", "")
                 },
@@ -2117,13 +2081,13 @@
             wrap.innerHTML = this.packages
                 .map(
                     (pkg, idx) => `
-                <div class="admin-card-hover bg-white rounded-3xl p-5 border ${pkg.isActive ? "border-slate-200" : "border-slate-200 opacity-60 bg-slate-50"} shadow-sm flex flex-col justify-between gap-4">
+                <div class="admin-card-hover bg-white rounded-3xl p-5 border ${pkg.isActive ? "border-slate-200" : "border-slate-200 opacity-60 bg-slate-50"} shadow-card flex flex-col justify-between gap-4">
                     <div class="space-y-2">
                         <div class="flex flex-wrap items-center justify-between gap-2">
                             <div class="flex items-center gap-1.5">
                                 <span class="bg-[#0B2D5B] text-white text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full">#${idx + 1}</span>
                                 <span class="bg-[#E6F6F8] text-[#0D8A9E] text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full">${escapeHtml(pkg.badgeText || "Package")}</span>
-                                ${pkg.isFeatured ? `<span class="bg-amber-100 text-amber-800 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-star mr-1"></i>Featured</span>` : ""}
+                                ${pkg.isFeatured ? `<span class="bg-[#FEF3C7] text-[#8A6D0B] text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-star mr-1"></i>Featured</span>` : ""}
                             </div>
                             <span class="text-lg font-black text-[#0D8A9E]">PKR ${formatPKR(pkg.price)}</span>
                         </div>
@@ -2144,7 +2108,7 @@
                             <button type="button" data-action="move-pkg" data-id="${escapeHtml(pkg.id)}" data-dir="down" ${idx === this.packages.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
                                 <i class="fa-solid fa-arrow-down"></i>
                             </button>
-                            <button type="button" data-action="toggle-pkg-active" data-id="${escapeHtml(pkg.id)}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${pkg.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-200 text-slate-700"}">
+                            <button type="button" data-action="toggle-pkg-active" data-id="${escapeHtml(pkg.id)}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${pkg.isActive ? "bg-[#E6F6F8] text-[#0D8A9E]" : "bg-slate-200 text-slate-700"}">
                                 ${pkg.isActive ? "Active" : "Hidden"}
                             </button>
                         </div>
@@ -2175,11 +2139,11 @@
             wrap.innerHTML = this.visas
                 .map(
                     (v, idx) => `
-                <div class="admin-card-hover bg-white rounded-3xl p-5 border ${v.isActive ? "border-slate-200" : "border-slate-200 opacity-60 bg-slate-50"} shadow-sm flex flex-col justify-between gap-4">
+                <div class="admin-card-hover bg-white rounded-3xl p-5 border ${v.isActive ? "border-slate-200" : "border-slate-200 opacity-60 bg-slate-50"} shadow-card flex flex-col justify-between gap-4">
                     <div class="flex items-start justify-between gap-3">
                         <div class="flex items-start gap-3.5">
                             <div class="w-12 h-12 rounded-2xl bg-[#E6F6F8] text-2xl flex items-center justify-center shrink-0">
-                                ${escapeHtml(v.flagEmoji || "🌍")}
+                                ${v.flagEmoji ? escapeHtml(v.flagEmoji) : '<i class="fa-solid fa-globe text-[#0D8A9E]"></i>'}
                             </div>
                             <div>
                                 <h4 class="text-base font-black text-[#0B2D5B]">${escapeHtml(v.countryName)}</h4>
@@ -2201,7 +2165,7 @@
                             <button type="button" data-action="move-visa" data-id="${escapeHtml(v.id)}" data-dir="down" ${idx === this.visas.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
                                 <i class="fa-solid fa-arrow-down"></i>
                             </button>
-                            <button type="button" data-action="toggle-visa-active" data-id="${escapeHtml(v.id)}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${v.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-200 text-slate-700"}">
+                            <button type="button" data-action="toggle-visa-active" data-id="${escapeHtml(v.id)}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${v.isActive ? "bg-[#E6F6F8] text-[#0D8A9E]" : "bg-slate-200 text-slate-700"}">
                                 ${v.isActive ? "Active" : "Hidden"}
                             </button>
                         </div>
@@ -2226,8 +2190,8 @@
                 const isMatch = btn.getAttribute("data-tab") === tabName;
                 const extraColSpan = btn.getAttribute("data-tab") === "contacts" ? " col-span-2 sm:col-span-1" : "";
                 btn.className = isMatch
-                    ? `admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#16437E] text-white font-extrabold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-md transition-all${extraColSpan}`
-                    : `admin-tab-btn text-slate-600 hover:bg-slate-100 font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all${extraColSpan}`;
+                    ? `admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] text-white font-extrabold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-md transition-all${extraColSpan}`
+                    : `admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all${extraColSpan}`;
             });
 
             ["spotlight", "umrah", "visas", "calculator", "contacts"].forEach((t) => {
@@ -2367,7 +2331,7 @@
                 });
             });
 
-            // About Us — Team Member Photo Uploads
+            // About Us - Team Member Photo Uploads
             this.container.querySelectorAll("input[type='file'][data-team-photo-upload]").forEach((fileInput) => {
                 fileInput.addEventListener("change", async (e) => {
                     const file = e.target.files && e.target.files[0];
@@ -2662,30 +2626,6 @@
                     await db.resetToFlyerDefaults();
                     this.container.querySelector("#resetConfirmModal").classList.add("hidden");
                     this.showToast("Restored Original January Flyer Defaults (PKR 232,000)!");
-                } else if (action === "open-firebase-modal") {
-                    const existing = db.getFirebaseConfig();
-                    this.container.querySelector("#firebaseConfigTextarea").value = existing
-                        ? JSON.stringify(existing, null, 2)
-                        : "";
-                    this.container.querySelector("#firebaseConfigModal").classList.remove("hidden");
-                } else if (action === "close-firebase-modal") {
-                    this.container.querySelector("#firebaseConfigModal").classList.add("hidden");
-                } else if (action === "save-firebase-config") {
-                    try {
-                        const raw = this.container.querySelector("#firebaseConfigTextarea").value.trim();
-                        const parsed = JSON.parse(raw);
-                        await db.saveFirebaseConfig(parsed);
-                        this.container.querySelector("#firebaseConfigModal").classList.add("hidden");
-                        this._updateAuthView();
-                        this.showToast("Connected to Firebase Cloud!");
-                    } catch (err) {
-                        this.showToast("Invalid Firebase JSON config: " + err.message, "error");
-                    }
-                } else if (action === "disconnect-firebase") {
-                    db.disconnectFirebaseConfig();
-                    this.container.querySelector("#firebaseConfigModal").classList.add("hidden");
-                    this._updateAuthView();
-                    this.showToast("Switched to Built-In Real-Time Local Sync.");
                 }
             });
         }
@@ -2696,7 +2636,7 @@
                 : "Create New Special Flyer Deal";
             this.container.querySelector("#dealEditId").value = (deal && deal.id) || "";
             this.container.querySelector("#dealEditMonth").value =
-                (deal && deal.monthLabel) || "February & शाबान Special";
+                (deal && deal.monthLabel) || "February & Shaban Special";
             this.container.querySelector("#dealEditTitle").value = (deal && deal.title) || "UMRAH PACKAGE";
             this.container.querySelector("#dealEditPrice").value = (deal && deal.startingPrice) || 245000;
             this.container.querySelector("#dealEditUnit").value =
@@ -2773,7 +2713,7 @@
                 : "Add New Country Visa";
             this.container.querySelector("#visaEditId").value = (visa && visa.id) || "";
             this.container.querySelector("#visaEditCountry").value = (visa && visa.countryName) || "";
-            this.container.querySelector("#visaEditFlag").value = (visa && visa.flagEmoji) || "🌍";
+            this.container.querySelector("#visaEditFlag").value = (visa && visa.flagEmoji) || "";
             this.container.querySelector("#visaEditType").value = (visa && visa.visaType) || "Tourist E-Visa";
             this.container.querySelector("#visaEditTime").value = (visa && visa.processingTime) || "3-5 Working Days";
             this.container.querySelector("#visaEditPrice").value =
