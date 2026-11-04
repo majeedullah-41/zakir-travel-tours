@@ -284,16 +284,8 @@
                                 </div>
                             </div>
 
-                            <!-- Live Price Badge & Action Buttons -->
+                            <!-- Action Buttons -->
                             <div class="flex flex-wrap items-center gap-2 sm:gap-2.5 ml-auto">
-                                <div class="hidden md:flex bg-white/10 border border-white/15 rounded-xl px-3.5 py-1.5 items-center gap-2.5">
-                                    <i class="fa-solid fa-tag text-[#15B2CB]"></i>
-                                    <div class="text-left">
-                                        <span class="text-[9px] uppercase tracking-wider text-sky-200 block leading-none">Primary Flyer Deal</span>
-                                        <span id="livePreviewPriceBadge" class="text-xs sm:text-sm font-black text-white">PKR 232,000</span>
-                                    </div>
-                                </div>
-
                                 <!-- Save & Push to Website Button -->
                                 <button type="button" id="headerSavePushBtn" data-action="save-push-all" class="anim-pulse-emerald bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-lg transition-all active:scale-95">
                                     <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
@@ -321,60 +313,6 @@
                     </header>
 
                     <main class="max-w-7xl mx-auto px-4 pt-6 space-y-6">
-
-                        <!-- ========================================================== -->
-                        <!-- TOP "10-SECOND QUICK UPDATE" BAR (MOBILE PRIORITY)         -->
-                        <!-- ========================================================== -->
-                        <section class="admin-gradient-animated rounded-3xl p-5 sm:p-6 text-white shadow-2xl border border-white/15 relative overflow-hidden anim-fade-up">
-                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-                                <div class="flex items-center gap-2.5">
-                                    <span class="bg-amber-400 text-[#071E3E] text-[10px] font-black uppercase px-3 py-1 rounded-full flex items-center gap-1 shadow">
-                                        <i class="fa-solid fa-bolt"></i> 10-Second Quick Update
-                                    </span>
-                                    <h2 class="text-base sm:text-lg font-black tracking-tight">Primary Flyer Deal & Tier Rate Updater</h2>
-                                </div>
-                                <span id="quickUpdateTierHint" class="text-[11px] text-sky-200 font-semibold flex items-center gap-1.5">
-                                    <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
-                                    <span>Auto-scales Primary Deal + Calculator Tiers</span>
-                                </span>
-                            </div>
-
-                            <form id="quickUpdateForm" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
-                                <div class="sm:col-span-4">
-                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-sky-200 mb-1">
-                                        Primary Deal Starting Price (PKR)
-                                    </label>
-                                    <div class="relative">
-                                        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-[#0B2D5B]">PKR</span>
-                                        <input type="number" id="quickStartingPrice" min="1000" step="500" required
-                                            class="w-full bg-white text-[#0B2D5B] font-black text-base rounded-xl pl-12 pr-3.5 py-3 focus:outline-none focus:ring-2 focus:ring-amber-300 shadow-inner">
-                                    </div>
-                                </div>
-
-                                <div class="sm:col-span-3">
-                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-sky-200 mb-1">
-                                        Next Departure Date
-                                    </label>
-                                    <input type="text" id="quickDepartureDate" required placeholder="e.g. Jan 26, 2026"
-                                        class="w-full bg-white text-[#0B2D5B] font-extrabold text-sm rounded-xl px-3.5 py-3.5 focus:outline-none focus:ring-2 focus:ring-amber-300 shadow-inner">
-                                </div>
-
-                                <div class="sm:col-span-2">
-                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-sky-200 mb-1">
-                                        Season / Month Label
-                                    </label>
-                                    <input type="text" id="quickMonthLabel" required placeholder="e.g. Ramzan"
-                                        class="w-full bg-white text-[#0B2D5B] font-extrabold text-sm rounded-xl px-3.5 py-3.5 focus:outline-none focus:ring-2 focus:ring-amber-300 shadow-inner">
-                                </div>
-
-                                <div class="sm:col-span-3">
-                                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-black py-3.5 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2 text-sm">
-                                        <i class="fa-solid fa-bolt"></i>
-                                        <span>Publish Live Now</span>
-                                    </button>
-                                </div>
-                            </form>
-                        </section>
 
                         <!-- ========================================================== -->
                         <!-- 5 PAGE-DEDICATED MANAGEMENT TABS NAVIGATION                -->
@@ -579,7 +517,76 @@
                         <!-- TAB 2: UMRAH PACKAGES PAGE (DEALS + PACKAGES + CONTENT)    -->
                         <!-- ========================================================== -->
                         <div id="admin-panel-umrah" class="admin-tab-panel hidden space-y-6 anim-fade-up">
-                            
+
+                            <!-- Primary Umrah Flyer Deal Quick Update -->
+                            <section class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                                <div class="bg-gradient-to-r from-[#0B2D5B] via-[#16437E] to-[#0D8A9E] px-5 sm:px-6 py-4 text-white flex flex-wrap items-center justify-between gap-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center">
+                                            <i class="fa-solid fa-bolt text-amber-300"></i>
+                                        </div>
+                                        <div>
+                                            <span class="text-[10px] font-black uppercase tracking-widest text-sky-200 block">Primary Flyer Deal</span>
+                                            <h3 class="text-base sm:text-lg font-black leading-tight">Quick Update Umrah Offer</h3>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white/10 border border-white/15 rounded-xl px-3.5 py-1.5 flex items-center gap-2">
+                                        <i class="fa-solid fa-tag text-[#15B2CB]"></i>
+                                        <div>
+                                            <span class="text-[9px] uppercase tracking-wider text-sky-200 block leading-none">Live Price</span>
+                                            <span id="livePreviewPriceBadge" class="text-xs sm:text-sm font-black text-white">PKR 232,000</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <form id="quickUpdateForm" class="p-5 sm:p-6 space-y-4">
+                                    <p class="text-xs text-slate-500 leading-relaxed">
+                                        Update the headline price, departure date, and season label for the primary Umrah flyer deal. The homepage spotlight and calculator tiers update automatically when you publish.
+                                    </p>
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                                        <div class="sm:col-span-4">
+                                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                                                Starting Price (PKR)
+                                            </label>
+                                            <div class="relative">
+                                                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-[#0B2D5B]">PKR</span>
+                                                <input type="number" id="quickStartingPrice" min="1000" step="500" required
+                                                    class="w-full bg-slate-50 border border-slate-200 text-[#0B2D5B] font-black text-base rounded-xl pl-12 pr-3.5 py-3 focus:outline-none focus:border-[#0D8A9E] focus:ring-2 focus:ring-[#0D8A9E]/20 transition-all">
+                                            </div>
+                                        </div>
+
+                                        <div class="sm:col-span-3">
+                                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                                                Next Departure Date
+                                            </label>
+                                            <input type="text" id="quickDepartureDate" required placeholder="e.g. Jan 26, 2026"
+                                                class="w-full bg-slate-50 border border-slate-200 text-[#0B2D5B] font-extrabold text-sm rounded-xl px-3.5 py-3.5 focus:outline-none focus:border-[#0D8A9E] focus:ring-2 focus:ring-[#0D8A9E]/20 transition-all">
+                                        </div>
+
+                                        <div class="sm:col-span-2">
+                                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                                                Season / Month
+                                            </label>
+                                            <input type="text" id="quickMonthLabel" required placeholder="e.g. Ramzan"
+                                                class="w-full bg-slate-50 border border-slate-200 text-[#0B2D5B] font-extrabold text-sm rounded-xl px-3.5 py-3.5 focus:outline-none focus:border-[#0D8A9E] focus:ring-2 focus:ring-[#0D8A9E]/20 transition-all">
+                                        </div>
+
+                                        <div class="sm:col-span-3">
+                                            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3.5 px-4 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 text-sm">
+                                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                                <span>Publish Update</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center gap-2 text-[11px] font-bold text-[#0D8A9E]">
+                                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                        <span id="quickUpdateTierHint">Auto-scales the primary deal and calculator tiers</span>
+                                    </div>
+                                </form>
+                            </section>
+
                             <!-- Header Bar for Special Flyer Deals CRUD -->
                             <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200/90 flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div>
