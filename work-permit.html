@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poland Work Permit & European Employment Visa | Zakir Travel & Tours</title>
+    <title>Europe Work Permits | Poland & EU Employment Visas | Zakir Travel & Tours</title>
     <link rel="icon" type="image/png" href="./assets/logo-mark.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -170,6 +170,83 @@
             transform: translateY(0);
         }
 
+        /* Dotted Section Background (matches Umrah showcase) */
+        .dotted-bg {
+            background-color: #f4fafe;
+            background-image: radial-gradient(#0D8A9E 0.55px, transparent 0.55px), radial-gradient(#0B2D5B 0.55px, #f4fafe 0.55px);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+        }
+        @keyframes floatingPriceShield {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-7px); }
+        }
+        .floating-price-shield { animation: floatingPriceShield 4s ease-in-out infinite; }
+
+        /* CSS Country Flags */
+        .flag { display: inline-block; width: 22px; height: 15px; border-radius: 3px; box-shadow: 0 0 0 1px rgba(11,45,91,0.18); flex-shrink: 0; }
+        .flag-lg { width: 30px; height: 20px; }
+        .flag-xl { width: 40px; height: 27px; border-radius: 5px; }
+        .flag-pl { background: linear-gradient(to bottom, #fff 50%, #DC143C 50%); }
+        .flag-ro { background: linear-gradient(to right, #002B7F 33.3%, #FCD116 33.3% 66.6%, #CE1126 66.6%); }
+        .flag-hr { background: linear-gradient(to bottom, #FF0000 33.3%, #fff 33.3% 66.6%, #171796 66.6%); }
+        .flag-hu { background: linear-gradient(to bottom, #CE2939 33.3%, #fff 33.3% 66.6%, #477050 66.6%); }
+        .flag-cz { background: linear-gradient(to bottom right, #11457E 50%, transparent 50%) left bottom / 50% 50% no-repeat, linear-gradient(to top right, #11457E 50%, transparent 50%) left top / 50% 50% no-repeat, linear-gradient(to bottom, #fff 50%, #D7141A 50%); }
+        .flag-pt { background: linear-gradient(to right, #006600 40%, #FF0000 40%); }
+        .flag-mt { background: linear-gradient(to right, #fff 50%, #CF142B 50%); }
+
+        /* Job Chips */
+        .job-chip { display: inline-flex; align-items: center; gap: 6px; background: #F1F5FA; color: #0B2D5B; border: 1px solid #E2E8F0; font-weight: 700; font-size: 11px; padding: 6px 12px; border-radius: 9999px; }
+        .job-chip i { color: #0D8A9E; }
+        @media (max-width: 640px) { .job-chip { font-size: 9.5px; padding: 4px 9px; } }
+
+        /* Destination Cards (Umrah package-card style) */
+        .dest-card { position: relative; background: #fff; border-radius: 1.5rem; padding: 1.5rem; display: flex; flex-direction: column; box-shadow: 0 10px 30px -12px rgba(11,45,91,0.12); }
+        .dest-tag { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; padding: 4px 10px; border-radius: 9999px; }
+        .dest-box { margin-top: 1rem; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 1rem; padding: .9rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+        .dest-label { display: block; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: #94A3B8; }
+        .dest-pill { background: #fff; border: 1px solid #CBD5E1; color: #0B2D5B; font-size: 11px; font-weight: 800; padding: 5px 10px; border-radius: .6rem; white-space: nowrap; }
+        .dest-rows { margin-top: 1rem; font-size: 12.5px; }
+        .dest-rows > div { display: flex; justify-content: space-between; gap: 1rem; padding: .55rem 0; border-bottom: 1px solid #F1F5F9; }
+        .dest-rows dt { color: #64748B; font-weight: 600; white-space: nowrap; }
+        .dest-rows dt i { color: #0D8A9E; width: 16px; }
+        .dest-rows dd { color: #0B2D5B; font-weight: 800; text-align: right; }
+        .dest-ticks { margin-top: .9rem; display: flex; flex-wrap: wrap; gap: 6px; }
+        .dest-ticks span { background: #F1F5F9; color: #334155; font-size: 10.5px; font-weight: 700; padding: 4px 9px; border-radius: .5rem; }
+        .dest-ticks i { color: #0D8A9E; margin-right: 3px; }
+        .dest-actions { margin-top: auto; padding-top: 1.25rem; display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+        .dest-btn-primary, .dest-btn-wa { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 800; padding: .8rem .5rem; border-radius: .8rem; color: #fff; transition: all .25s; }
+        .dest-btn-primary { background: #0B2D5B; }
+        .dest-btn-primary:hover { background: #16437E; }
+        .dest-btn-wa { background: #059669; }
+        .dest-btn-wa:hover { background: #10B981; }
+
+        /* Benefit & Step Cards */
+        .benefit-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 1.25rem; padding: 1.25rem; }
+        .benefit-icon { width: 44px; height: 44px; border-radius: .9rem; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; margin-bottom: .8rem; }
+        .benefit-card h4 { font-weight: 900; color: #0B2D5B; font-size: .95rem; }
+        .benefit-card p { font-size: 12px; color: #64748B; margin-top: .35rem; line-height: 1.55; }
+        .step-card { position: relative; background: #fff; border: 1px solid #E2E8F0; border-radius: 1.25rem; padding: 1.75rem 1.25rem 1.25rem; }
+        .step-num { position: absolute; top: -14px; left: 1.25rem; width: 30px; height: 30px; border-radius: 9999px; background: #0D8A9E; color: #fff; font-weight: 900; font-size: 13px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 4px #fff; }
+        .step-icon { width: 44px; height: 44px; border-radius: .9rem; background: #E6F6F8; color: #0D8A9E; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; margin-bottom: .8rem; }
+        .step-card h4 { font-weight: 900; color: #0B2D5B; }
+        .step-card p { font-size: 12.5px; color: #64748B; margin-top: .35rem; line-height: 1.55; }
+
+        /* Checklist, Form & FAQ */
+        .check-item { display: flex; gap: .8rem; background: #fff; border: 1px solid #E2E8F0; border-radius: 1rem; padding: .85rem 1rem; }
+        .check-item > i { color: #0D8A9E; margin-top: 3px; }
+        .check-item strong { display: block; color: #0B2D5B; font-size: 13.5px; }
+        .check-item span { display: block; color: #64748B; font-size: 12px; }
+        .form-lbl { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; color: #CBD5E1; margin-bottom: 4px; }
+        .form-fld { width: 100%; background: #fff; border: 1px solid #E2E8F0; border-radius: .8rem; padding: .75rem 1rem; font-size: 14px; font-weight: 600; color: #0B2D5B; }
+        .form-fld:focus { outline: none; border-color: #0D8A9E; box-shadow: 0 0 0 3px rgba(13,138,158,0.2); }
+        .faq-item { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 1rem; padding: 1rem 1.25rem; }
+        .faq-item summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 1rem; font-weight: 800; color: #0B2D5B; font-size: 14.5px; }
+        .faq-item summary::-webkit-details-marker { display: none; }
+        .faq-item summary i { color: #0D8A9E; font-size: 12px; transition: transform .25s; }
+        .faq-item[open] summary i { transform: rotate(180deg); }
+        .faq-item p { margin-top: .6rem; font-size: 13px; color: #475569; line-height: 1.65; }
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
@@ -200,7 +277,7 @@
                 <span class="text-white/20">|</span>
                 <span class="flex items-center gap-1.5 text-slate-400">
                     <i class="fa-solid fa-passport text-amber-400"></i>
-                    <span class="text-white font-semibold">Overseas Employment &amp; European Work Permits</span>
+                    <span class="text-white font-semibold">Europe Work Permits &amp; Overseas Employment</span>
                 </span>
             </div>
             <div class="flex items-center space-x-4">
@@ -302,7 +379,7 @@
                 </nav>
 
                 <!-- Action Pill 1: Direct WhatsApp Desk (Solid Navy Pill) -->
-                <a id="navWhatsAppBtn" href="https://wa.me/923490558345?text=Assalam-o-Alaikum%20Zakir%20Travel%20%26%20Tours!%20I%20am%20inquiring%20about%20Poland%20Work%20Permit%20services." target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-3.5 xl:px-4 py-1.5 rounded-full bg-gradient-to-r from-[#08346B] to-[#0E4C9A] hover:from-[#062752] hover:to-[#08346B] text-white shadow-[0_6px_16px_-3px_rgba(8,52,107,0.5)] transition-all group">
+                <a id="navWhatsAppBtn" href="https://wa.me/923490558345?text=Assalam-o-Alaikum%20Zakir%20Travel%20%26%20Tours!%20I%20am%20inquiring%20about%20Europe%20Work%20Permit%20services." target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-3.5 xl:px-4 py-1.5 rounded-full bg-gradient-to-r from-[#08346B] to-[#0E4C9A] hover:from-[#062752] hover:to-[#08346B] text-white shadow-[0_6px_16px_-3px_rgba(8,52,107,0.5)] transition-all group">
                     <span class="w-6 h-6 rounded-full bg-[#25D366] flex items-center justify-center text-white shadow-sm shrink-0">
                         <i class="fa-brands fa-whatsapp text-sm"></i>
                     </span>
@@ -331,7 +408,7 @@
             <a href="index.html" class="block py-2 px-3.5 rounded-xl font-semibold text-navy hover:bg-slate-50 text-sm">Home (Agency Overview)</a>
             <a href="umrah-packages.html" class="block py-2 px-3.5 rounded-xl font-semibold text-navy hover:bg-slate-50 text-sm">Umrah Packages</a>
             <a href="visa-services.html" class="block py-2 px-3.5 rounded-xl font-semibold text-navy hover:bg-slate-50 text-sm">Visas &amp; Air Tickets</a>
-            <a href="work-permit.html" class="block py-2 px-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-[#0E56B5] to-[#083574] text-sm">Work Permit (Poland &amp; Global)</a>
+            <a href="work-permit.html" class="block py-2 px-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-[#0E56B5] to-[#083574] text-sm">Europe Work Permits</a>
             <a href="contact.html" class="block py-2 px-3.5 rounded-xl font-semibold text-navy hover:bg-slate-50 text-sm">About Us &amp; Contact</a>
             <button type="button" onclick="openAdminPortalDrawer()" class="w-full text-left py-2 px-3.5 rounded-xl font-bold text-navy hover:bg-slate-100 flex items-center gap-2 text-sm">
                 <i class="fa-regular fa-user"></i> Admin Portal
@@ -344,608 +421,493 @@
         </div>
     </header>
 
-    <!-- Page Hero Banner: Executive Mesh Background with Ambient Floating Orbs & Ken Burns Motion -->
+    <!-- Page Hero Banner: Europe Work Permits -->
     <section class="relative overflow-hidden executive-mesh-bg text-white pt-14 pb-16 lg:py-20 border-b border-white/10">
-        <!-- Architectural European Cityscape Background with Ken Burns Slow Motion -->
-        <div class="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1519197924294-4ba991a11128?auto=format&fit=crop&w=1900&q=80')] bg-cover bg-center mix-blend-luminosity pointer-events-none ken-burns"></div>
+        <div class="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1900&q=80')] bg-cover bg-center mix-blend-luminosity pointer-events-none ken-burns"></div>
         <div class="absolute inset-0 bg-gradient-to-r from-[#05162E] via-[#05162E]/95 to-[#05162E]/80 pointer-events-none"></div>
-        
-        <!-- Ambient Floating Aurora Orbs -->
         <div class="aurora-orb-1 absolute -top-24 -left-24 w-96 h-96 rounded-full bg-teal/20 blur-3xl pointer-events-none"></div>
-        <div class="aurora-orb-2 absolute bottom-0 right-10 w-80 h-80 rounded-full bg-poland-red/20 blur-3xl pointer-events-none"></div>
+        <div class="aurora-orb-2 absolute bottom-0 right-10 w-80 h-80 rounded-full bg-[#1E3A8A]/30 blur-3xl pointer-events-none"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <!-- Badge with Polish Flag -->
             <div class="inline-flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/15 px-4 py-2 rounded-full text-xs sm:text-sm font-bold text-sky-100 shadow-sm mb-4">
-                <span class="inline-flex items-center justify-center w-5 h-3.5 rounded-sm overflow-hidden shadow-sm border border-white/30">
-                    <span class="w-full h-1/2 bg-white block"></span>
-                    <span class="w-full h-1/2 bg-[#DC143C] block"></span>
-                </span>
-                <span>EUROPEAN SCHENGEN WORK PERMIT • POLAND</span>
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                <i class="fa-solid fa-earth-europe text-amber-300"></i>
+                <span>EU &amp; Schengen Employment • Legal Work Permits</span>
             </div>
 
             <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight uppercase leading-[1.15]">
-                <span class="block">Poland Work Permit</span>
-                <span class="font-serif italic font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-teal-light to-rose-200 animated-gradient-text block mt-1 text-2xl sm:text-4xl lg:text-5xl">Your Legal Gateway to Employment in Europe.</span>
+                <span class="block">Europe Work Permits</span>
+                <span class="font-serif italic font-bold normal-case text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-teal-light to-sky-200 animated-gradient-text block mt-1 text-2xl sm:text-4xl lg:text-5xl">Build Your Career Abroad — The Legal Way.</span>
             </h1>
 
             <p class="mt-4 text-base sm:text-lg text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed">
-                A work permit allows individuals to legally work in a foreign country, providing opportunities for career growth abroad. Backed by our Swat Matta Head Office and Islamabad branch, Zakir Travel &amp; Tours delivers end-to-end legal document preparation, verified employer approvals, and embassy appointment assistance.
+                A work permit allows you to legally live and work in a foreign country. From our Head Office in Matta Swat, Zakir Travel &amp; Tours guides you through every stage of European employment — consultation, eligibility, documents and embassy filing — for Poland and other leading EU destinations.
             </p>
+
+            <!-- Country Quick Chips -->
+            <div class="mt-6 flex flex-wrap justify-center gap-2 max-w-3xl mx-auto">
+                <a href="#poland-programme" class="inline-flex items-center gap-2 bg-white text-navy font-extrabold text-xs px-3.5 py-2 rounded-full shadow-md hover:-translate-y-0.5 transition-all">
+                    <span class="flag flag-pl"></span> Poland <span class="bg-emerald-500 text-white text-[9px] px-1.5 py-0.5 rounded-full uppercase">Open</span>
+                </a>
+                <a href="#europe-destinations" class="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white font-bold text-xs px-3.5 py-2 rounded-full hover:bg-white/20 transition-all"><span class="flag flag-ro"></span> Romania</a>
+                <a href="#europe-destinations" class="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white font-bold text-xs px-3.5 py-2 rounded-full hover:bg-white/20 transition-all"><span class="flag flag-hr"></span> Croatia</a>
+                <a href="#europe-destinations" class="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white font-bold text-xs px-3.5 py-2 rounded-full hover:bg-white/20 transition-all"><span class="flag flag-hu"></span> Hungary</a>
+                <a href="#europe-destinations" class="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white font-bold text-xs px-3.5 py-2 rounded-full hover:bg-white/20 transition-all"><span class="flag flag-cz"></span> Czech Republic</a>
+                <a href="#europe-destinations" class="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white font-bold text-xs px-3.5 py-2 rounded-full hover:bg-white/20 transition-all"><span class="flag flag-pt"></span> Portugal</a>
+                <a href="#europe-destinations" class="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white font-bold text-xs px-3.5 py-2 rounded-full hover:bg-white/20 transition-all"><span class="flag flag-mt"></span> Malta</a>
+            </div>
 
             <div class="mt-8 flex flex-wrap justify-center gap-3.5 text-xs sm:text-sm font-bold">
                 <a href="#quick-assessment" class="btn-shimmer bg-gradient-to-r from-teal to-teal-light hover:-translate-y-0.5 text-white px-7 py-3.5 rounded-xl shadow-lg shadow-teal/25 transition-all flex items-center gap-2">
                     <i class="fa-solid fa-file-circle-check text-amber-300"></i>
-                    <span>Apply / Free Eligibility Check</span>
+                    <span>Free Eligibility Assessment</span>
                 </a>
-                <a href="#our-services" class="bg-white/10 hover:bg-white/15 hover:-translate-y-0.5 backdrop-blur-md border border-white/20 text-white px-6 py-3.5 rounded-xl transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-shield-halved text-teal-light"></i>
-                    <span>Our 4-Pillar Services</span>
-                </a>
-                <a href="#job-sectors" class="bg-white/10 hover:bg-white/15 hover:-translate-y-0.5 backdrop-blur-md border border-white/20 text-white px-6 py-3.5 rounded-xl transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-briefcase text-amber-300"></i>
-                    <span>In-Demand Sectors</span>
+                <a href="#europe-destinations" class="bg-white/10 hover:bg-white/15 hover:-translate-y-0.5 backdrop-blur-md border border-white/20 text-white px-6 py-3.5 rounded-xl transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-earth-europe text-teal-light"></i>
+                    <span>Explore Destinations</span>
                 </a>
             </div>
 
             <!-- Executive Trust Strip -->
             <div class="mt-10 pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-4xl mx-auto text-center">
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
-                    <div class="text-xl sm:text-2xl font-extrabold text-amber-300">100% Legal</div>
-                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Voivodeship Approved</div>
+                    <div class="text-xl sm:text-2xl font-extrabold text-amber-300">7+ Countries</div>
+                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">EU Destinations Covered</div>
                 </div>
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
-                    <div class="text-xl sm:text-2xl font-extrabold text-teal-light">Schengen</div>
-                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">29 Countries Mobility</div>
+                    <div class="text-xl sm:text-2xl font-extrabold text-teal-light">100% Legal</div>
+                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Government-Issued Permits</div>
                 </div>
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
-                    <div class="text-xl sm:text-2xl font-extrabold text-white">Direct Desk</div>
-                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Islamabad &amp; Swat</div>
+                    <div class="text-xl sm:text-2xl font-extrabold text-white">Schengen</div>
+                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Travel Mobility Rights</div>
                 </div>
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
-                    <div class="text-xl sm:text-2xl font-extrabold text-emerald-400">TRC Pathway</div>
-                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Karta Pobytu Support</div>
+                    <div class="text-xl sm:text-2xl font-extrabold text-emerald-400">Free</div>
+                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Initial Profile Review</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Section 1: Poland Opportunity & Legal Benefits Overview -->
-    <section class="py-16 lg:py-24 bg-white relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid lg:grid-cols-12 gap-10 items-center">
-                
-                <!-- Left: Why Poland Work Permit? -->
-                <div class="lg:col-span-6 space-y-5">
-                    <span class="bg-teal-accent text-teal text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block">
-                        Why Choose Poland for Work?
-                    </span>
-                    <h2 class="text-3xl sm:text-4xl font-black text-navy leading-tight">
-                        A Secure, Fast-Growing European Economy with Full Legal Rights
-                    </h2>
-                    <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
-                        Poland has emerged as one of Central Europe's strongest industrial and logistical hubs. As a member of the European Union and Schengen Zone, a Polish National Type-D Work Visa provides international workers with legal contracts, standard social security (ZUS), and long-term career growth.
-                    </p>
-
-                    <div class="grid sm:grid-cols-2 gap-4 pt-2">
-                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-1.5">
-                            <div class="w-8 h-8 rounded-lg bg-teal text-white flex items-center justify-center text-sm font-black">
-                                <i class="fa-solid fa-passport"></i>
-                            </div>
-                            <h4 class="text-sm font-black text-navy">National Type-D Visa</h4>
-                            <p class="text-xs text-slate-500">Allows up to 1-year multiple entry stay, renewable inside Poland through Temporary Residence (Karta Pobytu).</p>
-                        </div>
-
-                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-1.5">
-                            <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-sm font-black">
-                                <i class="fa-solid fa-money-bill-wave"></i>
-                            </div>
-                            <h4 class="text-sm font-black text-navy">Guaranteed Minimum Wage</h4>
-                            <p class="text-xs text-slate-500">Legal hourly rates set by the Polish government, paid transparently in PLN with overtime bonuses.</p>
-                        </div>
-
-                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-1.5">
-                            <div class="w-8 h-8 rounded-lg bg-navy text-white flex items-center justify-center text-sm font-black">
-                                <i class="fa-solid fa-shield-heart"></i>
-                            </div>
-                            <h4 class="text-sm font-black text-navy">State Health (NFZ/ZUS)</h4>
-                            <p class="text-xs text-slate-500">Full medical care coverage and workplace accidental protection guaranteed under Polish labor law.</p>
-                        </div>
-
-                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-1.5">
-                            <div class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center text-sm font-black">
-                                <i class="fa-solid fa-earth-europe"></i>
-                            </div>
-                            <h4 class="text-sm font-black text-navy">Schengen Freedom</h4>
-                            <p class="text-xs text-slate-500">Visit Germany, France, Italy, and 26 other Schengen member states for travel without separate tourist visas.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right: Visual Feature Card with Poster Preview & Key Facts -->
-                <div class="lg:col-span-6">
-                    <div class="bg-gradient-to-br from-navy-dark via-navy to-teal-dark rounded-[2rem] p-7 sm:p-9 text-white shadow-executive relative overflow-hidden card-hover-lift">
-                        <div class="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-poland-red/25 blur-3xl pointer-events-none"></div>
-                        <div class="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-teal-light/20 blur-3xl pointer-events-none"></div>
-
-                        <div class="relative z-10 space-y-6">
-                            <div class="flex items-center justify-between border-b border-white/15 pb-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-xl">
-                                        🇵🇱
-                                    </div>
-                                    <div>
-                                        <span class="text-xs font-bold text-teal-light uppercase tracking-wider block">Official Permit Type</span>
-                                        <h3 class="text-lg font-black text-white">Voivodeship Work Permit (Type A)</h3>
-                                    </div>
-                                </div>
-                                <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-extrabold px-3 py-1 rounded-full">
-                                    Verified Employer
-                                </span>
-                            </div>
-
-                            <p class="text-sm text-slate-200 leading-relaxed">
-                                Under Polish law (Ustawa o promocji zatrudnienia), an official Work Permit (Zezwolenie na Pracę) is issued by the Regional Voivode (Governor) at the request of an authorized Polish company, granting legal employment rights before you apply for your visa at the Embassy in Islamabad.
-                            </p>
-
-                            <!-- Key Specifications Grid -->
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-                                <div class="bg-white/10 rounded-xl p-3 border border-white/10">
-                                    <span class="text-[10px] text-slate-300 font-bold uppercase block">Permit Duration</span>
-                                    <span class="font-extrabold text-white text-sm">1 to 3 Years</span>
-                                </div>
-                                <div class="bg-white/10 rounded-xl p-3 border border-white/10">
-                                    <span class="text-[10px] text-slate-300 font-bold uppercase block">Visa Category</span>
-                                    <span class="font-extrabold text-amber-300 text-sm">National D-Type</span>
-                                </div>
-                                <div class="bg-white/10 rounded-xl p-3 border border-white/10">
-                                    <span class="text-[10px] text-slate-300 font-bold uppercase block">Processing Hub</span>
-                                    <span class="font-extrabold text-teal-light text-sm">Embassy Islamabad</span>
-                                </div>
-                            </div>
-
-                            <!-- Poster Highlight Pill -->
-                            <div class="bg-white/10 border border-white/15 rounded-2xl p-4 flex items-center justify-between gap-4">
-                                <div class="flex items-center gap-3">
-                                    <img src="./assets/poland-work-permit.jpg" alt="Poland Work Permit Poster" class="w-14 h-14 object-cover rounded-xl shadow-md border border-white/20 shrink-0">
-                                    <div>
-                                        <div class="text-xs font-extrabold text-white">Official Agency Promotion Flyer</div>
-                                        <div class="text-[11px] text-slate-300">Click to view high-resolution announcement</div>
-                                    </div>
-                                </div>
-                                <a href="./assets/poland-work-permit.jpg" target="_blank" rel="noopener noreferrer" class="bg-white text-navy hover:bg-teal-accent font-extrabold px-3.5 py-2 rounded-xl text-xs transition-all shrink-0">
-                                    <i class="fa-solid fa-expand mr-1"></i>View Flyer
-                                </a>
-                            </div>
-
-                            <div class="pt-2 flex items-center gap-3 text-xs text-slate-300">
-                                <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-                                <span>Complete file preparation by senior consultant Inam Khan &amp; Sadiq Ullah.</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Section 2: Our 4-Pillar Core Services (Elevated from the Poster) -->
-    <section id="our-services" class="py-16 lg:py-24 bg-slate-50 subtle-grid-pattern relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-14">
-                <span class="bg-teal-accent text-teal text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block">
-                    Full Spectrum Assistance
-                </span>
-                <h2 class="text-3xl sm:text-4xl font-black text-navy mt-3">
-                    Our 4-Pillar Work Permit Services
+    <!-- Featured Programme: Poland (Same Showcase Layout as Umrah Special Deals) -->
+    <section id="poland-programme" class="py-16 lg:py-24 dotted-bg relative scroll-mt-24">
+        <div class="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <span class="font-script text-3xl sm:text-4xl text-teal block mb-1">Now Accepting Applications</span>
+                <h2 class="text-3xl sm:text-5xl font-black tracking-tight uppercase">
+                    <span class="text-navy">Featured</span> <span class="text-teal">Programme</span>
                 </h2>
-                <p class="text-slate-600 text-sm sm:text-base mt-2">
-                    Direct oversight from inquiry to departure — ensuring your Poland application is legally compliant, completely documented, and embassy-ready.
-                </p>
+                <p class="text-slate-600 mt-3 text-sm sm:text-base">Our currently active European work permit programme, with complete legal processing handled by our Swat Head Office team.</p>
             </div>
 
-            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- 1. Visa Consultation -->
-                <div class="card-hover-lift bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div class="w-14 h-14 rounded-2xl bg-teal-accent text-teal text-2xl flex items-center justify-center mb-5">
-                            <i class="fa-solid fa-headset"></i>
-                        </div>
-                        <span class="text-[10px] font-black uppercase tracking-wider text-amber-500 block">Pillar 1</span>
-                        <h3 class="text-xl font-black text-navy mt-1">Visa Consultation</h3>
-                        <p class="text-slate-600 text-xs sm:text-sm mt-3 leading-relaxed">
-                            Personal consultation with our experienced overseas visa desk in Swat Matta or Islamabad to understand your career background, education, and foreign employment aspirations.
-                        </p>
+            <div class="bg-white rounded-2xl sm:rounded-3xl shadow-flyer border-2 border-teal/35 overflow-hidden transition-all duration-500 hover:shadow-2xl">
+                <!-- Ribbon Header -->
+                <div class="bg-gradient-to-r from-slate-50 via-teal-accent/40 to-slate-50 px-3.5 sm:px-8 lg:px-10 py-3 sm:py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                        <span class="inline-flex items-center gap-1 text-[9.5px] sm:text-[11px] font-black uppercase tracking-wider px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full shadow-sm bg-gradient-to-r from-navy to-teal text-white">
+                            <i class="fa-solid fa-crown text-amber-300"></i> Featured Programme
+                        </span>
+                        <span class="flag flag-pl flag-lg"></span>
+                        <h3 class="text-base sm:text-2xl font-black tracking-tight uppercase">
+                            <span class="text-navy">Work Permit</span>
+                            <span class="text-teal">Poland</span>
+                        </h3>
                     </div>
-                    <ul class="mt-5 pt-4 border-t border-slate-100 text-xs text-slate-600 space-y-2">
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-teal"></i> Trade &amp; skill matching</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-teal"></i> Poland job market overview</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-teal"></i> Transparent cost explanation</li>
-                    </ul>
+                    <div class="hidden sm:flex items-center gap-2 text-xs font-bold text-slate-500">
+                        <span class="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-slate-200 text-navy shadow-sm">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Status: <strong class="text-emerald-600">Open</strong>
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-slate-200 text-navy shadow-sm">
+                            <i class="fa-solid fa-earth-europe text-teal"></i>
+                            <strong>EU &amp; Schengen</strong>
+                        </span>
+                    </div>
                 </div>
 
-                <!-- 2. Eligibility Assessment -->
-                <div class="card-hover-lift bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 text-2xl flex items-center justify-center mb-5">
-                            <i class="fa-solid fa-clipboard-check"></i>
+                <div class="p-3 sm:p-8 lg:p-10">
+                    <!-- Dual Framed Images with Center Shield -->
+                    <div class="relative grid grid-cols-2 gap-2 sm:gap-6 lg:gap-10 items-center">
+                        <div class="group relative rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 border-teal shadow-md sm:shadow-lg h-36 sm:h-64 lg:h-72">
+                            <img src="https://images.unsplash.com/photo-1519197924294-4ba991a11128?auto=format&fit=crop&w=900&q=80"
+                                 onerror="this.src='https://placehold.co/800x600/0B2D5B/FFFFFF?text=Warsaw+Poland'"
+                                 alt="Warsaw, Poland" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
+                            <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/25 to-transparent"></div>
+                            <div class="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 text-white max-w-[78%] sm:max-w-[70%]">
+                                <span class="bg-teal text-[8px] sm:text-xs font-bold uppercase px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded shadow inline-block">Capital &amp; Business Hub</span>
+                                <h4 class="text-xs sm:text-xl font-bold mt-0.5 sm:mt-1.5 drop-shadow leading-tight">Warsaw</h4>
+                            </div>
                         </div>
-                        <span class="text-[10px] font-black uppercase tracking-wider text-amber-500 block">Pillar 2</span>
-                        <h3 class="text-xl font-black text-navy mt-1">Eligibility Assessment</h3>
-                        <p class="text-slate-600 text-xs sm:text-sm mt-3 leading-relaxed">
-                            We perform a stringent background check to ensure your profile meets all Polish Voivodeship labor test exemptions, age criteria, and Embassy Islamabad visa issuance requirements.
-                        </p>
-                    </div>
-                    <ul class="mt-5 pt-4 border-t border-slate-100 text-xs text-slate-600 space-y-2">
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-amber-500"></i> Passport &amp; age check (21–48)</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-amber-500"></i> Criminal record check clearance</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-amber-500"></i> Prior travel history review</li>
-                    </ul>
-                </div>
 
-                <!-- 3. Document Preparation -->
-                <div class="card-hover-lift bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 text-2xl flex items-center justify-center mb-5">
-                            <i class="fa-solid fa-file-signature"></i>
+                        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex justify-center">
+                            <div class="floating-price-shield bg-gradient-to-br from-navy via-[#0E4C7A] to-teal text-white p-1 sm:p-1.5 rounded-2xl sm:rounded-3xl shadow-2xl border-2 sm:border-4 border-white text-center w-36 sm:w-64 lg:w-72">
+                                <div class="border border-teal-light/60 sm:border-2 rounded-xl sm:rounded-2xl py-2 px-1.5 sm:py-4 sm:px-4 bg-navy/45 backdrop-blur-sm">
+                                    <span class="text-[7.5px] sm:text-[11px] font-bold uppercase tracking-widest text-sky-200 block leading-none">Work Permit</span>
+                                    <div class="text-lg sm:text-3xl lg:text-4xl font-black tracking-tight my-0.5 sm:my-1 text-white drop-shadow leading-tight">POLAND</div>
+                                    <span class="text-[7.5px] sm:text-xs font-semibold uppercase tracking-wider text-teal-accent block leading-tight">Type-A Permit + D-Visa</span>
+                                    <div class="mt-1 sm:mt-2 inline-flex items-center gap-1 text-[7.5px] sm:text-[11px] bg-white/15 px-2 sm:px-2.5 py-0.5 rounded-full">
+                                        <i class="fa-solid fa-circle-check text-emerald-300"></i> Applications Open
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <span class="text-[10px] font-black uppercase tracking-wider text-amber-500 block">Pillar 3</span>
-                        <h3 class="text-xl font-black text-navy mt-1">Document Preparation</h3>
-                        <p class="text-slate-600 text-xs sm:text-sm mt-3 leading-relaxed">
-                            Full preparation of your legal file including certified English/Polish translations, MOFA legalizations, Europass format CVs, and comprehensive travel medical insurance coverage.
-                        </p>
-                    </div>
-                    <ul class="mt-5 pt-4 border-t border-slate-100 text-xs text-slate-600 space-y-2">
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-600"></i> Certified Europass CV &amp; cover</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-600"></i> MOFA / Police attestation care</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-600"></i> €30,000 Schengen insurance</li>
-                    </ul>
-                </div>
 
-                <!-- 4. Application Assistance -->
-                <div class="card-hover-lift bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 text-2xl flex items-center justify-center mb-5">
-                            <i class="fa-solid fa-layer-group"></i>
+                        <div class="group relative rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 border-navy shadow-md sm:shadow-lg h-36 sm:h-64 lg:h-72">
+                            <img src="./assets/poland-work-permit.jpg" alt="Polish city skyline"
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" style="object-position: 82% 55%;">
+                            <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/25 to-transparent"></div>
+                            <div class="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 text-right text-white max-w-[78%] sm:max-w-[70%] ml-auto">
+                                <span class="bg-navy text-[8px] sm:text-xs font-bold uppercase px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded shadow inline-block">Industry &amp; Logistics</span>
+                                <h4 class="text-xs sm:text-xl font-bold mt-0.5 sm:mt-1.5 drop-shadow leading-tight">Wrocław &amp; Kraków</h4>
+                            </div>
                         </div>
-                        <span class="text-[10px] font-black uppercase tracking-wider text-amber-500 block">Pillar 4</span>
-                        <h3 class="text-xl font-black text-navy mt-1">Application Assistance</h3>
-                        <p class="text-slate-600 text-xs sm:text-sm mt-3 leading-relaxed">
-                            End-to-end management of your National D-Visa submission: appointment registration (e-Konsulat / VFS), mock interview coaching, file submission, and air ticket reservation.
-                        </p>
                     </div>
-                    <ul class="mt-5 pt-4 border-t border-slate-100 text-xs text-slate-600 space-y-2">
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-blue-600"></i> e-Konsulat appointment support</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-blue-600"></i> Embassy interview preparation</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-blue-600"></i> Ticket &amp; arrival briefing</li>
-                    </ul>
+
+                    <!-- Permit & Visa Boxes -->
+                    <div class="mt-2.5 sm:mt-4 grid grid-cols-2 gap-2 sm:gap-6 lg:gap-10 items-stretch">
+                        <div class="bg-gradient-to-r from-[#F0FAFC] via-white to-[#F0FAFC] border-2 border-teal/40 hover:border-teal rounded-xl sm:rounded-2xl p-2 sm:p-3.5 shadow-sm flex items-start sm:items-center gap-2 sm:gap-3.5 transition-all h-full">
+                            <div class="w-7 h-7 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-teal text-white flex items-center justify-center shrink-0 shadow-sm text-xs sm:text-lg mt-0.5 sm:mt-0">
+                                <i class="fa-solid fa-file-signature"></i>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-[8.5px] sm:text-[11px] font-black uppercase tracking-wider text-teal">Work Permit</div>
+                                <div class="text-[10.5px] sm:text-sm lg:text-base font-extrabold text-navy leading-snug break-words mt-0.5">Voivodeship Type-A Permit (Zezwolenie na pracę)</div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-r from-[#F3F6FB] via-white to-[#F3F6FB] border-2 border-navy/30 hover:border-navy rounded-xl sm:rounded-2xl p-2 sm:p-3.5 shadow-sm flex items-start sm:items-center gap-2 sm:gap-3.5 transition-all h-full">
+                            <div class="w-7 h-7 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-navy text-white flex items-center justify-center shrink-0 shadow-sm text-xs sm:text-lg mt-0.5 sm:mt-0">
+                                <i class="fa-solid fa-passport text-amber-300"></i>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-[8.5px] sm:text-[11px] font-black uppercase tracking-wider text-navy">Entry Visa</div>
+                                <div class="text-[10.5px] sm:text-sm lg:text-base font-extrabold text-navy leading-snug break-words mt-0.5">National D-Type Work Visa (Schengen Valid)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Schedule Strip -->
+                    <div class="mt-3 sm:mt-6 border-2 border-teal rounded-xl sm:rounded-2xl bg-slate-50 p-2.5 sm:p-5 grid grid-cols-3 gap-1 sm:gap-4 divide-x divide-teal/30">
+                        <div class="flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 sm:gap-3.5 px-1 sm:px-2">
+                            <div class="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-navy/10 text-navy flex items-center justify-center text-xs sm:text-2xl shrink-0"><i class="fa-solid fa-hourglass-half"></i></div>
+                            <div class="min-w-0">
+                                <div class="text-[8.5px] sm:text-xs font-bold uppercase tracking-wider text-navy leading-tight">Processing</div>
+                                <div class="text-[11px] sm:text-lg lg:text-xl font-extrabold text-teal leading-tight mt-0.5">3–6 Months <span class="text-[8px] sm:text-xs font-normal text-slate-500 block lg:inline">(Approx.)</span></div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 sm:gap-3.5 px-1 sm:px-2">
+                            <div class="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-teal/15 text-teal flex items-center justify-center text-xs sm:text-2xl shrink-0"><i class="fa-solid fa-file-contract"></i></div>
+                            <div class="min-w-0">
+                                <div class="text-[8.5px] sm:text-xs font-bold uppercase tracking-wider text-navy leading-tight">Contract</div>
+                                <div class="text-[11px] sm:text-lg lg:text-xl font-extrabold text-teal leading-tight mt-0.5">1–3 Years <span class="text-[8px] sm:text-xs font-normal text-slate-500 block lg:inline">(Renewable)</span></div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 sm:gap-3.5 px-1 sm:px-2">
+                            <div class="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-navy/10 text-navy flex items-center justify-center text-xs sm:text-2xl shrink-0"><i class="fa-solid fa-id-card"></i></div>
+                            <div class="min-w-0">
+                                <div class="text-[8.5px] sm:text-xs font-bold uppercase tracking-wider text-navy leading-tight">Residence Path</div>
+                                <div class="text-[11px] sm:text-lg lg:text-xl font-extrabold text-teal leading-tight mt-0.5">Karta Pobytu <span class="text-[8px] sm:text-xs font-normal text-slate-500 block lg:inline">(TRC)</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Services Included -->
+                    <div class="mt-3.5 sm:mt-7 text-center">
+                        <div class="inline-flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-navy via-teal to-navy text-white font-extrabold uppercase tracking-wider px-5 sm:px-8 py-1.5 sm:py-2.5 rounded-full shadow-md text-[10px] sm:text-sm">
+                            <span class="text-[9px] sm:text-xs">◆</span><span>Our Services</span><span class="text-[9px] sm:text-xs">◆</span>
+                        </div>
+
+                        <div class="grid grid-cols-4 gap-1.5 sm:gap-5 mt-3 sm:mt-6 max-w-4xl mx-auto">
+                            <div class="bg-slate-50 hover:bg-teal-accent/60 border border-slate-200 hover:border-teal/40 hover:-translate-y-1 shadow-sm rounded-xl sm:rounded-2xl p-2 sm:p-5 flex flex-col items-center transition-all duration-300 group">
+                                <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all"><i class="fa-solid fa-headset"></i></div>
+                                <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">Visa Consultation</h4>
+                                <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">One-to-one guidance</p>
+                            </div>
+                            <div class="bg-slate-50 hover:bg-teal-accent/60 border border-slate-200 hover:border-teal/40 hover:-translate-y-1 shadow-sm rounded-xl sm:rounded-2xl p-2 sm:p-5 flex flex-col items-center transition-all duration-300 group">
+                                <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all"><i class="fa-solid fa-clipboard-check"></i></div>
+                                <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">Eligibility Assessment</h4>
+                                <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">Profile &amp; skill match</p>
+                            </div>
+                            <div class="bg-slate-50 hover:bg-teal-accent/60 border border-slate-200 hover:border-teal/40 hover:-translate-y-1 shadow-sm rounded-xl sm:rounded-2xl p-2 sm:p-5 flex flex-col items-center transition-all duration-300 group">
+                                <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all"><i class="fa-solid fa-file-lines"></i></div>
+                                <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">Document Preparation</h4>
+                                <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">Translation &amp; attestation</p>
+                            </div>
+                            <div class="bg-slate-50 hover:bg-teal-accent/60 border border-slate-200 hover:border-teal/40 hover:-translate-y-1 shadow-sm rounded-xl sm:rounded-2xl p-2 sm:p-5 flex flex-col items-center transition-all duration-300 group">
+                                <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all"><i class="fa-solid fa-layer-group"></i></div>
+                                <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">Application Assistance</h4>
+                                <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">Embassy filing &amp; follow-up</p>
+                            </div>
+                        </div>
+
+                        <!-- Popular Job Categories -->
+                        <div class="mt-4 sm:mt-6 flex flex-wrap justify-center gap-1.5 sm:gap-2 max-w-4xl mx-auto">
+                            <span class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-400 w-full mb-0.5">Popular Job Categories</span>
+                            <span class="job-chip"><i class="fa-solid fa-warehouse"></i> Warehouse &amp; Logistics</span>
+                            <span class="job-chip"><i class="fa-solid fa-helmet-safety"></i> Construction</span>
+                            <span class="job-chip"><i class="fa-solid fa-industry"></i> Factory &amp; Production</span>
+                            <span class="job-chip"><i class="fa-solid fa-truck"></i> CE Drivers</span>
+                            <span class="job-chip"><i class="fa-solid fa-utensils"></i> Hospitality</span>
+                            <span class="job-chip"><i class="fa-solid fa-seedling"></i> Agriculture</span>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="mt-4 sm:mt-7 flex flex-wrap items-center justify-center gap-2 sm:gap-4">
+                            <button type="button" onclick="selectWorkPermitCountry('Poland')" class="bg-navy hover:bg-navy-light text-white font-bold px-3.5 sm:px-8 py-2.5 sm:py-3.5 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
+                                <i class="fa-solid fa-file-circle-check text-teal-light"></i><span>Apply Now</span>
+                            </button>
+                            <a href="#" data-wa-country="Poland" class="bg-teal hover:bg-teal-dark text-white font-bold px-3.5 sm:px-8 py-2.5 sm:py-3.5 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
+                                <i class="fa-brands fa-whatsapp text-sm sm:text-xl"></i><span>Inquire via WhatsApp</span>
+                            </a>
+                            <button type="button" onclick="openPolandPosterModal()" class="bg-slate-100 hover:bg-teal-accent text-navy font-bold px-3.5 sm:px-6 py-2.5 sm:py-3.5 rounded-xl border border-teal/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
+                                <i class="fa-solid fa-file-image text-teal"></i><span>View Official Flyer</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Section 3: High Demand Job Sectors in Poland -->
-    <section id="job-sectors" class="py-16 lg:py-24 bg-white relative">
+    <!-- European Destinations (Package-Style Cards) -->
+    <section id="europe-destinations" class="py-16 lg:py-24 bg-white relative scroll-mt-24">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-                <div>
-                    <span class="bg-teal-accent text-teal text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block">
-                        Market Opportunities
-                    </span>
-                    <h2 class="text-3xl sm:text-4xl font-black text-navy mt-3">
-                        In-Demand Work Sectors in Poland
-                    </h2>
-                    <p class="text-slate-600 text-sm mt-1 max-w-2xl">
-                        Polish employers regularly hire international workers across these key vocational, industrial, and skilled trades under official Type-A permits.
-                    </p>
-                </div>
-                <a href="#quick-assessment" class="bg-navy hover:bg-teal text-white font-extrabold text-xs sm:text-sm px-6 py-3 rounded-xl transition-all self-start md:self-auto flex items-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <span>Check My Sector Eligibility</span>
-                </a>
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-xs font-bold uppercase tracking-widest text-teal">European Destinations</span>
+                <h2 class="text-3xl sm:text-4xl font-black text-navy mt-1">Work Permit Programmes Across Europe</h2>
+                <p class="text-slate-600 mt-3 text-sm sm:text-base">Compare permit types, timelines and in-demand sectors. Availability depends on employer demand and quotas — contact our desk for the latest openings.</p>
             </div>
 
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Sector 1: Logistics & Warehouse -->
-                <div class="card-hover-lift bg-slate-50 border border-slate-200 rounded-3xl p-6 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div class="w-12 h-12 rounded-2xl bg-teal-accent text-teal text-xl flex items-center justify-center">
-                            <i class="fa-solid fa-boxes-stacked"></i>
-                        </div>
-                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full">High Demand</span>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-black text-navy">Warehouse &amp; Logistics</h3>
-                        <p class="text-xs text-slate-500 mt-1">Forklift drivers, order pickers, packaging assistants, and distribution center operators in Warsaw, Poznan &amp; Wroclaw.</p>
-                    </div>
-                    <div class="pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs font-bold text-slate-700">
-                        <span><i class="fa-regular fa-clock text-teal mr-1"></i>1-3 Year Contract</span>
-                        <span class="text-teal font-extrabold">Overtime Available</span>
-                    </div>
+                <!-- Poland -->
+                <div class="dest-card card-hover-lift border-2 border-teal/50">
+                    <span class="absolute top-0 right-0 bg-navy text-white text-[10px] font-extrabold px-3 py-1 rounded-bl-xl rounded-tr-[1.4rem] flex items-center gap-1"><i class="fa-solid fa-star text-amber-300"></i> FEATURED</span>
+                    <div class="flex items-center gap-2 text-xs"><span class="dest-tag bg-emerald-100 text-emerald-700">Applications Open</span><span class="text-slate-500 font-semibold"><i class="fa-regular fa-clock text-teal"></i> 3–6 Months</span></div>
+                    <div class="flex items-center gap-3 mt-3"><span class="flag flag-pl flag-xl"></span><h3 class="text-xl font-black text-navy leading-tight">Poland Work Permit</h3></div>
+                    <div class="dest-box"><div><span class="dest-label">Permit Type</span><div class="text-base font-black text-teal">Type-A Work Permit</div></div><span class="dest-pill">D-Visa</span></div>
+                    <dl class="dest-rows">
+                        <div><dt><i class="fa-solid fa-file-contract"></i> Contract</dt><dd>1–3 Years, Renewable</dd></div>
+                        <div><dt><i class="fa-solid fa-id-card"></i> Residence</dt><dd>Karta Pobytu (TRC)</dd></div>
+                        <div><dt><i class="fa-solid fa-briefcase"></i> Sectors</dt><dd>Logistics, Factory, Construction</dd></div>
+                    </dl>
+                    <div class="dest-ticks"><span><i class="fa-solid fa-check"></i> Schengen Access</span><span><i class="fa-solid fa-check"></i> EU Labour Rights</span><span><i class="fa-solid fa-check"></i> Social Security (ZUS)</span></div>
+                    <div class="dest-actions"><button type="button" onclick="selectWorkPermitCountry('Poland')" class="dest-btn-primary"><i class="fa-solid fa-paper-plane text-teal-light"></i> Quick Apply</button><a href="#" data-wa-country="Poland" class="dest-btn-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></div>
                 </div>
 
-                <!-- Sector 2: Construction Trades -->
-                <div class="card-hover-lift bg-slate-50 border border-slate-200 rounded-3xl p-6 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 text-xl flex items-center justify-center">
-                            <i class="fa-solid fa-trowel-bricks"></i>
-                        </div>
-                        <span class="bg-amber-100 text-amber-800 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full">Skilled</span>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-black text-navy">Construction &amp; Civil Trades</h3>
-                        <p class="text-xs text-slate-500 mt-1">Masons, shuttering carpenters, steel fixers, electricians, plumbers, and general building renovation personnel.</p>
-                    </div>
-                    <div class="pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs font-bold text-slate-700">
-                        <span><i class="fa-regular fa-clock text-teal mr-1"></i>Renewable Permit</span>
-                        <span class="text-teal font-extrabold">Accommodation Support</span>
-                    </div>
+                <!-- Romania -->
+                <div class="dest-card card-hover-lift border border-slate-200">
+                    <div class="flex items-center gap-2 text-xs"><span class="dest-tag bg-sky-100 text-sky-700">EU Member</span><span class="text-slate-500 font-semibold"><i class="fa-regular fa-clock text-teal"></i> 3–5 Months</span></div>
+                    <div class="flex items-center gap-3 mt-3"><span class="flag flag-ro flag-xl"></span><h3 class="text-xl font-black text-navy leading-tight">Romania Work Permit</h3></div>
+                    <div class="dest-box"><div><span class="dest-label">Permit Type</span><div class="text-base font-black text-teal">Work Authorisation (Aviz)</div></div><span class="dest-pill">D/AM Visa</span></div>
+                    <dl class="dest-rows">
+                        <div><dt><i class="fa-solid fa-file-contract"></i> Contract</dt><dd>1 Year, Renewable</dd></div>
+                        <div><dt><i class="fa-solid fa-id-card"></i> Residence</dt><dd>Residence Permit (IGI)</dd></div>
+                        <div><dt><i class="fa-solid fa-briefcase"></i> Sectors</dt><dd>Construction, HoReCa, Delivery</dd></div>
+                    </dl>
+                    <div class="dest-ticks"><span><i class="fa-solid fa-check"></i> Schengen Member</span><span><i class="fa-solid fa-check"></i> Employer Sponsored</span><span><i class="fa-solid fa-check"></i> Legal Contract</span></div>
+                    <div class="dest-actions"><button type="button" onclick="selectWorkPermitCountry('Romania')" class="dest-btn-primary"><i class="fa-solid fa-paper-plane text-teal-light"></i> Quick Apply</button><a href="#" data-wa-country="Romania" class="dest-btn-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></div>
                 </div>
 
-                <!-- Sector 3: Factory & Manufacturing -->
-                <div class="card-hover-lift bg-slate-50 border border-slate-200 rounded-3xl p-6 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 text-xl flex items-center justify-center">
-                            <i class="fa-solid fa-industry"></i>
-                        </div>
-                        <span class="bg-blue-100 text-blue-800 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full">Steady Shifts</span>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-black text-navy">Factory &amp; Food Processing</h3>
-                        <p class="text-xs text-slate-500 mt-1">Automotive assembly line workers, meat/fish packaging, electronics assembly, and consumer goods manufacturing.</p>
-                    </div>
-                    <div class="pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs font-bold text-slate-700">
-                        <span><i class="fa-regular fa-clock text-teal mr-1"></i>Shift Allowances</span>
-                        <span class="text-teal font-extrabold">ZUS Insured</span>
-                    </div>
+                <!-- Croatia -->
+                <div class="dest-card card-hover-lift border border-slate-200">
+                    <div class="flex items-center gap-2 text-xs"><span class="dest-tag bg-sky-100 text-sky-700">EU &amp; Schengen</span><span class="text-slate-500 font-semibold"><i class="fa-regular fa-clock text-teal"></i> 2–4 Months</span></div>
+                    <div class="flex items-center gap-3 mt-3"><span class="flag flag-hr flag-xl"></span><h3 class="text-xl font-black text-navy leading-tight">Croatia Work Permit</h3></div>
+                    <div class="dest-box"><div><span class="dest-label">Permit Type</span><div class="text-base font-black text-teal">Stay &amp; Work Permit</div></div><span class="dest-pill">D-Visa</span></div>
+                    <dl class="dest-rows">
+                        <div><dt><i class="fa-solid fa-file-contract"></i> Contract</dt><dd>Up to 3 Years</dd></div>
+                        <div><dt><i class="fa-solid fa-id-card"></i> Residence</dt><dd>Temporary Stay (MUP)</dd></div>
+                        <div><dt><i class="fa-solid fa-briefcase"></i> Sectors</dt><dd>Construction, Tourism, Shipyards</dd></div>
+                    </dl>
+                    <div class="dest-ticks"><span><i class="fa-solid fa-check"></i> Schengen Access</span><span><i class="fa-solid fa-check"></i> Seasonal &amp; Annual</span><span><i class="fa-solid fa-check"></i> Employer Sponsored</span></div>
+                    <div class="dest-actions"><button type="button" onclick="selectWorkPermitCountry('Croatia')" class="dest-btn-primary"><i class="fa-solid fa-paper-plane text-teal-light"></i> Quick Apply</button><a href="#" data-wa-country="Croatia" class="dest-btn-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></div>
                 </div>
 
-                <!-- Sector 4: Commercial Drivers & Transport -->
-                <div class="card-hover-lift bg-slate-50 border border-slate-200 rounded-3xl p-6 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 text-xl flex items-center justify-center">
-                            <i class="fa-solid fa-truck-moving"></i>
-                        </div>
-                        <span class="bg-rose-100 text-rose-800 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full">Top Earnings</span>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-black text-navy">Heavy Transport &amp; Truck Drivers</h3>
-                        <p class="text-xs text-slate-500 mt-1">CE license long-haul cargo drivers traversing Poland and the EU Schengen freight corridors with international stipends.</p>
-                    </div>
-                    <div class="pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs font-bold text-slate-700">
-                        <span><i class="fa-regular fa-clock text-teal mr-1"></i>Code 95 Support</span>
-                        <span class="text-teal font-extrabold">EU-Wide Routes</span>
-                    </div>
+                <!-- Hungary -->
+                <div class="dest-card card-hover-lift border border-slate-200">
+                    <div class="flex items-center gap-2 text-xs"><span class="dest-tag bg-sky-100 text-sky-700">EU &amp; Schengen</span><span class="text-slate-500 font-semibold"><i class="fa-regular fa-clock text-teal"></i> 2–4 Months</span></div>
+                    <div class="flex items-center gap-3 mt-3"><span class="flag flag-hu flag-xl"></span><h3 class="text-xl font-black text-navy leading-tight">Hungary Work Permit</h3></div>
+                    <div class="dest-box"><div><span class="dest-label">Permit Type</span><div class="text-base font-black text-teal">Single Work &amp; Residence</div></div><span class="dest-pill">D-Visa</span></div>
+                    <dl class="dest-rows">
+                        <div><dt><i class="fa-solid fa-file-contract"></i> Contract</dt><dd>Up to 2 Years</dd></div>
+                        <div><dt><i class="fa-solid fa-id-card"></i> Residence</dt><dd>Residence Permit Card</dd></div>
+                        <div><dt><i class="fa-solid fa-briefcase"></i> Sectors</dt><dd>Manufacturing, Logistics</dd></div>
+                    </dl>
+                    <div class="dest-ticks"><span><i class="fa-solid fa-check"></i> Schengen Access</span><span><i class="fa-solid fa-check"></i> Industrial Jobs</span><span><i class="fa-solid fa-check"></i> Legal Contract</span></div>
+                    <div class="dest-actions"><button type="button" onclick="selectWorkPermitCountry('Hungary')" class="dest-btn-primary"><i class="fa-solid fa-paper-plane text-teal-light"></i> Quick Apply</button><a href="#" data-wa-country="Hungary" class="dest-btn-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></div>
                 </div>
 
-                <!-- Sector 5: Hospitality & Food Services -->
-                <div class="card-hover-lift bg-slate-50 border border-slate-200 rounded-3xl p-6 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 text-xl flex items-center justify-center">
-                            <i class="fa-solid fa-utensils"></i>
-                        </div>
-                        <span class="bg-purple-100 text-purple-800 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full">Urban Hubs</span>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-black text-navy">Hospitality &amp; Culinary</h3>
-                        <p class="text-xs text-slate-500 mt-1">Cooks, kitchen hands, hotel room stewards, and banquet staff for Poland's major tourist and business centers.</p>
-                    </div>
-                    <div class="pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs font-bold text-slate-700">
-                        <span><i class="fa-regular fa-clock text-teal mr-1"></i>Meals Included</span>
-                        <span class="text-teal font-extrabold">Tips + Salary</span>
-                    </div>
+                <!-- Czech Republic -->
+                <div class="dest-card card-hover-lift border border-slate-200">
+                    <div class="flex items-center gap-2 text-xs"><span class="dest-tag bg-sky-100 text-sky-700">EU &amp; Schengen</span><span class="text-slate-500 font-semibold"><i class="fa-regular fa-clock text-teal"></i> 3–5 Months</span></div>
+                    <div class="flex items-center gap-3 mt-3"><span class="flag flag-cz flag-xl"></span><h3 class="text-xl font-black text-navy leading-tight">Czech Republic Work Permit</h3></div>
+                    <div class="dest-box"><div><span class="dest-label">Permit Type</span><div class="text-base font-black text-teal">Employee Card</div></div><span class="dest-pill">Long-Term</span></div>
+                    <dl class="dest-rows">
+                        <div><dt><i class="fa-solid fa-file-contract"></i> Contract</dt><dd>Up to 2 Years, Renewable</dd></div>
+                        <div><dt><i class="fa-solid fa-id-card"></i> Residence</dt><dd>Combined Permit Card</dd></div>
+                        <div><dt><i class="fa-solid fa-briefcase"></i> Sectors</dt><dd>Automotive, Welding, Warehousing</dd></div>
+                    </dl>
+                    <div class="dest-ticks"><span><i class="fa-solid fa-check"></i> Schengen Access</span><span><i class="fa-solid fa-check"></i> Skilled Trades</span><span><i class="fa-solid fa-check"></i> Family Pathway</span></div>
+                    <div class="dest-actions"><button type="button" onclick="selectWorkPermitCountry('Czech Republic')" class="dest-btn-primary"><i class="fa-solid fa-paper-plane text-teal-light"></i> Quick Apply</button><a href="#" data-wa-country="Czech Republic" class="dest-btn-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></div>
                 </div>
 
-                <!-- Sector 6: Agriculture & Greenhouses -->
-                <div class="card-hover-lift bg-slate-50 border border-slate-200 rounded-3xl p-6 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 text-xl flex items-center justify-center">
-                            <i class="fa-solid fa-wheat-awn"></i>
-                        </div>
-                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full">Year-Round</span>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-black text-navy">Agriculture &amp; Hydroponics</h3>
-                        <p class="text-xs text-slate-500 mt-1">Modern climate-controlled greenhouse operations, mushroom harvesting, horticulture, and farm machinery operators.</p>
-                    </div>
-                    <div class="pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs font-bold text-slate-700">
-                        <span><i class="fa-regular fa-clock text-teal mr-1"></i>Housing on Site</span>
-                        <span class="text-teal font-extrabold">Piece-Rate Bonuses</span>
-                    </div>
+                <!-- Portugal -->
+                <div class="dest-card card-hover-lift border border-slate-200">
+                    <div class="flex items-center gap-2 text-xs"><span class="dest-tag bg-sky-100 text-sky-700">EU &amp; Schengen</span><span class="text-slate-500 font-semibold"><i class="fa-regular fa-clock text-teal"></i> 3–6 Months</span></div>
+                    <div class="flex items-center gap-3 mt-3"><span class="flag flag-pt flag-xl"></span><h3 class="text-xl font-black text-navy leading-tight">Portugal Work Visa</h3></div>
+                    <div class="dest-box"><div><span class="dest-label">Permit Type</span><div class="text-base font-black text-teal">Employment Work Visa</div></div><span class="dest-pill">Type-D</span></div>
+                    <dl class="dest-rows">
+                        <div><dt><i class="fa-solid fa-file-contract"></i> Contract</dt><dd>1 Year+, Renewable</dd></div>
+                        <div><dt><i class="fa-solid fa-id-card"></i> Residence</dt><dd>Residence Permit (AIMA)</dd></div>
+                        <div><dt><i class="fa-solid fa-briefcase"></i> Sectors</dt><dd>Agriculture, Hospitality, Construction</dd></div>
+                    </dl>
+                    <div class="dest-ticks"><span><i class="fa-solid fa-check"></i> Schengen Access</span><span><i class="fa-solid fa-check"></i> Residency Pathway</span><span><i class="fa-solid fa-check"></i> Family Reunion</span></div>
+                    <div class="dest-actions"><button type="button" onclick="selectWorkPermitCountry('Portugal')" class="dest-btn-primary"><i class="fa-solid fa-paper-plane text-teal-light"></i> Quick Apply</button><a href="#" data-wa-country="Portugal" class="dest-btn-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></div>
+                </div>
+            </div>
+
+            <!-- Other Countries Banner -->
+            <div class="mt-10 bg-gradient-to-r from-navy via-[#0E4C7A] to-teal rounded-3xl p-6 sm:p-8 text-white flex flex-col md:flex-row items-center justify-between gap-5 shadow-executive">
+                <div class="text-center md:text-left">
+                    <span class="bg-white/15 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">More Destinations</span>
+                    <h3 class="text-xl sm:text-2xl font-black mt-2">Looking for Malta, Lithuania, Serbia or another country?</h3>
+                    <p class="text-sm text-sky-100 mt-1">Openings change with employer demand. Share your profile and our team will advise on the best current option.</p>
+                </div>
+                <div class="flex flex-wrap justify-center gap-3 shrink-0">
+                    <button type="button" onclick="selectWorkPermitCountry('Other European Country')" class="bg-white text-navy font-extrabold px-5 py-3 rounded-xl shadow-md hover:-translate-y-0.5 transition-all text-sm">Check Eligibility</button>
+                    <a href="#" data-wa-country="another European country" class="bg-navy-dark/70 hover:bg-navy-dark text-white font-extrabold px-5 py-3 rounded-xl border border-white/20 transition-all text-sm flex items-center gap-2"><i class="fa-brands fa-whatsapp text-emerald-400"></i> Ask on WhatsApp</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Section 4: 4-Step Transparent Procedure Roadmap -->
-    <section class="py-16 lg:py-24 bg-slate-50 subtle-grid-pattern relative">
+    <!-- Why Work in Europe -->
+    <section class="py-16 lg:py-20 bg-slate-50 subtle-grid-pattern border-y border-slate-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-14">
-                <span class="bg-teal-accent text-teal text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block">
-                    Transparent Roadmap
-                </span>
-                <h2 class="text-3xl sm:text-4xl font-black text-navy mt-3">
-                    How Your Poland Work Permit File Moves
-                </h2>
-                <p class="text-slate-600 text-sm mt-2">
-                    A clear, step-by-step roadmap from initial consultation in Swat or Islamabad to stepping off the flight in Poland.
-                </p>
+            <div class="text-center max-w-2xl mx-auto mb-10">
+                <span class="text-xs font-bold uppercase tracking-widest text-teal">Why Europe</span>
+                <h2 class="text-3xl sm:text-4xl font-black text-navy mt-1">Benefits of a European Work Permit</h2>
             </div>
-
-            <div class="grid md:grid-cols-4 gap-6 relative">
-                <!-- Step 1 -->
-                <div class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm relative card-hover-lift">
-                    <div class="w-10 h-10 rounded-full bg-navy text-white font-black text-sm flex items-center justify-center mb-4">
-                        01
-                    </div>
-                    <h3 class="text-lg font-black text-navy">Profile &amp; Documents</h3>
-                    <p class="text-xs text-slate-600 mt-2 leading-relaxed">
-                        Submit passport scan, educational / vocational certificates, and police character certificate to our desk for initial eligibility evaluation.
-                    </p>
-                </div>
-
-                <!-- Step 2 -->
-                <div class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm relative card-hover-lift">
-                    <div class="w-10 h-10 rounded-full bg-teal text-white font-black text-sm flex items-center justify-center mb-4">
-                        02
-                    </div>
-                    <h3 class="text-lg font-black text-navy">Voivodeship Permit</h3>
-                    <p class="text-xs text-slate-600 mt-2 leading-relaxed">
-                        Authorized Polish employer applies for your official Work Permit (Zezwolenie na Pracę) through the regional Voivodeship office in Poland.
-                    </p>
-                </div>
-
-                <!-- Step 3 -->
-                <div class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm relative card-hover-lift">
-                    <div class="w-10 h-10 rounded-full bg-amber-500 text-white font-black text-sm flex items-center justify-center mb-4">
-                        03
-                    </div>
-                    <h3 class="text-lg font-black text-navy">Embassy File &amp; Slot</h3>
-                    <p class="text-xs text-slate-600 mt-2 leading-relaxed">
-                        Original permit arrives from Poland. We prepare the complete embassy file, attestations, travel insurance, and secure your biometric appointment.
-                    </p>
-                </div>
-
-                <!-- Step 4 -->
-                <div class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm relative card-hover-lift">
-                    <div class="w-10 h-10 rounded-full bg-emerald-600 text-white font-black text-sm flex items-center justify-center mb-4">
-                        04
-                    </div>
-                    <h3 class="text-lg font-black text-navy">Visa Stamping &amp; Flight</h3>
-                    <p class="text-xs text-slate-600 mt-2 leading-relaxed">
-                        Attend the biometric appointment with our briefing. Receive your stamped National D-Visa, air ticket issuance, and employer reception guidance.
-                    </p>
-                </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                <div class="benefit-card card-hover-lift"><div class="benefit-icon bg-teal"><i class="fa-solid fa-scale-balanced"></i></div><h4>Legal Employment</h4><p>Registered contracts with full EU labour-law protection and minimum-wage guarantees.</p></div>
+                <div class="benefit-card card-hover-lift"><div class="benefit-icon bg-navy"><i class="fa-solid fa-earth-europe"></i></div><h4>Schengen Mobility</h4><p>Travel across Schengen member states for short visits while holding a valid residence permit.</p></div>
+                <div class="benefit-card card-hover-lift"><div class="benefit-icon bg-emerald-600"><i class="fa-solid fa-shield-heart"></i></div><h4>Health &amp; Social Security</h4><p>State health insurance and social security contributions from your first salary.</p></div>
+                <div class="benefit-card card-hover-lift"><div class="benefit-icon bg-amber-500"><i class="fa-solid fa-house-chimney-user"></i></div><h4>Residency Pathway</h4><p>Renew your permit in-country and build towards long-term residence and family reunion.</p></div>
             </div>
         </div>
     </section>
 
-    <!-- Section 5: Interactive Eligibility Assessment & Direct WhatsApp Inquiry -->
-    <section id="quick-assessment" class="py-16 lg:py-24 bg-white relative">
+    <!-- 4-Step Process Roadmap -->
+    <section class="py-16 lg:py-24 bg-white relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid lg:grid-cols-12 gap-10 items-center">
-                
-                <!-- Left Column: Document Checklist & Requirements -->
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span class="text-xs font-bold uppercase tracking-widest text-teal">How It Works</span>
+                <h2 class="text-3xl sm:text-4xl font-black text-navy mt-1">Your Path to Working in Europe</h2>
+                <p class="text-slate-600 mt-3 text-sm sm:text-base">A transparent, step-by-step process managed from our Swat Head Office.</p>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="step-card card-hover-lift"><span class="step-num">1</span><div class="step-icon"><i class="fa-solid fa-headset"></i></div><h4>Consultation</h4><p>Discuss your goals, preferred country and work background with our visa consultant.</p></div>
+                <div class="step-card card-hover-lift"><span class="step-num">2</span><div class="step-icon"><i class="fa-solid fa-clipboard-check"></i></div><h4>Eligibility &amp; Job Match</h4><p>We assess your age, education and skills, and match your profile with suitable employer demand.</p></div>
+                <div class="step-card card-hover-lift"><span class="step-num">3</span><div class="step-icon"><i class="fa-solid fa-file-signature"></i></div><h4>Permit &amp; Documents</h4><p>Work permit filing, sworn translations, attestations, police clearance and Europass CV preparation.</p></div>
+                <div class="step-card card-hover-lift"><span class="step-num">4</span><div class="step-icon"><i class="fa-solid fa-plane-departure"></i></div><h4>Embassy &amp; Departure</h4><p>Embassy appointment, interview preparation, visa collection and pre-departure briefing.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Documents & Assessment Form -->
+    <section id="quick-assessment" class="py-16 lg:py-24 bg-slate-50 border-t border-slate-200 relative scroll-mt-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-12 gap-10 items-start">
+                <!-- Document Checklist -->
                 <div class="lg:col-span-5 space-y-5">
-                    <span class="bg-teal-accent text-teal text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block">
-                        Requirements Checklist
-                    </span>
-                    <h2 class="text-3xl sm:text-4xl font-black text-navy leading-tight">
-                        What You Need to Apply for Poland Work Permit
-                    </h2>
-                    <p class="text-slate-600 text-sm leading-relaxed">
-                        Keep these primary documents ready when contacting our executive desk in Swat Matta or Islamabad for rapid processing.
-                    </p>
-
-                    <div class="space-y-3 pt-2">
-                        <div class="flex items-start gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
-                            <div class="w-8 h-8 rounded-xl bg-teal-accent text-teal flex items-center justify-center shrink-0 mt-0.5">
-                                <i class="fa-solid fa-passport text-sm"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-xs font-black text-navy">Original Passport</h4>
-                                <p class="text-[11px] text-slate-500">Valid for at least 2 years with minimum 4 blank visa pages.</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
-                            <div class="w-8 h-8 rounded-xl bg-teal-accent text-teal flex items-center justify-center shrink-0 mt-0.5">
-                                <i class="fa-solid fa-id-card text-sm"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-xs font-black text-navy">CNIC &amp; Police Clearance</h4>
-                                <p class="text-[11px] text-slate-500">Original CNIC and Police Character Certificate from your local district office.</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
-                            <div class="w-8 h-8 rounded-xl bg-teal-accent text-teal flex items-center justify-center shrink-0 mt-0.5">
-                                <i class="fa-solid fa-graduation-cap text-sm"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-xs font-black text-navy">Educational / Skill Certificates</h4>
-                                <p class="text-[11px] text-slate-500">Matric, Intermediate, Technical Diploma, or Driving License if applying for skilled trades.</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
-                            <div class="w-8 h-8 rounded-xl bg-teal-accent text-teal flex items-center justify-center shrink-0 mt-0.5">
-                                <i class="fa-solid fa-camera text-sm"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-xs font-black text-navy">Biometric Photographs</h4>
-                                <p class="text-[11px] text-slate-500">35mm x 45mm white background photographs compliant with Schengen visa standards.</p>
-                            </div>
-                        </div>
-                    </div>
+                    <span class="bg-teal-accent text-teal text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block">Requirements</span>
+                    <h2 class="text-3xl sm:text-4xl font-black text-navy leading-tight">General Document Checklist</h2>
+                    <p class="text-slate-600 text-sm leading-relaxed">Typical documents required for most European work permit applications. Exact requirements vary by country and employer.</p>
+                    <ul class="space-y-3">
+                        <li class="check-item"><i class="fa-solid fa-circle-check"></i><div><strong>Valid Passport</strong><span>Minimum 12–18 months validity with blank pages</span></div></li>
+                        <li class="check-item"><i class="fa-solid fa-circle-check"></i><div><strong>CNIC &amp; Passport Photographs</strong><span>White background, embassy specification</span></div></li>
+                        <li class="check-item"><i class="fa-solid fa-circle-check"></i><div><strong>Educational Certificates</strong><span>Attested by HEC / Board and MOFA where required</span></div></li>
+                        <li class="check-item"><i class="fa-solid fa-circle-check"></i><div><strong>Experience Letters</strong><span>Trade certificates, NAVTTC / technical diplomas</span></div></li>
+                        <li class="check-item"><i class="fa-solid fa-circle-check"></i><div><strong>Police Character Certificate</strong><span>Issued and attested for the destination country</span></div></li>
+                        <li class="check-item"><i class="fa-solid fa-circle-check"></i><div><strong>Medical &amp; Insurance</strong><span>Fitness certificate and travel health insurance</span></div></li>
+                    </ul>
                 </div>
 
-                <!-- Right Column: Interactive Quick Eligibility Form -->
+                <!-- Assessment Form -->
                 <div class="lg:col-span-7">
-                    <div class="bg-gradient-to-br from-navy via-navy-dark to-[#093060] rounded-3xl p-6 sm:p-10 text-white shadow-2xl border border-white/10 card-hover-lift">
-                        <div class="flex items-center justify-between pb-4 border-b border-white/15 mb-6">
+                    <div class="bg-gradient-to-br from-navy via-navy-dark to-[#093060] rounded-3xl p-6 sm:p-10 text-white shadow-2xl border border-white/10">
+                        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-white/15 mb-6">
                             <div>
                                 <span class="text-xs font-bold uppercase tracking-wider text-teal-light">Direct Management Desk</span>
-                                <h3 class="text-xl sm:text-2xl font-black text-white">Poland Work Permit Assessment</h3>
+                                <h3 class="text-xl sm:text-2xl font-black text-white">Europe Work Permit Assessment</h3>
                             </div>
                             <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-extrabold px-3 py-1 rounded-full flex items-center gap-1.5">
                                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Free Assessment
                             </span>
                         </div>
 
-                        <form id="polandInquiryForm" onsubmit="handlePolandWorkPermitSubmit(event)" class="space-y-4 text-slate-800">
+                        <form id="europeInquiryForm" onsubmit="handleEuropeWorkPermitSubmit(event)" class="space-y-4 text-slate-800">
                             <div class="grid sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Your Full Name</label>
-                                    <input type="text" id="polandClientName" required placeholder="e.g. Tariq Mehmood" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-navy focus:outline-none focus:border-teal">
+                                    <label class="form-lbl">Your Full Name</label>
+                                    <input type="text" id="wpClientName" required placeholder="e.g. Tariq Mehmood" class="form-fld">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold uppercase text-slate-300 mb-1">WhatsApp Mobile Number</label>
-                                    <input type="text" id="polandClientPhone" required placeholder="e.g. 0300 1234567" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-navy focus:outline-none focus:border-teal">
+                                    <label class="form-lbl">WhatsApp Mobile Number</label>
+                                    <input type="tel" id="wpClientPhone" required placeholder="e.g. 0300 1234567" class="form-fld">
                                 </div>
                             </div>
-
                             <div class="grid sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Desired Job Sector</label>
-                                    <select id="polandSector" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-navy focus:outline-none focus:border-teal">
-                                        <option value="Warehouse & Logistics">Warehouse &amp; Logistics / Forklift</option>
-                                        <option value="Construction & Civil Trades">Construction &amp; Building Trades</option>
-                                        <option value="Factory & Food Packaging">Factory &amp; Food Packaging</option>
-                                        <option value="Heavy Commercial Driving (CE)">Heavy Commercial Driving (CE)</option>
-                                        <option value="Hospitality & Culinary">Hospitality &amp; Restaurant Staff</option>
-                                        <option value="Agriculture & Farming">Agriculture &amp; Greenhouse</option>
-                                        <option value="Other / General Labor">Other / General Labor</option>
+                                    <label class="form-lbl">Preferred Country</label>
+                                    <select id="wpCountry" class="form-fld">
+                                        <option value="Poland">Poland (Applications Open)</option>
+                                        <option value="Romania">Romania</option>
+                                        <option value="Croatia">Croatia</option>
+                                        <option value="Hungary">Hungary</option>
+                                        <option value="Czech Republic">Czech Republic</option>
+                                        <option value="Portugal">Portugal</option>
+                                        <option value="Other European Country">Other / Not Sure — Advise Me</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Years of Experience</label>
-                                    <select id="polandExperience" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-navy focus:outline-none focus:border-teal">
+                                    <label class="form-lbl">Desired Job Sector</label>
+                                    <select id="wpSector" class="form-fld">
+                                        <option value="Warehouse & Logistics">Warehouse &amp; Logistics</option>
+                                        <option value="Construction & Building Trades">Construction &amp; Building Trades</option>
+                                        <option value="Factory & Production">Factory &amp; Production</option>
+                                        <option value="Heavy Commercial Driving (CE)">Heavy Commercial Driving (CE)</option>
+                                        <option value="Hospitality & Restaurant">Hospitality &amp; Restaurant</option>
+                                        <option value="Agriculture & Farming">Agriculture &amp; Farming</option>
+                                        <option value="Welding & Technical Trades">Welding &amp; Technical Trades</option>
+                                        <option value="Other / General Labour">Other / General Labour</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="form-lbl">Work Experience</label>
+                                    <select id="wpExperience" class="form-fld">
                                         <option value="Fresh / Under 1 Year">Fresh / Under 1 Year</option>
                                         <option value="1 to 3 Years">1 to 3 Years</option>
                                         <option value="3 to 5 Years">3 to 5 Years</option>
-                                        <option value="5+ Years (Expert)">5+ Years (Expert)</option>
+                                        <option value="5+ Years">5+ Years</option>
                                     </select>
                                 </div>
-                            </div>
-
-                            <div class="grid sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Highest Education</label>
-                                    <select id="polandEducation" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-navy focus:outline-none focus:border-teal">
+                                    <label class="form-lbl">Education</label>
+                                    <select id="wpEducation" class="form-fld">
                                         <option value="Matric / Middle">Matric / Middle</option>
-                                        <option value="Intermediate / FA / FSc">Intermediate / FA / FSc</option>
-                                        <option value="Technical Diploma (DAE/NAVTEC)">Technical Diploma (DAE/NAVTEC)</option>
-                                        <option value="Bachelor Degree or Higher">Bachelor Degree or Higher</option>
+                                        <option value="Intermediate">Intermediate</option>
+                                        <option value="Technical Diploma (DAE/NAVTTC)">Technical Diploma</option>
+                                        <option value="Bachelor or Higher">Bachelor or Higher</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Nearest Office for Meeting</label>
-                                    <select id="polandBranchSelect" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-navy focus:outline-none focus:border-teal">
-                                        <option value="Swat Matta Head Office">Swat Matta Head Office (Hayat Market)</option>
-                                        <option value="Islamabad Branch">Islamabad Branch (Potohar Plaza, Blue Area)</option>
-                                        <option value="Online / WhatsApp Only">Online / WhatsApp Consultation</option>
+                                    <label class="form-lbl">Meeting Office</label>
+                                    <select id="wpBranch" class="form-fld">
+                                        <option value="Swat Head Office (Hayat Market, Matta)">Swat Head Office</option>
+                                        <option value="Islamabad Branch">Islamabad Branch</option>
+                                        <option value="Online / WhatsApp">Online / WhatsApp</option>
                                     </select>
                                 </div>
                             </div>
@@ -954,71 +916,59 @@
                                 <i class="fa-brands fa-whatsapp text-2xl"></i>
                                 <span>Send Profile to WhatsApp Desk</span>
                             </button>
-
                             <p class="text-center text-[11px] text-slate-300 pt-1">
                                 <i class="fa-solid fa-lock text-emerald-400 mr-1"></i>
-                                100% confidential. Your details are reviewed directly by Inam Khan (Manager) &amp; Sadiq Ullah.
+                                100% confidential. Your profile is reviewed directly by our visa consultants.
                             </p>
                         </form>
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
 
-    <!-- Section 6: Frequently Asked Questions -->
-    <section class="py-16 bg-slate-50 border-t border-slate-200">
+    <!-- FAQ -->
+    <section class="py-16 bg-white border-t border-slate-200">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <span class="text-xs font-bold uppercase tracking-widest text-teal">Frequently Asked Questions</span>
-                <h2 class="text-3xl font-black text-navy mt-1">Poland Work Permit Clarity</h2>
-                <p class="text-slate-600 text-sm mt-2">Honest answers to the most common questions regarding Polish work visas.</p>
+            <div class="text-center mb-10">
+                <span class="text-xs font-bold uppercase tracking-widest text-teal">FAQ</span>
+                <h2 class="text-3xl font-black text-navy mt-1">Frequently Asked Questions</h2>
             </div>
-
-            <div class="space-y-4">
-                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-                    <h3 class="text-base font-extrabold text-navy flex items-center gap-2">
-                        <i class="fa-solid fa-circle-question text-teal"></i>
-                        <span>What is a Type-A Work Permit in Poland?</span>
-                    </h3>
-                    <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-                        A Type-A Work Permit (Zezwolenie Typ A) is the standard legal document issued by a Polish Regional Voivodeship office for a foreign national working for a registered Polish employer. It serves as the primary legal basis for your National D-Type Employment Visa application.
-                    </p>
-                </div>
-
-                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-                    <h3 class="text-base font-extrabold text-navy flex items-center gap-2">
-                        <i class="fa-solid fa-circle-question text-teal"></i>
-                        <span>Can I travel to other European countries on a Poland work visa?</span>
-                    </h3>
-                    <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-                        Yes. Since Poland is an official Schengen Agreement member, a valid Polish National D-Visa permits you to travel freely throughout the 29 Schengen member states (such as Germany, France, Italy, Spain, etc.) for up to 90 days in any 180-day period for tourism and leisure while maintaining your primary employment in Poland.
-                    </p>
-                </div>
-
-                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-                    <h3 class="text-base font-extrabold text-navy flex items-center gap-2">
-                        <i class="fa-solid fa-circle-question text-teal"></i>
-                        <span>Can I convert my Poland work visa into a European Residence Card (TRC)?</span>
-                    </h3>
-                    <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-                        Yes. After arriving and commencing work in Poland, you and your employer can apply to the regional Voivode office for a Temporary Residence Card (Karta Pobytu), which grants extended residency rights and can be renewed without returning to Pakistan.
-                    </p>
-                </div>
-
-                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-                    <h3 class="text-base font-extrabold text-navy flex items-center gap-2">
-                        <i class="fa-solid fa-circle-question text-teal"></i>
-                        <span>Where do I submit my original documents?</span>
-                    </h3>
-                    <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-                        You can bring your original passport and certificates directly to our Central Head Office on 2nd Floor, Hayat Market, Matta Swat, or our secondary branch in Office No. 7, Potohar Plaza, Blue Area, Islamabad. Both offices are open Monday to Saturday for walk-in consultations.
-                    </p>
-                </div>
+            <div class="space-y-3">
+                <details class="faq-item" open>
+                    <summary>Which European country is currently open for applications?<i class="fa-solid fa-chevron-down"></i></summary>
+                    <p>Poland is our featured programme and is currently accepting applications. Other destinations such as Romania, Croatia, Hungary, Czech Republic and Portugal depend on live employer demand — contact our desk for the latest openings.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>How long does a European work permit take?<i class="fa-solid fa-chevron-down"></i></summary>
+                    <p>Most programmes take approximately 2–6 months from document submission to visa decision, depending on the country, the permit authority and embassy appointment availability. Timelines shown on this page are indicative.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Can I travel to other Schengen countries with my work visa?<i class="fa-solid fa-chevron-down"></i></summary>
+                    <p>Yes. A valid national D-visa or residence permit from a Schengen member state generally allows short visits (up to 90 days in any 180-day period) to other Schengen countries. Your employment, however, remains tied to the issuing country.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Can I renew my permit or bring my family later?<i class="fa-solid fa-chevron-down"></i></summary>
+                    <p>Most EU countries allow in-country renewal of work and residence permits (for example the Karta Pobytu in Poland), and many offer family reunion after meeting income and residence conditions.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Where do I submit my original documents?<i class="fa-solid fa-chevron-down"></i></summary>
+                    <p>You can visit our Head Office at 2nd Floor, Hayat Market, Matta Swat, or our Islamabad branch at Potohar Plaza, Blue Area. Both offices are open Monday to Saturday for walk-in consultations.</p>
+                </details>
             </div>
         </div>
     </section>
+
+    <!-- Poland Official Flyer Modal -->
+    <div id="polandPosterModal" class="fixed inset-0 z-[60] hidden bg-navy-dark/80 backdrop-blur-sm items-center justify-center p-4" onclick="if(event.target===this)closePolandPosterModal()">
+        <div class="relative max-w-2xl w-full">
+            <button type="button" onclick="closePolandPosterModal()" class="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-white text-navy shadow-lg flex items-center justify-center hover:bg-slate-100 z-10" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <img src="./assets/poland-work-permit.jpg" alt="Poland Work Permit official flyer" class="w-full rounded-2xl shadow-2xl border-4 border-white">
+        </div>
+    </div>
+
 
     <!-- Executive Corporate Footer -->
     <footer class="bg-navy-dark text-slate-400 pt-16 pb-12 border-t border-white/10 text-sm executive-mesh-bg relative">
@@ -1060,7 +1010,7 @@
                         <li><a href="index.html" class="hover:text-teal-light transition-colors">Home — Agency Overview</a></li>
                         <li><a href="umrah-packages.html" class="hover:text-teal-light transition-colors">Umrah Packages &amp; Flyer Deals</a></li>
                         <li><a href="visa-services.html" class="hover:text-teal-light transition-colors">Worldwide Visas &amp; Air Tickets</a></li>
-                        <li><a href="work-permit.html" class="text-teal-light font-bold hover:underline transition-colors">Work Permit &amp; Poland Visas</a></li>
+                        <li><a href="work-permit.html" class="text-teal-light font-bold hover:underline transition-colors">Europe Work Permits</a></li>
                         <li><a href="umrah-packages.html#package-estimator" class="hover:text-teal-light transition-colors">Interactive Umrah Estimator</a></li>
                         <li><a href="contact.html" class="hover:text-teal-light transition-colors">About Us, Team &amp; Contact</a></li>
                     </ul>
@@ -1098,9 +1048,9 @@
     </footer>
 
     <!-- Floating WhatsApp Quick-Connect Button -->
-    <a href="https://wa.me/923490558345?text=Assalam-o-Alaikum%20Zakir%20Travel%20%26%20Tours!%20I%20am%20inquiring%20about%20Poland%20Work%20Permit%20services." target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-40 group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-3.5 rounded-full shadow-2xl transition-all hover:scale-105 pulse-emerald-ring">
+    <a href="https://wa.me/923490558345?text=Assalam-o-Alaikum%20Zakir%20Travel%20%26%20Tours!%20I%20am%20inquiring%20about%20Europe%20Work%20Permit%20services." target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-40 group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-3.5 rounded-full shadow-2xl transition-all hover:scale-105 pulse-emerald-ring">
         <i class="fa-brands fa-whatsapp text-2xl"></i>
-        <span class="hidden sm:inline text-xs font-extrabold tracking-wide pr-1">Poland Work Permit Desk</span>
+        <span class="hidden sm:inline text-xs font-extrabold tracking-wide pr-1">Europe Work Permit Desk</span>
     </a>
 
     <!-- Protected Full-Screen Mobile-First Admin Portal Drawer (/admin or #admin) -->
@@ -1154,32 +1104,64 @@
             });
         });
 
-        // Dedicated Poland Work Permit WhatsApp Lead Submission Handler
-        window.handlePolandWorkPermitSubmit = function (e) {
+        // ---- Europe Work Permit helpers ----
+        function getWorkPermitWhatsApp() {
+            const link = document.getElementById('navWhatsAppBtn');
+            const m = link && link.href.match(/wa\.me\/(\d+)/);
+            return (m && m[1]) || '923490558345';
+        }
+
+        // WhatsApp buttons on country cards
+        document.addEventListener('click', (e) => {
+            const btn = e.target instanceof Element ? e.target.closest('[data-wa-country]') : null;
+            if (!btn) return;
             e.preventDefault();
-            const name = (document.getElementById("polandClientName") && document.getElementById("polandClientName").value.trim()) || "Not specified";
-            const phone = (document.getElementById("polandClientPhone") && document.getElementById("polandClientPhone").value.trim()) || "";
-            const sector = (document.getElementById("polandSector") && document.getElementById("polandSector").value) || "General";
-            const exp = (document.getElementById("polandExperience") && document.getElementById("polandExperience").value) || "Not specified";
-            const edu = (document.getElementById("polandEducation") && document.getElementById("polandEducation").value) || "Not specified";
-            const branch = (document.getElementById("polandBranchSelect") && document.getElementById("polandBranchSelect").value) || "Swat Matta Head Office";
-
-            const activeWA = (window.liveSiteConfig && window.getResolvedActiveWhatsApp && window.getResolvedActiveWhatsApp(window.liveSiteConfig)) || "923490558345";
-            const agencyName = (window.liveSiteConfig && window.liveSiteConfig.contacts && window.liveSiteConfig.contacts.agencyName) || "Zakir Travel & Tours";
-
+            const country = btn.getAttribute('data-wa-country');
             const text = encodeURIComponent(
-                `Assalam-o-Alaikum ${agencyName}!\n\n` +
-                `*Poland Work Permit Inquiry*\n` +
-                `- Applicant Name: ${name}\n` +
-                `- WhatsApp Contact: ${phone}\n` +
-                `- Desired Sector: ${sector}\n` +
-                `- Experience: ${exp}\n` +
-                `- Education Level: ${edu}\n` +
-                `- Preferred Office: ${branch}\n\n` +
-                `Please review my profile and share the document requirements, processing timeline, and next steps for Poland.`
+                `Assalam-o-Alaikum Zakir Travel & Tours!\n\nI am interested in a *${country} Work Permit*.\nPlease share eligibility, required documents, processing time and current openings.`
             );
+            window.open(`https://wa.me/${getWorkPermitWhatsApp()}?text=${text}`, '_blank', 'noopener');
+        });
 
-            window.open(`https://wa.me/${activeWA}?text=${text}`, "_blank");
+        // "Apply" buttons: pre-select the country and scroll to the form
+        window.selectWorkPermitCountry = function (country) {
+            const sel = document.getElementById('wpCountry');
+            if (sel) {
+                const match = Array.from(sel.options).find((o) => o.value === country);
+                sel.value = match ? country : 'Other European Country';
+            }
+            const target = document.getElementById('quick-assessment');
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => { const n = document.getElementById('wpClientName'); if (n) n.focus({ preventScroll: true }); }, 700);
+        };
+
+        window.openPolandPosterModal = function () {
+            const m = document.getElementById('polandPosterModal');
+            if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
+        };
+        window.closePolandPosterModal = function () {
+            const m = document.getElementById('polandPosterModal');
+            if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
+        };
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') window.closePolandPosterModal(); });
+
+        // Assessment form -> WhatsApp
+        window.handleEuropeWorkPermitSubmit = function (e) {
+            e.preventDefault();
+            const val = (id) => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+            const text = encodeURIComponent(
+                `Assalam-o-Alaikum Zakir Travel & Tours!\n\n` +
+                `*Europe Work Permit Assessment*\n` +
+                `- Name: ${val('wpClientName') || 'Not specified'}\n` +
+                `- WhatsApp: ${val('wpClientPhone')}\n` +
+                `- Preferred Country: ${val('wpCountry')}\n` +
+                `- Job Sector: ${val('wpSector')}\n` +
+                `- Experience: ${val('wpExperience')}\n` +
+                `- Education: ${val('wpEducation')}\n` +
+                `- Preferred Office: ${val('wpBranch')}\n\n` +
+                `Please review my profile and share the requirements, processing timeline and next steps.`
+            );
+            window.open(`https://wa.me/${getWorkPermitWhatsApp()}?text=${text}`, '_blank', 'noopener');
         };
     </script>
 
