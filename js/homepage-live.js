@@ -17,7 +17,11 @@
     let livePackages = zakirDB.getLocalUmrahPackages();
     let liveVisas = zakirDB.getLocalVisaServices();
     let liveWorkPermits = zakirDB.getLocalWorkPermits ? zakirDB.getLocalWorkPermits() : [];
+    let liveWorkPermitProgrammes = zakirDB.getLocalWorkPermitProgrammes
+        ? zakirDB.getLocalWorkPermitProgrammes()
+        : [];
     let selectedSpecialDealFilter = "ALL"; // "ALL" or specific deal.id
+    let selectedWorkPermitProgrammeFilter = "ALL"; // "ALL" or specific programme.id
     let adminDrawerInstance = null;
 
     function escapeHtmlAttr(str) {
@@ -57,6 +61,7 @@
             renderUmrahPackagesGrid(livePackages);
             renderVisaServicesGrid(liveVisas);
             renderWorkPermitsGrid(liveWorkPermits);
+            renderFeaturedWorkPermitsShowcase(liveWorkPermitProgrammes);
             populateHeroUmrahDropdown(livePackages, liveSpecialDeals, config);
             updateCalculator();
         });
@@ -88,6 +93,13 @@
             });
         }
 
+        if (zakirDB.onWorkPermitProgrammesSnapshot) {
+            zakirDB.onWorkPermitProgrammesSnapshot((programmes) => {
+                liveWorkPermitProgrammes = Array.isArray(programmes) ? programmes : [];
+                renderFeaturedWorkPermitsShowcase(liveWorkPermitProgrammes);
+            });
+        }
+
         // Re-sync when tab gains focus (helpful for file:// cross-tab edits)
         window.addEventListener("focus", () => {
             liveSiteConfig = zakirDB.getLocalSiteConfig();
@@ -95,11 +107,15 @@
             livePackages = zakirDB.getLocalUmrahPackages();
             liveVisas = zakirDB.getLocalVisaServices();
             liveWorkPermits = zakirDB.getLocalWorkPermits ? zakirDB.getLocalWorkPermits() : [];
+            liveWorkPermitProgrammes = zakirDB.getLocalWorkPermitProgrammes
+                ? zakirDB.getLocalWorkPermitProgrammes()
+                : [];
             renderSiteConfigToDOM(liveSiteConfig);
             renderSpecialDealsShowcase(liveSpecialDeals);
             renderUmrahPackagesGrid(livePackages);
             renderVisaServicesGrid(liveVisas);
             renderWorkPermitsGrid(liveWorkPermits);
+            renderFeaturedWorkPermitsShowcase(liveWorkPermitProgrammes);
             populateHeroUmrahDropdown(livePackages, liveSpecialDeals, liveSiteConfig);
             updateCalculator();
         });
@@ -113,6 +129,13 @@
             const filterBtn = target.closest("[data-deal-filter]");
             if (filterBtn) {
                 window.filterSpecialDealsShowcase(filterBtn.getAttribute("data-deal-filter"));
+                return;
+            }
+            const wpProgFilterBtn = target.closest("[data-wp-prog-filter]");
+            if (wpProgFilterBtn) {
+                window.filterWorkPermitProgrammesShowcase(
+                    wpProgFilterBtn.getAttribute("data-wp-prog-filter")
+                );
                 return;
             }
             const flyerBtn = target.closest("[data-open-flyer]");
@@ -1223,6 +1246,275 @@
                     </div>
                 </div>
             `;
+            })
+            .join("");
+    }
+
+    // ============================================================================
+    // 4B-1. RENDER FEATURED WORK PERMIT PROGRAMMES SHOWCASE
+    // ============================================================================
+
+    window.filterWorkPermitProgrammesShowcase = function (programmeId) {
+        selectedWorkPermitProgrammeFilter = programmeId || "ALL";
+        renderFeaturedWorkPermitsShowcase(liveWorkPermitProgrammes);
+    };
+
+    function renderFeaturedWorkPermitsShowcase(programmes) {
+        const container = document.getElementById("featuredWorkPermitsContainer");
+        const filterBar = document.getElementById("featuredWorkPermitsFilterBar");
+        if (!container) return;
+
+        const allProgs = Array.isArray(programmes) && programmes.length
+            ? programmes
+            : (zakirDB.getLocalWorkPermitProgrammes ? zakirDB.getLocalWorkPermitProgrammes() : []);
+        const activeProgs = allProgs.filter((p) => p && p.isActive !== false);
+
+        if (!activeProgs.length) {
+            container.innerHTML = `<div class="bg-white rounded-3xl p-10 text-center text-slate-500 shadow-md">
+                <i class="fa-solid fa-briefcase text-4xl text-teal mb-3 block"></i>
+                <h3 class="text-xl font-bold text-navy">No Active Featured Programmes</h3>
+                <p class="text-sm text-slate-500 mt-1">Please check our European Destinations below or contact our Swat desk on WhatsApp.</p>
+            </div>`;
+            if (filterBar) filterBar.classList.add("hidden");
+            return;
+        }
+
+        if (
+            selectedWorkPermitProgrammeFilter !== "ALL" &&
+            !activeProgs.some((p) => p.id === selectedWorkPermitProgrammeFilter)
+        ) {
+            selectedWorkPermitProgrammeFilter = "ALL";
+        }
+
+        if (filterBar) {
+            if (activeProgs.length > 1) {
+                filterBar.classList.remove("hidden");
+                filterBar.innerHTML = `
+                    <div class="inline-flex flex-wrap items-center justify-center gap-2 bg-white/90 backdrop-blur-md p-2 rounded-2xl shadow-md border border-teal/20">
+                        <button type="button" data-wp-prog-filter="ALL" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all flex items-center gap-2 ${
+                            selectedWorkPermitProgrammeFilter === "ALL"
+                                ? "bg-gradient-to-r from-navy to-teal text-white shadow-md scale-[1.02]"
+                                : "text-slate-600 hover:text-navy hover:bg-slate-100"
+                        }">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <span>All Featured (${activeProgs.length})</span>
+                        </button>
+                        ${activeProgs
+                            .map(
+                                (p) => `
+                            <button type="button" data-wp-prog-filter="${escapeHtmlAttr(p.id)}" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all flex items-center gap-2 ${
+                                    selectedWorkPermitProgrammeFilter === p.id
+                                        ? "bg-gradient-to-r from-navy to-teal text-white shadow-md scale-[1.02]"
+                                        : "text-slate-600 hover:text-navy hover:bg-slate-100"
+                                }">
+                                <span class="flag ${escapeHtmlAttr(p.flagClass || "flag-pl")}"></span>
+                                <span>${escapeHtmlAttr(p.countryName)}</span>
+                            </button>
+                        `
+                            )
+                            .join("")}
+                    </div>
+                `;
+            } else {
+                filterBar.classList.add("hidden");
+                filterBar.innerHTML = "";
+            }
+        }
+
+        const progsToShow =
+            selectedWorkPermitProgrammeFilter === "ALL"
+                ? activeProgs
+                : activeProgs.filter((p) => p.id === selectedWorkPermitProgrammeFilter);
+
+        const activeWA = getResolvedActiveWhatsApp(liveSiteConfig);
+        const agencyName =
+            (liveSiteConfig && liveSiteConfig.contacts && liveSiteConfig.contacts.agencyName) ||
+            "Zakir Travel & Tours";
+
+        container.innerHTML = progsToShow
+            .map((prog, idx) => {
+                const country = String(prog.countryName || "Poland");
+                const flagCls = String(prog.flagClass || "flag-pl").toLowerCase().replace(/[^a-z0-9-]/g, "") || "flag-pl";
+                const categories = String(prog.jobCategories || "")
+                    .split(/[|,]/)
+                    .map((c) => c.trim())
+                    .filter(Boolean);
+
+                const leftFallback = prog.leftImageFallback || "https://images.unsplash.com/photo-1519197924294-4ba991a11128?auto=format&fit=crop&w=900&q=80";
+                const rightFallback = prog.rightImageFallback || "https://images.unsplash.com/photo-1544986581-efac024faf62?auto=format&fit=crop&w=900&q=80";
+
+                const waText = encodeURIComponent(
+                    `Assalam-o-Alaikum ${agencyName}!\n\nI am interested in your Featured Work Permit Programme:\n*Work Permit ${country} (${prog.shieldSub || "Type-A Permit + D-Visa"})*\n- Permit Type: ${prog.permitTypeLong || "Work Permit"}\n- Visa: ${prog.visaTypeLong || "National D-Visa"}\n- Processing: ${prog.processing || "3-6 Months"}\n- Contract: ${prog.contract || "1-3 Years"}\n- Residence: ${prog.residence || "TRC"}\n\nPlease assess my profile and guide me on the next steps.`
+                );
+
+                return `
+                <div class="bg-white rounded-2xl sm:rounded-3xl shadow-flyer border-2 border-teal/35 overflow-hidden transition-all duration-500 hover:shadow-2xl">
+                    <!-- Ribbon Header -->
+                    <div class="bg-gradient-to-r from-slate-50 via-teal-accent/40 to-slate-50 px-3.5 sm:px-8 lg:px-10 py-3 sm:py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                            <span class="inline-flex items-center gap-1 text-[9.5px] sm:text-[11px] font-black uppercase tracking-wider px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full shadow-sm bg-gradient-to-r from-navy to-teal text-white">
+                                <i class="fa-solid fa-crown text-amber-300"></i> Featured Programme
+                            </span>
+                            <span class="flag ${flagCls} flag-lg"></span>
+                            <h3 class="text-base sm:text-2xl font-black tracking-tight uppercase">
+                                <span class="text-navy">Work Permit</span>
+                                <span class="text-teal">${escapeHtmlAttr(country)}</span>
+                            </h3>
+                        </div>
+                        <div class="hidden sm:flex items-center gap-2 text-xs font-bold text-slate-500">
+                            <span class="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-slate-200 text-navy shadow-sm">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Status: <strong class="text-emerald-600">${escapeHtmlAttr(prog.statusText || "Open")}</strong>
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-slate-200 text-navy shadow-sm">
+                                <i class="fa-solid fa-earth-europe text-teal"></i>
+                                <strong>${escapeHtmlAttr(prog.regionText || "EU & Schengen")}</strong>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="p-3 sm:p-8 lg:p-10">
+                        <!-- Dual Framed Images with Center Shield -->
+                        <div class="relative grid grid-cols-2 gap-2 sm:gap-6 lg:gap-10 items-center">
+                            <div class="group relative rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 border-teal shadow-md sm:shadow-lg h-36 sm:h-64 lg:h-72">
+                                <img src="${escapeHtmlAttr(prog.leftImageUrl || "./assets/warsaw-poland.jpg")}"
+                                     onerror="this.src='${escapeHtmlAttr(leftFallback)}'"
+                                     alt="${escapeHtmlAttr(prog.leftCityTitle || country)}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
+                                <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/25 to-transparent"></div>
+                                <div class="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 text-white max-w-[78%] sm:max-w-[70%]">
+                                    <span class="bg-teal text-[8px] sm:text-xs font-bold uppercase px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded shadow inline-block">${escapeHtmlAttr(prog.leftImageBadge || "City Hub")}</span>
+                                    <h4 class="text-xs sm:text-xl font-bold mt-0.5 sm:mt-1.5 drop-shadow leading-tight">${escapeHtmlAttr(prog.leftCityTitle || "Warsaw")}</h4>
+                                </div>
+                            </div>
+
+                            <div class="absolute z-20 flex justify-center pointer-events-none" style="left: 50%; top: 50%; transform: translate(-50%, -50%); -webkit-transform: translate(-50%, -50%);">
+                                <div class="floating-price-shield pointer-events-auto bg-gradient-to-br from-navy via-[#0E4C7A] to-teal text-white p-1 sm:p-1.5 rounded-2xl sm:rounded-3xl shadow-2xl border-2 sm:border-4 border-white text-center w-36 sm:w-64 lg:w-72">
+                                    <div class="border border-teal-light/60 sm:border-2 rounded-xl sm:rounded-2xl py-2 px-1.5 sm:py-4 sm:px-4 bg-navy/45 backdrop-blur-sm">
+                                        <span class="text-[7.5px] sm:text-[11px] font-bold uppercase tracking-widest text-sky-200 block leading-none">${escapeHtmlAttr(prog.shieldLabel || "Work Permit")}</span>
+                                        <div class="text-lg sm:text-3xl lg:text-4xl font-black tracking-tight my-0.5 sm:my-1 text-white drop-shadow leading-tight uppercase">${escapeHtmlAttr(prog.shieldCountry || country)}</div>
+                                        <span class="text-[7.5px] sm:text-xs font-semibold uppercase tracking-wider text-teal-accent block leading-tight">${escapeHtmlAttr(prog.shieldSub || "Type-A Permit + D-Visa")}</span>
+                                        <div class="mt-1 sm:mt-2 inline-flex items-center gap-1 text-[7.5px] sm:text-[11px] bg-white/15 px-2 sm:px-2.5 py-0.5 rounded-full">
+                                            <i class="fa-solid fa-circle-check text-emerald-300"></i> ${escapeHtmlAttr(prog.shieldStatus || "Applications Open")}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="group relative rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 border-navy shadow-md sm:shadow-lg h-36 sm:h-64 lg:h-72">
+                                <img src="${escapeHtmlAttr(prog.rightImageUrl || "./assets/krakow-wroclaw-poland.jpg")}"
+                                     onerror="this.src='${escapeHtmlAttr(rightFallback)}'"
+                                     alt="${escapeHtmlAttr(prog.rightCityTitle || country)}"
+                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
+                                <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/25 to-transparent"></div>
+                                <div class="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 text-right text-white max-w-[78%] sm:max-w-[70%] ml-auto">
+                                    <span class="bg-navy text-[8px] sm:text-xs font-bold uppercase px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded shadow inline-block">${escapeHtmlAttr(prog.rightImageBadge || "Logistics Hub")}</span>
+                                    <h4 class="text-xs sm:text-xl font-bold mt-0.5 sm:mt-1.5 drop-shadow leading-tight">${escapeHtmlAttr(prog.rightCityTitle || "Wrocław & Kraków")}</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Permit & Visa Boxes -->
+                        <div class="mt-2.5 sm:mt-4 grid grid-cols-2 gap-2 sm:gap-6 lg:gap-10 items-stretch">
+                            <div class="bg-gradient-to-r from-[#F0FAFC] via-white to-[#F0FAFC] border-2 border-teal/40 hover:border-teal rounded-xl sm:rounded-2xl p-2 sm:p-3.5 shadow-sm flex items-start sm:items-center gap-2 sm:gap-3.5 transition-all h-full">
+                                <div class="w-7 h-7 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-teal text-white flex items-center justify-center shrink-0 shadow-sm text-xs sm:text-lg mt-0.5 sm:mt-0">
+                                    <i class="fa-solid fa-file-signature"></i>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[8.5px] sm:text-[11px] font-black uppercase tracking-wider text-teal">Work Permit</div>
+                                    <div class="text-[10.5px] sm:text-sm lg:text-base font-extrabold text-navy leading-snug break-words mt-0.5">${escapeHtmlAttr(prog.permitTypeLong || "Voivodeship Type-A Permit")}</div>
+                                </div>
+                            </div>
+                            <div class="bg-gradient-to-r from-[#F3F6FB] via-white to-[#F3F6FB] border-2 border-navy/30 hover:border-navy rounded-xl sm:rounded-2xl p-2 sm:p-3.5 shadow-sm flex items-start sm:items-center gap-2 sm:gap-3.5 transition-all h-full">
+                                <div class="w-7 h-7 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-navy text-white flex items-center justify-center shrink-0 shadow-sm text-xs sm:text-lg mt-0.5 sm:mt-0">
+                                    <i class="fa-solid fa-passport text-amber-300"></i>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[8.5px] sm:text-[11px] font-black uppercase tracking-wider text-navy">Entry Visa</div>
+                                    <div class="text-[10.5px] sm:text-sm lg:text-base font-extrabold text-navy leading-snug break-words mt-0.5">${escapeHtmlAttr(prog.visaTypeLong || "National D-Type Work Visa (Schengen Valid)")}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Schedule Strip -->
+                        <div class="mt-3 sm:mt-6 border-2 border-teal rounded-xl sm:rounded-2xl bg-slate-50 p-2.5 sm:p-5 grid grid-cols-3 gap-1 sm:gap-4 divide-x divide-teal/30">
+                            <div class="flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 sm:gap-3.5 px-1 sm:px-2">
+                                <div class="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-navy/10 text-navy flex items-center justify-center text-xs sm:text-2xl shrink-0"><i class="fa-solid fa-hourglass-half"></i></div>
+                                <div class="min-w-0">
+                                    <div class="text-[8.5px] sm:text-xs font-bold uppercase tracking-wider text-navy leading-tight">Processing</div>
+                                    <div class="text-[11px] sm:text-lg lg:text-xl font-extrabold text-teal leading-tight mt-0.5">${escapeHtmlAttr(prog.processing || "3–6 Months")} <span class="text-[8px] sm:text-xs font-normal text-slate-500 block lg:inline">(${escapeHtmlAttr(prog.processingNote || "Approx.")})</span></div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 sm:gap-3.5 px-1 sm:px-2">
+                                <div class="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-teal/15 text-teal flex items-center justify-center text-xs sm:text-2xl shrink-0"><i class="fa-solid fa-file-contract"></i></div>
+                                <div class="min-w-0">
+                                    <div class="text-[8.5px] sm:text-xs font-bold uppercase tracking-wider text-navy leading-tight">Contract</div>
+                                    <div class="text-[11px] sm:text-lg lg:text-xl font-extrabold text-teal leading-tight mt-0.5">${escapeHtmlAttr(prog.contract || "1–3 Years")} <span class="text-[8px] sm:text-xs font-normal text-slate-500 block lg:inline">(${escapeHtmlAttr(prog.contractNote || "Renewable")})</span></div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 sm:gap-3.5 px-1 sm:px-2">
+                                <div class="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-navy/10 text-navy flex items-center justify-center text-xs sm:text-2xl shrink-0"><i class="fa-solid fa-id-card"></i></div>
+                                <div class="min-w-0">
+                                    <div class="text-[8.5px] sm:text-xs font-bold uppercase tracking-wider text-navy leading-tight">Residence Path</div>
+                                    <div class="text-[11px] sm:text-lg lg:text-xl font-extrabold text-teal leading-tight mt-0.5">${escapeHtmlAttr(prog.residence || "Karta Pobytu")} <span class="text-[8px] sm:text-xs font-normal text-slate-500 block lg:inline">(${escapeHtmlAttr(prog.residenceNote || "TRC")})</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Services Included -->
+                        <div class="mt-3.5 sm:mt-7 text-center">
+                            <div class="inline-flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-navy via-teal to-navy text-white font-extrabold uppercase tracking-wider px-5 sm:px-8 py-1.5 sm:py-2.5 rounded-full shadow-md text-[10px] sm:text-sm">
+                                <span class="text-[9px] sm:text-xs">◆</span><span>Our Services</span><span class="text-[9px] sm:text-xs">◆</span>
+                            </div>
+
+                            <div class="grid grid-cols-4 gap-1.5 sm:gap-5 mt-3 sm:mt-6 max-w-4xl mx-auto">
+                                <div class="bg-slate-50 hover:bg-teal-accent/60 border border-slate-200 hover:border-teal/40 hover:-translate-y-1 shadow-sm rounded-xl sm:rounded-2xl p-2 sm:p-5 flex flex-col items-center transition-all duration-300 group">
+                                    <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all"><i class="fa-solid fa-headset"></i></div>
+                                    <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">Visa Consultation</h4>
+                                    <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">One-to-one guidance</p>
+                                </div>
+                                <div class="bg-slate-50 hover:bg-teal-accent/60 border border-slate-200 hover:border-teal/40 hover:-translate-y-1 shadow-sm rounded-xl sm:rounded-2xl p-2 sm:p-5 flex flex-col items-center transition-all duration-300 group">
+                                    <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all"><i class="fa-solid fa-clipboard-check"></i></div>
+                                    <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">Eligibility Assessment</h4>
+                                    <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">Profile &amp; skill match</p>
+                                </div>
+                                <div class="bg-slate-50 hover:bg-teal-accent/60 border border-slate-200 hover:border-teal/40 hover:-translate-y-1 shadow-sm rounded-xl sm:rounded-2xl p-2 sm:p-5 flex flex-col items-center transition-all duration-300 group">
+                                    <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all"><i class="fa-solid fa-file-lines"></i></div>
+                                    <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">Document Preparation</h4>
+                                    <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">Translation &amp; attestation</p>
+                                </div>
+                                <div class="bg-slate-50 hover:bg-teal-accent/60 border border-slate-200 hover:border-teal/40 hover:-translate-y-1 shadow-sm rounded-xl sm:rounded-2xl p-2 sm:p-5 flex flex-col items-center transition-all duration-300 group">
+                                    <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all"><i class="fa-solid fa-layer-group"></i></div>
+                                    <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">Application Assistance</h4>
+                                    <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">Embassy filing &amp; follow-up</p>
+                                </div>
+                            </div>
+
+                            <!-- Popular Job Categories -->
+                            ${
+                                categories.length
+                                    ? `
+                            <div class="mt-4 sm:mt-6 flex flex-wrap justify-center gap-1.5 sm:gap-2 max-w-4xl mx-auto">
+                                <span class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-400 w-full mb-0.5">Popular Job Categories</span>
+                                ${categories.map((c) => `<span class="job-chip"><i class="fa-solid fa-briefcase"></i> ${escapeHtmlAttr(c)}</span>`).join("")}
+                            </div>`
+                                    : ""
+                            }
+
+                            <!-- Action Buttons -->
+                            <div class="mt-4 sm:mt-7 flex flex-wrap items-center justify-center gap-2 sm:gap-4">
+                                <button type="button" onclick="selectWorkPermitCountry('${escapeHtmlAttr(country)}')" class="bg-navy hover:bg-navy-light text-white font-bold px-3.5 sm:px-8 py-2.5 sm:py-3.5 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
+                                    <i class="fa-solid fa-file-circle-check text-teal-light"></i><span>Apply Now</span>
+                                </button>
+                                <a href="https://wa.me/${activeWA}?text=${waText}" target="_blank" rel="noopener noreferrer" class="bg-teal hover:bg-teal-dark text-white font-bold px-3.5 sm:px-8 py-2.5 sm:py-3.5 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
+                                    <i class="fa-brands fa-whatsapp text-sm sm:text-xl"></i><span>Inquire via WhatsApp</span>
+                                </a>
+                                <button type="button" onclick="openPolandPosterModal()" class="bg-slate-100 hover:bg-teal-accent text-navy font-bold px-3.5 sm:px-6 py-2.5 sm:py-3.5 rounded-xl border border-teal/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
+                                    <i class="fa-solid fa-file-image text-teal"></i><span>View Official Flyer</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
             })
             .join("");
     }

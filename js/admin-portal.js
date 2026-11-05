@@ -120,6 +120,7 @@
             this.packages = db.getLocalUmrahPackages();
             this.visas = db.getLocalVisaServices();
             this.workPermits = db.getLocalWorkPermits ? db.getLocalWorkPermits() : [];
+            this.workPermitProgrammes = db.getLocalWorkPermitProgrammes ? db.getLocalWorkPermitProgrammes() : [];
             this.currentUser = db.getCurrentUser();
 
             this._detectRoutingRole(this.siteConfig);
@@ -177,6 +178,14 @@
                 db.onWorkPermitsSnapshot((permits) => {
                     this.workPermits = Array.isArray(permits) ? permits : [];
                     this._renderWorkPermitsList();
+                    this._updateTabCounters();
+                });
+            }
+
+            if (db.onWorkPermitProgrammesSnapshot) {
+                db.onWorkPermitProgrammesSnapshot((progs) => {
+                    this.workPermitProgrammes = Array.isArray(progs) ? progs : [];
+                    this._renderWorkPermitProgrammesList();
                     this._updateTabCounters();
                 });
             }
@@ -932,6 +941,33 @@
                         <!-- ========================================================== -->
                         <div id="admin-panel-workpermit" class="admin-tab-panel hidden space-y-6 anim-fade-up">
 
+                            <!-- Manage Featured Work Permit Programmes & Offers Showcase -->
+                            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-card">
+                                <div class="max-w-xl">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="bg-[#E6F6F8] text-[#0D8A9E] text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
+                                            Work Permit Programmes
+                                        </span>
+                                        <span class="text-xs font-bold text-[#0D8A9E]"><i class="fa-solid fa-circle text-[6px] mr-1"></i>Shown on Work Permit Page Showcase</span>
+                                    </div>
+                                    <h3 class="text-xl font-black text-[#0B2D5B] mt-1">Manage Featured Work Permit Programmes &amp; Offers</h3>
+                                    <p class="text-xs text-slate-500 mt-0.5">
+                                        Add multiple featured programme showcases (for example Poland Type-A Permit, Romania Work Permit, or Hungary). Each programme appears as its own dual-city showcase card on the Work Permit page.
+                                    </p>
+                                </div>
+
+                                <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                                    <button type="button" data-action="open-wp-programme-modal" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg transition-all active:scale-95 flex items-center gap-2">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <span>Add Featured Programme</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Featured Work Permit Programmes Visual CRUD Grid -->
+                            <div id="crudWorkPermitProgrammesContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+
+                            <!-- Europe Work Permit Destinations Header & Grid -->
                             <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-card">
                                 <div>
                                     <span class="text-[10px] font-black uppercase tracking-wider text-[#0D8A9E]">Work Permit Page Content</span>
@@ -1554,6 +1590,191 @@
                 </div>
 
                 <!-- ============================================================== -->
+                <!-- MODAL: ADD / EDIT FEATURED WORK PERMIT PROGRAMME (SHOWCASE)   -->
+                <!-- ============================================================== -->
+                <div id="wpProgrammeCrudModal" class="fixed inset-0 z-[85] hidden bg-[#05162E]/80 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl max-h-[92vh] overflow-y-auto anim-scale-in">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
+                            <div>
+                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#0D8A9E]">Showcase Programme Offer</span>
+                                <h3 id="wpProgModalTitle" class="text-xl font-black text-[#0B2D5B]">Add / Edit Featured Work Permit Programme</h3>
+                            </div>
+                            <button type="button" data-action="close-wp-programme-modal" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+
+                        <form id="wpProgrammeCrudForm" class="space-y-4">
+                            <input type="hidden" id="wpProgEditId">
+
+                            <!-- Section 1: Country & Ribbon Header -->
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-3">
+                                <span class="text-xs font-black uppercase text-[#0B2D5B] block">1. Country &amp; Top Ribbon Header</span>
+                                <div class="grid sm:grid-cols-4 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Country Name</label>
+                                        <input type="text" id="wpProgEditCountry" required placeholder="Poland" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-black text-[#0B2D5B]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Flag Class</label>
+                                        <input type="text" id="wpProgEditFlag" placeholder="flag-pl" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Status Text</label>
+                                        <input type="text" id="wpProgEditStatus" placeholder="Open" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-emerald-600">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Region Text</label>
+                                        <input type="text" id="wpProgEditRegion" placeholder="EU & Schengen" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 2: Dual City Showcase Cards & Media -->
+                            <div class="grid sm:grid-cols-2 gap-4">
+                                <!-- Left City Card -->
+                                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2.5">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-black uppercase text-[#0D8A9E]">Left City Image Card</span>
+                                        <span class="text-[10px] text-slate-400 font-semibold">e.g. Warsaw</span>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">City Title</label>
+                                        <input type="text" id="wpProgEditLeftTitle" required placeholder="Warsaw" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Badge Text</label>
+                                        <input type="text" id="wpProgEditLeftBadge" placeholder="Capital & Business Hub" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Image URL / Path</label>
+                                        <div class="flex items-center gap-1.5">
+                                            <input type="text" id="wpProgEditLeftUrl" required placeholder="./assets/warsaw-poland.jpg" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                            <div class="relative shrink-0">
+                                                <input type="file" accept="image/*" class="hidden">
+                                                <button type="button" data-wp-prog-image-target="wpProgEditLeftUrl" class="px-2.5 py-2 bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-[11px] font-bold rounded-xl whitespace-nowrap">
+                                                    <i class="fa-solid fa-cloud-arrow-up mr-1"></i>Upload
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right City Card -->
+                                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2.5">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-black uppercase text-[#0B2D5B]">Right City Image Card</span>
+                                        <span class="text-[10px] text-slate-400 font-semibold">e.g. Wrocław & Kraków</span>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">City Title</label>
+                                        <input type="text" id="wpProgEditRightTitle" required placeholder="Wrocław & Kraków" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Badge Text</label>
+                                        <input type="text" id="wpProgEditRightBadge" placeholder="Industry & Logistics" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Image URL / Path</label>
+                                        <div class="flex items-center gap-1.5">
+                                            <input type="text" id="wpProgEditRightUrl" required placeholder="./assets/krakow-wroclaw-poland.jpg" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                            <div class="relative shrink-0">
+                                                <input type="file" accept="image/*" class="hidden">
+                                                <button type="button" data-wp-prog-image-target="wpProgEditRightUrl" class="px-2.5 py-2 bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-[11px] font-bold rounded-xl whitespace-nowrap">
+                                                    <i class="fa-solid fa-cloud-arrow-up mr-1"></i>Upload
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 3: Center Shield Floating Badge -->
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2.5">
+                                <span class="text-xs font-black uppercase text-[#0B2D5B] block">3. Center Floating Shield Badge</span>
+                                <div class="grid sm:grid-cols-4 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Top Label</label>
+                                        <input type="text" id="wpProgEditShieldLabel" placeholder="Work Permit" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Country Name (Bold)</label>
+                                        <input type="text" id="wpProgEditShieldCountry" required placeholder="POLAND" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-black text-[#0B2D5B] uppercase">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Permit Subtitle</label>
+                                        <input type="text" id="wpProgEditShieldSub" placeholder="Type-A Permit + D-Visa" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Badge Status Pill</label>
+                                        <input type="text" id="wpProgEditShieldStatus" placeholder="Applications Open" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 4: Permit & Visa Box Labels -->
+                            <div class="grid sm:grid-cols-2 gap-4">
+                                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 space-y-1">
+                                    <label class="block text-[11px] font-black uppercase text-[#0D8A9E]">Work Permit Box Description</label>
+                                    <input type="text" id="wpProgEditPermitTypeLong" required placeholder="Voivodeship Type-A Permit (Zezwolenie na pracę)" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                </div>
+                                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 space-y-1">
+                                    <label class="block text-[11px] font-black uppercase text-[#0B2D5B]">Entry Visa Box Description</label>
+                                    <input type="text" id="wpProgEditVisaTypeLong" required placeholder="National D-Type Work Visa (Schengen Valid)" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                </div>
+                            </div>
+
+                            <!-- Section 5: Schedule Metrics -->
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2.5">
+                                <span class="text-xs font-black uppercase text-[#0B2D5B] block">5. Schedule Strip Metrics</span>
+                                <div class="grid sm:grid-cols-3 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Processing Time &amp; Note</label>
+                                        <div class="grid grid-cols-2 gap-1.5">
+                                            <input type="text" id="wpProgEditProcessing" placeholder="3–6 Months" class="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-[#0D8A9E]">
+                                            <input type="text" id="wpProgEditProcessingNote" placeholder="Approx." class="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Contract Duration &amp; Note</label>
+                                        <div class="grid grid-cols-2 gap-1.5">
+                                            <input type="text" id="wpProgEditContract" placeholder="1–3 Years" class="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-[#0D8A9E]">
+                                            <input type="text" id="wpProgEditContractNote" placeholder="Renewable" class="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Residence Path &amp; Note</label>
+                                        <div class="grid grid-cols-2 gap-1.5">
+                                            <input type="text" id="wpProgEditResidence" placeholder="Karta Pobytu" class="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-[#0D8A9E]">
+                                            <input type="text" id="wpProgEditResidenceNote" placeholder="TRC" class="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 6: Popular Job Categories -->
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-1.5">
+                                <label class="block text-xs font-black uppercase text-[#0B2D5B]">Popular Job Categories (separate by pipe | or comma)</label>
+                                <textarea id="wpProgEditJobCategories" rows="2" placeholder="Warehouse & Logistics|Construction|Factory & Production|CE Drivers|Hospitality|Agriculture" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs"></textarea>
+                                <p class="text-[10px] text-slate-400">Displayed as interactive badges at the bottom of the featured showcase card.</p>
+                            </div>
+
+                            <!-- Active Visibility Checkbox -->
+                            <div class="flex items-center gap-6 pt-1">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="wpProgEditActive" checked class="w-4 h-4 accent-[#0D8A9E]">
+                                    <span class="text-xs font-bold text-[#0B2D5B]">Active (Visible in Showcase on Website)</span>
+                                </label>
+                            </div>
+
+                            <button type="submit" class="w-full bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black py-3.5 rounded-2xl shadow-lg mt-2 text-sm transition-all">
+                                Save &amp; Publish Featured Programme
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
                 <!-- MODAL: RESET TO FLYER DEFAULTS CONFIRMATION                    -->
                 <!-- ============================================================== -->
                 <div id="resetConfirmModal" class="fixed inset-0 z-[90] hidden bg-[#05162E]/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -1595,7 +1816,8 @@
 
             const workPermitBadge = this.container.querySelector("#tabBadgeWorkPermits");
             if (workPermitBadge) {
-                workPermitBadge.textContent = String((this.workPermits || []).length);
+                const totalWP = (this.workPermits || []).length + (this.workPermitProgrammes || []).length;
+                workPermitBadge.textContent = String(totalWP);
             }
         }
 
@@ -2410,6 +2632,165 @@
                 .join("");
         }
 
+        _renderWorkPermitProgrammesList() {
+            const wrap = this.container.querySelector("#crudWorkPermitProgrammesContainer");
+            if (!wrap) return;
+
+            if (!this.workPermitProgrammes || !this.workPermitProgrammes.length) {
+                wrap.innerHTML = `<div class="col-span-full bg-white rounded-3xl p-8 text-center text-slate-500">No Featured Work Permit Programmes found. Click "Add Featured Programme" to create one.</div>`;
+                return;
+            }
+
+            wrap.innerHTML = this.workPermitProgrammes
+                .map((prog, idx) => {
+                    const flagClass = String(prog.flagClass || "flag-pl").toLowerCase().replace(/[^a-z0-9-]/g, "") || "flag-pl";
+                    const categories = String(prog.jobCategories || "")
+                        .split(/[|,]/)
+                        .map((c) => c.trim())
+                        .filter(Boolean);
+
+                    return `
+                    <div class="admin-card-hover bg-white rounded-3xl border-2 ${
+                        prog.isActive
+                            ? "border-[#0D8A9E] shadow-xl"
+                            : "border-slate-200 opacity-60 bg-slate-50"
+                    } overflow-hidden flex flex-col justify-between">
+                        
+                        <div>
+                            <!-- Dual Image Mini Banner with Floating Centre Shield Badge -->
+                            <div class="relative grid grid-cols-2 gap-1 bg-gradient-to-br from-[#05162E] via-[#0B2D5B] to-[#0D8A9E] h-44 overflow-hidden">
+                                <div class="relative h-full overflow-hidden">
+                                    <img src="${escapeHtml(prog.leftImageUrl)}" onerror="this.src='https://images.unsplash.com/photo-1519197924294-4ba991a11128?auto=format&fit=crop&w=900&q=80'" class="w-full h-full object-cover opacity-90">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-[#05162E]/90 via-transparent to-transparent"></div>
+                                    <div class="absolute bottom-2 left-2.5">
+                                        <span class="bg-[#0D8A9E] text-[8px] font-bold text-white px-1.5 py-0.5 rounded shadow">${escapeHtml(prog.leftImageBadge || "City Hub")}</span>
+                                        <div class="text-[11px] font-bold text-white leading-tight mt-0.5">${escapeHtml(prog.leftCityTitle || "Warsaw")}</div>
+                                    </div>
+                                </div>
+                                <div class="relative h-full overflow-hidden">
+                                    <img src="${escapeHtml(prog.rightImageUrl)}" onerror="this.src='https://images.unsplash.com/photo-1544986581-efac024faf62?auto=format&fit=crop&w=900&q=80'" class="w-full h-full object-cover opacity-90">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-[#05162E]/90 via-transparent to-transparent"></div>
+                                    <div class="absolute bottom-2 right-2.5 text-right">
+                                        <span class="bg-[#0B2D5B] text-[8px] font-bold text-white px-1.5 py-0.5 rounded shadow">${escapeHtml(prog.rightImageBadge || "Logistics")}</span>
+                                        <div class="text-[11px] font-bold text-white leading-tight mt-0.5">${escapeHtml(prog.rightCityTitle || "Wrocław & Kraków")}</div>
+                                    </div>
+                                </div>
+
+                                <!-- Top Left Status Badges -->
+                                <div class="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5 z-10">
+                                    <span class="bg-[#05162E]/90 backdrop-blur-sm text-white text-[10px] font-black px-2.5 py-1 rounded-full">
+                                        Showcase #${idx + 1}
+                                    </span>
+                                    <span class="bg-[#D4AF37] text-[#05162E] text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow flex items-center gap-1">
+                                        <i class="fa-solid fa-crown text-xs"></i> Featured
+                                    </span>
+                                    ${
+                                        !prog.isActive
+                                            ? `<span class="bg-rose-600 text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full">Hidden</span>`
+                                            : `<span class="bg-emerald-600 text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full">Live</span>`
+                                    }
+                                </div>
+
+                                <!-- Center Shield Badge -->
+                                <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
+                                    <div class="bg-gradient-to-b from-[#0B2D5B] via-[#0E4C7A] to-[#0D8A9E] text-white px-3.5 py-1.5 rounded-2xl border-2 border-white shadow-2xl text-center w-36 sm:w-40">
+                                        <span class="text-[7.5px] font-bold uppercase tracking-widest text-sky-200 block">${escapeHtml(prog.shieldLabel || "WORK PERMIT")}</span>
+                                        <div class="text-sm font-black leading-tight text-white uppercase">${escapeHtml(prog.shieldCountry || prog.countryName || "POLAND")}</div>
+                                        <span class="text-[7.5px] font-semibold text-teal-200 block truncate">${escapeHtml(prog.shieldSub || "Type-A Permit + D-Visa")}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Programme Info Body -->
+                            <div class="p-5 space-y-3">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="flag ${flagClass} flag-lg"></span>
+                                            <h4 class="text-lg font-black text-[#0B2D5B] uppercase tracking-tight">Work Permit ${escapeHtml(prog.countryName)}</h4>
+                                        </div>
+                                        <span class="text-xs font-extrabold text-[#0D8A9E] block mt-0.5">${escapeHtml(prog.regionText || "EU & Schengen")}</span>
+                                    </div>
+                                    <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-extrabold px-2.5 py-1 rounded-lg">
+                                        ● Status: ${escapeHtml(prog.statusText || "Open")}
+                                    </span>
+                                </div>
+
+                                <!-- Permit & Visa Boxes Preview -->
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <div class="bg-[#F0FAFC] border border-[#0D8A9E]/30 rounded-xl p-2.5">
+                                        <span class="text-[9px] font-black uppercase tracking-wider text-[#0D8A9E] block">Work Permit</span>
+                                        <strong class="text-[#0B2D5B] font-bold text-[11px] block leading-tight mt-0.5 truncate">${escapeHtml(prog.permitTypeLong || "Voivodeship Type-A Permit")}</strong>
+                                    </div>
+                                    <div class="bg-[#F3F6FB] border border-[#0B2D5B]/20 rounded-xl p-2.5">
+                                        <span class="text-[9px] font-black uppercase tracking-wider text-[#0B2D5B] block">Entry Visa</span>
+                                        <strong class="text-[#0B2D5B] font-bold text-[11px] block leading-tight mt-0.5 truncate">${escapeHtml(prog.visaTypeLong || "National D-Type Work Visa")}</strong>
+                                    </div>
+                                </div>
+
+                                <!-- Schedule Strip Preview -->
+                                <div class="grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-2xl border border-slate-200/80 text-center text-xs">
+                                    <div>
+                                        <span class="text-[9px] text-slate-400 font-bold uppercase block">Processing</span>
+                                        <strong class="text-[#0D8A9E] font-black text-xs">${escapeHtml(prog.processing || "3-6 Mos")}</strong>
+                                        <span class="text-[8px] text-slate-400 block">${escapeHtml(prog.processingNote || "Approx.")}</span>
+                                    </div>
+                                    <div class="border-x border-slate-200">
+                                        <span class="text-[9px] text-slate-400 font-bold uppercase block">Contract</span>
+                                        <strong class="text-[#0D8A9E] font-black text-xs">${escapeHtml(prog.contract || "1-3 Yrs")}</strong>
+                                        <span class="text-[8px] text-slate-400 block">${escapeHtml(prog.contractNote || "Renewable")}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-[9px] text-slate-400 font-bold uppercase block">Residence</span>
+                                        <strong class="text-[#0D8A9E] font-black text-xs">${escapeHtml(prog.residence || "TRC")}</strong>
+                                        <span class="text-[8px] text-slate-400 block">${escapeHtml(prog.residenceNote || "TRC")}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Job Categories Preview -->
+                                ${
+                                    categories.length
+                                        ? `<div class="flex flex-wrap gap-1 pt-1">
+                                            ${categories.slice(0, 5).map(cat => `<span class="text-[9.5px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">${escapeHtml(cat)}</span>`).join("")}
+                                            ${categories.length > 5 ? `<span class="text-[9.5px] font-bold px-1.5 py-0.5 rounded-md bg-[#E6F6F8] text-[#0D8A9E]">+${categories.length - 5} more</span>` : ""}
+                                           </div>`
+                                        : ""
+                                }
+                            </div>
+                        </div>
+
+                        <!-- CRUD Action Bar -->
+                        <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" data-action="move-wp-programme" data-id="${escapeHtml(prog.id)}" data-dir="up" ${idx === 0 ? "disabled" : ""} class="w-8 h-8 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs" title="Move Up">
+                                    <i class="fa-solid fa-arrow-up"></i>
+                                </button>
+                                <button type="button" data-action="move-wp-programme" data-id="${escapeHtml(prog.id)}" data-dir="down" ${idx === this.workPermitProgrammes.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs" title="Move Down">
+                                    <i class="fa-solid fa-arrow-down"></i>
+                                </button>
+                                <button type="button" data-action="toggle-wp-programme-active" data-id="${escapeHtml(prog.id)}" class="px-3 py-1.5 rounded-xl text-xs font-bold border ${prog.isActive ? "bg-[#E6F6F8] text-[#0D8A9E] border-[#0D8A9E]/20 hover:bg-[#D7F0F4]" : "bg-slate-200 text-slate-700 border-slate-300"}">
+                                    ${prog.isActive ? "Visible" : "Hidden"}
+                                </button>
+                            </div>
+
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" data-action="duplicate-wp-programme" data-id="${escapeHtml(prog.id)}" class="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold" title="Duplicate Programme">
+                                    <i class="fa-regular fa-copy mr-1"></i>Clone
+                                </button>
+                                <button type="button" data-action="edit-wp-programme" data-id="${escapeHtml(prog.id)}" class="px-3.5 py-1.5 rounded-xl bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-xs font-bold transition-colors shadow-sm">
+                                    <i class="fa-solid fa-pen mr-1"></i>Edit Programme
+                                </button>
+                                <button type="button" data-action="delete-wp-programme" data-id="${escapeHtml(prog.id)}" class="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors" title="Delete Programme">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                })
+                .join("");
+        }
+
         _autoGrowFields(root) {
             const scope = root || this.container;
             if (!scope || !scope.querySelectorAll) return;
@@ -2761,6 +3142,75 @@
                 });
             }
 
+            // Featured Work Permit Programme Image Uploads
+            this.container.querySelectorAll("[data-wp-prog-image-target]").forEach((btn) => {
+                const targetId = btn.getAttribute("data-wp-prog-image-target");
+                const fileInput = btn.parentElement.querySelector("input[type='file']");
+                if (!fileInput) return;
+
+                btn.addEventListener("click", () => fileInput.click());
+
+                fileInput.addEventListener("change", async (e) => {
+                    const file = e.target.files && e.target.files[0];
+                    if (!file) return;
+                    try {
+                        this.showToast("Optimizing programme image...", "warning");
+                        const url = await db.uploadMediaFile(file, "zakir_work_permits");
+                        const inputEl = this.container.querySelector(`#${targetId}`);
+                        if (inputEl) inputEl.value = url;
+                        this.showToast("Programme image uploaded!");
+                    } catch (err) {
+                        this.showToast(err.message || "Image upload failed.", "error");
+                    }
+                });
+            });
+
+            // Featured Work Permit Programme Modal Submit
+            const wpProgForm = this.container.querySelector("#wpProgrammeCrudForm");
+            if (wpProgForm) {
+                wpProgForm.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    const countryName = this.container.querySelector("#wpProgEditCountry").value.trim();
+                    if (!countryName) {
+                        this.showToast("Country name is required.", "error");
+                        return;
+                    }
+
+                    const programmeData = {
+                        id: this.container.querySelector("#wpProgEditId").value.trim() || undefined,
+                        countryName,
+                        flagClass: this.container.querySelector("#wpProgEditFlag").value.trim() || "flag-pl",
+                        statusText: this.container.querySelector("#wpProgEditStatus").value.trim() || "Open",
+                        regionText: this.container.querySelector("#wpProgEditRegion").value.trim() || "EU & Schengen",
+                        leftCityTitle: this.container.querySelector("#wpProgEditLeftTitle").value.trim() || "Warsaw",
+                        leftImageBadge: this.container.querySelector("#wpProgEditLeftBadge").value.trim() || "Capital & Business Hub",
+                        leftImageUrl: this.container.querySelector("#wpProgEditLeftUrl").value.trim() || "./assets/warsaw-poland.jpg",
+                        rightCityTitle: this.container.querySelector("#wpProgEditRightTitle").value.trim() || "Wrocław & Kraków",
+                        rightImageBadge: this.container.querySelector("#wpProgEditRightBadge").value.trim() || "Industry & Logistics",
+                        rightImageUrl: this.container.querySelector("#wpProgEditRightUrl").value.trim() || "./assets/krakow-wroclaw-poland.jpg",
+                        shieldLabel: this.container.querySelector("#wpProgEditShieldLabel").value.trim() || "Work Permit",
+                        shieldCountry: this.container.querySelector("#wpProgEditShieldCountry").value.trim() || countryName.toUpperCase(),
+                        shieldSub: this.container.querySelector("#wpProgEditShieldSub").value.trim() || "Type-A Permit + D-Visa",
+                        shieldStatus: this.container.querySelector("#wpProgEditShieldStatus").value.trim() || "Applications Open",
+                        permitTypeLong: this.container.querySelector("#wpProgEditPermitTypeLong").value.trim() || "Voivodeship Type-A Permit (Zezwolenie na pracę)",
+                        visaTypeLong: this.container.querySelector("#wpProgEditVisaTypeLong").value.trim() || "National D-Type Work Visa (Schengen Valid)",
+                        processing: this.container.querySelector("#wpProgEditProcessing").value.trim() || "3–6 Months",
+                        processingNote: this.container.querySelector("#wpProgEditProcessingNote").value.trim() || "Approx.",
+                        contract: this.container.querySelector("#wpProgEditContract").value.trim() || "1–3 Years",
+                        contractNote: this.container.querySelector("#wpProgEditContractNote").value.trim() || "Renewable",
+                        residence: this.container.querySelector("#wpProgEditResidence").value.trim() || "Karta Pobytu",
+                        residenceNote: this.container.querySelector("#wpProgEditResidenceNote").value.trim() || "TRC",
+                        jobCategories: this.container.querySelector("#wpProgEditJobCategories").value.trim(),
+                        applyCountry: countryName,
+                        isActive: this.container.querySelector("#wpProgEditActive").checked
+                    };
+
+                    await db.saveWorkPermitProgramme(programmeData);
+                    this.container.querySelector("#wpProgrammeCrudModal").classList.add("hidden");
+                    this.showToast("Featured Work Permit Programme Saved & Published Live!");
+                });
+            }
+
             // Delegated Click Actions
             this.container.addEventListener("click", async (e) => {
                 const tabBtn = e.target.closest("[data-tab]");
@@ -2884,6 +3334,34 @@
                         actionEl.getAttribute("data-id"),
                         actionEl.getAttribute("data-dir")
                     );
+                } else if (action === "open-wp-programme-modal") {
+                    this._openWorkPermitProgrammeModal(null);
+                } else if (action === "close-wp-programme-modal") {
+                    this.container.querySelector("#wpProgrammeCrudModal").classList.add("hidden");
+                } else if (action === "edit-wp-programme") {
+                    const prog = this.workPermitProgrammes.find((p) => p.id === actionEl.getAttribute("data-id"));
+                    if (prog) this._openWorkPermitProgrammeModal(prog);
+                } else if (action === "duplicate-wp-programme") {
+                    await db.duplicateWorkPermitProgramme(actionEl.getAttribute("data-id"));
+                    this.showToast("Featured Programme cloned & published!");
+                } else if (action === "toggle-wp-programme-active") {
+                    const prog = this.workPermitProgrammes.find((p) => p.id === actionEl.getAttribute("data-id"));
+                    if (prog) {
+                        await db.saveWorkPermitProgramme({ ...prog, isActive: !prog.isActive });
+                        this.showToast(`Featured Programme ${!prog.isActive ? "shown" : "hidden"} live.`);
+                    }
+                } else if (action === "move-wp-programme") {
+                    await db.reorderWorkPermitProgramme(
+                        actionEl.getAttribute("data-id"),
+                        actionEl.getAttribute("data-dir")
+                    );
+                } else if (action === "delete-wp-programme") {
+                    try {
+                        await db.deleteWorkPermitProgramme(actionEl.getAttribute("data-id"));
+                        this.showToast("Featured Programme deleted.", "warning");
+                    } catch (err) {
+                        this.showToast(err.message, "error");
+                    }
                 } else if (action === "reset-flyer-defaults") {
                     this.container.querySelector("#resetConfirmModal").classList.remove("hidden");
                 } else if (action === "cancel-reset-modal") {
@@ -3028,6 +3506,47 @@
             const wpModal = this.container.querySelector("#workPermitCrudModal");
             wpModal.classList.remove("hidden");
             this._autoGrowFields(wpModal);
+        }
+
+        _openWorkPermitProgrammeModal(prog) {
+            this.container.querySelector("#wpProgModalTitle").textContent = prog
+                ? "Edit Featured Work Permit Programme"
+                : "Add Featured Work Permit Programme";
+            this.container.querySelector("#wpProgEditId").value = (prog && prog.id) || "";
+            this.container.querySelector("#wpProgEditCountry").value = (prog && prog.countryName) || "Poland";
+            this.container.querySelector("#wpProgEditFlag").value = (prog && prog.flagClass) || "flag-pl";
+            this.container.querySelector("#wpProgEditStatus").value = (prog && prog.statusText) || "Open";
+            this.container.querySelector("#wpProgEditRegion").value = (prog && prog.regionText) || "EU & Schengen";
+
+            this.container.querySelector("#wpProgEditLeftTitle").value = (prog && prog.leftCityTitle) || "Warsaw";
+            this.container.querySelector("#wpProgEditLeftBadge").value = (prog && prog.leftImageBadge) || "Capital & Business Hub";
+            this.container.querySelector("#wpProgEditLeftUrl").value = (prog && prog.leftImageUrl) || "./assets/warsaw-poland.jpg";
+
+            this.container.querySelector("#wpProgEditRightTitle").value = (prog && prog.rightCityTitle) || "Wrocław & Kraków";
+            this.container.querySelector("#wpProgEditRightBadge").value = (prog && prog.rightImageBadge) || "Industry & Logistics";
+            this.container.querySelector("#wpProgEditRightUrl").value = (prog && prog.rightImageUrl) || "./assets/krakow-wroclaw-poland.jpg";
+
+            this.container.querySelector("#wpProgEditShieldLabel").value = (prog && prog.shieldLabel) || "Work Permit";
+            this.container.querySelector("#wpProgEditShieldCountry").value = (prog && prog.shieldCountry) || "POLAND";
+            this.container.querySelector("#wpProgEditShieldSub").value = (prog && prog.shieldSub) || "Type-A Permit + D-Visa";
+            this.container.querySelector("#wpProgEditShieldStatus").value = (prog && prog.shieldStatus) || "Applications Open";
+
+            this.container.querySelector("#wpProgEditPermitTypeLong").value = (prog && prog.permitTypeLong) || "Voivodeship Type-A Permit (Zezwolenie na pracę)";
+            this.container.querySelector("#wpProgEditVisaTypeLong").value = (prog && prog.visaTypeLong) || "National D-Type Work Visa (Schengen Valid)";
+
+            this.container.querySelector("#wpProgEditProcessing").value = (prog && prog.processing) || "3–6 Months";
+            this.container.querySelector("#wpProgEditProcessingNote").value = (prog && prog.processingNote) || "Approx.";
+            this.container.querySelector("#wpProgEditContract").value = (prog && prog.contract) || "1–3 Years";
+            this.container.querySelector("#wpProgEditContractNote").value = (prog && prog.contractNote) || "Renewable";
+            this.container.querySelector("#wpProgEditResidence").value = (prog && prog.residence) || "Karta Pobytu";
+            this.container.querySelector("#wpProgEditResidenceNote").value = (prog && prog.residenceNote) || "TRC";
+
+            this.container.querySelector("#wpProgEditJobCategories").value = (prog && prog.jobCategories) || "Warehouse & Logistics|Construction|Factory & Production|CE Drivers|Hospitality|Agriculture";
+            this.container.querySelector("#wpProgEditActive").checked = prog ? Boolean(prog.isActive) : true;
+
+            const modal = this.container.querySelector("#wpProgrammeCrudModal");
+            modal.classList.remove("hidden");
+            this._autoGrowFields(modal);
         }
     }
 

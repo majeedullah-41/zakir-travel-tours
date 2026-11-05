@@ -471,6 +471,42 @@
                 isActive: true,
                 sortOrder: 6
             }
+        ],
+        work_permit_programmes: [
+            {
+                id: "wpp_poland",
+                countryName: "Poland",
+                flagClass: "flag-pl",
+                statusText: "Open",
+                regionText: "EU & Schengen",
+                leftImageUrl: "./assets/warsaw-poland.jpg",
+                leftImageFallback:
+                    "https://images.unsplash.com/photo-1519197924294-4ba991a11128?auto=format&fit=crop&w=900&q=80",
+                leftImageBadge: "Capital & Business Hub",
+                leftCityTitle: "Warsaw",
+                rightImageUrl: "./assets/krakow-wroclaw-poland.jpg",
+                rightImageFallback:
+                    "https://images.unsplash.com/photo-1544986581-efac024faf62?auto=format&fit=crop&w=900&q=80",
+                rightImageBadge: "Industry & Logistics",
+                rightCityTitle: "Wroc\u0142aw & Krak\u00f3w",
+                shieldLabel: "Work Permit",
+                shieldCountry: "POLAND",
+                shieldSub: "Type-A Permit + D-Visa",
+                shieldStatus: "Applications Open",
+                permitTypeLong: "Voivodeship Type-A Permit (Zezwolenie na prac\u0119)",
+                visaTypeLong: "National D-Type Work Visa (Schengen Valid)",
+                processing: "3\u20136 Months",
+                processingNote: "Approx.",
+                contract: "1\u20133 Years",
+                contractNote: "Renewable",
+                residence: "Karta Pobytu",
+                residenceNote: "TRC",
+                jobCategories:
+                    "Warehouse & Logistics|Construction|Factory & Production|CE Drivers|Hospitality|Agriculture",
+                applyCountry: "Poland",
+                isActive: true,
+                sortOrder: 1
+            }
         ]
     };
 
@@ -523,6 +559,7 @@
         UMRAH_PACKAGES: "zakir_db_umrah_packages_v1",
         VISA_SERVICES: "zakir_db_visa_services_v1",
         WORK_PERMITS: "zakir_db_work_permits_v1",
+        WORK_PERMIT_PROGRAMMES: "zakir_db_work_permit_programmes_v1",
         AUTH_SESSION: "zakir_auth_session_v1",
         LOCAL_ADMIN_PASS: "zakir_db_local_admin_pass_v1"
     };
@@ -541,6 +578,7 @@
                 umrah_packages: new Set(),
                 visa_services: new Set(),
                 work_permits: new Set(),
+                work_permit_programmes: new Set(),
                 auth: new Set()
             };
 
@@ -571,7 +609,8 @@
                     e.key === STORAGE_KEYS.SPECIAL_DEALS ||
                     e.key === STORAGE_KEYS.UMRAH_PACKAGES ||
                     e.key === STORAGE_KEYS.VISA_SERVICES ||
-                    e.key === STORAGE_KEYS.WORK_PERMITS
+                    e.key === STORAGE_KEYS.WORK_PERMITS ||
+                    e.key === STORAGE_KEYS.WORK_PERMIT_PROGRAMMES
                 ) {
                     this._notifyLocalListeners();
                 } else if (e.key === STORAGE_KEYS.AUTH_SESSION) {
@@ -619,6 +658,12 @@
                     localStorage.setItem(
                         STORAGE_KEYS.WORK_PERMITS,
                         JSON.stringify(FLYER_DEFAULTS.work_permits)
+                    );
+                }
+                if (!localStorage.getItem(STORAGE_KEYS.WORK_PERMIT_PROGRAMMES)) {
+                    localStorage.setItem(
+                        STORAGE_KEYS.WORK_PERMIT_PROGRAMMES,
+                        JSON.stringify(FLYER_DEFAULTS.work_permit_programmes)
                     );
                 }
             } catch (err) {
@@ -777,7 +822,24 @@
                     this.listeners.work_permits.forEach((cb) => cb(list));
                 });
 
-            this.firebaseUnsubscribes.push(unsubConfig, unsubDeals, unsubPkgs, unsubVisas, unsubWorkPermits);
+            const unsubWorkPermitProgrammes = this.db
+                .collection("work_permit_programmes")
+                .orderBy("sortOrder", "asc")
+                .onSnapshot((snap) => {
+                    const list = [];
+                    snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
+                    localStorage.setItem(STORAGE_KEYS.WORK_PERMIT_PROGRAMMES, JSON.stringify(list));
+                    this.listeners.work_permit_programmes.forEach((cb) => cb(list));
+                });
+
+            this.firebaseUnsubscribes.push(
+                unsubConfig,
+                unsubDeals,
+                unsubPkgs,
+                unsubVisas,
+                unsubWorkPermits,
+                unsubWorkPermitProgrammes
+            );
         }
 
         // --------------------------------------------------------------------
@@ -814,6 +876,12 @@
             return () => this.listeners.work_permits.delete(callback);
         }
 
+        onWorkPermitProgrammesSnapshot(callback) {
+            this.listeners.work_permit_programmes.add(callback);
+            callback(this.getLocalWorkPermitProgrammes());
+            return () => this.listeners.work_permit_programmes.delete(callback);
+        }
+
         onAuthSnapshot(callback) {
             this.listeners.auth.add(callback);
             callback(this.getCurrentUser());
@@ -826,12 +894,14 @@
             const packages = this.getLocalUmrahPackages();
             const visas = this.getLocalVisaServices();
             const workPermits = this.getLocalWorkPermits();
+            const workPermitProgrammes = this.getLocalWorkPermitProgrammes();
 
             this.listeners.site_config.forEach((cb) => cb(siteConfig));
             this.listeners.special_deals.forEach((cb) => cb(deals));
             this.listeners.umrah_packages.forEach((cb) => cb(packages));
             this.listeners.visa_services.forEach((cb) => cb(visas));
             this.listeners.work_permits.forEach((cb) => cb(workPermits));
+            this.listeners.work_permit_programmes.forEach((cb) => cb(workPermitProgrammes));
         }
 
         _broadcastChange(type = "DB_UPDATED") {
@@ -940,6 +1010,19 @@
                 console.error("Error reading work_permits:", e);
             }
             return JSON.parse(JSON.stringify(FLYER_DEFAULTS.work_permits));
+        }
+
+        getLocalWorkPermitProgrammes() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.WORK_PERMIT_PROGRAMMES);
+                if (raw) {
+                    const list = JSON.parse(raw);
+                    return [...list].sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+                }
+            } catch (e) {
+                console.error("Error reading work_permit_programmes:", e);
+            }
+            return JSON.parse(JSON.stringify(FLYER_DEFAULTS.work_permit_programmes));
         }
 
         // --------------------------------------------------------------------
@@ -1492,6 +1575,110 @@
             }
         }
 
+        // --------------------------------------------------------------------
+        // MUTATIONS: FEATURED WORK PERMIT PROGRAMMES (SHOWCASE CRUD)
+        // --------------------------------------------------------------------
+
+        async saveWorkPermitProgramme(programmeData) {
+            const list = this.getLocalWorkPermitProgrammes();
+            let targetProgramme;
+            if (programmeData.id) {
+                const idx = list.findIndex((p) => p.id === programmeData.id);
+                if (idx !== -1) {
+                    targetProgramme = {
+                        ...list[idx],
+                        ...programmeData,
+                        sortOrder: Number(programmeData.sortOrder ?? list[idx].sortOrder ?? idx + 1)
+                    };
+                    list[idx] = targetProgramme;
+                }
+            }
+
+            if (!targetProgramme) {
+                const newId = programmeData.id || `wpp_${Date.now()}`;
+                targetProgramme = {
+                    ...(FLYER_DEFAULTS.work_permit_programmes[0] || {}),
+                    ...programmeData,
+                    id: newId,
+                    isActive: programmeData.isActive !== undefined ? Boolean(programmeData.isActive) : true,
+                    sortOrder: Number(programmeData.sortOrder ?? list.length + 1)
+                };
+                list.push(targetProgramme);
+            }
+
+            localStorage.setItem(STORAGE_KEYS.WORK_PERMIT_PROGRAMMES, JSON.stringify(list));
+            this._notifyLocalListeners();
+            this._broadcastChange("DB_UPDATED");
+
+            if (this.mode === "firebase" && this.db) {
+                await this.db
+                    .collection("work_permit_programmes")
+                    .doc(targetProgramme.id)
+                    .set(targetProgramme, { merge: true });
+            }
+
+            return targetProgramme;
+        }
+
+        async deleteWorkPermitProgramme(programmeId) {
+            let list = this.getLocalWorkPermitProgrammes();
+            if (list.length <= 1) {
+                throw new Error("At least one Featured Work Permit Programme must remain. You can edit or hide it instead.");
+            }
+            list = list.filter((p) => p.id !== programmeId);
+            localStorage.setItem(STORAGE_KEYS.WORK_PERMIT_PROGRAMMES, JSON.stringify(list));
+            this._notifyLocalListeners();
+            this._broadcastChange("DB_UPDATED");
+
+            if (this.mode === "firebase" && this.db) {
+                await this.db.collection("work_permit_programmes").doc(programmeId).delete();
+            }
+        }
+
+        async reorderWorkPermitProgramme(programmeId, direction) {
+            const list = this.getLocalWorkPermitProgrammes();
+            const idx = list.findIndex((p) => p.id === programmeId);
+            if (idx === -1) return;
+            const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+            if (swapIdx < 0 || swapIdx >= list.length) return;
+
+            const temp = list[idx];
+            list[idx] = list[swapIdx];
+            list[swapIdx] = temp;
+
+            list.forEach((item, index) => {
+                item.sortOrder = index + 1;
+            });
+
+            localStorage.setItem(STORAGE_KEYS.WORK_PERMIT_PROGRAMMES, JSON.stringify(list));
+            this._notifyLocalListeners();
+            this._broadcastChange("DB_UPDATED");
+
+            if (this.mode === "firebase" && this.db) {
+                const batch = this.db.batch();
+                list.forEach((item) => {
+                    batch.set(this.db.collection("work_permit_programmes").doc(item.id), item, { merge: true });
+                });
+                await batch.commit();
+            }
+        }
+
+        async duplicateWorkPermitProgramme(programmeId) {
+            const list = this.getLocalWorkPermitProgrammes();
+            const orig = list.find((p) => p.id === programmeId);
+            if (!orig) return null;
+
+            const copy = {
+                ...JSON.parse(JSON.stringify(orig)),
+                id: `wpp_${Date.now()}`,
+                countryName: `${orig.countryName} (Copy)`,
+                shieldCountry: `${orig.shieldCountry} (COPY)`,
+                isActive: true,
+                sortOrder: list.length + 1
+            };
+            return this.saveWorkPermitProgramme(copy);
+        }
+
         async uploadMediaFile(file, folder = "zakir_media") {
             if (!file) throw new Error("No file selected.");
 
@@ -1544,12 +1731,19 @@
             const defaultPkgs = JSON.parse(JSON.stringify(FLYER_DEFAULTS.umrah_packages));
             const defaultVisas = JSON.parse(JSON.stringify(FLYER_DEFAULTS.visa_services));
             const defaultWorkPermits = JSON.parse(JSON.stringify(FLYER_DEFAULTS.work_permits));
+            const defaultWorkPermitProgrammes = JSON.parse(
+                JSON.stringify(FLYER_DEFAULTS.work_permit_programmes)
+            );
 
             localStorage.setItem(STORAGE_KEYS.SITE_CONFIG, JSON.stringify(defaultConfig));
             localStorage.setItem(STORAGE_KEYS.SPECIAL_DEALS, JSON.stringify(defaultDeals));
             localStorage.setItem(STORAGE_KEYS.UMRAH_PACKAGES, JSON.stringify(defaultPkgs));
             localStorage.setItem(STORAGE_KEYS.VISA_SERVICES, JSON.stringify(defaultVisas));
             localStorage.setItem(STORAGE_KEYS.WORK_PERMITS, JSON.stringify(defaultWorkPermits));
+            localStorage.setItem(
+                STORAGE_KEYS.WORK_PERMIT_PROGRAMMES,
+                JSON.stringify(defaultWorkPermitProgrammes)
+            );
 
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
@@ -1582,6 +1776,12 @@
                     batch.set(this.db.collection("work_permits").doc(permit.id), permit);
                 });
 
+                const existingWpProgs = await this.db.collection("work_permit_programmes").get();
+                existingWpProgs.forEach((d) => batch.delete(d.ref));
+                defaultWorkPermitProgrammes.forEach((prog) => {
+                    batch.set(this.db.collection("work_permit_programmes").doc(prog.id), prog);
+                });
+
                 await batch.commit();
             }
 
@@ -1590,7 +1790,8 @@
                 special_deals: defaultDeals,
                 umrah_packages: defaultPkgs,
                 visa_services: defaultVisas,
-                work_permits: defaultWorkPermits
+                work_permits: defaultWorkPermits,
+                work_permit_programmes: defaultWorkPermitProgrammes
             };
         }
 
