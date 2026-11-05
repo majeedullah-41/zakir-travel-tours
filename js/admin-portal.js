@@ -119,6 +119,7 @@
             this.specialDeals = db.getLocalSpecialDeals();
             this.packages = db.getLocalUmrahPackages();
             this.visas = db.getLocalVisaServices();
+            this.workPermits = db.getLocalWorkPermits ? db.getLocalWorkPermits() : [];
             this.currentUser = db.getCurrentUser();
 
             this._detectRoutingRole(this.siteConfig);
@@ -171,6 +172,14 @@
                 this._renderVisasList();
                 this._updateTabCounters();
             });
+
+            if (db.onWorkPermitsSnapshot) {
+                db.onWorkPermitsSnapshot((permits) => {
+                    this.workPermits = Array.isArray(permits) ? permits : [];
+                    this._renderWorkPermitsList();
+                    this._updateTabCounters();
+                });
+            }
         }
 
         showToast(message, type = "success") {
@@ -341,9 +350,10 @@
                                 <span>3. Visas & Flights</span>
                                 <span id="tabBadgeVisas" class="bg-[#E6F6F8] text-[#0D8A9E] text-[10px] font-black px-2 py-0.5 rounded-full">6</span>
                             </button>
-                            <button type="button" data-tab="calculator" class="admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all">
-                                <i class="fa-solid fa-calculator text-[#0D8A9E]"></i>
-                                <span>4. Estimator</span>
+                            <button type="button" data-tab="workpermit" class="admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all">
+                                <i class="fa-solid fa-earth-europe text-[#0D8A9E]"></i>
+                                <span>4. Work Permit</span>
+                                <span id="tabBadgeWorkPermits" class="bg-[#E6F6F8] text-[#0D8A9E] text-[10px] font-black px-2 py-0.5 rounded-full">6</span>
                             </button>
                             <button type="button" data-tab="contacts" class="admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all col-span-2 sm:col-span-1">
                                 <i class="fa-brands fa-whatsapp text-[#128C7E] text-base"></i>
@@ -705,96 +715,8 @@
                                     </button>
                                 </div>
                             </form>
-                        </div>
 
-                        <!-- ========================================================== -->
-                        <!-- TAB 3: VISAS & FLIGHTS PAGE (CRUD + PAGE CONTENT)          -->
-                        <!-- ========================================================== -->
-                        <div id="admin-panel-visas" class="admin-tab-panel hidden space-y-6 anim-fade-up">
-                            
-                            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-card">
-                                <div>
-                                    <span class="text-[10px] font-black uppercase tracking-wider text-[#0D8A9E]">Visa Page Content</span>
-                                    <h3 class="text-xl font-black text-[#0B2D5B]">Country Visa Cards</h3>
-                                    <p class="text-xs text-slate-500">Add, edit, reorder, or hide Country Visa destinations and starting fees.</p>
-                                </div>
-                                <button type="button" data-action="open-visa-modal" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 transition-all">
-                                    <i class="fa-solid fa-plus"></i> Add Country Visa
-                                </button>
-                            </div>
-
-                            <!-- Country Visas List -->
-                            <div id="crudVisasContainer" class="grid md:grid-cols-2 gap-4"></div>
-
-                            <!-- Visas & Flights Page Content Editor -->
-                            <form id="visaPageContentForm" class="bg-white rounded-3xl p-6 shadow-card border border-slate-200/80 space-y-5">
-                                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-                                    <div>
-                                        <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Visas, Flights & 3-Step Process Editor</span>
-                                        <h3 class="text-lg font-black text-[#0B2D5B]">Manage Visas & Air Tickets Page Content</h3>
-                                    </div>
-                                    <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">Visa Page</span>
-                                </div>
-
-                                <div class="grid sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Top Badge</label>
-                                        <input type="text" id="visaHeroBadgeInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Main Heading</label>
-                                        <input type="text" id="visaHeroTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
-                                    </div>
-                                    <div class="sm:col-span-2">
-                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Subtitle</label>
-                                        <textarea id="visaHeroSubtitleInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
-                                    </div>
-                                </div>
-
-                                <div class="grid sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
-                                    <div>
-                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Flights Section Heading</label>
-                                        <input type="text" id="visaFlightHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
-                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mt-3 mb-1">Flights Description</label>
-                                        <textarea id="visaFlightDescInput" rows="3" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
-                                    </div>
-                                    <div>
-                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Flight Highlights (1 per line)</label>
-                                        <textarea id="visaFlightBulletsInput" rows="3" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
-                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mt-3 mb-1">Partner Airlines (Comma Separated)</label>
-                                        <input type="text" id="visaPartnerAirlinesInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
-                                    </div>
-                                </div>
-
-                                <div class="grid md:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
-                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Visa Step 1</span>
-                                        <input type="text" id="visaStep1TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
-                                        <textarea id="visaStep1DescInput" rows="3" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-600"></textarea>
-                                    </div>
-                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Visa Step 2</span>
-                                        <input type="text" id="visaStep2TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
-                                        <textarea id="visaStep2DescInput" rows="3" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-600"></textarea>
-                                    </div>
-                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Visa Step 3</span>
-                                        <input type="text" id="visaStep3TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
-                                        <textarea id="visaStep3DescInput" rows="3" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-600"></textarea>
-                                    </div>
-                                </div>
-
-                                <button type="submit" class="w-full sm:w-auto bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold px-8 py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
-                                    <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
-                                    <span>Save Visas & Flights Page Content</span>
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- ========================================================== -->
-                        <!-- TAB 4: CALCULATOR PAGE (TIER RATES, ADDONS & PAGE CONTENT) -->
-                        <!-- ========================================================== -->
-                        <div id="admin-panel-calculator" class="admin-tab-panel hidden space-y-6 anim-fade-up">
+                            <!-- Estimator pricing & content (moved into the Umrah page tab) -->
                             <form id="spotlightAndCalcForm" class="grid lg:grid-cols-12 gap-6">
                                 
                                 <!-- Left Column: Calculator Room Tier Pricing & Auto-Scale -->
@@ -815,7 +737,7 @@
                                             <input type="checkbox" id="calcAutoScaleToggle" class="w-5 h-5 accent-[#0B2D5B] mt-0.5 rounded">
                                             <div>
                                                 <span class="text-xs font-extrabold text-[#0B2D5B] block">Match room rates to the main deal price</span>
-                                                <span class="text-[11px] text-slate-600">Room rates adjust automatically whenever you update the main deal price.</span>
+                                                <span class="text-[11px] text-slate-600">When enabled, room rates adjust automatically whenever you update the main deal price.</span>
                                             </div>
                                         </label>
 
@@ -918,6 +840,189 @@
                                         <span>Save Estimator Content</span>
                                     </button>
                                 </div>
+                            </form>
+                        </div>
+
+                        <!-- ========================================================== -->
+                        <!-- TAB 3: VISAS & FLIGHTS PAGE (CRUD + PAGE CONTENT)          -->
+                        <!-- ========================================================== -->
+                        <div id="admin-panel-visas" class="admin-tab-panel hidden space-y-6 anim-fade-up">
+
+                            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-card">
+                                <div>
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-[#0D8A9E]">Visa Page Content</span>
+                                    <h3 class="text-xl font-black text-[#0B2D5B]">Country Visa Cards</h3>
+                                    <p class="text-xs text-slate-500">Add, edit, reorder, or hide Country Visa destinations and starting fees.</p>
+                                </div>
+                                <button type="button" data-action="open-visa-modal" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 transition-all">
+                                    <i class="fa-solid fa-plus"></i> Add Country Visa
+                                </button>
+                            </div>
+
+                            <!-- Country Visas List -->
+                            <div id="crudVisasContainer" class="grid md:grid-cols-2 gap-4"></div>
+
+                            <!-- Visas & Flights Page Content Editor -->
+                            <form id="visaPageContentForm" class="bg-white rounded-3xl p-6 shadow-card border border-slate-200/80 space-y-5">
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                                    <div>
+                                        <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Visas, Flights & 3-Step Process Editor</span>
+                                        <h3 class="text-lg font-black text-[#0B2D5B]">Manage Visas & Air Tickets Page Content</h3>
+                                    </div>
+                                    <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">Visa Page</span>
+                                </div>
+
+                                <div class="grid sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Top Badge</label>
+                                        <input type="text" id="visaHeroBadgeInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Main Heading</label>
+                                        <input type="text" id="visaHeroTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Subtitle</label>
+                                        <textarea id="visaHeroSubtitleInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="grid sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Flights Section Heading</label>
+                                        <input type="text" id="visaFlightHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mt-3 mb-1">Flights Description</label>
+                                        <textarea id="visaFlightDescInput" rows="3" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Flight Highlights (1 per line)</label>
+                                        <textarea id="visaFlightBulletsInput" rows="3" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mt-3 mb-1">Partner Airlines (Comma Separated)</label>
+                                        <input type="text" id="visaPartnerAirlinesInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                </div>
+
+                                <div class="grid md:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Visa Step 1</span>
+                                        <input type="text" id="visaStep1TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                        <textarea id="visaStep1DescInput" rows="3" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-600"></textarea>
+                                    </div>
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Visa Step 2</span>
+                                        <input type="text" id="visaStep2TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                        <textarea id="visaStep2DescInput" rows="3" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-600"></textarea>
+                                    </div>
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E]">Visa Step 3</span>
+                                        <input type="text" id="visaStep3TitleInput" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                        <textarea id="visaStep3DescInput" rows="3" required class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-600"></textarea>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="w-full sm:w-auto bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold px-8 py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+                                    <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
+                                    <span>Save Visas & Flights Page Content</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- ========================================================== -->
+                        <!-- TAB 4: WORK PERMIT PAGE (CRUD + PAGE CONTENT)              -->
+                        <!-- ========================================================== -->
+                        <div id="admin-panel-workpermit" class="admin-tab-panel hidden space-y-6 anim-fade-up">
+
+                            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-card">
+                                <div>
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-[#0D8A9E]">Work Permit Page Content</span>
+                                    <h3 class="text-xl font-black text-[#0B2D5B]">Europe Work Permit Destinations</h3>
+                                    <p class="text-xs text-slate-500">Add, edit, reorder, or hide work permit country cards and edit page text.</p>
+                                </div>
+                                <button type="button" data-action="open-workpermit-modal" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 transition-all">
+                                    <i class="fa-solid fa-plus"></i> Add Work Permit Country
+                                </button>
+                            </div>
+
+                            <div id="crudWorkPermitsContainer" class="grid md:grid-cols-2 gap-4"></div>
+
+                            <form id="workPermitPageContentForm" class="bg-white rounded-3xl p-6 shadow-card border border-slate-200/80 space-y-5">
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                                    <div>
+                                        <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Work Permit Page Content</span>
+                                        <h3 class="text-lg font-black text-[#0B2D5B]">Hero, Section Headings &amp; Assessment Copy</h3>
+                                    </div>
+                                    <span class="bg-[#E6F6F8] text-[#0D8A9E] text-xs font-bold px-3 py-1 rounded-full">Work Permit Page</span>
+                                </div>
+
+                                <div class="grid sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Hero Top Badge</label>
+                                        <input type="text" id="wpHeroBadgeInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Hero Main Heading</label>
+                                        <input type="text" id="wpHeroTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Hero Script Line</label>
+                                        <input type="text" id="wpHeroScriptInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Hero Subtitle</label>
+                                        <textarea id="wpHeroSubtitleInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="grid sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Featured Script Line</label>
+                                        <input type="text" id="wpFeaturedScriptInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Featured Description</label>
+                                        <input type="text" id="wpFeaturedDescInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-700">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Destinations Heading</label>
+                                        <input type="text" id="wpDestinationsHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Destinations Description</label>
+                                        <textarea id="wpDestinationsDescInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="grid sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Benefits Heading</label>
+                                        <input type="text" id="wpBenefitsHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Process Heading</label>
+                                        <input type="text" id="wpProcessHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Checklist Heading</label>
+                                        <input type="text" id="wpChecklistHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Checklist Description</label>
+                                        <textarea id="wpChecklistDescInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Assessment Form Heading</label>
+                                        <input type="text" id="wpAssessmentHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">FAQ Heading</label>
+                                        <input type="text" id="wpFaqHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="w-full sm:w-auto bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold px-8 py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+                                    <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
+                                    <span>Save Work Permit Page Content</span>
+                                </button>
                             </form>
                         </div>
 
@@ -1326,7 +1431,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Flag Emoji / Code</label>
-                                    <input type="text" id="visaEditFlag" required placeholder="e.g. Saudi Arabia flag" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+                                    <input type="text" id="visaEditFlag" placeholder="e.g. Saudi Arabia flag" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Visa Type</label>
@@ -1355,6 +1460,93 @@
                             </label>
                             <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold py-3.5 rounded-xl shadow-lg mt-2">
                                 Save Country Visa
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
+                <!-- MODAL: ADD / EDIT WORK PERMIT COUNTRY                         -->
+                <!-- ============================================================== -->
+                <div id="workPermitCrudModal" class="fixed inset-0 z-[85] hidden bg-[#05162E]/80 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto anim-scale-in">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                            <h3 id="workPermitModalTitle" class="text-lg font-black text-[#0B2D5B]">Add / Edit Work Permit Country</h3>
+                            <button type="button" data-action="close-workpermit-modal" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <form id="workPermitCrudForm" class="space-y-3.5">
+                            <input type="hidden" id="wpEditId">
+                            <div class="grid sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Country Name</label>
+                                    <input type="text" id="wpEditCountry" required placeholder="Poland" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B]">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Card Title</label>
+                                    <input type="text" id="wpEditTitle" placeholder="Poland Work Permit" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B]">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Flag CSS Class</label>
+                                    <input type="text" id="wpEditFlag" placeholder="flag-pl" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Status Tag Text</label>
+                                    <input type="text" id="wpEditTag" placeholder="Applications Open" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Status Tag Colour</label>
+                                    <select id="wpEditTagStyle" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B]">
+                                        <option value="emerald">Emerald</option>
+                                        <option value="sky">Sky</option>
+                                        <option value="amber">Amber</option>
+                                        <option value="rose">Rose</option>
+                                        <option value="indigo">Indigo</option>
+                                        <option value="slate">Slate</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Processing Timeline</label>
+                                    <input type="text" id="wpEditTimeline" placeholder="3-6 Months" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Permit Type</label>
+                                    <input type="text" id="wpEditPermitType" placeholder="Type-A Work Permit" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Visa Code / Pill</label>
+                                    <input type="text" id="wpEditVisaCode" placeholder="D-Visa" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Contract</label>
+                                    <input type="text" id="wpEditContract" placeholder="1-3 Years, Renewable" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Residence</label>
+                                    <input type="text" id="wpEditResidence" placeholder="Karta Pobytu (TRC)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Sectors</label>
+                                    <input type="text" id="wpEditSectors" placeholder="Logistics, Factory, Construction" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Checklist Ticks (one per line)</label>
+                                    <textarea id="wpEditTicks" rows="3" placeholder="Schengen Access&#10;EU Labour Rights&#10;Social Security (ZUS)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm"></textarea>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-6 pt-1">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="wpEditActive" checked class="w-4 h-4 accent-[#0D8A9E]">
+                                    <span class="text-xs font-bold text-[#0B2D5B]">Active (Visible on Website)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="wpEditFeatured" class="w-4 h-4 accent-[#0B2D5B]">
+                                    <span class="text-xs font-bold text-[#0B2D5B]">Featured Highlight</span>
+                                </label>
+                            </div>
+                            <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold py-3.5 rounded-xl shadow-lg mt-2">
+                                Save Work Permit Country
                             </button>
                         </form>
                     </div>
@@ -1398,6 +1590,11 @@
             const visaBadge = this.container.querySelector("#tabBadgeVisas");
             if (visaBadge) {
                 visaBadge.textContent = String((this.visas || []).length);
+            }
+
+            const workPermitBadge = this.container.querySelector("#tabBadgeWorkPermits");
+            if (workPermitBadge) {
+                workPermitBadge.textContent = String((this.workPermits || []).length);
             }
         }
 
@@ -1549,6 +1746,7 @@
             const pVisas = pc.visas || {};
             const pCalc = pc.calculator || {};
             const pContact = pc.contact || {};
+            const pWork = pc.workPermit || {};
 
             setVal("#homeHeroBadgeInput", pHome.heroBadge || "Swat's Trusted Travel & Umrah Partner");
             setVal("#homeHeroHeadingMainInput", pHome.heroHeadingMain || "Your Spiritual & Global Journey,");
@@ -1621,6 +1819,21 @@
             setVal("#calcHeroTitleInput", pCalc.heroTitle || "Umrah Package Budget Calculator");
             setVal("#calcHeroSubtitleInput", pCalc.heroSubtitle || "");
             setVal("#calcIncludedBulletsInput", pCalc.includedBullets || "");
+
+            setVal("#wpHeroBadgeInput", pWork.heroBadge || "Europe Work Permit Specialists");
+            setVal("#wpHeroTitleInput", pWork.heroTitle || "Work Permit & Job Placement Abroad");
+            setVal("#wpHeroScriptInput", pWork.heroScript || "Your Gateway to Europe");
+            setVal("#wpHeroSubtitleInput", pWork.heroSubtitle || "");
+            setVal("#wpFeaturedScriptInput", pWork.featuredScript || "Featured Destination");
+            setVal("#wpFeaturedDescInput", pWork.featuredDesc || "");
+            setVal("#wpDestinationsHeadingInput", pWork.destinationsHeading || "Work Permit Destinations");
+            setVal("#wpDestinationsDescInput", pWork.destinationsDesc || "");
+            setVal("#wpBenefitsHeadingInput", pWork.benefitsHeading || "Why Apply Through Zakir Travel & Tours");
+            setVal("#wpProcessHeadingInput", pWork.processHeading || "Our Work Permit Process");
+            setVal("#wpChecklistHeadingInput", pWork.checklistHeading || "Documents Required");
+            setVal("#wpChecklistDescInput", pWork.checklistDesc || "");
+            setVal("#wpAssessmentHeadingInput", pWork.assessmentHeading || "Start Your Work Permit Assessment");
+            setVal("#wpFaqHeadingInput", pWork.faqHeading || "Work Permit FAQs");
 
             const legacyBadges = ["Head Office: Blue Area, Islamabad", "Swat Head Office (Matta) \u2022 Islamabad Branch Office"];
             const aboutBadge = pContact.heroBadge && !legacyBadges.includes(pContact.heroBadge) ? pContact.heroBadge : "About Us \u2022 Our People \u2022 Contact";
@@ -1982,6 +2195,22 @@
                         heroSubtitle: getVal("#calcHeroSubtitleInput"),
                         includedBullets: getVal("#calcIncludedBulletsInput")
                     },
+                    workPermit: {
+                        heroBadge: getVal("#wpHeroBadgeInput"),
+                        heroTitle: getVal("#wpHeroTitleInput"),
+                        heroScript: getVal("#wpHeroScriptInput"),
+                        heroSubtitle: getVal("#wpHeroSubtitleInput"),
+                        featuredScript: getVal("#wpFeaturedScriptInput"),
+                        featuredDesc: getVal("#wpFeaturedDescInput"),
+                        destinationsHeading: getVal("#wpDestinationsHeadingInput"),
+                        destinationsDesc: getVal("#wpDestinationsDescInput"),
+                        benefitsHeading: getVal("#wpBenefitsHeadingInput"),
+                        processHeading: getVal("#wpProcessHeadingInput"),
+                        checklistHeading: getVal("#wpChecklistHeadingInput"),
+                        checklistDesc: getVal("#wpChecklistDescInput"),
+                        assessmentHeading: getVal("#wpAssessmentHeadingInput"),
+                        faqHeading: getVal("#wpFaqHeadingInput")
+                    },
                     contact: {
                         heroBadge: getVal("#contactHeroBadgeInput"),
                         heroTitle: getVal("#contactHeroTitleInput"),
@@ -2109,6 +2338,77 @@
                 .join("");
         }
 
+        _renderWorkPermitsList() {
+            const wrap = this.container.querySelector("#crudWorkPermitsContainer");
+            if (!wrap) return;
+
+            if (!this.workPermits || !this.workPermits.length) {
+                wrap.innerHTML = `<div class="col-span-full bg-white rounded-2xl p-8 text-center text-slate-500 text-sm">No work permit destinations found. Click "Add Work Permit Country" to create one.</div>`;
+                return;
+            }
+
+            const tagColors = {
+                emerald: "bg-emerald-100 text-emerald-700",
+                sky: "bg-sky-100 text-sky-700",
+                amber: "bg-amber-100 text-amber-700",
+                rose: "bg-rose-100 text-rose-700",
+                indigo: "bg-indigo-100 text-indigo-700",
+                slate: "bg-slate-100 text-slate-700"
+            };
+
+            wrap.innerHTML = this.workPermits
+                .map((p, idx) => {
+                    const tagCls = tagColors[String(p.tagStyle || "sky").toLowerCase()] || tagColors.sky;
+                    const flagClass =
+                        String(p.flagClass || "flag-eu")
+                            .toLowerCase()
+                            .replace(/[^a-z0-9-]/g, "") || "flag-eu";
+                    return `
+                <div class="admin-card-hover bg-white rounded-3xl p-5 border ${p.isActive ? "border-slate-200" : "border-slate-200 opacity-60 bg-slate-50"} shadow-card flex flex-col justify-between gap-4">
+                    <div class="space-y-2">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-1.5">
+                                <span class="bg-[#0B2D5B] text-white text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full">#${idx + 1}</span>
+                                <span class="${tagCls} text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full">${escapeHtml(p.tagText || "Applications Open")}</span>
+                                ${p.isFeatured ? `<span class="bg-[#FEF3C7] text-[#8A6D0B] text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-star mr-1"></i>Featured</span>` : ""}
+                            </div>
+                            <span class="text-xs font-bold text-slate-500"><i class="fa-regular fa-clock text-[#0D8A9E] mr-1"></i>${escapeHtml(p.timeline || "3-6 Months")}</span>
+                        </div>
+                        <h4 class="text-base font-black text-[#0B2D5B]"><span class="flag ${flagClass} mr-2"></span>${escapeHtml(p.cardTitle || p.countryName)}</h4>
+                        <div class="text-xs text-slate-500 grid grid-cols-2 gap-1.5 bg-slate-50 p-3 rounded-2xl">
+                            <span><i class="fa-solid fa-file-contract text-[#0D8A9E] mr-1"></i>${escapeHtml(p.permitType || "Work Permit")}</span>
+                            <span><i class="fa-solid fa-passport text-[#0D8A9E] mr-1"></i>${escapeHtml(p.visaCode || "D-Visa")}</span>
+                            <span class="col-span-2"><i class="fa-solid fa-briefcase text-[#0D8A9E] mr-1"></i>${escapeHtml(p.sectors || "General Labour")}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-1.5 pt-2 border-t border-slate-100">
+                        <div class="flex items-center gap-1">
+                            <button type="button" data-action="move-workpermit" data-id="${escapeHtml(p.id)}" data-dir="up" ${idx === 0 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-arrow-up"></i>
+                            </button>
+                            <button type="button" data-action="move-workpermit" data-id="${escapeHtml(p.id)}" data-dir="down" ${idx === this.workPermits.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-arrow-down"></i>
+                            </button>
+                            <button type="button" data-action="toggle-workpermit-active" data-id="${escapeHtml(p.id)}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${p.isActive ? "bg-[#E6F6F8] text-[#0D8A9E]" : "bg-slate-200 text-slate-700"}">
+                                ${p.isActive ? "Active" : "Hidden"}
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" data-action="edit-workpermit" data-id="${escapeHtml(p.id)}" class="px-3.5 py-1.5 rounded-lg bg-[#0B2D5B] text-white hover:bg-[#0D8A9E] text-xs font-bold transition-colors">
+                                <i class="fa-solid fa-pen mr-1"></i>Edit
+                            </button>
+                            <button type="button" data-action="delete-workpermit" data-id="${escapeHtml(p.id)}" class="w-8 h-8 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+                })
+                .join("");
+        }
+
         _autoGrowFields(root) {
             const scope = root || this.container;
             if (!scope || !scope.querySelectorAll) return;
@@ -2129,7 +2429,7 @@
                     : `admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all${extraColSpan}`;
             });
 
-            ["spotlight", "umrah", "visas", "calculator", "contacts"].forEach((t) => {
+            ["spotlight", "umrah", "visas", "workpermit", "contacts"].forEach((t) => {
                 const panel = this.container.querySelector(`#admin-panel-${t}`);
                 if (panel) {
                     panel.classList.toggle("hidden", t !== tabName);
@@ -2220,8 +2520,8 @@
                 });
             }
 
-            // Home, Umrah & Visa Page Content Forms Submit
-            ["#homePageContentForm", "#umrahPageContentForm", "#visaPageContentForm"].forEach((formSel) => {
+            // Home, Umrah, Visa & Work Permit Page Content Forms Submit
+            ["#homePageContentForm", "#umrahPageContentForm", "#visaPageContentForm", "#workPermitPageContentForm"].forEach((formSel) => {
                 const formEl = this.container.querySelector(formSel);
                 if (formEl) {
                     formEl.addEventListener("submit", async (e) => {
@@ -2420,6 +2720,46 @@
                 });
             }
 
+            // Work Permit Modal Submit
+            const workPermitForm = this.container.querySelector("#workPermitCrudForm");
+            if (workPermitForm) {
+                workPermitForm.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    const countryName = this.container.querySelector("#wpEditCountry").value.trim();
+                    if (!countryName) {
+                        this.showToast("Country name is required!", "error");
+                        return;
+                    }
+
+                    const ticksRaw = this.container.querySelector("#wpEditTicks").value;
+                    const ticks = ticksRaw
+                        .split(/\r?\n|\|/)
+                        .map((t) => t.trim())
+                        .filter(Boolean);
+
+                    await db.saveWorkPermit({
+                        id: this.container.querySelector("#wpEditId").value || undefined,
+                        countryName,
+                        cardTitle: this.container.querySelector("#wpEditTitle").value.trim(),
+                        flagClass: this.container.querySelector("#wpEditFlag").value.trim(),
+                        tagText: this.container.querySelector("#wpEditTag").value.trim(),
+                        tagStyle: this.container.querySelector("#wpEditTagStyle").value,
+                        timeline: this.container.querySelector("#wpEditTimeline").value.trim(),
+                        permitType: this.container.querySelector("#wpEditPermitType").value.trim(),
+                        visaCode: this.container.querySelector("#wpEditVisaCode").value.trim(),
+                        contract: this.container.querySelector("#wpEditContract").value.trim(),
+                        residence: this.container.querySelector("#wpEditResidence").value.trim(),
+                        sectors: this.container.querySelector("#wpEditSectors").value.trim(),
+                        ticks,
+                        isActive: this.container.querySelector("#wpEditActive").checked,
+                        isFeatured: this.container.querySelector("#wpEditFeatured").checked
+                    });
+
+                    this.container.querySelector("#workPermitCrudModal").classList.add("hidden");
+                    this.showToast("Work Permit Country Saved & Published Live!");
+                });
+            }
+
             // Delegated Click Actions
             this.container.addEventListener("click", async (e) => {
                 const tabBtn = e.target.closest("[data-tab]");
@@ -2519,6 +2859,27 @@
                     }
                 } else if (action === "move-visa") {
                     await db.reorderVisaService(
+                        actionEl.getAttribute("data-id"),
+                        actionEl.getAttribute("data-dir")
+                    );
+                } else if (action === "open-workpermit-modal") {
+                    this._openWorkPermitModal(null);
+                } else if (action === "close-workpermit-modal") {
+                    this.container.querySelector("#workPermitCrudModal").classList.add("hidden");
+                } else if (action === "edit-workpermit") {
+                    const permit = this.workPermits.find((p) => p.id === actionEl.getAttribute("data-id"));
+                    if (permit) this._openWorkPermitModal(permit);
+                } else if (action === "delete-workpermit") {
+                    await db.deleteWorkPermit(actionEl.getAttribute("data-id"));
+                    this.showToast("Work permit destination deleted.", "warning");
+                } else if (action === "toggle-workpermit-active") {
+                    const permit = this.workPermits.find((p) => p.id === actionEl.getAttribute("data-id"));
+                    if (permit) {
+                        await db.saveWorkPermit({ ...permit, isActive: !permit.isActive });
+                        this.showToast(`Work permit card ${!permit.isActive ? "shown" : "hidden"} live.`);
+                    }
+                } else if (action === "move-workpermit") {
+                    await db.reorderWorkPermit(
                         actionEl.getAttribute("data-id"),
                         actionEl.getAttribute("data-dir")
                     );
@@ -2634,6 +2995,38 @@
             const visaModal = this.container.querySelector("#visaCrudModal");
             visaModal.classList.remove("hidden");
             this._autoGrowFields(visaModal);
+        }
+
+        _openWorkPermitModal(permit) {
+            this.container.querySelector("#workPermitModalTitle").textContent = permit
+                ? "Edit Work Permit Country"
+                : "Add New Work Permit Country";
+            this.container.querySelector("#wpEditId").value = (permit && permit.id) || "";
+            this.container.querySelector("#wpEditCountry").value = (permit && permit.countryName) || "";
+            this.container.querySelector("#wpEditTitle").value = (permit && permit.cardTitle) || "";
+            this.container.querySelector("#wpEditFlag").value = (permit && permit.flagClass) || "flag-eu";
+            this.container.querySelector("#wpEditTag").value = (permit && permit.tagText) || "Applications Open";
+            this.container.querySelector("#wpEditTagStyle").value = (permit && permit.tagStyle) || "emerald";
+            this.container.querySelector("#wpEditTimeline").value = (permit && permit.timeline) || "3-6 Months";
+            this.container.querySelector("#wpEditPermitType").value =
+                (permit && permit.permitType) || "Type-A Work Permit";
+            this.container.querySelector("#wpEditVisaCode").value = (permit && permit.visaCode) || "D-Visa";
+            this.container.querySelector("#wpEditContract").value =
+                (permit && permit.contract) || "1-3 Years, Renewable";
+            this.container.querySelector("#wpEditResidence").value =
+                (permit && permit.residence) || "Residence Permit (TRC)";
+            this.container.querySelector("#wpEditSectors").value =
+                (permit && permit.sectors) || "Logistics, Factory, Construction";
+            const ticks = permit && Array.isArray(permit.ticks) ? permit.ticks : [];
+            this.container.querySelector("#wpEditTicks").value = ticks.length
+                ? ticks.join("\n")
+                : "Schengen Access\nEU Labour Rights\nSocial Security";
+            this.container.querySelector("#wpEditActive").checked = permit ? Boolean(permit.isActive) : true;
+            this.container.querySelector("#wpEditFeatured").checked = permit ? Boolean(permit.isFeatured) : false;
+
+            const wpModal = this.container.querySelector("#workPermitCrudModal");
+            wpModal.classList.remove("hidden");
+            this._autoGrowFields(wpModal);
         }
     }
 

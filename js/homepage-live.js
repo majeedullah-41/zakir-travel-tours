@@ -16,6 +16,7 @@
     let liveSpecialDeals = zakirDB.getLocalSpecialDeals ? zakirDB.getLocalSpecialDeals() : [];
     let livePackages = zakirDB.getLocalUmrahPackages();
     let liveVisas = zakirDB.getLocalVisaServices();
+    let liveWorkPermits = zakirDB.getLocalWorkPermits ? zakirDB.getLocalWorkPermits() : [];
     let selectedSpecialDealFilter = "ALL"; // "ALL" or specific deal.id
     let adminDrawerInstance = null;
 
@@ -55,6 +56,7 @@
             renderSpecialDealsShowcase(liveSpecialDeals);
             renderUmrahPackagesGrid(livePackages);
             renderVisaServicesGrid(liveVisas);
+            renderWorkPermitsGrid(liveWorkPermits);
             populateHeroUmrahDropdown(livePackages, liveSpecialDeals, config);
             updateCalculator();
         });
@@ -79,16 +81,25 @@
             populateHeroVisaDropdown(visas);
         });
 
+        if (zakirDB.onWorkPermitsSnapshot) {
+            zakirDB.onWorkPermitsSnapshot((permits) => {
+                liveWorkPermits = Array.isArray(permits) ? permits : [];
+                renderWorkPermitsGrid(liveWorkPermits);
+            });
+        }
+
         // Re-sync when tab gains focus (helpful for file:// cross-tab edits)
         window.addEventListener("focus", () => {
             liveSiteConfig = zakirDB.getLocalSiteConfig();
             liveSpecialDeals = zakirDB.getLocalSpecialDeals ? zakirDB.getLocalSpecialDeals() : [];
             livePackages = zakirDB.getLocalUmrahPackages();
             liveVisas = zakirDB.getLocalVisaServices();
+            liveWorkPermits = zakirDB.getLocalWorkPermits ? zakirDB.getLocalWorkPermits() : [];
             renderSiteConfigToDOM(liveSiteConfig);
             renderSpecialDealsShowcase(liveSpecialDeals);
             renderUmrahPackagesGrid(livePackages);
             renderVisaServicesGrid(liveVisas);
+            renderWorkPermitsGrid(liveWorkPermits);
             populateHeroUmrahDropdown(livePackages, liveSpecialDeals, liveSiteConfig);
             updateCalculator();
         });
@@ -112,6 +123,11 @@
             const bookBtn = target.closest("[data-book-service]");
             if (bookBtn) {
                 window.openBookingModal(bookBtn.getAttribute("data-book-service"));
+                return;
+            }
+            const wpApplyBtn = target.closest("[data-wp-apply]");
+            if (wpApplyBtn && typeof window.selectWorkPermitCountry === "function") {
+                window.selectWorkPermitCountry(wpApplyBtn.getAttribute("data-wp-apply"));
             }
         });
     }
@@ -210,6 +226,7 @@
         const pVisas = pContent.visas || {};
         const pCalc = pContent.calculator || {};
         const pContact = pContent.contact || {};
+        const pWorkPermit = pContent.workPermit || {};
 
         // --- Page-Specific Content: HOME PAGE ---
         if (pHome.heroBadge) setText("homeHeroBadge", pHome.heroBadge);
@@ -366,6 +383,22 @@
                 calcBulletsEl.innerHTML = cLines.map((line) => `<p>• ${escapeHtmlAttr(line)}</p>`).join("");
             }
         }
+
+        // --- Page-Specific Content: WORK PERMIT PAGE ---
+        if (pWorkPermit.heroBadge) setText("workPermitHeroBadge", pWorkPermit.heroBadge);
+        if (pWorkPermit.heroTitle) setText("workPermitHeroTitle", pWorkPermit.heroTitle);
+        if (pWorkPermit.heroScript) setText("workPermitHeroScript", pWorkPermit.heroScript);
+        if (pWorkPermit.heroSubtitle) setText("workPermitHeroSubtitle", pWorkPermit.heroSubtitle);
+        if (pWorkPermit.featuredScript) setText("workPermitFeaturedScript", pWorkPermit.featuredScript);
+        if (pWorkPermit.featuredDesc) setText("workPermitFeaturedDesc", pWorkPermit.featuredDesc);
+        if (pWorkPermit.destinationsHeading) setText("workPermitDestinationsHeading", pWorkPermit.destinationsHeading);
+        if (pWorkPermit.destinationsDesc) setText("workPermitDestinationsDesc", pWorkPermit.destinationsDesc);
+        if (pWorkPermit.benefitsHeading) setText("workPermitBenefitsHeading", pWorkPermit.benefitsHeading);
+        if (pWorkPermit.processHeading) setText("workPermitProcessHeading", pWorkPermit.processHeading);
+        if (pWorkPermit.checklistHeading) setText("workPermitChecklistHeading", pWorkPermit.checklistHeading);
+        if (pWorkPermit.checklistDesc) setText("workPermitChecklistDesc", pWorkPermit.checklistDesc);
+        if (pWorkPermit.assessmentHeading) setText("workPermitAssessmentHeading", pWorkPermit.assessmentHeading);
+        if (pWorkPermit.faqHeading) setText("workPermitFaqHeading", pWorkPermit.faqHeading);
 
         const heroRoomSelect = document.getElementById("umrahRoom");
         if (heroRoomSelect) {
@@ -1190,6 +1223,83 @@
                     </div>
                 </div>
             `;
+            })
+            .join("");
+    }
+
+    // ============================================================================
+    // 4B. RENDER WORK PERMIT DESTINATION CARDS
+    // ============================================================================
+
+    function renderWorkPermitsGrid(permits) {
+        const grid = document.getElementById("workPermitsGrid");
+        if (!grid) return;
+
+        const activePermits = (permits || []).filter((p) => p && p.isActive !== false);
+        if (!activePermits.length) {
+            grid.innerHTML = `<div class="col-span-full bg-white rounded-2xl p-8 text-center text-slate-500">Contact our desk on WhatsApp for current European work permit openings.</div>`;
+            return;
+        }
+
+        const tagStyleMap = {
+            emerald: "bg-emerald-100 text-emerald-700",
+            sky: "bg-sky-100 text-sky-700",
+            amber: "bg-amber-100 text-amber-700",
+            rose: "bg-rose-100 text-rose-700",
+            indigo: "bg-indigo-100 text-indigo-700",
+            slate: "bg-slate-100 text-slate-700"
+        };
+
+        grid.innerHTML = activePermits
+            .map((p) => {
+                const country = String(p.countryName || "Country");
+                const countryAttr = escapeHtmlAttr(country);
+                const title = p.cardTitle || `${country} Work Permit`;
+                const tagCls = tagStyleMap[String(p.tagStyle || "sky").toLowerCase()] || tagStyleMap.sky;
+                const flagClass = String(p.flagClass || "flag-eu")
+                    .toLowerCase()
+                    .replace(/[^a-z0-9-]/g, "") || "flag-eu";
+                const ticks = Array.isArray(p.ticks)
+                    ? p.ticks
+                    : String(p.ticks || "")
+                          .split(/\r?\n|\|/)
+                          .map((t) => t.trim())
+                          .filter(Boolean);
+
+                return `
+                <div class="dest-card card-hover-lift ${p.isFeatured ? "border-2 border-teal/50" : "border border-slate-200"}">
+                    ${
+                        p.isFeatured
+                            ? `<span class="absolute top-0 right-0 bg-navy text-white text-[10px] font-extrabold px-3 py-1 rounded-bl-xl rounded-tr-[1.4rem] flex items-center gap-1"><i class="fa-solid fa-star text-amber-300"></i> FEATURED</span>`
+                            : ""
+                    }
+                    <div class="flex items-center gap-2 text-xs"><span class="dest-tag ${tagCls}">${escapeHtmlAttr(
+                        p.tagText || "Applications Open"
+                    )}</span><span class="text-slate-500 font-semibold"><i class="fa-regular fa-clock text-teal"></i> ${escapeHtmlAttr(
+                        p.timeline || "3-6 Months"
+                    )}</span></div>
+                    <div class="flex items-center gap-3 mt-3"><span class="flag ${flagClass} flag-xl"></span><h3 class="text-xl font-black text-navy leading-tight">${escapeHtmlAttr(
+                        title
+                    )}</h3></div>
+                    <div class="dest-box"><div><span class="dest-label">Permit Type</span><div class="text-base font-black text-teal">${escapeHtmlAttr(
+                        p.permitType || "Work Permit"
+                    )}</div></div><span class="dest-pill">${escapeHtmlAttr(p.visaCode || "D-Visa")}</span></div>
+                    <dl class="dest-rows">
+                        <div><dt><i class="fa-solid fa-file-contract"></i> Contract</dt><dd>${escapeHtmlAttr(
+                            p.contract || "1 Year, Renewable"
+                        )}</dd></div>
+                        <div><dt><i class="fa-solid fa-id-card"></i> Residence</dt><dd>${escapeHtmlAttr(
+                            p.residence || "Residence Permit"
+                        )}</dd></div>
+                        <div><dt><i class="fa-solid fa-briefcase"></i> Sectors</dt><dd>${escapeHtmlAttr(
+                            p.sectors || "General Labour"
+                        )}</dd></div>
+                    </dl>
+                    <div class="dest-ticks">${ticks
+                        .map((t) => `<span><i class="fa-solid fa-check"></i> ${escapeHtmlAttr(t)}</span>`)
+                        .join("")}</div>
+                    <div class="dest-actions"><button type="button" data-wp-apply="${countryAttr}" class="dest-btn-primary"><i class="fa-solid fa-paper-plane text-teal-light"></i> Quick Apply</button><a href="#" data-wa-country="${countryAttr}" class="dest-btn-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></div>
+                </div>`;
             })
             .join("");
     }

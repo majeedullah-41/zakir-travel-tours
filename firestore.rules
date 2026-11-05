@@ -25,5 +25,9 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+    match /work_permits/{permitId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
   }
 }

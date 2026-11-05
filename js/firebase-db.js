@@ -161,6 +161,26 @@
             heroTitle: "Contact Our Travel Desk",
             heroSubtitle:
                 "We are always here to assist your spiritual journey and global travel. Visit our Blue Area office or speak directly with our manager and consultant via phone or WhatsApp."
+        },
+        workPermit: {
+            heroBadge: "EU & Schengen Employment \u2022 Legal Work Permits",
+            heroTitle: "Europe Work Permits",
+            heroScript: "Build Your Career Abroad \u2014 The Legal Way.",
+            heroSubtitle:
+                "A work permit allows you to legally live and work in a foreign country. From our Head Office in Matta Swat, Zakir Travel & Tours guides you through every stage of European employment \u2014 consultation, eligibility, documents and embassy filing \u2014 for Poland and other leading EU destinations.",
+            featuredScript: "Now Accepting Applications",
+            featuredDesc:
+                "Our currently active European work permit programme, with complete legal processing handled by our Swat Head Office team.",
+            destinationsHeading: "Work Permit Programmes Across Europe",
+            destinationsDesc:
+                "Compare permit types, timelines and in-demand sectors. Availability depends on employer demand and quotas \u2014 contact our desk for the latest openings.",
+            benefitsHeading: "Benefits of a European Work Permit",
+            processHeading: "Your Path to Working in Europe",
+            checklistHeading: "General Document Checklist",
+            checklistDesc:
+                "Typical documents required for most European work permit applications. Exact requirements vary by country and employer.",
+            assessmentHeading: "Europe Work Permit Assessment",
+            faqHeading: "Frequently Asked Questions"
         }
     };
 
@@ -341,6 +361,116 @@
                 isActive: true,
                 sortOrder: 6
             }
+        ],
+        work_permits: [
+            {
+                id: "wp_poland",
+                countryName: "Poland",
+                cardTitle: "Poland Work Permit",
+                flagClass: "flag-pl",
+                tagText: "Applications Open",
+                tagStyle: "emerald",
+                timeline: "3\u20136 Months",
+                permitType: "Type-A Work Permit",
+                visaCode: "D-Visa",
+                contract: "1\u20133 Years, Renewable",
+                residence: "Karta Pobytu (TRC)",
+                sectors: "Logistics, Factory, Construction",
+                ticks: ["Schengen Access", "EU Labour Rights", "Social Security (ZUS)"],
+                isFeatured: true,
+                isActive: true,
+                sortOrder: 1
+            },
+            {
+                id: "wp_romania",
+                countryName: "Romania",
+                cardTitle: "Romania Work Permit",
+                flagClass: "flag-ro",
+                tagText: "EU Member",
+                tagStyle: "sky",
+                timeline: "3\u20135 Months",
+                permitType: "Work Authorisation (Aviz)",
+                visaCode: "D/AM Visa",
+                contract: "1 Year, Renewable",
+                residence: "Residence Permit (IGI)",
+                sectors: "Construction, HoReCa, Delivery",
+                ticks: ["Schengen Member", "Employer Sponsored", "Legal Contract"],
+                isFeatured: false,
+                isActive: true,
+                sortOrder: 2
+            },
+            {
+                id: "wp_croatia",
+                countryName: "Croatia",
+                cardTitle: "Croatia Work Permit",
+                flagClass: "flag-hr",
+                tagText: "EU & Schengen",
+                tagStyle: "sky",
+                timeline: "2\u20134 Months",
+                permitType: "Stay & Work Permit",
+                visaCode: "D-Visa",
+                contract: "Up to 3 Years",
+                residence: "Temporary Stay (MUP)",
+                sectors: "Construction, Tourism, Shipyards",
+                ticks: ["Schengen Access", "Seasonal & Annual", "Employer Sponsored"],
+                isFeatured: false,
+                isActive: true,
+                sortOrder: 3
+            },
+            {
+                id: "wp_hungary",
+                countryName: "Hungary",
+                cardTitle: "Hungary Work Permit",
+                flagClass: "flag-hu",
+                tagText: "EU & Schengen",
+                tagStyle: "sky",
+                timeline: "2\u20134 Months",
+                permitType: "Single Work & Residence",
+                visaCode: "D-Visa",
+                contract: "Up to 2 Years",
+                residence: "Residence Permit Card",
+                sectors: "Manufacturing, Logistics",
+                ticks: ["Schengen Access", "Industrial Jobs", "Legal Contract"],
+                isFeatured: false,
+                isActive: true,
+                sortOrder: 4
+            },
+            {
+                id: "wp_czech",
+                countryName: "Czech Republic",
+                cardTitle: "Czech Republic Work Permit",
+                flagClass: "flag-cz",
+                tagText: "EU & Schengen",
+                tagStyle: "sky",
+                timeline: "3\u20135 Months",
+                permitType: "Employee Card",
+                visaCode: "Long-Term",
+                contract: "Up to 2 Years, Renewable",
+                residence: "Combined Permit Card",
+                sectors: "Automotive, Welding, Warehousing",
+                ticks: ["Schengen Access", "Skilled Trades", "Family Pathway"],
+                isFeatured: false,
+                isActive: true,
+                sortOrder: 5
+            },
+            {
+                id: "wp_portugal",
+                countryName: "Portugal",
+                cardTitle: "Portugal Work Visa",
+                flagClass: "flag-pt",
+                tagText: "EU & Schengen",
+                tagStyle: "sky",
+                timeline: "3\u20136 Months",
+                permitType: "Employment Work Visa",
+                visaCode: "Type-D",
+                contract: "1 Year+, Renewable",
+                residence: "Residence Permit (AIMA)",
+                sectors: "Agriculture, Hospitality, Construction",
+                ticks: ["Schengen Access", "Residency Pathway", "Family Reunion"],
+                isFeatured: false,
+                isActive: true,
+                sortOrder: 6
+            }
         ]
     };
 
@@ -377,7 +507,8 @@
             umrah: { ...DEFAULT_PAGE_CONTENT.umrah, ...(base.umrah || {}), ...(inc.umrah || {}) },
             visas: { ...DEFAULT_PAGE_CONTENT.visas, ...(base.visas || {}), ...(inc.visas || {}) },
             calculator: { ...DEFAULT_PAGE_CONTENT.calculator, ...(base.calculator || {}), ...(inc.calculator || {}) },
-            contact: { ...DEFAULT_PAGE_CONTENT.contact, ...(base.contact || {}), ...(inc.contact || {}) }
+            contact: { ...DEFAULT_PAGE_CONTENT.contact, ...(base.contact || {}), ...(inc.contact || {}) },
+            workPermit: { ...DEFAULT_PAGE_CONTENT.workPermit, ...(base.workPermit || {}), ...(inc.workPermit || {}) }
         };
     }
 
@@ -391,6 +522,7 @@
         SPECIAL_DEALS: "zakir_db_special_deals_v1",
         UMRAH_PACKAGES: "zakir_db_umrah_packages_v1",
         VISA_SERVICES: "zakir_db_visa_services_v1",
+        WORK_PERMITS: "zakir_db_work_permits_v1",
         AUTH_SESSION: "zakir_auth_session_v1",
         LOCAL_ADMIN_PASS: "zakir_db_local_admin_pass_v1"
     };
@@ -408,6 +540,7 @@
                 special_deals: new Set(),
                 umrah_packages: new Set(),
                 visa_services: new Set(),
+                work_permits: new Set(),
                 auth: new Set()
             };
 
@@ -437,7 +570,8 @@
                     e.key === STORAGE_KEYS.SITE_CONFIG ||
                     e.key === STORAGE_KEYS.SPECIAL_DEALS ||
                     e.key === STORAGE_KEYS.UMRAH_PACKAGES ||
-                    e.key === STORAGE_KEYS.VISA_SERVICES
+                    e.key === STORAGE_KEYS.VISA_SERVICES ||
+                    e.key === STORAGE_KEYS.WORK_PERMITS
                 ) {
                     this._notifyLocalListeners();
                 } else if (e.key === STORAGE_KEYS.AUTH_SESSION) {
@@ -479,6 +613,12 @@
                     localStorage.setItem(
                         STORAGE_KEYS.VISA_SERVICES,
                         JSON.stringify(FLYER_DEFAULTS.visa_services)
+                    );
+                }
+                if (!localStorage.getItem(STORAGE_KEYS.WORK_PERMITS)) {
+                    localStorage.setItem(
+                        STORAGE_KEYS.WORK_PERMITS,
+                        JSON.stringify(FLYER_DEFAULTS.work_permits)
                     );
                 }
             } catch (err) {
@@ -627,7 +767,17 @@
                     this.listeners.visa_services.forEach((cb) => cb(list));
                 });
 
-            this.firebaseUnsubscribes.push(unsubConfig, unsubDeals, unsubPkgs, unsubVisas);
+            const unsubWorkPermits = this.db
+                .collection("work_permits")
+                .orderBy("sortOrder", "asc")
+                .onSnapshot((snap) => {
+                    const list = [];
+                    snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
+                    localStorage.setItem(STORAGE_KEYS.WORK_PERMITS, JSON.stringify(list));
+                    this.listeners.work_permits.forEach((cb) => cb(list));
+                });
+
+            this.firebaseUnsubscribes.push(unsubConfig, unsubDeals, unsubPkgs, unsubVisas, unsubWorkPermits);
         }
 
         // --------------------------------------------------------------------
@@ -658,6 +808,12 @@
             return () => this.listeners.visa_services.delete(callback);
         }
 
+        onWorkPermitsSnapshot(callback) {
+            this.listeners.work_permits.add(callback);
+            callback(this.getLocalWorkPermits());
+            return () => this.listeners.work_permits.delete(callback);
+        }
+
         onAuthSnapshot(callback) {
             this.listeners.auth.add(callback);
             callback(this.getCurrentUser());
@@ -669,11 +825,13 @@
             const deals = this.getLocalSpecialDeals();
             const packages = this.getLocalUmrahPackages();
             const visas = this.getLocalVisaServices();
+            const workPermits = this.getLocalWorkPermits();
 
             this.listeners.site_config.forEach((cb) => cb(siteConfig));
             this.listeners.special_deals.forEach((cb) => cb(deals));
             this.listeners.umrah_packages.forEach((cb) => cb(packages));
             this.listeners.visa_services.forEach((cb) => cb(visas));
+            this.listeners.work_permits.forEach((cb) => cb(workPermits));
         }
 
         _broadcastChange(type = "DB_UPDATED") {
@@ -769,6 +927,19 @@
                 console.error("Error reading visa_services:", e);
             }
             return JSON.parse(JSON.stringify(FLYER_DEFAULTS.visa_services));
+        }
+
+        getLocalWorkPermits() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.WORK_PERMITS);
+                if (raw) {
+                    const list = JSON.parse(raw);
+                    return [...list].sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+                }
+            } catch (e) {
+                console.error("Error reading work_permits:", e);
+            }
+            return JSON.parse(JSON.stringify(FLYER_DEFAULTS.work_permits));
         }
 
         // --------------------------------------------------------------------
@@ -1225,6 +1396,117 @@
             }
         }
 
+        async saveWorkPermit(permitData) {
+            const list = this.getLocalWorkPermits();
+            const ticks = Array.isArray(permitData.ticks)
+                ? permitData.ticks
+                : String(permitData.ticks || "")
+                      .split(/\r?\n|\|/)
+                      .map((t) => t.trim())
+                      .filter(Boolean);
+
+            let targetPermit;
+            if (permitData.id) {
+                const idx = list.findIndex((p) => p.id === permitData.id);
+                if (idx !== -1) {
+                    targetPermit = {
+                        ...list[idx],
+                        ...permitData,
+                        ticks,
+                        sortOrder: Number(permitData.sortOrder ?? list[idx].sortOrder ?? idx + 1)
+                    };
+                    list[idx] = targetPermit;
+                }
+            }
+
+            if (!targetPermit) {
+                const newId = permitData.id || `wp_${Date.now()}`;
+                targetPermit = {
+                    id: newId,
+                    countryName: permitData.countryName || "Country Name",
+                    cardTitle: permitData.cardTitle || `${permitData.countryName || "Country"} Work Permit`,
+                    flagClass: permitData.flagClass || "flag-eu",
+                    tagText: permitData.tagText || "Applications Open",
+                    tagStyle: permitData.tagStyle || "sky",
+                    timeline: permitData.timeline || "3-6 Months",
+                    permitType: permitData.permitType || "Work Permit",
+                    visaCode: permitData.visaCode || "D-Visa",
+                    contract: permitData.contract || "1 Year, Renewable",
+                    residence: permitData.residence || "Residence Permit",
+                    sectors: permitData.sectors || "General Labour",
+                    ticks,
+                    isFeatured: Boolean(permitData.isFeatured),
+                    isActive: permitData.isActive !== undefined ? Boolean(permitData.isActive) : true,
+                    sortOrder: Number(permitData.sortOrder ?? list.length + 1)
+                };
+                list.push(targetPermit);
+            }
+
+            const clearedFeatured = [];
+            if (targetPermit.isFeatured) {
+                list.forEach((p) => {
+                    if (p.id !== targetPermit.id && p.isFeatured) {
+                        p.isFeatured = false;
+                        clearedFeatured.push(p);
+                    }
+                });
+            }
+
+            localStorage.setItem(STORAGE_KEYS.WORK_PERMITS, JSON.stringify(list));
+            this._notifyLocalListeners();
+            this._broadcastChange("DB_UPDATED");
+
+            if (this.mode === "firebase" && this.db) {
+                const batch = this.db.batch();
+                batch.set(this.db.collection("work_permits").doc(targetPermit.id), targetPermit, { merge: true });
+                clearedFeatured.forEach((p) => {
+                    batch.set(this.db.collection("work_permits").doc(p.id), p, { merge: true });
+                });
+                await batch.commit();
+            }
+
+            return targetPermit;
+        }
+
+        async deleteWorkPermit(permitId) {
+            const list = this.getLocalWorkPermits().filter((p) => p.id !== permitId);
+            localStorage.setItem(STORAGE_KEYS.WORK_PERMITS, JSON.stringify(list));
+            this._notifyLocalListeners();
+            this._broadcastChange("DB_UPDATED");
+
+            if (this.mode === "firebase" && this.db) {
+                await this.db.collection("work_permits").doc(permitId).delete();
+            }
+        }
+
+        async reorderWorkPermit(permitId, direction) {
+            const list = this.getLocalWorkPermits();
+            const idx = list.findIndex((p) => p.id === permitId);
+            if (idx === -1) return;
+            const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+            if (swapIdx < 0 || swapIdx >= list.length) return;
+
+            const temp = list[idx];
+            list[idx] = list[swapIdx];
+            list[swapIdx] = temp;
+
+            list.forEach((item, index) => {
+                item.sortOrder = index + 1;
+            });
+
+            localStorage.setItem(STORAGE_KEYS.WORK_PERMITS, JSON.stringify(list));
+            this._notifyLocalListeners();
+            this._broadcastChange("DB_UPDATED");
+
+            if (this.mode === "firebase" && this.db) {
+                const batch = this.db.batch();
+                list.forEach((item) => {
+                    batch.set(this.db.collection("work_permits").doc(item.id), item, { merge: true });
+                });
+                await batch.commit();
+            }
+        }
+
         async uploadMediaFile(file, folder = "zakir_media") {
             if (!file) throw new Error("No file selected.");
 
@@ -1276,11 +1558,13 @@
             const defaultDeals = JSON.parse(JSON.stringify(FLYER_DEFAULTS.special_deals));
             const defaultPkgs = JSON.parse(JSON.stringify(FLYER_DEFAULTS.umrah_packages));
             const defaultVisas = JSON.parse(JSON.stringify(FLYER_DEFAULTS.visa_services));
+            const defaultWorkPermits = JSON.parse(JSON.stringify(FLYER_DEFAULTS.work_permits));
 
             localStorage.setItem(STORAGE_KEYS.SITE_CONFIG, JSON.stringify(defaultConfig));
             localStorage.setItem(STORAGE_KEYS.SPECIAL_DEALS, JSON.stringify(defaultDeals));
             localStorage.setItem(STORAGE_KEYS.UMRAH_PACKAGES, JSON.stringify(defaultPkgs));
             localStorage.setItem(STORAGE_KEYS.VISA_SERVICES, JSON.stringify(defaultVisas));
+            localStorage.setItem(STORAGE_KEYS.WORK_PERMITS, JSON.stringify(defaultWorkPermits));
 
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
@@ -1307,6 +1591,12 @@
                     batch.set(this.db.collection("visa_services").doc(visa.id), visa);
                 });
 
+                const existingWorkPermits = await this.db.collection("work_permits").get();
+                existingWorkPermits.forEach((d) => batch.delete(d.ref));
+                defaultWorkPermits.forEach((permit) => {
+                    batch.set(this.db.collection("work_permits").doc(permit.id), permit);
+                });
+
                 await batch.commit();
             }
 
@@ -1314,7 +1604,8 @@
                 site_config: defaultConfig,
                 special_deals: defaultDeals,
                 umrah_packages: defaultPkgs,
-                visa_services: defaultVisas
+                visa_services: defaultVisas,
+                work_permits: defaultWorkPermits
             };
         }
 
