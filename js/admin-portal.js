@@ -1542,9 +1542,10 @@
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <input type="checkbox" id="wpEditFeatured" class="w-4 h-4 accent-[#0B2D5B]">
-                                    <span class="text-xs font-bold text-[#0B2D5B]">Featured Highlight</span>
+                                    <span class="text-xs font-bold text-[#0B2D5B]">Featured Programme</span>
                                 </label>
                             </div>
+                            <p class="text-[10px] font-semibold text-slate-400">You can feature multiple programmes. Featured cards get a highlighted badge on the website.</p>
                             <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold py-3.5 rounded-xl shadow-lg mt-2">
                                 Save Work Permit Country
                             </button>

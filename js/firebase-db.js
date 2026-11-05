@@ -1442,27 +1442,12 @@
                 list.push(targetPermit);
             }
 
-            const clearedFeatured = [];
-            if (targetPermit.isFeatured) {
-                list.forEach((p) => {
-                    if (p.id !== targetPermit.id && p.isFeatured) {
-                        p.isFeatured = false;
-                        clearedFeatured.push(p);
-                    }
-                });
-            }
-
             localStorage.setItem(STORAGE_KEYS.WORK_PERMITS, JSON.stringify(list));
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
             if (this.mode === "firebase" && this.db) {
-                const batch = this.db.batch();
-                batch.set(this.db.collection("work_permits").doc(targetPermit.id), targetPermit, { merge: true });
-                clearedFeatured.forEach((p) => {
-                    batch.set(this.db.collection("work_permits").doc(p.id), p, { merge: true });
-                });
-                await batch.commit();
+                await this.db.collection("work_permits").doc(targetPermit.id).set(targetPermit, { merge: true });
             }
 
             return targetPermit;
