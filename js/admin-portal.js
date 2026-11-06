@@ -3148,7 +3148,11 @@
                             const ph = this.container.querySelector("#previewFlyerPlaceholder");
                             if (ph) ph.classList.add("hidden");
                         }
-                        this.showToast("Image ready! Click Save & Push to Website.");
+                        if (url.startsWith("data:")) {
+                            this.showToast("Image stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning");
+                        } else {
+                            this.showToast("Image ready! Click Save & Push to Website.");
+                        }
                     } catch (err) {
                         this.showToast(err.message || "Failed to upload image.", "error");
                     }
@@ -3165,7 +3169,11 @@
                         this.showToast("Uploading & optimizing team photo...", "warning");
                         const url = await db.uploadMediaFile(file, "zakir_team");
                         this._setTeamPhotoPreview(memberId, url);
-                        this.showToast("Photo ready! Click Save & Push to Website.");
+                        if (url.startsWith("data:")) {
+                            this.showToast("Photo stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning");
+                        } else {
+                            this.showToast("Photo ready! Click Save & Push to Website.");
+                        }
                     } catch (err) {
                         this.showToast(err.message || "Failed to upload photo.", "error");
                     } finally {
@@ -3191,7 +3199,11 @@
                         const url = await db.uploadMediaFile(file);
                         const inputEl = this.container.querySelector(`#${targetId}`);
                         if (inputEl) inputEl.value = url;
-                        this.showToast("Deal image uploaded!");
+                        if (url.startsWith("data:")) {
+                            this.showToast("Image stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning");
+                        } else {
+                            this.showToast("Deal image uploaded!");
+                        }
                     } catch (err) {
                         this.showToast(err.message || "Image upload failed.", "error");
                     }
@@ -3387,7 +3399,11 @@
                         const url = await db.uploadMediaFile(file, "zakir_work_permits");
                         const inputEl = this.container.querySelector(`#${targetId}`);
                         if (inputEl) inputEl.value = url;
-                        this.showToast("Programme image uploaded!");
+                        if (url.startsWith("data:")) {
+                            this.showToast("Image stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning");
+                        } else {
+                            this.showToast("Programme image uploaded!");
+                        }
                     } catch (err) {
                         this.showToast(err.message || "Image upload failed.", "error");
                     }
