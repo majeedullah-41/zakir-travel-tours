@@ -1664,11 +1664,11 @@
                                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2.5">
                                     <div class="flex items-center justify-between">
                                         <span class="text-xs font-black uppercase text-[#0B2D5B]">Right City Image Card</span>
-                                        <span class="text-[10px] text-slate-400 font-semibold">e.g. Wrocław & Kraków</span>
+                                        <span class="text-[10px] text-slate-400 font-semibold">e.g. Wroc\u0142aw & Krak\u00f3w</span>
                                     </div>
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-600 mb-1">City Title</label>
-                                        <input type="text" id="wpProgEditRightTitle" required placeholder="Wrocław & Kraków" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                        <input type="text" id="wpProgEditRightTitle" required placeholder="Wroc\u0142aw & Krak\u00f3w" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
                                     </div>
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-600 mb-1">Badge Text</label>
@@ -1716,7 +1716,7 @@
                             <div class="grid sm:grid-cols-2 gap-4">
                                 <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 space-y-1">
                                     <label class="block text-[11px] font-black uppercase text-[#0D8A9E]">Work Permit Box Description</label>
-                                    <input type="text" id="wpProgEditPermitTypeLong" required placeholder="Voivodeship Type-A Permit (Zezwolenie na pracę)" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                    <input type="text" id="wpProgEditPermitTypeLong" required placeholder="Voivodeship Type-A Permit (Zezwolenie na prac\u0119)" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
                                 </div>
                                 <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 space-y-1">
                                     <label class="block text-[11px] font-black uppercase text-[#0B2D5B]">Entry Visa Box Description</label>
@@ -1731,14 +1731,14 @@
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-600 mb-1">Processing Time &amp; Note</label>
                                         <div class="grid grid-cols-2 gap-1.5">
-                                            <input type="text" id="wpProgEditProcessing" placeholder="3–6 Months" class="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-[#0D8A9E]">
+                                            <input type="text" id="wpProgEditProcessing" placeholder="3\u20136 Months" class="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-[#0D8A9E]">
                                             <input type="text" id="wpProgEditProcessingNote" placeholder="Approx." class="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs">
                                         </div>
                                     </div>
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-600 mb-1">Contract Duration &amp; Note</label>
                                         <div class="grid grid-cols-2 gap-1.5">
-                                            <input type="text" id="wpProgEditContract" placeholder="1–3 Years" class="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-[#0D8A9E]">
+                                            <input type="text" id="wpProgEditContract" placeholder="1\u20133 Years" class="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-[#0D8A9E]">
                                             <input type="text" id="wpProgEditContractNote" placeholder="Renewable" class="bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs">
                                         </div>
                                     </div>
@@ -2672,7 +2672,7 @@
                                     <div class="absolute inset-0 bg-gradient-to-t from-[#05162E]/90 via-transparent to-transparent"></div>
                                     <div class="absolute bottom-2 right-2.5 text-right">
                                         <span class="bg-[#0B2D5B] text-[8px] font-bold text-white px-1.5 py-0.5 rounded shadow">${escapeHtml(prog.rightImageBadge || "Logistics")}</span>
-                                        <div class="text-[11px] font-bold text-white leading-tight mt-0.5">${escapeHtml(prog.rightCityTitle || "Wrocław & Kraków")}</div>
+                                        <div class="text-[11px] font-bold text-white leading-tight mt-0.5">${escapeHtml(prog.rightCityTitle || "Wroc\u0142aw & Krak\u00f3w")}</div>
                                     </div>
                                 </div>
 
@@ -2712,7 +2712,7 @@
                                         <span class="text-xs font-extrabold text-[#0D8A9E] block mt-0.5">${escapeHtml(prog.regionText || "EU & Schengen")}</span>
                                     </div>
                                     <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-extrabold px-2.5 py-1 rounded-lg">
-                                        ● Status: ${escapeHtml(prog.statusText || "Open")}
+                                        \u25CF Status: ${escapeHtml(prog.statusText || "Open")}
                                     </span>
                                 </div>
 
@@ -3185,18 +3185,18 @@
                         leftCityTitle: this.container.querySelector("#wpProgEditLeftTitle").value.trim() || "Warsaw",
                         leftImageBadge: this.container.querySelector("#wpProgEditLeftBadge").value.trim() || "Capital & Business Hub",
                         leftImageUrl: this.container.querySelector("#wpProgEditLeftUrl").value.trim() || "./assets/warsaw-poland.jpg",
-                        rightCityTitle: this.container.querySelector("#wpProgEditRightTitle").value.trim() || "Wrocław & Kraków",
+                        rightCityTitle: this.container.querySelector("#wpProgEditRightTitle").value.trim() || "Wroc\u0142aw & Krak\u00f3w",
                         rightImageBadge: this.container.querySelector("#wpProgEditRightBadge").value.trim() || "Industry & Logistics",
                         rightImageUrl: this.container.querySelector("#wpProgEditRightUrl").value.trim() || "./assets/krakow-wroclaw-poland.jpg",
                         shieldLabel: this.container.querySelector("#wpProgEditShieldLabel").value.trim() || "Work Permit",
                         shieldCountry: this.container.querySelector("#wpProgEditShieldCountry").value.trim() || countryName.toUpperCase(),
                         shieldSub: this.container.querySelector("#wpProgEditShieldSub").value.trim() || "Type-A Permit + D-Visa",
                         shieldStatus: this.container.querySelector("#wpProgEditShieldStatus").value.trim() || "Applications Open",
-                        permitTypeLong: this.container.querySelector("#wpProgEditPermitTypeLong").value.trim() || "Voivodeship Type-A Permit (Zezwolenie na pracę)",
+                        permitTypeLong: this.container.querySelector("#wpProgEditPermitTypeLong").value.trim() || "Voivodeship Type-A Permit (Zezwolenie na prac\u0119)",
                         visaTypeLong: this.container.querySelector("#wpProgEditVisaTypeLong").value.trim() || "National D-Type Work Visa (Schengen Valid)",
-                        processing: this.container.querySelector("#wpProgEditProcessing").value.trim() || "3–6 Months",
+                        processing: this.container.querySelector("#wpProgEditProcessing").value.trim() || "3\u20136 Months",
                         processingNote: this.container.querySelector("#wpProgEditProcessingNote").value.trim() || "Approx.",
-                        contract: this.container.querySelector("#wpProgEditContract").value.trim() || "1–3 Years",
+                        contract: this.container.querySelector("#wpProgEditContract").value.trim() || "1\u20133 Years",
                         contractNote: this.container.querySelector("#wpProgEditContractNote").value.trim() || "Renewable",
                         residence: this.container.querySelector("#wpProgEditResidence").value.trim() || "Karta Pobytu",
                         residenceNote: this.container.querySelector("#wpProgEditResidenceNote").value.trim() || "TRC",
@@ -3522,7 +3522,7 @@
             this.container.querySelector("#wpProgEditLeftBadge").value = (prog && prog.leftImageBadge) || "Capital & Business Hub";
             this.container.querySelector("#wpProgEditLeftUrl").value = (prog && prog.leftImageUrl) || "./assets/warsaw-poland.jpg";
 
-            this.container.querySelector("#wpProgEditRightTitle").value = (prog && prog.rightCityTitle) || "Wrocław & Kraków";
+            this.container.querySelector("#wpProgEditRightTitle").value = (prog && prog.rightCityTitle) || "Wroc\u0142aw & Krak\u00f3w";
             this.container.querySelector("#wpProgEditRightBadge").value = (prog && prog.rightImageBadge) || "Industry & Logistics";
             this.container.querySelector("#wpProgEditRightUrl").value = (prog && prog.rightImageUrl) || "./assets/krakow-wroclaw-poland.jpg";
 
@@ -3531,12 +3531,12 @@
             this.container.querySelector("#wpProgEditShieldSub").value = (prog && prog.shieldSub) || "Type-A Permit + D-Visa";
             this.container.querySelector("#wpProgEditShieldStatus").value = (prog && prog.shieldStatus) || "Applications Open";
 
-            this.container.querySelector("#wpProgEditPermitTypeLong").value = (prog && prog.permitTypeLong) || "Voivodeship Type-A Permit (Zezwolenie na pracę)";
+            this.container.querySelector("#wpProgEditPermitTypeLong").value = (prog && prog.permitTypeLong) || "Voivodeship Type-A Permit (Zezwolenie na prac\u0119)";
             this.container.querySelector("#wpProgEditVisaTypeLong").value = (prog && prog.visaTypeLong) || "National D-Type Work Visa (Schengen Valid)";
 
-            this.container.querySelector("#wpProgEditProcessing").value = (prog && prog.processing) || "3–6 Months";
+            this.container.querySelector("#wpProgEditProcessing").value = (prog && prog.processing) || "3\u20136 Months";
             this.container.querySelector("#wpProgEditProcessingNote").value = (prog && prog.processingNote) || "Approx.";
-            this.container.querySelector("#wpProgEditContract").value = (prog && prog.contract) || "1–3 Years";
+            this.container.querySelector("#wpProgEditContract").value = (prog && prog.contract) || "1\u20133 Years";
             this.container.querySelector("#wpProgEditContractNote").value = (prog && prog.contractNote) || "Renewable";
             this.container.querySelector("#wpProgEditResidence").value = (prog && prog.residence) || "Karta Pobytu";
             this.container.querySelector("#wpProgEditResidenceNote").value = (prog && prog.residenceNote) || "TRC";
