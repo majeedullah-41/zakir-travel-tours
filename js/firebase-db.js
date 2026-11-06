@@ -7,6 +7,14 @@
 (function (window) {
     "use strict";
 
+    // How long a Firebase Storage upload may take before we give up on it
+    // and fall back to the compressed DataURL instead. Storage is broken
+    // for this project right now (rules unpublished in the console, billing
+    // not set up), so an upload can hang indefinitely while Firebase
+    // retries — without this timeout the admin shows no preview and no
+    // feedback at all while the upload is stuck.
+    const STORAGE_UPLOAD_TIMEOUT_MS = 10000;
+
     function formatPKR(val) {
         const num = Number(val);
         if (isNaN(num)) return "0";
@@ -1958,12 +1966,35 @@
             if (!file) throw new Error("No file selected.");
 
             if (this.mode === "firebase" && this.storage) {
+                // Give the Storage upload one bounded window (put + getting
+                // its download URL). If it stalls, cancel the task so it
+                // stops retrying in the background and fall through to the
+                // DataURL fallback below instead of hanging forever.
+                let task = null;
+                let timeoutTimer = null;
+                const timeout = new Promise((_, reject) => {
+                    timeoutTimer = setTimeout(
+                        () => reject(new Error(`Storage upload timed out after ${STORAGE_UPLOAD_TIMEOUT_MS / 1000}s`)),
+                        STORAGE_UPLOAD_TIMEOUT_MS
+                    );
+                });
                 try {
                     const safeName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
                     const ref = this.storage.ref(`${folder}/${safeName}`);
-                    const snap = await ref.put(file);
-                    return await snap.ref.getDownloadURL();
+                    task = ref.put(file);
+                    const snap = await Promise.race([task, timeout]);
+                    const url = await Promise.race([snap.ref.getDownloadURL(), timeout]);
+                    clearTimeout(timeoutTimer);
+                    return url;
                 } catch (err) {
+                    clearTimeout(timeoutTimer);
+                    if (task) {
+                        try {
+                            task.cancel();
+                        } catch (_) {
+                            // Already finished or already cancelled — nothing to stop.
+                        }
+                    }
                     console.warn("Firebase Storage fallback to compressed DataURL:", err);
                 }
             }

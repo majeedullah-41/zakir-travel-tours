@@ -220,7 +220,11 @@
         // written to the persistent Activity log, so no message is ever
         // lost when the toast disappears. `detail` is an extra line shown
         // only in the log (e.g. file name, size, destination).
-        showToast(message, type = "success", detail = "") {
+        // `options.sticky` keeps the toast on screen until the caller
+        // dismisses it (used for "Uploading…" / "Saving…" messages that
+        // must not vanish mid-operation); sticky toasts get a × button
+        // so the user can still close one by hand.
+        showToast(message, type = "success", detail = "", options = {}) {
             const text = String(message == null ? "" : message);
             // Log first, so the record survives even if the toast DOM is gone.
             this._logActivity(text, type, detail);
@@ -236,7 +240,7 @@
                 success: { bg: "bg-[#0D8A9E] border-[#15B2CB]", icon: "fa-circle-check" }
             };
             const style = styleByType[type] || styleByType.success;
-            const persistent = type === "error" || type === "warning";
+            const persistent = Boolean(options && options.sticky) || type === "error" || type === "warning";
 
             toast.className = `${style.bg} text-white px-4 py-3.5 rounded-2xl shadow-2xl border flex items-start gap-3 text-sm font-bold transform transition-all duration-300 translate-y-2 opacity-0 pointer-events-auto`;
             toast.innerHTML = `
@@ -260,9 +264,12 @@
                 toast.classList.remove("translate-y-2", "opacity-0");
             });
 
-            // Success and in-progress ("info") toasts auto-dismiss after 5s.
-            // Errors and warnings stay on screen until the user dismisses
-            // them — they are also kept in the Activity log.
+            // Success and in-progress ("info") toasts auto-dismiss after 5s,
+            // unless the toast is sticky — a sticky toast stays until the
+            // caller dismisses it (see _runUploadWithFeedback /
+            // _runSaveWithFeedback). Errors and warnings stay on screen
+            // until the user dismisses them — they are also kept in the
+            // Activity log.
             if (!persistent) {
                 setTimeout(() => this._dismissToast(toast), 5000);
             }
@@ -524,12 +531,27 @@
         // the message are always restored, even when the save fails.
         async _runSaveWithFeedback(button, work) {
             const restoreButton = this._markButtonSaving(button);
-            const savingToast = this.showToast("Saving… please wait.", "info");
+            const savingToast = this.showToast("Saving… please wait.", "info", "", { sticky: true });
             try {
                 return await work();
             } finally {
                 this._dismissToast(savingToast);
                 restoreButton();
+            }
+        }
+
+        // Runs an image upload with a visible processing state: an
+        // "Uploading…" message stays on screen until the upload finishes
+        // (it is sticky — not auto-dismissed after 5s), then the result
+        // toast is shown. `work` is the async upload itself; its result
+        // is returned and its errors are re-thrown to the caller's catch.
+        // The message is always dismissed, even when the upload fails.
+        async _runUploadWithFeedback(message, detail, work) {
+            const uploadingToast = this.showToast(message, "info", detail, { sticky: true });
+            try {
+                return await work();
+            } finally {
+                this._dismissToast(uploadingToast);
             }
         }
 
@@ -2776,8 +2798,11 @@
             const sizeText = this._formatFileSize(file.size);
             const fileDesc = sizeText ? `${file.name} (${sizeText})` : file.name;
             try {
-                this.showToast(`Uploading team photo ${fileDesc}…`, "info", `Team photo · ${memberName} · Destination: Firebase Storage (zakir_team)`);
-                const url = await db.uploadMediaFile(file, "zakir_team");
+                const url = await this._runUploadWithFeedback(
+                    `Uploading team photo ${fileDesc}…`,
+                    `Team photo · ${memberName} · Destination: Firebase Storage (zakir_team)`,
+                    () => db.uploadMediaFile(file, "zakir_team")
+                );
                 this._setTeamPhotoPreview(memberId, url);
                 if (url.startsWith("data:")) {
                     this.showToast("Photo adjusted and saved as a local copy — click Save & Push to Website.", "warning", `Team photo · ${memberName} · ${fileDesc} · fell back to a local copy`);
@@ -3742,8 +3767,11 @@
                     const fileDesc = sizeText ? `${file.name} (${sizeText})` : file.name;
 
                     try {
-                        this.showToast(`Uploading image ${fileDesc}…`, "info", "Destination: Firebase Storage (zakir_media)");
-                        const url = await db.uploadMediaFile(file);
+                        const url = await this._runUploadWithFeedback(
+                            `Uploading image ${fileDesc}…`,
+                            "Destination: Firebase Storage (zakir_media)",
+                            () => db.uploadMediaFile(file)
+                        );
                         const urlInput = this.container.querySelector(`#${targetInputId}`);
                         if (urlInput) urlInput.value = url;
                         const prevImg = this.container.querySelector(`#${previewImgId}`);
@@ -3813,8 +3841,11 @@
                     const sizeText = this._formatFileSize(file.size);
                     const fileDesc = sizeText ? `${file.name} (${sizeText})` : file.name;
                     try {
-                        this.showToast(`Optimizing deal image ${fileDesc}…`, "info", "Destination: Firebase Storage (zakir_media)");
-                        const url = await db.uploadMediaFile(file);
+                        const url = await this._runUploadWithFeedback(
+                            `Optimizing deal image ${fileDesc}…`,
+                            "Destination: Firebase Storage (zakir_media)",
+                            () => db.uploadMediaFile(file)
+                        );
                         const inputEl = this.container.querySelector(`#${targetId}`);
                         if (inputEl) inputEl.value = url;
                         if (url.startsWith("data:")) {
@@ -4040,8 +4071,11 @@
                     const sizeText = this._formatFileSize(file.size);
                     const fileDesc = sizeText ? `${file.name} (${sizeText})` : file.name;
                     try {
-                        this.showToast(`Uploading flag ${fileDesc}…`, "info", `Country flag · ${countryName} · Destination: Firebase Storage (zakir_work_permits)`);
-                        const url = await db.uploadMediaFile(file, "zakir_work_permits");
+                        const url = await this._runUploadWithFeedback(
+                            `Uploading flag ${fileDesc}…`,
+                            `Country flag · ${countryName} · Destination: Firebase Storage (zakir_work_permits)`,
+                            () => db.uploadMediaFile(file, "zakir_work_permits")
+                        );
                         this.container.querySelector("#wpEditFlagUrl").value = url;
                         this._setWpFlagPreview(url);
                         if (url.startsWith("data:")) {
@@ -4080,8 +4114,11 @@
                     const sizeText = this._formatFileSize(file.size);
                     const fileDesc = sizeText ? `${file.name} (${sizeText})` : file.name;
                     try {
-                        this.showToast(`Optimizing programme image ${fileDesc}…`, "info", "Destination: Firebase Storage (zakir_work_permits)");
-                        const url = await db.uploadMediaFile(file, "zakir_work_permits");
+                        const url = await this._runUploadWithFeedback(
+                            `Optimizing programme image ${fileDesc}…`,
+                            "Destination: Firebase Storage (zakir_work_permits)",
+                            () => db.uploadMediaFile(file, "zakir_work_permits")
+                        );
                         const inputEl = this.container.querySelector(`#${targetId}`);
                         if (inputEl) inputEl.value = url;
                         if (url.startsWith("data:")) {
