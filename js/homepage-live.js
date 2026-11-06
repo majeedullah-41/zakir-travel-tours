@@ -99,6 +99,7 @@
             renderUmrahPackagesGrid(livePackages);
             renderVisaServicesGrid(liveVisas);
             renderWorkPermitsGrid(liveWorkPermits);
+            renderCountryPills(liveWorkPermits);
             renderFeaturedWorkPermitsShowcase(liveWorkPermitProgrammes);
             populateHeroUmrahDropdown(livePackages, liveSpecialDeals, config);
             updateCalculator();
@@ -128,6 +129,7 @@
             zakirDB.onWorkPermitsSnapshot((permits) => {
                 liveWorkPermits = Array.isArray(permits) ? permits : [];
                 renderWorkPermitsGrid(liveWorkPermits);
+                renderCountryPills(liveWorkPermits);
             });
         }
 
@@ -153,6 +155,7 @@
             renderUmrahPackagesGrid(livePackages);
             renderVisaServicesGrid(liveVisas);
             renderWorkPermitsGrid(liveWorkPermits);
+            renderCountryPills(liveWorkPermits);
             renderFeaturedWorkPermitsShowcase(liveWorkPermitProgrammes);
             populateHeroUmrahDropdown(livePackages, liveSpecialDeals, liveSiteConfig);
             updateCalculator();
@@ -1560,6 +1563,47 @@
     // ============================================================================
     // 4B. RENDER WORK PERMIT DESTINATION CARDS
     // ============================================================================
+
+    // Country quick pills in the work-permit hero, rendered from the SAME
+    // admin-provided work_permits collection as the destinations grid — so a
+    // country only appears here when the admin provides it. Returns null when
+    // there is nothing to show, so the caller can leave the hardcoded
+    // fallback pills in the HTML untouched. Pure (no DOM) so it is testable.
+    function buildCountryPillsHtml(permits) {
+        const activePermits = (permits || [])
+            .filter((p) => p && p.isActive !== false)
+            .slice()
+            .sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+        if (!activePermits.length) return null;
+
+        return activePermits
+            .map((p) => {
+                const country = String(p.countryName || "Country");
+                const isOpen = /open/i.test(String(p.tagText || ""));
+                const flagHtml = p.flagUrl
+                    ? `<img src="${escapeHtmlAttr(p.flagUrl)}" alt="" class="flag object-cover">`
+                    : `<span class="flag ${String(p.flagClass || "flag-eu")
+                          .toLowerCase()
+                          .replace(/[^a-z0-9-]/g, "") || "flag-eu"}"></span>`;
+                const pillCls = isOpen
+                    ? "inline-flex items-center gap-2 bg-white text-navy font-extrabold text-xs px-3.5 py-2 rounded-full shadow-md hover:-translate-y-0.5 transition-all"
+                    : "inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white font-bold text-xs px-3.5 py-2 rounded-full hover:bg-white/20 transition-all";
+                const badgeHtml = isOpen
+                    ? ` <span class="bg-emerald-500 text-white text-[9px] px-1.5 py-0.5 rounded-full uppercase">Open</span>`
+                    : "";
+                return `<a href="#europe-destinations" class="${pillCls}">${flagHtml} ${escapeHtmlAttr(country)}${badgeHtml}</a>`;
+            })
+            .join("");
+    }
+
+    function renderCountryPills(permits) {
+        const wrap = document.getElementById("countryPills");
+        if (!wrap) return;
+        const html = buildCountryPillsHtml(permits);
+        if (html) wrap.innerHTML = html;
+        // When there is nothing to show, leave the hardcoded fallback pills
+        // in the HTML alone so visitors never see an empty row.
+    }
 
     function renderWorkPermitsGrid(permits) {
         const grid = document.getElementById("workPermitsGrid");

@@ -1937,6 +1937,21 @@
                                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Flag CSS Class</label>
                                     <input type="text" id="wpEditFlag" placeholder="flag-pl" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
                                 </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Country Flag Image</label>
+                                    <input type="hidden" id="wpEditFlagUrl">
+                                    <div class="flex items-center gap-3">
+                                        <img id="wpEditFlagPreview" alt="Flag preview" class="hidden w-11 h-8 object-cover rounded-md shadow-sm ring-1 ring-slate-200">
+                                        <button type="button" data-wp-flag-upload class="px-3.5 py-2.5 bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-2">
+                                            <i class="fa-solid fa-cloud-arrow-up"></i> Upload Flag
+                                        </button>
+                                        <button type="button" data-wp-flag-remove class="px-3 py-2.5 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-xs font-bold rounded-xl transition-colors" title="Remove flag image">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                        <span class="text-[11px] text-slate-400 font-semibold">Optional — if no image is uploaded, the CSS flag above is used.</span>
+                                    </div>
+                                    <input type="file" accept="image/*" class="hidden" data-wp-flag-file>
+                                </div>
                                 <div>
                                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Status Tag Text</label>
                                     <input type="text" id="wpEditTag" placeholder="Applications Open" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
@@ -3365,6 +3380,9 @@
                         String(p.flagClass || "flag-eu")
                             .toLowerCase()
                             .replace(/[^a-z0-9-]/g, "") || "flag-eu";
+                    const flagHtml = p.flagUrl
+                        ? `<img src="${escapeHtml(p.flagUrl)}" alt="" class="flag object-cover mr-2">`
+                        : `<span class="flag ${flagClass} mr-2"></span>`;
                     return `
                 <div class="admin-card-hover bg-white rounded-3xl p-5 border ${p.isActive ? "border-slate-200" : "border-slate-200 opacity-60 bg-slate-50"} shadow-card flex flex-col justify-between gap-4">
                     <div class="space-y-2">
@@ -3376,7 +3394,7 @@
                             </div>
                             <span class="text-xs font-bold text-slate-500"><i class="fa-regular fa-clock text-[#0D8A9E] mr-1"></i>${escapeHtml(p.timeline || "3-6 Months")}</span>
                         </div>
-                        <h4 class="text-base font-black text-[#0B2D5B]"><span class="flag ${flagClass} mr-2"></span>${escapeHtml(p.cardTitle || p.countryName)}</h4>
+                        <h4 class="text-base font-black text-[#0B2D5B]">${flagHtml}${escapeHtml(p.cardTitle || p.countryName)}</h4>
                         <div class="text-xs text-slate-500 grid grid-cols-2 gap-1.5 bg-slate-50 p-3 rounded-2xl">
                             <span><i class="fa-solid fa-file-contract text-[#0D8A9E] mr-1"></i>${escapeHtml(p.permitType || "Work Permit")}</span>
                             <span><i class="fa-solid fa-passport text-[#0D8A9E] mr-1"></i>${escapeHtml(p.visaCode || "D-Visa")}</span>
@@ -3980,6 +3998,7 @@
                             countryName,
                             cardTitle: this.container.querySelector("#wpEditTitle").value.trim(),
                             flagClass: this.container.querySelector("#wpEditFlag").value.trim(),
+                            flagUrl: this.container.querySelector("#wpEditFlagUrl").value.trim(),
                             tagText: this.container.querySelector("#wpEditTag").value.trim(),
                             tagStyle: this.container.querySelector("#wpEditTagStyle").value,
                             timeline: this.container.querySelector("#wpEditTimeline").value.trim(),
@@ -3998,11 +4017,51 @@
                             result,
                             "Work Permit Country Saved & Published Live!",
                             "success",
-                            this._verifyFor("work_permits", result && result.permit, ["countryName", "cardTitle"])
+                            this._verifyFor("work_permits", result && result.permit, ["countryName", "cardTitle", "flagUrl"])
                         );
                     } catch (err) {
                         this.showToast(err.message || "Could not save the work permit.", "error");
                     }
+                });
+            }
+
+            // Work Permit Country Flag Upload (stored as flagUrl; the CSS flag
+            // class stays as the fallback when no image is uploaded).
+            const wpFlagUploadBtn = this.container.querySelector("[data-wp-flag-upload]");
+            const wpFlagFileInput = this.container.querySelector("[data-wp-flag-file]");
+            if (wpFlagUploadBtn && wpFlagFileInput) {
+                wpFlagUploadBtn.addEventListener("click", () => wpFlagFileInput.click());
+
+                wpFlagFileInput.addEventListener("change", async (e) => {
+                    const file = e.target.files && e.target.files[0];
+                    if (!file) return;
+                    const countryName = this.container.querySelector("#wpEditCountry").value.trim() || "country";
+                    const sizeText = this._formatFileSize(file.size);
+                    const fileDesc = sizeText ? `${file.name} (${sizeText})` : file.name;
+                    try {
+                        this.showToast(`Uploading flag ${fileDesc}…`, "info", `Country flag · ${countryName} · Destination: Firebase Storage (zakir_work_permits)`);
+                        const url = await db.uploadMediaFile(file, "zakir_work_permits");
+                        this.container.querySelector("#wpEditFlagUrl").value = url;
+                        this._setWpFlagPreview(url);
+                        if (url.startsWith("data:")) {
+                            this.showToast("Flag stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning", `Country flag · ${countryName} · ${fileDesc} · fell back to a local copy`);
+                        } else {
+                            this.showToast(`Flag uploaded to Storage ✓ ${fileDesc} — save the country to keep it.`, "success", `Country flag · ${countryName} · Destination: Firebase Storage (zakir_work_permits)`);
+                        }
+                    } catch (err) {
+                        this.showToast(`Flag upload failed: ${err.message || "Unknown error"}`, "error", `Country flag · ${countryName} · ${fileDesc}`);
+                    } finally {
+                        wpFlagFileInput.value = "";
+                    }
+                });
+            }
+
+            const wpFlagRemoveBtn = this.container.querySelector("[data-wp-flag-remove]");
+            if (wpFlagRemoveBtn) {
+                wpFlagRemoveBtn.addEventListener("click", () => {
+                    this.container.querySelector("#wpEditFlagUrl").value = "";
+                    this._setWpFlagPreview("");
+                    this.showToast("Flag image removed — the CSS flag will be used instead.", "info", "Country flag removed");
                 });
             }
 
@@ -4462,6 +4521,20 @@
             this._autoGrowFields(visaModal);
         }
 
+        // Shows the uploaded flag image in the country editor (or hides the
+        // preview when there is no flag image — the CSS flag is used then).
+        _setWpFlagPreview(url) {
+            const img = this.container.querySelector("#wpEditFlagPreview");
+            if (!img) return;
+            if (url) {
+                img.src = url;
+                img.classList.remove("hidden");
+            } else {
+                img.removeAttribute("src");
+                img.classList.add("hidden");
+            }
+        }
+
         _openWorkPermitModal(permit) {
             this.container.querySelector("#workPermitModalTitle").textContent = permit
                 ? "Edit Work Permit Country"
@@ -4470,6 +4543,8 @@
             this.container.querySelector("#wpEditCountry").value = (permit && permit.countryName) || "";
             this.container.querySelector("#wpEditTitle").value = (permit && permit.cardTitle) || "";
             this.container.querySelector("#wpEditFlag").value = (permit && permit.flagClass) || "flag-eu";
+            this.container.querySelector("#wpEditFlagUrl").value = (permit && permit.flagUrl) || "";
+            this._setWpFlagPreview((permit && permit.flagUrl) || "");
             this.container.querySelector("#wpEditTag").value = (permit && permit.tagText) || "Applications Open";
             this.container.querySelector("#wpEditTagStyle").value = (permit && permit.tagStyle) || "emerald";
             this.container.querySelector("#wpEditTimeline").value = (permit && permit.timeline) || "3-6 Months";
