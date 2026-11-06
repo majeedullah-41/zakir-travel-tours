@@ -422,19 +422,114 @@
 
         // Honest save feedback. db save methods return { synced, ... }:
         // `synced` is true only when the change actually reached Firestore.
-        // - synced === true  -> show the "published live" message.
-        // - synced === false -> warn clearly: saved on this device only.
+        // - synced === true  -> the save reached Firebase. If `verify`
+        //   is given, the document is re-read straight from the server
+        //   before anything is claimed live (see below).
+        // - synced === false -> warn clearly: saved on this device only,
+        //   and do NOT run the live check — there is nothing live to check.
         // - result is null/undefined (e.g. a reorder with nothing to move)
         //   -> nothing changed, so show no toast at all.
-        _showSyncToast(result, liveMessage, liveType = "success") {
+        // `verify` is { collection, docId, expected } — the document to
+        // re-read and the field values that must match. The check runs in
+        // the background: the admin stays usable while it runs.
+        _showSyncToast(result, liveMessage, liveType = "success", verify = null) {
             if (!result || typeof result.synced !== "boolean") return;
-            if (result.synced) {
-                this.showToast(liveMessage, liveType);
-            } else {
+            if (!result.synced) {
                 this.showToast(
                     "Saved on this device only — NOT published. Firebase is not connected. Open the admin on the live site and check your connection, then save again.",
                     "warning"
                 );
+                return;
+            }
+            if (!verify || !verify.collection || !verify.docId) {
+                this.showToast(liveMessage, liveType);
+                return;
+            }
+            const db = window.zakirDB;
+            if (!db || typeof db.verifyDocSaved !== "function") {
+                // Very old cached code without the check — fall back to the
+                // plain message instead of breaking the save feedback.
+                this.showToast(liveMessage, liveType);
+                return;
+            }
+            // Saved to Firebase — now prove it is actually live before
+            // saying so. The checking message stays up until the verdict
+            // arrives, then it is replaced by the confirmation (or the
+            // warning). Every step is logged to the Activity log.
+            const checkingToast = this.showToast("Saved. Checking the website…", "info", liveMessage);
+            db.verifyDocSaved(verify.collection, verify.docId, verify.expected || {})
+                .then((check) => {
+                    this._dismissToast(checkingToast);
+                    if (check && check.verified) {
+                        this.showToast("Confirmed live on the website — verified just now ✓", "success", liveMessage);
+                    } else {
+                        this.showToast(
+                            "Saved to Firebase, but the live check could not confirm it yet — please check the website.",
+                            "warning",
+                            liveMessage
+                        );
+                    }
+                })
+                .catch(() => {
+                    this._dismissToast(checkingToast);
+                    this.showToast(
+                        "Saved to Firebase, but the live check could not confirm it yet — please check the website.",
+                        "warning",
+                        liveMessage
+                    );
+                });
+        }
+
+        // Builds the "verify this save" descriptor for _showSyncToast
+        // from a saved record: which document to re-read, and which
+        // field values must match. Returns null when there is nothing
+        // safe to check (no record / no id), in which case _showSyncToast
+        // falls back to the plain "saved live" message.
+        _verifyFor(collection, record, fields, docId) {
+            const id = docId || (record && record.id);
+            if (!id || !record) return null;
+            const expected = {};
+            (fields || []).forEach((f) => {
+                expected[f] = record[f];
+            });
+            return { collection, docId: id, expected };
+        }
+
+        // Processing state for a save button: disable it and show
+        // "Saving…" on it while the save is in flight, so a double-tap
+        // can't fire the save twice. Returns a restore function — always
+        // call it (e.g. in a finally block) so the button comes back on
+        // success AND on failure. Safe to call with no button.
+        _markButtonSaving(button) {
+            if (!button) return () => {};
+            const originalHtml = button.innerHTML;
+            button.disabled = true;
+            const labelSpan = button.querySelector("span");
+            if (labelSpan) labelSpan.textContent = "Saving…";
+            else button.textContent = "Saving…";
+            let done = false;
+            return () => {
+                if (done) return;
+                done = true;
+                button.disabled = false;
+                button.innerHTML = originalHtml;
+            };
+        }
+
+        // Runs a save with a visible processing state: the button shows
+        // "Saving…" and can't be double-tapped, and a "Saving… please
+        // wait." message stays on screen until the save finishes.
+        // `work` is the async save itself; its result is returned and
+        // its errors are re-thrown to the caller's catch. The button and
+        // the message are always restored, even when the save fails.
+        async _runSaveWithFeedback(button, work) {
+            const restoreButton = this._markButtonSaving(button);
+            const savingToast = this.showToast("Saving… please wait.", "info");
+            try {
+                return await work();
+            } finally {
+                this._dismissToast(savingToast);
+                restoreButton();
             }
         }
 
@@ -2566,7 +2661,7 @@
                 .join("");
         }
 
-        async saveAllPortalChanges() {
+        async saveAllPortalChanges(triggerButton) {
             const db = window.zakirDB;
 
             const startingPrice = Number(this.container.querySelector("#spotStartingPrice").value);
@@ -2615,7 +2710,7 @@
 
             let result;
             try {
-                result = await db.updateSiteConfig({
+                result = await this._runSaveWithFeedback(triggerButton, () => db.updateSiteConfig({
                     teamPhotos,
                     spotlight: {
                         monthLabel: getVal("#spotMonthLabel", "January"),
@@ -2761,13 +2856,18 @@
                             heroSubtitle: getVal("#contactHeroSubtitleInput")
                         }
                     }
-                });
+                }));
             } catch (err) {
                 this.showToast(err.message || "Could not save. Please try again.", "error");
                 return false;
             }
 
-            this._showSyncToast(result, "Saved & Pushed All Changes Live to Website!");
+            this._showSyncToast(
+                result,
+                "Saved & Pushed All Changes Live to Website!",
+                "success",
+                this._verifyFor("site_config", result && result.config, ["updatedAt"], "main_settings")
+            );
             return true;
         }
 
@@ -3332,7 +3432,7 @@
             if (spotForm) {
                 spotForm.addEventListener("submit", async (e) => {
                     e.preventDefault();
-                    await this.saveAllPortalChanges();
+                    await this.saveAllPortalChanges(e.submitter);
                 });
             }
 
@@ -3342,7 +3442,7 @@
                 if (formEl) {
                     formEl.addEventListener("submit", async (e) => {
                         e.preventDefault();
-                        await this.saveAllPortalChanges();
+                        await this.saveAllPortalChanges(e.submitter);
                     });
                 }
             });
@@ -3450,8 +3550,9 @@
                         return;
                     }
 
+                    const submitBtn = e.submitter || dealForm.querySelector("button[type='submit']");
                     try {
-                        const result = await db.saveSpecialDeal({
+                        const result = await this._runSaveWithFeedback(submitBtn, () => db.saveSpecialDeal({
                             id: this.container.querySelector("#dealEditId").value || undefined,
                             monthLabel: this.container.querySelector("#dealEditMonth").value.trim(),
                             title: this.container.querySelector("#dealEditTitle").value.trim(),
@@ -3477,10 +3578,15 @@
                             },
                             isActive: this.container.querySelector("#dealEditActive").checked,
                             isPrimary: this.container.querySelector("#dealEditPrimary").checked
-                        });
+                        }));
 
                         this.container.querySelector("#dealCrudModal").classList.add("hidden");
-                        this._showSyncToast(result, "Special Flyer Deal Saved & Published Live!");
+                        this._showSyncToast(
+                            result,
+                            "Special Flyer Deal Saved & Published Live!",
+                            "success",
+                            this._verifyFor("special_deals", result && result.deal, ["startingPrice", "monthLabel"])
+                        );
                     } catch (err) {
                         this.showToast(err.message || "Could not save the deal.", "error");
                     }
@@ -3492,7 +3598,7 @@
             if (contactsForm) {
                 contactsForm.addEventListener("submit", async (e) => {
                     e.preventDefault();
-                    await this.saveAllPortalChanges();
+                    await this.saveAllPortalChanges(e.submitter);
                 });
             }
 
@@ -3507,8 +3613,9 @@
                         return;
                     }
 
+                    const submitBtn = e.submitter || pkgForm.querySelector("button[type='submit']");
                     try {
-                        const result = await db.saveUmrahPackage({
+                        const result = await this._runSaveWithFeedback(submitBtn, () => db.saveUmrahPackage({
                             id: this.container.querySelector("#pkgEditId").value || undefined,
                             title: this.container.querySelector("#pkgEditTitle").value.trim(),
                             badgeText: this.container.querySelector("#pkgEditBadge").value.trim(),
@@ -3526,10 +3633,15 @@
                                 .filter(Boolean),
                             isActive: this.container.querySelector("#pkgEditActive").checked,
                             isFeatured: this.container.querySelector("#pkgEditFeatured").checked
-                        });
+                        }));
 
                         this.container.querySelector("#pkgCrudModal").classList.add("hidden");
-                        this._showSyncToast(result, "Umrah Package Saved & Published Live!");
+                        this._showSyncToast(
+                            result,
+                            "Umrah Package Saved & Published Live!",
+                            "success",
+                            this._verifyFor("umrah_packages", result && result.package, ["price", "title"])
+                        );
                     } catch (err) {
                         this.showToast(err.message || "Could not save the package.", "error");
                     }
@@ -3547,8 +3659,9 @@
                         return;
                     }
 
+                    const submitBtn = e.submitter || visaForm.querySelector("button[type='submit']");
                     try {
-                        const result = await db.saveVisaService({
+                        const result = await this._runSaveWithFeedback(submitBtn, () => db.saveVisaService({
                             id: this.container.querySelector("#visaEditId").value || undefined,
                             countryName: this.container.querySelector("#visaEditCountry").value.trim(),
                             flagEmoji: this.container.querySelector("#visaEditFlag").value.trim(),
@@ -3558,10 +3671,15 @@
                             imageUrl: this.container.querySelector("#visaEditImage").value.trim(),
                             requirementsSummary: this.container.querySelector("#visaEditReqs").value.trim(),
                             isActive: this.container.querySelector("#visaEditActive").checked
-                        });
+                        }));
 
                         this.container.querySelector("#visaCrudModal").classList.add("hidden");
-                        this._showSyncToast(result, "Country Visa Saved & Published Live!");
+                        this._showSyncToast(
+                            result,
+                            "Country Visa Saved & Published Live!",
+                            "success",
+                            this._verifyFor("visa_services", result && result.visa, ["pricePKR", "countryName"])
+                        );
                     } catch (err) {
                         this.showToast(err.message || "Could not save the visa.", "error");
                     }
@@ -3585,8 +3703,9 @@
                         .map((t) => t.trim())
                         .filter(Boolean);
 
+                    const submitBtn = e.submitter || workPermitForm.querySelector("button[type='submit']");
                     try {
-                        const result = await db.saveWorkPermit({
+                        const result = await this._runSaveWithFeedback(submitBtn, () => db.saveWorkPermit({
                             id: this.container.querySelector("#wpEditId").value || undefined,
                             countryName,
                             cardTitle: this.container.querySelector("#wpEditTitle").value.trim(),
@@ -3602,10 +3721,15 @@
                             ticks,
                             isActive: this.container.querySelector("#wpEditActive").checked,
                             isFeatured: this.container.querySelector("#wpEditFeatured").checked
-                        });
+                        }));
 
                         this.container.querySelector("#workPermitCrudModal").classList.add("hidden");
-                        this._showSyncToast(result, "Work Permit Country Saved & Published Live!");
+                        this._showSyncToast(
+                            result,
+                            "Work Permit Country Saved & Published Live!",
+                            "success",
+                            this._verifyFor("work_permits", result && result.permit, ["countryName", "cardTitle"])
+                        );
                     } catch (err) {
                         this.showToast(err.message || "Could not save the work permit.", "error");
                     }
@@ -3681,10 +3805,16 @@
                         isActive: this.container.querySelector("#wpProgEditActive").checked
                     };
 
+                    const submitBtn = e.submitter || wpProgForm.querySelector("button[type='submit']");
                     try {
-                        const result = await db.saveWorkPermitProgramme(programmeData);
+                        const result = await this._runSaveWithFeedback(submitBtn, () => db.saveWorkPermitProgramme(programmeData));
                         this.container.querySelector("#wpProgrammeCrudModal").classList.add("hidden");
-                        this._showSyncToast(result, "Featured Work Permit Programme Saved & Published Live!");
+                        this._showSyncToast(
+                            result,
+                            "Featured Work Permit Programme Saved & Published Live!",
+                            "success",
+                            this._verifyFor("work_permit_programmes", result && result.programme, ["countryName"])
+                        );
                     } catch (err) {
                         this.showToast(err.message || "Could not save the programme.", "error");
                     }
@@ -3710,7 +3840,7 @@
                 const action = actionEl.getAttribute("data-action");
 
                 if (action === "save-push-all") {
-                    await this.saveAllPortalChanges();
+                    await this.saveAllPortalChanges(actionEl);
                 } else if (action === "logout") {
                     await db.logout();
                     this.showToast("Admin session locked.", "warning");
@@ -3721,7 +3851,7 @@
                 } else if (action === "clear-activity-log") {
                     this._clearActivityLog();
                 } else if (action === "close-drawer") {
-                    await this.saveAllPortalChanges();
+                    await this.saveAllPortalChanges(actionEl);
                     this.onCloseDrawer();
                 } else if (action === "open-deal-modal") {
                     this._openDealModal(null);
