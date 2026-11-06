@@ -9,7 +9,9 @@
     { "source": "/visas", "destination": "/visa-services.html" },
     { "source": "/visa-services", "destination": "/visa-services.html" },
     { "source": "/contact", "destination": "/contact.html" },
-    { "source": "/contact-us", "destination": "/contact.html" }
+    { "source": "/contact-us", "destination": "/contact.html" },
+    { "source": "/work-permit", "destination": "/work-permit.html" },
+    { "source": "/home", "destination": "/index.html" }
   ],
   "redirects": [
     { "source": "/calculator", "destination": "/umrah-packages#package-estimator", "permanent": false },

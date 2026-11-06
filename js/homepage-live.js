@@ -646,7 +646,7 @@
                 priceUnit: s.priceUnit || "PER PERSON (SHARING)",
                 badgeTag: "All-Inclusive Deal",
                 departureDate: s.departureDate || "Jan 26, 2026",
-                returnDate: s.returnDate || "Nov 10, 2026",
+                returnDate: s.returnDate || "Feb 09, 2026",
                 duration: s.duration || "14 Nights",
                 madinahImageUrl:
                     s.madinahImageUrl ||
@@ -953,7 +953,7 @@
                                 <div class="min-w-0">
                                     <div class="text-[8.5px] sm:text-xs font-bold uppercase tracking-wider text-navy leading-tight">Return / Schedule</div>
                                     <div class="text-[11px] sm:text-lg lg:text-xl font-extrabold text-teal leading-tight mt-0.5">${escapeHtmlAttr(
-                                        deal.returnDate || "Nov 10, 2026"
+                                        deal.returnDate || "Feb 09, 2026"
                                     )}</div>
                                 </div>
                             </div>
@@ -1667,7 +1667,7 @@
         setTxt("flyerPreviewPrice", `PKR ${formatPKR(s.startingPrice || 232000)}`);
         setTxt("flyerPreviewUnit", s.priceUnit || "PER PERSON (SHARING)");
         setTxt("flyerPreviewDep", s.departureDate || "Jan 26, 2026");
-        setTxt("flyerPreviewRet", s.returnDate || "Nov 10, 2026");
+        setTxt("flyerPreviewRet", s.returnDate || "Feb 09, 2026");
         setTxt("flyerPreviewDur", s.duration || "14 Nights");
         setTxt("flyerPreviewPhones", `${c.managerPhone || "+92 349 0558345"} | ${c.secondaryPhone || "+92 343 4159182"}`);
 

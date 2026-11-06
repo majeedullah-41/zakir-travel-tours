@@ -4,12 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us, Our Team & Contact | Zakir Travel & Tours</title>
+    <!-- SEO: description + Open Graph / Twitter Card -->
+    <!-- TODO: replace www.example.com with the real live domain in og:url, og:image and sitemap.xml -->
+    <meta name="description" content="Contact Zakir Travel & Tours — head office in Matta, Swat and branch in Blue Area, Islamabad. Meet our team or reach us on WhatsApp +92 349 0558345.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Zakir Travel & Tours">
+    <meta property="og:title" content="About Us, Our Team & Contact | Zakir Travel & Tours">
+    <meta property="og:description" content="Contact Zakir Travel & Tours — head office in Matta, Swat and branch in Blue Area, Islamabad. Meet our team or reach us on WhatsApp +92 349 0558345.">
+    <meta property="og:url" content="https://www.example.com/contact">
+    <meta property="og:image" content="https://www.example.com/assets/logo-mark.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="About Us, Our Team & Contact | Zakir Travel & Tours">
+    <meta name="twitter:description" content="Contact Zakir Travel & Tours — head office in Matta, Swat and branch in Blue Area, Islamabad. Meet our team or reach us on WhatsApp +92 349 0558345.">
+    <meta name="twitter:image" content="https://www.example.com/assets/logo-mark.png">
+    <!-- Google Analytics (measurement ID already in js/firebase-config.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CRDXFTXY55"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-CRDXFTXY55');
+    </script>
     <link rel="icon" type="image/png" href="./assets/logo-mark.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://images.unsplash.com">
+    <link rel="preconnect" href="https://www.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Kaushan+Script&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -390,7 +413,7 @@
                 <!-- CEO Photo Slot -->
                 <div class="md:col-span-5 lg:col-span-4 relative">
                     <div data-team-photo="ceo" class="team-photo-slot relative aspect-[4/5] w-full max-w-xs mx-auto rounded-3xl overflow-hidden border-4 border-white/15 shadow-2xl bg-white/5">
-                        <img alt="Zakir Ullah - CEO" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover">
+                        <img alt="Zakir Ullah - CEO" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover" loading="lazy">
                         <div class="team-photo-placeholder absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-white/10 to-white/0">
                             <div class="w-24 h-24 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 text-navy-dark flex items-center justify-center text-3xl font-black shadow-lg">ZU</div>
                             <span class="text-[11px] uppercase tracking-widest text-slate-300 font-bold"><i class="fa-regular fa-image mr-1"></i>Photo Coming Soon</span>
@@ -433,7 +456,7 @@
                 <!-- Inam Ullah -->
                 <div class="card-hover-lift group bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                     <div data-team-photo="inam" class="team-photo-slot relative aspect-[4/3] bg-gradient-to-br from-navy to-teal overflow-hidden">
-                        <img alt="Inam Ullah - Manager" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <img alt="Inam Ullah - Manager" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">
                         <div class="team-photo-placeholder absolute inset-0 flex flex-col items-center justify-center gap-2">
                             <div class="w-20 h-20 rounded-full bg-white/15 border-2 border-white/30 text-white flex items-center justify-center text-2xl font-black group-hover:scale-110 transition-transform duration-500">IU</div>
                             <span class="text-[10px] uppercase tracking-widest text-white/70 font-bold"><i class="fa-regular fa-image mr-1"></i>Photo Coming Soon</span>
@@ -448,7 +471,7 @@
                 <!-- Hafizullah -->
                 <div class="card-hover-lift group bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                     <div data-team-photo="hafizullah" class="team-photo-slot relative aspect-[4/3] bg-gradient-to-br from-navy to-teal overflow-hidden">
-                        <img alt="Hafizullah - Visa Officer" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <img alt="Hafizullah - Visa Officer" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">
                         <div class="team-photo-placeholder absolute inset-0 flex flex-col items-center justify-center gap-2">
                             <div class="w-20 h-20 rounded-full bg-white/15 border-2 border-white/30 text-white flex items-center justify-center text-2xl font-black group-hover:scale-110 transition-transform duration-500">HU</div>
                             <span class="text-[10px] uppercase tracking-widest text-white/70 font-bold"><i class="fa-regular fa-image mr-1"></i>Photo Coming Soon</span>
@@ -463,7 +486,7 @@
                 <!-- Fida Hussain -->
                 <div class="card-hover-lift group bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                     <div data-team-photo="fida" class="team-photo-slot relative aspect-[4/3] bg-gradient-to-br from-navy to-teal overflow-hidden">
-                        <img alt="Fida Hussain - Umrah Officer" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <img alt="Fida Hussain - Umrah Officer" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">
                         <div class="team-photo-placeholder absolute inset-0 flex flex-col items-center justify-center gap-2">
                             <div class="w-20 h-20 rounded-full bg-white/15 border-2 border-white/30 text-white flex items-center justify-center text-2xl font-black group-hover:scale-110 transition-transform duration-500">FH</div>
                             <span class="text-[10px] uppercase tracking-widest text-white/70 font-bold"><i class="fa-regular fa-image mr-1"></i>Photo Coming Soon</span>
@@ -491,7 +514,7 @@
                 <!-- Sadiq -->
                 <div class="card-hover-lift group bg-slate-50 rounded-3xl border border-slate-200 p-4 sm:p-5 text-center">
                     <div data-team-photo="sadiq" class="team-photo-slot relative w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-navy to-teal ring-4 ring-white shadow-md group-hover:ring-teal/30 transition-all">
-                        <img alt="Sadiq - Visa Consultant" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover">
+                        <img alt="Sadiq - Visa Consultant" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover" loading="lazy">
                         <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">S</div>
                     </div>
                     <h3 class="mt-4 text-base font-black text-navy">Sadiq</h3>
@@ -501,7 +524,7 @@
                 <!-- Faisal -->
                 <div class="card-hover-lift group bg-slate-50 rounded-3xl border border-slate-200 p-4 sm:p-5 text-center">
                     <div data-team-photo="faisal" class="team-photo-slot relative w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-navy to-teal ring-4 ring-white shadow-md group-hover:ring-teal/30 transition-all">
-                        <img alt="Faisal - Visa Processing" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover">
+                        <img alt="Faisal - Visa Processing" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover" loading="lazy">
                         <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">F</div>
                     </div>
                     <h3 class="mt-4 text-base font-black text-navy">Faisal</h3>
@@ -511,7 +534,7 @@
                 <!-- Suliman -->
                 <div class="card-hover-lift group bg-slate-50 rounded-3xl border border-slate-200 p-4 sm:p-5 text-center">
                     <div data-team-photo="suliman" class="team-photo-slot relative w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-navy to-teal ring-4 ring-white shadow-md group-hover:ring-teal/30 transition-all">
-                        <img alt="Suliman - Umrah Visa Officer" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover">
+                        <img alt="Suliman - Umrah Visa Officer" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover" loading="lazy">
                         <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">S</div>
                     </div>
                     <h3 class="mt-4 text-base font-black text-navy">Suliman</h3>
@@ -521,7 +544,7 @@
                 <!-- Mazhar -->
                 <div class="card-hover-lift group bg-slate-50 rounded-3xl border border-slate-200 p-4 sm:p-5 text-center">
                     <div data-team-photo="mazhar" class="team-photo-slot relative w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-navy to-teal ring-4 ring-white shadow-md group-hover:ring-teal/30 transition-all">
-                        <img alt="Mazhar - Accountant" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover">
+                        <img alt="Mazhar - Accountant" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover" loading="lazy">
                         <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">M</div>
                     </div>
                     <h3 class="mt-4 text-base font-black text-navy">Mazhar</h3>
@@ -531,7 +554,7 @@
                 <!-- Saad Khan -->
                 <div class="card-hover-lift group bg-slate-50 rounded-3xl border border-slate-200 p-4 sm:p-5 text-center">
                     <div data-team-photo="saad" class="team-photo-slot relative w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-navy to-teal ring-4 ring-white shadow-md group-hover:ring-teal/30 transition-all">
-                        <img alt="Saad Khan - Social Media Manager" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover">
+                        <img alt="Saad Khan - Social Media Manager" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover" loading="lazy">
                         <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">SK</div>
                     </div>
                     <h3 class="mt-4 text-base font-black text-navy">Saad Khan</h3>
@@ -541,7 +564,7 @@
                 <!-- Salim -->
                 <div class="card-hover-lift group bg-slate-50 rounded-3xl border border-slate-200 p-4 sm:p-5 text-center">
                     <div data-team-photo="salim" class="team-photo-slot relative w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-navy to-teal ring-4 ring-white shadow-md group-hover:ring-teal/30 transition-all">
-                        <img alt="Salim - Office Boy" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover">
+                        <img alt="Salim - Office Boy" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover" loading="lazy">
                         <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">S</div>
                     </div>
                     <h3 class="mt-4 text-base font-black text-navy">Salim</h3>
@@ -788,7 +811,7 @@
                 <div class="lg:col-span-4 space-y-4">
                     <div class="flex items-center gap-3">
                         <div class="w-11 h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shadow-md shrink-0">
-                            <img src="./assets/logo-mark.png" alt="Zakir Travel & Tours Logo" class="w-full h-full object-contain">
+                            <img src="./assets/logo-mark.png" alt="Zakir Travel & Tours Logo" class="w-full h-full object-contain" loading="lazy">
                         </div>
                         <div>
                             <span id="footerAgencyName" class="font-extrabold text-white text-lg block leading-none">Zakir Travel & Tours</span>
@@ -915,15 +938,15 @@
     </script>
 
     <!-- Firebase v10 Compat SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
     <!-- Full-Stack Real-Time Homepage & Admin Portal Scripts -->
-    <script src="./js/firebase-config.js"></script>
-    <script src="./js/firebase-db.js"></script>
-    <script src="./js/homepage-live.js"></script>
+    <script defer src="./js/firebase-config.js"></script>
+    <script defer src="./js/firebase-db.js"></script>
+    <script defer src="./js/homepage-live.js"></script>
 </body>
 </html>
 

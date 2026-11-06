@@ -31,7 +31,7 @@
         priceUnit: "PER PERSON (SHARING)",
         departureDate: "Jan 26, 2026",
         departureSubtext: "(Weekly Batches)",
-        returnDate: "Nov 10, 2026",
+        returnDate: "Feb 09, 2026",
         duration: "14 Nights",
         leftFrameTitle: "Madinah Munawwarah",
         leftFrameBadge: "Ziyarat & Stay",

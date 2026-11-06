@@ -4,12 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Worldwide Visa Services & Air Tickets | Zakir Travel & Tours</title>
+    <!-- SEO: description + Open Graph / Twitter Card -->
+    <!-- TODO: replace www.example.com with the real live domain in og:url, og:image and sitemap.xml -->
+    <meta name="description" content="Worldwide visa services and air tickets — visit, work, study and Umrah visas with expert guidance from Zakir Travel & Tours, Swat & Islamabad. WhatsApp +92 349 0558345.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Zakir Travel & Tours">
+    <meta property="og:title" content="Worldwide Visa Services & Air Tickets | Zakir Travel & Tours">
+    <meta property="og:description" content="Worldwide visa services and air tickets — visit, work, study and Umrah visas with expert guidance from Zakir Travel & Tours, Swat & Islamabad. WhatsApp +92 349 0558345.">
+    <meta property="og:url" content="https://www.example.com/visas">
+    <meta property="og:image" content="https://www.example.com/assets/logo-mark.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Worldwide Visa Services & Air Tickets | Zakir Travel & Tours">
+    <meta name="twitter:description" content="Worldwide visa services and air tickets — visit, work, study and Umrah visas with expert guidance from Zakir Travel & Tours, Swat & Islamabad. WhatsApp +92 349 0558345.">
+    <meta name="twitter:image" content="https://www.example.com/assets/logo-mark.png">
+    <!-- Google Analytics (measurement ID already in js/firebase-config.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CRDXFTXY55"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-CRDXFTXY55');
+    </script>
     <link rel="icon" type="image/png" href="./assets/logo-mark.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://images.unsplash.com">
+    <link rel="preconnect" href="https://www.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Kaushan+Script&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -488,7 +511,7 @@
 
                             <div>
                                 <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Your Name & WhatsApp Number</label>
-                                <input type="text" id="clientPhone" required placeholder="e.g. Tariq Mehmood - 0300 1234567" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-teal">
+                                <input type="text" id="clientPhone" required placeholder="e.g. Tariq Mehmood - 0349 0558345" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-teal">
                             </div>
 
                             <button type="submit" class="w-full bg-gradient-to-r from-navy to-teal hover:from-navy-dark hover:to-teal-dark text-white font-extrabold py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
@@ -611,7 +634,7 @@
                 <div class="lg:col-span-4 space-y-4">
                     <div class="flex items-center gap-3">
                         <div class="w-11 h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shadow-md shrink-0">
-                            <img src="./assets/logo-mark.png" alt="Zakir Travel & Tours Logo" class="w-full h-full object-contain">
+                            <img src="./assets/logo-mark.png" alt="Zakir Travel & Tours Logo" class="w-full h-full object-contain" loading="lazy">
                         </div>
                         <div>
                             <span id="footerAgencyName" class="font-extrabold text-white text-lg block leading-none">Zakir Travel & Tours</span>
@@ -784,15 +807,15 @@
     </script>
 
     <!-- Firebase v10 Compat SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
     <!-- Full-Stack Real-Time Homepage & Admin Portal Scripts -->
-    <script src="./js/firebase-config.js"></script>
-    <script src="./js/firebase-db.js"></script>
-    <script src="./js/homepage-live.js"></script>
+    <script defer src="./js/firebase-config.js"></script>
+    <script defer src="./js/firebase-db.js"></script>
+    <script defer src="./js/homepage-live.js"></script>
 </body>
 </html>
 
