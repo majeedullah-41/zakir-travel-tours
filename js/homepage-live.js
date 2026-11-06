@@ -1310,6 +1310,21 @@
             : (zakirDB.getLocalWorkPermitProgrammes ? zakirDB.getLocalWorkPermitProgrammes() : []);
         const activeProgs = allProgs.filter((p) => p && p.isActive !== false);
 
+        // Programmes carry no flag upload of their own — resolve an uploaded
+        // flag from the matching admin-provided country (same collection the
+        // pills and destination cards read). Falls back to the programme's
+        // own CSS flag class when no uploaded flag exists for the country.
+        const flagUrlByCountry = {};
+        (liveWorkPermits || []).forEach((perm) => {
+            if (perm && perm.countryName && perm.flagUrl) {
+                flagUrlByCountry[String(perm.countryName).toLowerCase()] = perm.flagUrl;
+            }
+        });
+        const programmeFlagUrl = (prog) =>
+            (prog && prog.flagUrl) ||
+            flagUrlByCountry[String((prog && prog.countryName) || "").toLowerCase()] ||
+            "";
+
         if (!activeProgs.length) {
             container.innerHTML = `<div class="bg-white rounded-3xl p-10 text-center text-slate-500 shadow-md">
                 <i class="fa-solid fa-briefcase text-4xl text-teal mb-3 block"></i>
@@ -1348,7 +1363,7 @@
                                         ? "bg-gradient-to-r from-navy to-teal text-white shadow-md scale-[1.02]"
                                         : "text-slate-600 hover:text-navy hover:bg-slate-100"
                                 }">
-                                <span class="flag ${escapeHtmlAttr(p.flagClass || "flag-pl")}"></span>
+                                ${flagHtmlFor({ flagUrl: programmeFlagUrl(p), flagClass: p.flagClass || "flag-pl" }, "")}
                                 <span>${escapeHtmlAttr(p.countryName)}</span>
                             </button>
                         `
@@ -1375,7 +1390,6 @@
         container.innerHTML = progsToShow
             .map((prog, idx) => {
                 const country = String(prog.countryName || "Poland");
-                const flagCls = String(prog.flagClass || "flag-pl").toLowerCase().replace(/[^a-z0-9-]/g, "") || "flag-pl";
                 const categories = String(prog.jobCategories || "")
                     .split(/[|,]/)
                     .map((c) => c.trim())
@@ -1396,7 +1410,7 @@
                             <span class="inline-flex items-center gap-1 text-[9.5px] sm:text-[11px] font-black uppercase tracking-wider px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full shadow-sm bg-gradient-to-r from-navy to-teal text-white">
                                 <i class="fa-solid fa-crown text-amber-300"></i> Featured Programme
                             </span>
-                            <span class="flag ${flagCls} flag-lg"></span>
+                            ${flagHtmlFor({ flagUrl: programmeFlagUrl(prog), flagClass: prog.flagClass || "flag-pl" }, "flag-lg")}
                             <h3 class="text-base sm:text-2xl font-black tracking-tight uppercase">
                                 <span class="text-navy">Work Permit</span>
                                 <span class="text-teal">${escapeHtmlAttr(country)}</span>
@@ -1564,6 +1578,23 @@
     // 4B. RENDER WORK PERMIT DESTINATION CARDS
     // ============================================================================
 
+    // One flag rule for every work-permit surface: the uploaded flag image
+    // when the record carries a flagUrl, otherwise the CSS-gradient flag
+    // span. Pure (no DOM) so it stays testable like buildCountryPillsHtml.
+    // `sizeCls` is the existing size class for that spot ("flag-xl",
+    // "flag-lg", or "" for the plain 22x15 pill/filter size).
+    function flagHtmlFor(record, sizeCls) {
+        const size = sizeCls ? ` ${sizeCls}` : "";
+        const url = record && record.flagUrl ? String(record.flagUrl) : "";
+        if (url) {
+            return `<img src="${escapeHtmlAttr(url)}" alt="" class="flag${size} object-cover">`;
+        }
+        const cls = String((record && record.flagClass) || "flag-eu")
+            .toLowerCase()
+            .replace(/[^a-z0-9-]/g, "") || "flag-eu";
+        return `<span class="flag ${cls}${size}"></span>`;
+    }
+
     // Country quick pills in the work-permit hero, rendered from the SAME
     // admin-provided work_permits collection as the destinations grid — so a
     // country only appears here when the admin provides it. Returns null when
@@ -1630,9 +1661,6 @@
                 const countryAttr = escapeHtmlAttr(country);
                 const title = p.cardTitle || `${country} Work Permit`;
                 const tagCls = tagStyleMap[String(p.tagStyle || "sky").toLowerCase()] || tagStyleMap.sky;
-                const flagClass = String(p.flagClass || "flag-eu")
-                    .toLowerCase()
-                    .replace(/[^a-z0-9-]/g, "") || "flag-eu";
                 const ticks = Array.isArray(p.ticks)
                     ? p.ticks
                     : String(p.ticks || "")
@@ -1652,7 +1680,7 @@
                     )}</span><span class="text-slate-500 font-semibold"><i class="fa-regular fa-clock text-teal"></i> ${escapeHtmlAttr(
                         p.timeline || "3-6 Months"
                     )}</span></div>
-                    <div class="flex items-center gap-3 mt-3"><span class="flag ${flagClass} flag-xl"></span><h3 class="text-xl font-black text-navy leading-tight">${escapeHtmlAttr(
+                    <div class="flex items-center gap-3 mt-3">${flagHtmlFor(p, "flag-xl")}<h3 class="text-xl font-black text-navy leading-tight">${escapeHtmlAttr(
                         title
                     )}</h3></div>
                     <div class="dest-box"><div><span class="dest-label">Permit Type</span><div class="text-base font-black text-teal">${escapeHtmlAttr(
