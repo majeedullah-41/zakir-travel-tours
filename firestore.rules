@@ -4,8 +4,28 @@ service cloud.firestore {
     function isAdmin() {
       return request.auth != null && (
         request.auth.token.admin == true ||
-        request.auth.uid == "m7HIPZAuMRdO3IxAq4y6amGsdN53"
+        request.auth.uid == "m7HIPZAuMRdO3IxAq4y6amGsdN53" ||
+        isAllowlistedEmail()
       );
+    }
+
+    // True when the signed-in user's email is on the admin allowlist
+    // (document admin_users/allowed, managed in the portal's Admin Access
+    // tab). The exists() guard means a missing allowlist simply denies
+    // instead of erroring, and the email is compared lowercased on both
+    // sides (the portal always saves lowercased emails).
+    function isAllowlistedEmail() {
+      return request.auth != null
+        && request.auth.token.email is string
+        && exists(/databases/$(database)/documents/admin_users/allowed)
+        && get(/databases/$(database)/documents/admin_users/allowed).data.get('emails', []) is list
+        && request.auth.token.email.lower() in get(/databases/$(database)/documents/admin_users/allowed).data.get('emails', []);
+    }
+
+    // Admin allowlist: who may open the admin portal besides the owner.
+    // Never public — only admins may read or change it.
+    match /admin_users/{docId} {
+      allow read, write: if isAdmin();
     }
 
     // Public read access for real-time homepage listeners; writes restricted to admins
@@ -38,7 +58,7 @@ service cloud.firestore {
     // admins may read, update or delete them, so leads are not public.
     // Creates are validated so the collection cannot be used as free storage.
     // NOTE: 'service' is a reserved word in Firestore Rules, so it must be
-    // accessed as data['service'] — data.service fails to parse (lines 51-52).
+    // accessed as data['service'] — data.service fails to parse (lines 73-75).
     match /enquiries/{enquiryId} {
       allow create: if request.resource.data.keys().hasAll(
           ['name', 'phone', 'service', 'source', 'status', 'createdAt']
