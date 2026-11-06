@@ -121,6 +121,9 @@
             this.visas = db.getLocalVisaServices();
             this.workPermits = db.getLocalWorkPermits ? db.getLocalWorkPermits() : [];
             this.workPermitProgrammes = db.getLocalWorkPermitProgrammes ? db.getLocalWorkPermitProgrammes() : [];
+            this.enquiries = db.getLocalEnquiries ? db.getLocalEnquiries() : [];
+            this.enquiryFilter = "all";
+            this.enquirySearch = "";
             this.currentUser = db.getCurrentUser();
 
             this._detectRoutingRole(this.siteConfig);
@@ -186,6 +189,14 @@
                 db.onWorkPermitProgrammesSnapshot((progs) => {
                     this.workPermitProgrammes = Array.isArray(progs) ? progs : [];
                     this._renderWorkPermitProgrammesList();
+                    this._updateTabCounters();
+                });
+            }
+
+            if (db.onEnquiriesSnapshot) {
+                db.onEnquiriesSnapshot((enquiries) => {
+                    this.enquiries = Array.isArray(enquiries) ? enquiries : [];
+                    this._renderEnquiriesList();
                     this._updateTabCounters();
                 });
             }
@@ -341,9 +352,9 @@
                     <main class="max-w-7xl mx-auto px-4 pt-6 space-y-6">
 
                         <!-- ========================================================== -->
-                        <!-- 5 PAGE-DEDICATED MANAGEMENT TABS NAVIGATION                -->
+                        <!-- 6 MANAGEMENT TABS NAVIGATION                               -->
                         <!-- ========================================================== -->
-                        <nav class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 bg-white p-2 rounded-2xl shadow-card border border-slate-200/80">
+                        <nav class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 bg-white p-2 rounded-2xl shadow-card border border-slate-200/80">
                             <button type="button" data-tab="spotlight" class="admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] text-white font-extrabold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-md transition-all">
                                 <i class="fa-solid fa-house text-[#FDE68A]"></i>
                                 <span>1. Home Page</span>
@@ -367,6 +378,11 @@
                             <button type="button" data-tab="contacts" class="admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all col-span-2 sm:col-span-1">
                                 <i class="fa-brands fa-whatsapp text-[#128C7E] text-base"></i>
                                 <span>5. Contact & Office</span>
+                            </button>
+                            <button type="button" data-tab="enquiries" class="admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all col-span-2 sm:col-span-1">
+                                <i class="fa-solid fa-inbox text-[#0D8A9E]"></i>
+                                <span>6. Enquiries</span>
+                                <span id="tabBadgeEnquiries" class="bg-rose-100 text-rose-700 text-[10px] font-black px-2 py-0.5 rounded-full" title="New enquiries">0</span>
                             </button>
                         </nav>
 
@@ -1240,6 +1256,38 @@
                             </form>
                         </div>
 
+                        <!-- ========================================================== -->
+                        <!-- TAB 6: ENQUIRIES / LEADS INBOX                             -->
+                        <!-- ========================================================== -->
+                        <div id="admin-panel-enquiries" class="admin-tab-panel hidden space-y-6 anim-fade-up">
+                            <div class="bg-white rounded-3xl p-6 shadow-card border border-slate-200/80 space-y-5">
+                                <div class="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 pb-4">
+                                    <div>
+                                        <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Lead Capture</span>
+                                        <h3 class="text-lg font-black text-[#0B2D5B]">Enquiries Inbox</h3>
+                                        <p class="text-xs text-slate-500 mt-0.5">Every website form saves here first, then opens WhatsApp — so a lead is never lost if the visitor closes the chat. Newest first.</p>
+                                    </div>
+                                    <button type="button" data-action="enquiry-export" class="bg-[#E6F6F8] hover:bg-[#D7F0F4] border border-[#0D8A9E]/20 text-[#0B2D5B] text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition-all">
+                                        <i class="fa-solid fa-file-csv text-[#0D8A9E]"></i>
+                                        <span>Export CSV</span>
+                                    </button>
+                                </div>
+
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <button type="button" data-action="enquiry-filter" data-filter="all" class="enquiry-filter-btn bg-[#0B2D5B] text-white text-xs font-bold px-3.5 py-2 rounded-full">All</button>
+                                    <button type="button" data-action="enquiry-filter" data-filter="new" class="enquiry-filter-btn bg-slate-100 text-slate-700 text-xs font-bold px-3.5 py-2 rounded-full">New</button>
+                                    <button type="button" data-action="enquiry-filter" data-filter="contacted" class="enquiry-filter-btn bg-slate-100 text-slate-700 text-xs font-bold px-3.5 py-2 rounded-full">Contacted</button>
+                                    <button type="button" data-action="enquiry-filter" data-filter="booked" class="enquiry-filter-btn bg-slate-100 text-slate-700 text-xs font-bold px-3.5 py-2 rounded-full">Booked</button>
+                                    <button type="button" data-action="enquiry-filter" data-filter="closed" class="enquiry-filter-btn bg-slate-100 text-slate-700 text-xs font-bold px-3.5 py-2 rounded-full">Closed</button>
+                                    <input type="search" id="enquirySearchInput" placeholder="Search name, phone or service…" class="flex-1 min-w-[180px] bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:outline-none focus:border-[#0D8A9E]">
+                                </div>
+
+                                <div id="enquiriesListContainer" class="space-y-3">
+                                    <div class="bg-slate-50 rounded-2xl p-8 text-center text-slate-500 text-sm">No enquiries yet. New form submissions will appear here.</div>
+                                </div>
+                            </div>
+                        </div>
+
                     </main>
                 </div>
 
@@ -1818,6 +1866,13 @@
             if (workPermitBadge) {
                 const totalWP = (this.workPermits || []).length + (this.workPermitProgrammes || []).length;
                 workPermitBadge.textContent = String(totalWP);
+            }
+
+            const enquiriesBadge = this.container.querySelector("#tabBadgeEnquiries");
+            if (enquiriesBadge) {
+                const newCount = (this.enquiries || []).filter((e) => e.status === "new").length;
+                enquiriesBadge.textContent = String(newCount);
+                enquiriesBadge.classList.toggle("hidden", newCount === 0);
             }
         }
 
@@ -2446,6 +2501,95 @@
             return true;
         }
 
+        _getFilteredEnquiries() {
+            const q = String(this.enquirySearch || "").trim().toLowerCase();
+            return (this.enquiries || []).filter((e) => {
+                if (this.enquiryFilter && this.enquiryFilter !== "all" && e.status !== this.enquiryFilter) return false;
+                if (!q) return true;
+                return [e.name, e.phone, e.service, e.source, e.details]
+                    .join(" ")
+                    .toLowerCase()
+                    .includes(q);
+            });
+        }
+
+        _renderEnquiriesList() {
+            const wrap = this.container.querySelector("#enquiriesListContainer");
+            if (!wrap) return;
+
+            const list = this._getFilteredEnquiries();
+            const newCount = (this.enquiries || []).filter((e) => e.status === "new").length;
+            if (!list.length) {
+                wrap.innerHTML =
+                    (this.enquiries || []).length === 0
+                        ? `<div class="bg-slate-50 rounded-2xl p-8 text-center text-slate-500 text-sm">No enquiries yet. New form submissions will appear here.</div>`
+                        : `<div class="bg-slate-50 rounded-2xl p-8 text-center text-slate-500 text-sm">No enquiries match this filter. (${newCount} new in total.)</div>`;
+                return;
+            }
+
+            const statusBadge = {
+                new: "bg-rose-100 text-rose-700",
+                contacted: "bg-amber-100 text-amber-800",
+                booked: "bg-emerald-100 text-emerald-700",
+                closed: "bg-slate-100 text-slate-600"
+            };
+
+            wrap.innerHTML = list
+                .map((e) => {
+                    const waDigits = cleanWhatsAppDigits(e.phone);
+                    const when = e.createdAt ? new Date(e.createdAt).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
+                    const waLink = waDigits
+                        ? `https://wa.me/${waDigits}?text=${encodeURIComponent(`Assalam-o-Alaikum ${e.name}! This is Zakir Travel & Tours — following up on your ${e.service} enquiry.`)}`
+                        : "";
+                    return `
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2.5">
+                    <div class="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h4 class="text-sm font-black text-[#0B2D5B]">${escapeHtml(e.name || "Unknown")}</h4>
+                                <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${statusBadge[e.status] || statusBadge.new}">${escapeHtml(e.status || "new")}</span>
+                                ${e.syncPending ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Not synced yet</span>` : ""}
+                            </div>
+                            <p class="text-xs text-slate-500 mt-0.5">${escapeHtml(e.service)} · ${escapeHtml(e.source)} · ${escapeHtml(when)}</p>
+                        </div>
+                        <button type="button" data-action="enquiry-delete" data-id="${escapeHtml(e.id)}" class="w-8 h-8 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors" title="Delete enquiry">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed bg-white border border-slate-200 rounded-xl px-3 py-2.5">${escapeHtml(e.details || "No details.")}</p>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <a href="tel:${escapeHtml(e.phone)}" class="bg-white border border-slate-200 text-[#0B2D5B] text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5">
+                            <i class="fa-solid fa-phone text-[#0D8A9E]"></i>${escapeHtml(e.phone)}
+                        </a>
+                        ${waLink ? `<a href="${waLink}" target="_blank" rel="noopener noreferrer" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5"><i class="fa-brands fa-whatsapp"></i>Reply on WhatsApp</a>` : ""}
+                        <select data-enquiry-status="${escapeHtml(e.id)}" class="ml-auto bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-[#0B2D5B] focus:outline-none focus:border-[#0D8A9E]">
+                            ${["new", "contacted", "booked", "closed"].map((s) => `<option value="${s}" ${e.status === s ? "selected" : ""}>${s.charAt(0).toUpperCase() + s.slice(1)}</option>`).join("")}
+                        </select>
+                    </div>
+                </div>`;
+                })
+                .join("");
+        }
+
+        _exportEnquiriesCsv() {
+            const list = this._getFilteredEnquiries();
+            if (!list.length) {
+                this.showToast("No enquiries to export for this filter.", "warning");
+                return;
+            }
+            const esc = (v) => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
+            const rows = [["Date", "Name", "Phone", "Service", "Source", "Status", "Details"]].concat(
+                list.map((e) => [e.createdAt, e.name, e.phone, e.service, e.source, e.status, e.details].map(esc))
+            );
+            const blob = new Blob([rows.map((r) => r.join(",")).join("\n")], { type: "text/csv;charset=utf-8" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `zakir-enquiries-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+            this.showToast(`${list.length} enquiries exported as CSV.`);
+        }
+
         _renderPackagesList() {
             const wrap = this.container.querySelector("#crudPackagesContainer");
             if (!wrap) return;
@@ -2811,7 +2955,7 @@
                     : `admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all${extraColSpan}`;
             });
 
-            ["spotlight", "umrah", "visas", "workpermit", "contacts"].forEach((t) => {
+            ["spotlight", "umrah", "visas", "workpermit", "contacts", "enquiries"].forEach((t) => {
                 const panel = this.container.querySelector(`#admin-panel-${t}`);
                 if (panel) {
                     panel.classList.toggle("hidden", t !== tabName);
@@ -2834,9 +2978,28 @@
 
             this.container.addEventListener("input", (e) => {
                 const target = e.target;
+                if (target && target.id === "enquirySearchInput") {
+                    this.enquirySearch = target.value || "";
+                    this._renderEnquiriesList();
+                    return;
+                }
                 if (target && target.tagName === "TEXTAREA") {
                     target.style.height = "auto";
                     target.style.height = `${target.scrollHeight}px`;
+                }
+            });
+
+            // Enquiry status changes (inbox list)
+            this.container.addEventListener("change", async (e) => {
+                const statusEl = e.target && e.target.closest ? e.target.closest("[data-enquiry-status]") : null;
+                if (!statusEl) return;
+                try {
+                    await db.updateEnquiry(statusEl.getAttribute("data-enquiry-status"), {
+                        status: statusEl.value
+                    });
+                    this.showToast("Enquiry status updated.");
+                } catch (err) {
+                    this.showToast(err.message || "Could not update enquiry.", "error");
                 }
             });
 
@@ -3362,6 +3525,20 @@
                     } catch (err) {
                         this.showToast(err.message, "error");
                     }
+                } else if (action === "enquiry-filter") {
+                    this.enquiryFilter = actionEl.getAttribute("data-filter") || "all";
+                    this.container.querySelectorAll(".enquiry-filter-btn").forEach((btn) => {
+                        const isActive = btn.getAttribute("data-filter") === this.enquiryFilter;
+                        btn.className = isActive
+                            ? "enquiry-filter-btn bg-[#0B2D5B] text-white text-xs font-bold px-3.5 py-2 rounded-full"
+                            : "enquiry-filter-btn bg-slate-100 text-slate-700 text-xs font-bold px-3.5 py-2 rounded-full";
+                    });
+                    this._renderEnquiriesList();
+                } else if (action === "enquiry-export") {
+                    this._exportEnquiriesCsv();
+                } else if (action === "enquiry-delete") {
+                    await db.deleteEnquiry(actionEl.getAttribute("data-id"));
+                    this.showToast("Enquiry deleted.", "warning");
                 } else if (action === "reset-flyer-defaults") {
                     this.container.querySelector("#resetConfirmModal").classList.remove("hidden");
                 } else if (action === "cancel-reset-modal") {

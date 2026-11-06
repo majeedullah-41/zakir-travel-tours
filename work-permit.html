@@ -1491,8 +1491,8 @@
         };
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') window.closePolandPosterModal(); });
 
-        // Assessment form -> WhatsApp
-        window.handleEuropeWorkPermitSubmit = function (e) {
+        // Assessment form -> save enquiry, then WhatsApp
+        window.handleEuropeWorkPermitSubmit = async function (e) {
             e.preventDefault();
             const val = (id) => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
             const text = encodeURIComponent(
@@ -1507,7 +1507,22 @@
                 `- Preferred Office: ${val('wpBranch')}\n\n` +
                 `Please review my profile and share the requirements, processing timeline and next steps.`
             );
-            window.open(`https://wa.me/${getWorkPermitWhatsApp()}?text=${text}`, '_blank', 'noopener');
+            const waUrl = `https://wa.me/${getWorkPermitWhatsApp()}?text=${text}`;
+            if (typeof window.saveEnquiryThenOpenWhatsApp === 'function') {
+                await window.saveEnquiryThenOpenWhatsApp(
+                    {
+                        source: 'work-permit-assessment',
+                        service: `Europe Work Permit — ${val('wpCountry') || 'Not specified'}`,
+                        name: val('wpClientName'),
+                        phone: val('wpClientPhone'),
+                        details: `Country: ${val('wpCountry')} | Sector: ${val('wpSector')} | Experience: ${val('wpExperience')} | Education: ${val('wpEducation')} | Preferred Office: ${val('wpBranch')}`,
+                        whatsappNumber: getWorkPermitWhatsApp()
+                    },
+                    waUrl
+                );
+            } else {
+                window.open(waUrl, '_blank', 'noopener');
+            }
         };
     </script>
 

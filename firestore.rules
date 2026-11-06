@@ -33,5 +33,30 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+
+    // Lead capture: anyone may CREATE one enquiry (public forms), but only
+    // admins may read, update or delete them, so leads are not public.
+    // Creates are validated so the collection cannot be used as free storage.
+    match /enquiries/{enquiryId} {
+      allow create: if request.resource.data.keys().hasAll(
+          ['name', 'phone', 'service', 'source', 'status', 'createdAt']
+        )
+        && request.resource.data.status == 'new'
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 1
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.phone is string
+        && request.resource.data.phone.size() >= 7
+        && request.resource.data.phone.size() <= 30
+        && request.resource.data.service is string
+        && request.resource.data.service.size() >= 1
+        && request.resource.data.service.size() <= 120
+        && request.resource.data.source is string
+        && request.resource.data.source.size() >= 1
+        && request.resource.data.source.size() <= 50
+        && (!('details' in request.resource.data) || request.resource.data.details is string)
+        && (!('details' in request.resource.data) || request.resource.data.details.size() <= 1000);
+      allow read, update, delete: if isAdmin();
+    }
   }
 }

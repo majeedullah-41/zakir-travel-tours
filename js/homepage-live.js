@@ -49,6 +49,44 @@
         return mgrWA || secWA || "923490558345";
     }
 
+    // Lead capture: save the enquiry first, then open WhatsApp. The save
+    // must never block WhatsApp — if it fails we still open the chat and
+    // tell the visitor their message was still sent via WhatsApp.
+    function showPublicToast(message) {
+        let toast = document.getElementById("zakirPublicToast");
+        if (!toast) {
+            toast = document.createElement("div");
+            toast.id = "zakirPublicToast";
+            toast.className =
+                "fixed bottom-5 left-1/2 -translate-x-1/2 z-[90] max-w-[92vw] bg-[#0B2D5B] text-white text-sm font-bold px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-2.5";
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.style.display = "flex";
+        clearTimeout(showPublicToast._timer);
+        showPublicToast._timer = setTimeout(() => {
+            toast.style.display = "none";
+        }, 4500);
+    }
+
+    async function saveEnquiryThenOpenWhatsApp(enquiry, whatsappUrl) {
+        let saved = null;
+        try {
+            if (zakirDB && typeof zakirDB.saveEnquiry === "function") {
+                saved = await zakirDB.saveEnquiry({ ...enquiry, whatsappSent: true });
+            }
+        } catch (err) {
+            saved = null;
+        }
+        showPublicToast(
+            saved
+                ? "Thanks — your enquiry is saved. Opening WhatsApp…"
+                : "Opening WhatsApp — your message is ready to send there."
+        );
+        window.open(whatsappUrl, "_blank");
+        return saved;
+    }
+
     // ============================================================================
     // 1. REAL-TIME SNAPSHOT BINDINGS
     // ============================================================================
@@ -1738,7 +1776,7 @@
         });
     };
 
-    window.handleHeroSubmit = function (e) {
+    window.handleHeroSubmit = async function (e) {
         e.preventDefault();
         const clientInfo = document.getElementById("clientPhone").value.trim();
         const activeWA = getResolvedActiveWhatsApp(liveSiteConfig);
@@ -1767,7 +1805,19 @@
         const message = encodeURIComponent(
             `Assalam-o-Alaikum ${agencyName}!\n\n${details}\n- Client Contact: ${clientInfo}\n\nPlease share the best rates and details.`
         );
-        window.open(`https://wa.me/${activeWA}?text=${message}`, "_blank");
+        const serviceLabel =
+            currentHeroTab === "umrah" ? "Umrah Inquiry" : currentHeroTab === "flights" ? "Flight Ticket Inquiry" : "Visa Inquiry";
+        await saveEnquiryThenOpenWhatsApp(
+            {
+                source: `hero-${currentHeroTab}`,
+                service: serviceLabel,
+                name: clientInfo,
+                phone: cleanWhatsAppDigits(clientInfo) || clientInfo,
+                details: details.replace(/\*/g, "") + ` | Client Contact: ${clientInfo}`,
+                whatsappNumber: activeWA
+            },
+            `https://wa.me/${activeWA}?text=${message}`
+        );
     };
 
     window.switchMapBranch = function (branch) {
@@ -1819,7 +1869,7 @@
         }
     };
 
-    window.handleStandaloneFlightSubmit = function (e) {
+    window.handleStandaloneFlightSubmit = async function (e) {
         e.preventDefault();
         const clientEl = document.getElementById("clientPhone");
         const clientInfo = clientEl ? clientEl.value.trim() : "";
@@ -1843,7 +1893,17 @@
         const message = encodeURIComponent(
             `Assalam-o-Alaikum ${agencyName}!\n\n${details}\n- Client Contact: ${clientInfo}\n\nPlease share the best flight fares and availability.`
         );
-        window.open(`https://wa.me/${activeWA}?text=${message}`, "_blank");
+        await saveEnquiryThenOpenWhatsApp(
+            {
+                source: "flight-standalone",
+                service: "Flight Ticket Inquiry",
+                name: clientInfo,
+                phone: cleanWhatsAppDigits(clientInfo) || clientInfo,
+                details: details.replace(/\*/g, "") + ` | Client Contact: ${clientInfo}`,
+                whatsappNumber: activeWA
+            },
+            `https://wa.me/${activeWA}?text=${message}`
+        );
     };
 
     function updateCalculator() {
@@ -1883,7 +1943,7 @@
 
     window.updateCalculator = updateCalculator;
 
-    window.sendCalculatorToWhatsApp = function () {
+    window.sendCalculatorToWhatsApp = async function () {
         const durationSelect = document.getElementById("calcDuration");
         const roomSelect = document.getElementById("calcRoom");
         const hotelSelect = document.getElementById("calcHotel");
@@ -1912,7 +1972,19 @@
         const msg = encodeURIComponent(
             `Assalam-o-Alaikum ${agencyName}!\nI used your Live Umrah Package Calculator:\n- Duration: ${durationText}\n- Room Tier: ${roomText}\n- Hotel Category: ${hotelText}\n- Travelers: ${pax}\n- Rate: ${perPersonText}\n- *Estimated Total: ${totalText}*\n\nPlease confirm availability and final booking details.`
         );
-        window.open(`https://wa.me/${activeWA}?text=${msg}`, "_blank");
+        // The calculator has no name/phone fields, so this is saved as an
+        // anonymous estimate — the visitor identifies themselves on WhatsApp.
+        await saveEnquiryThenOpenWhatsApp(
+            {
+                source: "umrah-calculator",
+                service: "Umrah Calculator Estimate",
+                name: "Calculator user",
+                phone: "not-provided",
+                details: `Duration: ${durationText} | Room: ${roomText} | Hotel: ${hotelText} | Travelers: ${pax} | Rate: ${perPersonText} | Estimated Total: ${totalText}`,
+                whatsappNumber: activeWA
+            },
+            `https://wa.me/${activeWA}?text=${msg}`
+        );
     };
 
     window.openBookingModal = function (serviceTitle) {
@@ -1927,7 +1999,7 @@
         if (modal) modal.classList.add("hidden");
     };
 
-    window.submitModalInquiry = function (e) {
+    window.submitModalInquiry = async function (e) {
         e.preventDefault();
         const service = document.getElementById("modalServiceInput").value;
         const name = document.getElementById("modalUserName").value.trim();
@@ -1944,14 +2016,26 @@
         const text = encodeURIComponent(
             `Assalam-o-Alaikum ${agencyName}!\n\n*Service Inquiry:* ${service}\n*Name:* ${name}\n*Phone:* ${phone}\n*Notes:* ${notes}`
         );
-        window.open(`https://wa.me/${agentPhone}?text=${text}`, "_blank");
         window.closeBookingModal();
+        await saveEnquiryThenOpenWhatsApp(
+            {
+                source: "booking-modal",
+                service,
+                name,
+                phone,
+                details: `Service: ${service} | Notes: ${notes}`,
+                whatsappNumber: agentPhone
+            },
+            `https://wa.me/${agentPhone}?text=${text}`
+        );
     };
 
     window.openPromotionalFlyerModal = openPromotionalFlyerModal;
     window.closePromotionalFlyerModal = closePromotionalFlyerModal;
     window.openAdminPortalDrawer = openAdminPortalDrawer;
     window.closeAdminPortalDrawer = closeAdminPortalDrawer;
+    window.showPublicToast = showPublicToast;
+    window.saveEnquiryThenOpenWhatsApp = saveEnquiryThenOpenWhatsApp;
 
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", initHomepageBindings);
