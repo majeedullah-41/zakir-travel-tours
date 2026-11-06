@@ -2757,6 +2757,7 @@
         // "adjusted" wording: Storage upload or DataURL fallback, preview
         // staging, and the reminder to click Save & Push to Website.
         async _uploadAdjustedTeamPhoto(memberId, memberName, file) {
+            const db = window.zakirDB;
             const sizeText = this._formatFileSize(file.size);
             const fileDesc = sizeText ? `${file.name} (${sizeText})` : file.name;
             try {
