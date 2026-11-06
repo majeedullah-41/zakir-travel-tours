@@ -1,8 +1,6 @@
-<!-- TODO: replace www.example.com with the real live domain in robots.txt, sitemap.xml and the og:url / og:image tags on every page. No live domain was found in the repo (2026-11-06). -->
-<!-- User-agent: * is allowed to crawl the whole site except the admin portal. -->
 User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin.html
 
-Sitemap: https://www.example.com/sitemap.xml
+Sitemap: https://zakir-travel-tours.vercel.app/sitemap.xml
