@@ -1979,6 +1979,21 @@
                                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Flag Emoji / Code</label>
                                     <input type="text" id="visaEditFlag" placeholder="e.g. Saudi Arabia flag" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
                                 </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Flag Image</label>
+                                    <input type="hidden" id="visaEditFlagUrl">
+                                    <div class="flex flex-wrap items-center gap-3">
+                                        <img id="visaEditFlagPreview" alt="Flag preview" class="hidden w-11 h-8 object-cover rounded-md shadow-sm ring-1 ring-slate-200">
+                                        <button type="button" data-visa-flag-upload class="px-3.5 py-2.5 bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-2">
+                                            <i class="fa-solid fa-cloud-arrow-up"></i> Upload Flag
+                                        </button>
+                                        <button type="button" data-visa-flag-remove class="px-3 py-2.5 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-xs font-bold rounded-xl transition-colors" title="Remove flag image">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                        <span class="text-[11px] text-slate-400 font-semibold">Optional — if no image is uploaded, the code/emoji above is used.</span>
+                                    </div>
+                                    <input type="file" accept="image/*" class="hidden" data-visa-flag-file>
+                                </div>
                                 <div>
                                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Visa Type</label>
                                     <input type="text" id="visaEditType" required placeholder="Tourist / E-Visa" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
@@ -3417,8 +3432,8 @@
                 <div class="admin-card-hover bg-white rounded-3xl p-5 border ${v.isActive ? "border-slate-200" : "border-slate-200 opacity-60 bg-slate-50"} shadow-card flex flex-col justify-between gap-4">
                     <div class="flex items-start justify-between gap-3">
                         <div class="flex items-start gap-3.5">
-                            <div class="w-12 h-12 rounded-2xl bg-[#E6F6F8] text-2xl flex items-center justify-center shrink-0">
-                                ${v.flagEmoji ? escapeHtml(v.flagEmoji) : '<i class="fa-solid fa-globe text-[#0D8A9E]"></i>'}
+                            <div class="w-12 h-12 rounded-2xl bg-[#E6F6F8] text-2xl flex items-center justify-center shrink-0 overflow-hidden">
+                                ${v.flagUrl ? `<img src="${escapeHtml(v.flagUrl)}" alt="" class="w-full h-full object-cover rounded-2xl">` : (v.flagEmoji ? escapeHtml(v.flagEmoji) : '<i class="fa-solid fa-globe text-[#0D8A9E]"></i>')}
                             </div>
                             <div>
                                 <h4 class="text-base font-black text-[#0B2D5B]">${escapeHtml(v.countryName)}</h4>
@@ -4062,6 +4077,7 @@
                             id: this.container.querySelector("#visaEditId").value || undefined,
                             countryName: this.container.querySelector("#visaEditCountry").value.trim(),
                             flagEmoji: this.container.querySelector("#visaEditFlag").value.trim(),
+                            flagUrl: this.container.querySelector("#visaEditFlagUrl").value.trim(),
                             visaType: this.container.querySelector("#visaEditType").value.trim(),
                             processingTime: this.container.querySelector("#visaEditTime").value.trim(),
                             pricePKR,
@@ -4075,7 +4091,7 @@
                             result,
                             "Country Visa Saved & Published Live!",
                             "success",
-                            this._verifyFor("visa_services", result && result.visa, ["pricePKR", "countryName"])
+                            this._verifyFor("visa_services", result && result.visa, ["pricePKR", "countryName", "flagUrl"])
                         );
                     } catch (err) {
                         this.showToast(err.message || "Could not save the visa.", "error");
@@ -4174,6 +4190,51 @@
                     this.container.querySelector("#wpEditFlagUrl").value = "";
                     this._setWpFlagPreview("");
                     this.showToast("Flag image removed — the CSS flag will be used instead.", "info", "Country flag removed");
+                });
+            }
+
+            // Visa Flag Upload (stored as flagUrl; the code/emoji stays as
+            // the fallback when no image is uploaded). Same pattern as the
+            // work-permit country flag, but into the already-allowed
+            // zakir_media Storage folder, so no rules change is needed.
+            const visaFlagUploadBtn = this.container.querySelector("[data-visa-flag-upload]");
+            const visaFlagFileInput = this.container.querySelector("[data-visa-flag-file]");
+            if (visaFlagUploadBtn && visaFlagFileInput) {
+                visaFlagUploadBtn.addEventListener("click", () => visaFlagFileInput.click());
+
+                visaFlagFileInput.addEventListener("change", async (e) => {
+                    const file = e.target.files && e.target.files[0];
+                    if (!file) return;
+                    const countryName = this.container.querySelector("#visaEditCountry").value.trim() || "country";
+                    const sizeText = this._formatFileSize(file.size);
+                    const fileDesc = sizeText ? `${file.name} (${sizeText})` : file.name;
+                    try {
+                        const url = await this._runUploadWithFeedback(
+                            `Uploading flag ${fileDesc}…`,
+                            `Visa flag · ${countryName} · Destination: Firebase Storage (zakir_media)`,
+                            () => db.uploadMediaFile(file, "zakir_media")
+                        );
+                        this.container.querySelector("#visaEditFlagUrl").value = url;
+                        this._setVisaFlagPreview(url);
+                        if (url.startsWith("data:")) {
+                            this.showToast("Flag stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning", `Visa flag · ${countryName} · ${fileDesc} · fell back to a local copy`);
+                        } else {
+                            this.showToast(`Flag uploaded to Storage ✓ ${fileDesc} — save the visa to keep it.`, "success", `Visa flag · ${countryName} · Destination: Firebase Storage (zakir_media)`);
+                        }
+                    } catch (err) {
+                        this.showToast(`Flag upload failed: ${err.message || "Unknown error"}`, "error", `Visa flag · ${countryName} · ${fileDesc}`);
+                    } finally {
+                        visaFlagFileInput.value = "";
+                    }
+                });
+            }
+
+            const visaFlagRemoveBtn = this.container.querySelector("[data-visa-flag-remove]");
+            if (visaFlagRemoveBtn) {
+                visaFlagRemoveBtn.addEventListener("click", () => {
+                    this.container.querySelector("#visaEditFlagUrl").value = "";
+                    this._setVisaFlagPreview("");
+                    this.showToast("Flag image removed — the code/emoji will be used instead.", "info", "Visa flag removed");
                 });
             }
 
@@ -4622,6 +4683,8 @@
             this.container.querySelector("#visaEditId").value = (visa && visa.id) || "";
             this.container.querySelector("#visaEditCountry").value = (visa && visa.countryName) || "";
             this.container.querySelector("#visaEditFlag").value = (visa && visa.flagEmoji) || "";
+            this.container.querySelector("#visaEditFlagUrl").value = (visa && visa.flagUrl) || "";
+            this._setVisaFlagPreview((visa && visa.flagUrl) || "");
             this.container.querySelector("#visaEditType").value = (visa && visa.visaType) || "Tourist E-Visa";
             this.container.querySelector("#visaEditTime").value = (visa && visa.processingTime) || "3-5 Working Days";
             this.container.querySelector("#visaEditPrice").value =
@@ -4640,6 +4703,20 @@
         // preview when there is no flag image — the CSS flag is used then).
         _setWpFlagPreview(url) {
             const img = this.container.querySelector("#wpEditFlagPreview");
+            if (!img) return;
+            if (url) {
+                img.src = url;
+                img.classList.remove("hidden");
+            } else {
+                img.removeAttribute("src");
+                img.classList.add("hidden");
+            }
+        }
+
+        // Shows the uploaded flag image in the visa editor (or hides the
+        // preview when there is no flag image — the code/emoji is used then).
+        _setVisaFlagPreview(url) {
+            const img = this.container.querySelector("#visaEditFlagPreview");
             if (!img) return;
             if (url) {
                 img.src = url;
