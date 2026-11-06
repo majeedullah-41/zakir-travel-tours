@@ -1773,6 +1773,7 @@
                     countryName: permitData.countryName || "Country Name",
                     cardTitle: permitData.cardTitle || `${permitData.countryName || "Country"} Work Permit`,
                     flagClass: permitData.flagClass || "flag-eu",
+                    flagUrl: permitData.flagUrl || "",
                     tagText: permitData.tagText || "Applications Open",
                     tagStyle: permitData.tagStyle || "sky",
                     timeline: permitData.timeline || "3-6 Months",
