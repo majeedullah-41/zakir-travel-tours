@@ -1683,6 +1683,7 @@
                     id: newId,
                     countryName: visaData.countryName || "Country Name",
                     flagEmoji: visaData.flagEmoji || "🌍",
+                    flagUrl: visaData.flagUrl || "",
                     visaType: visaData.visaType || "Tourist / Visit Visa",
                     processingTime: visaData.processingTime || "3-5 Working Days",
                     pricePKR: cleanPrice,

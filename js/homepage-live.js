@@ -1251,8 +1251,8 @@
                     <div>
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-center gap-3.5">
-                                <div class="w-12 h-12 rounded-2xl bg-teal-accent text-2xl flex items-center justify-center shrink-0 shadow-sm">
-                                    ${escapeHtmlAttr(v.flagEmoji || "🌍")}
+                                <div class="w-12 h-12 rounded-2xl bg-teal-accent text-2xl flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+                                    ${v.flagUrl ? `<img src="${escapeHtmlAttr(v.flagUrl)}" alt="" class="w-full h-full object-cover rounded-2xl">` : escapeHtmlAttr(v.flagEmoji || "🌍")}
                                 </div>
                                 <div>
                                     <h4 class="font-extrabold text-navy text-base">${escapeHtmlAttr(v.countryName)}</h4>
