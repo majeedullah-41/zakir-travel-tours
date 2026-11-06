@@ -581,7 +581,11 @@
                 work_permits: new Set(),
                 work_permit_programmes: new Set(),
                 enquiries: new Set(),
-                auth: new Set()
+                auth: new Set(),
+                // Connection-mode listeners: notified whenever the backend
+                // switches between "firebase" and "local-realtime", so the
+                // admin badge always shows the real connection state.
+                mode: new Set()
             };
 
             this.firebaseUnsubscribes = [];
@@ -711,14 +715,27 @@
                 } catch (_) {}
             });
             this.firebaseUnsubscribes = [];
-            this.mode = "local-realtime";
+            this._setMode("local-realtime");
             this._notifyLocalListeners();
+        }
+
+        // Single place that changes the connection mode, so every change is
+        // announced to mode listeners (the admin connection badge).
+        _setMode(mode) {
+            if (this.mode !== mode) {
+                this.mode = mode;
+                this._notifyModeListeners();
+            }
+        }
+
+        _notifyModeListeners() {
+            this.listeners.mode.forEach((cb) => cb(this.mode));
         }
 
         async _tryInitializeFirebase() {
             const config = this.getFirebaseConfig();
             if (!config || !window.firebase) {
-                this.mode = "local-realtime";
+                this._setMode("local-realtime");
                 return;
             }
 
@@ -738,7 +755,7 @@
                         this.storage = null;
                     }
                 }
-                this.mode = "firebase";
+                this._setMode("firebase");
 
                 await this._ensureFirestoreSeed();
                 this._bindFirestoreSnapshots();
@@ -748,7 +765,7 @@
                 });
             } catch (err) {
                 console.warn("Firebase initialization fell back to local-realtime mode:", err);
-                this.mode = "local-realtime";
+                this._setMode("local-realtime");
             }
         }
 
@@ -924,6 +941,14 @@
             this.listeners.auth.add(callback);
             callback(this.getCurrentUser());
             return () => this.listeners.auth.delete(callback);
+        }
+
+        // Connection-mode subscription, same pattern as the other snapshots:
+        // fires immediately with the current mode, then on every mode change.
+        onModeSnapshot(callback) {
+            this.listeners.mode.add(callback);
+            callback(this.mode);
+            return () => this.listeners.mode.delete(callback);
         }
 
         _notifyLocalListeners() {
@@ -1147,6 +1172,7 @@
                 try {
                     const { syncPending, ...firestoreRecord } = record;
                     await this.db.collection("enquiries").doc(record.id).set(firestoreRecord);
+                    record.synced = true;
                 } catch (err) {
                     // Keep the local copy and flag it — the admin can still see
                     // it on this device, and it will retry on the next save.
@@ -1158,9 +1184,11 @@
                         localStorage.setItem(STORAGE_KEYS.ENQUIRIES, JSON.stringify(pending));
                     }
                     record.syncPending = true;
+                    record.synced = false;
                 }
             } else {
                 record.syncPending = true;
+                record.synced = false;
                 const pending = this.getLocalEnquiries();
                 const idx = pending.findIndex((e) => e.id === record.id);
                 if (idx !== -1) {
@@ -1187,10 +1215,13 @@
             this.listeners.enquiries.forEach((cb) => cb(this.getLocalEnquiries()));
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
+            // Result object: `synced` tells the caller (admin) whether the
+            // change actually reached Firestore. Firestore errors throw.
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 await this.db.collection("enquiries").doc(enquiryId).set(cleanPatch, { merge: true });
             }
-            return list[idx];
+            return { synced, enquiry: list[idx] };
         }
 
         async deleteEnquiry(enquiryId) {
@@ -1198,9 +1229,11 @@
             localStorage.setItem(STORAGE_KEYS.ENQUIRIES, JSON.stringify(list));
             this.listeners.enquiries.forEach((cb) => cb(this.getLocalEnquiries()));
             this._broadcastChange("DB_UPDATED");
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 await this.db.collection("enquiries").doc(enquiryId).delete();
             }
+            return { synced };
         }
 
         // --------------------------------------------------------------------
@@ -1274,11 +1307,12 @@
                 this._broadcastChange("DB_UPDATED");
             }
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 await this.db.collection("special_deals").doc(targetDeal.id).set(targetDeal, { merge: true });
             }
 
-            return targetDeal;
+            return { synced, deal: targetDeal };
         }
 
         async deleteSpecialDeal(dealId) {
@@ -1300,9 +1334,11 @@
                 this._broadcastChange("DB_UPDATED");
             }
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 await this.db.collection("special_deals").doc(dealId).delete();
             }
+            return { synced };
         }
 
         async reorderSpecialDeal(dealId, direction) {
@@ -1324,13 +1360,15 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 const batch = this.db.batch();
                 list.forEach((item) => {
                     batch.set(this.db.collection("special_deals").doc(item.id), item, { merge: true });
                 });
                 await batch.commit();
             }
+            return { synced };
         }
 
         async duplicateSpecialDeal(dealId) {
@@ -1424,11 +1462,12 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 await this.db.collection("site_config").doc("main_settings").set(updated, { merge: true });
             }
 
-            return updated;
+            return { synced, config: updated };
         }
 
         async publishQuickUpdate({ startingPrice, departureDate, monthLabel }) {
@@ -1521,11 +1560,12 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 await this.db.collection("umrah_packages").doc(targetPkg.id).set(targetPkg, { merge: true });
             }
 
-            return targetPkg;
+            return { synced, package: targetPkg };
         }
 
         async deleteUmrahPackage(pkgId) {
@@ -1534,9 +1574,11 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 await this.db.collection("umrah_packages").doc(pkgId).delete();
             }
+            return { synced };
         }
 
         async reorderUmrahPackage(pkgId, direction) {
@@ -1558,13 +1600,15 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 const batch = this.db.batch();
                 list.forEach((item) => {
                     batch.set(this.db.collection("umrah_packages").doc(item.id), item, { merge: true });
                 });
                 await batch.commit();
             }
+            return { synced };
         }
 
         async saveVisaService(visaData) {
@@ -1611,11 +1655,12 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 await this.db.collection("visa_services").doc(targetVisa.id).set(targetVisa, { merge: true });
             }
 
-            return targetVisa;
+            return { synced, visa: targetVisa };
         }
 
         async deleteVisaService(visaId) {
@@ -1624,9 +1669,11 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 await this.db.collection("visa_services").doc(visaId).delete();
             }
+            return { synced };
         }
 
         async reorderVisaService(visaId, direction) {
@@ -1648,13 +1695,15 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 const batch = this.db.batch();
                 list.forEach((item) => {
                     batch.set(this.db.collection("visa_services").doc(item.id), item, { merge: true });
                 });
                 await batch.commit();
             }
+            return { synced };
         }
 
         async saveWorkPermit(permitData) {
@@ -1707,11 +1756,12 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 await this.db.collection("work_permits").doc(targetPermit.id).set(targetPermit, { merge: true });
             }
 
-            return targetPermit;
+            return { synced, permit: targetPermit };
         }
 
         async deleteWorkPermit(permitId) {
@@ -1720,9 +1770,11 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 await this.db.collection("work_permits").doc(permitId).delete();
             }
+            return { synced };
         }
 
         async reorderWorkPermit(permitId, direction) {
@@ -1744,13 +1796,15 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 const batch = this.db.batch();
                 list.forEach((item) => {
                     batch.set(this.db.collection("work_permits").doc(item.id), item, { merge: true });
                 });
                 await batch.commit();
             }
+            return { synced };
         }
 
         // --------------------------------------------------------------------
@@ -1788,14 +1842,15 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 await this.db
                     .collection("work_permit_programmes")
                     .doc(targetProgramme.id)
                     .set(targetProgramme, { merge: true });
             }
 
-            return targetProgramme;
+            return { synced, programme: targetProgramme };
         }
 
         async deleteWorkPermitProgramme(programmeId) {
@@ -1808,9 +1863,11 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 await this.db.collection("work_permit_programmes").doc(programmeId).delete();
             }
+            return { synced };
         }
 
         async reorderWorkPermitProgramme(programmeId, direction) {
@@ -1832,13 +1889,15 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 const batch = this.db.batch();
                 list.forEach((item) => {
                     batch.set(this.db.collection("work_permit_programmes").doc(item.id), item, { merge: true });
                 });
                 await batch.commit();
             }
+            return { synced };
         }
 
         async duplicateWorkPermitProgramme(programmeId) {
@@ -1926,7 +1985,8 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
+            const synced = this.mode === "firebase" && this.db;
+            if (synced) {
                 const batch = this.db.batch();
                 batch.set(this.db.collection("site_config").doc("main_settings"), defaultConfig);
 
@@ -1964,12 +2024,15 @@
             }
 
             return {
-                site_config: defaultConfig,
-                special_deals: defaultDeals,
-                umrah_packages: defaultPkgs,
-                visa_services: defaultVisas,
-                work_permits: defaultWorkPermits,
-                work_permit_programmes: defaultWorkPermitProgrammes
+                synced,
+                defaults: {
+                    site_config: defaultConfig,
+                    special_deals: defaultDeals,
+                    umrah_packages: defaultPkgs,
+                    visa_services: defaultVisas,
+                    work_permits: defaultWorkPermits,
+                    work_permit_programmes: defaultWorkPermitProgrammes
+                }
             };
         }
 

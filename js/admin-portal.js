@@ -200,6 +200,13 @@
                     this._updateTabCounters();
                 });
             }
+
+            // Connection badge: reflects the REAL Firebase mode, live.
+            // onModeSnapshot fires immediately with the current mode, then
+            // on every mode change (e.g. Firebase finishing init).
+            if (db.onModeSnapshot) {
+                db.onModeSnapshot((mode) => this._updateSyncBadge(mode));
+            }
         }
 
         showToast(message, type = "success") {
@@ -237,6 +244,46 @@
                 toast.classList.add("opacity-0", "translate-y-2");
                 setTimeout(() => toast.remove(), 300);
             }, 3200);
+        }
+
+        // Honest save feedback. db save methods return { synced, ... }:
+        // `synced` is true only when the change actually reached Firestore.
+        // - synced === true  -> show the "published live" message.
+        // - synced === false -> warn clearly: saved on this device only.
+        // - result is null/undefined (e.g. a reorder with nothing to move)
+        //   -> nothing changed, so show no toast at all.
+        _showSyncToast(result, liveMessage, liveType = "success") {
+            if (!result || typeof result.synced !== "boolean") return;
+            if (result.synced) {
+                this.showToast(liveMessage, liveType);
+            } else {
+                this.showToast(
+                    "Saved on this device only — NOT published. Firebase is not connected. Open the admin on the live site and check your connection, then save again.",
+                    "warning"
+                );
+            }
+        }
+
+        // Connection badge: green when Firebase is really connected, amber
+        // when the admin is running on LocalStorage only. Called from the
+        // mode subscription in _init and on every login view update.
+        _updateSyncBadge(mode) {
+            const badge = this.container.querySelector("#dbModeBadge");
+            if (!badge) return;
+            const db = window.zakirDB;
+            const current = mode || (db ? db.mode : "local-realtime");
+            const live = current === "firebase";
+            badge.className =
+                "text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full flex items-center gap-1 " +
+                (live
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-300"
+                    : "bg-amber-50 text-amber-800 border border-amber-300");
+            badge.title = live
+                ? "Connected to Firebase — changes publish to the live website."
+                : "Firebase is not connected — changes save only in this browser and will not appear on other devices.";
+            badge.innerHTML = live
+                ? `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live — connected to Firebase`
+                : `<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Offline — changes save only on this device`;
         }
 
         renderShell() {
@@ -313,8 +360,8 @@
                                 <div>
                                     <div class="flex items-center gap-2">
                                         <h1 class="font-black text-base sm:text-lg tracking-tight leading-none text-[#0B2D5B]">Zakir Travel Admin</h1>
-                                        <span id="dbModeBadge" class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#E6F6F8] text-[#0D8A9E] border border-[#0D8A9E]/20 flex items-center gap-1">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-[#0D8A9E] animate-ping"></span> Live
+                                        <span id="dbModeBadge" class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-1" title="Firebase is not connected yet — changes save only in this browser.">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Offline — changes save only on this device
                                         </span>
                                     </div>
                                     <p id="adminActiveUserLabel" class="text-[11px] text-slate-500 mt-0.5">Signed in as Inam Khan</p>
@@ -1880,7 +1927,6 @@
             const authView = this.container.querySelector("#adminAuthView");
             const dashView = this.container.querySelector("#adminDashboardView");
             const userLabel = this.container.querySelector("#adminActiveUserLabel");
-            const modeBadge = this.container.querySelector("#dbModeBadge");
 
             if (!authView || !dashView) return;
 
@@ -1890,10 +1936,8 @@
                 if (userLabel) {
                     userLabel.textContent = `Signed in as ${this.currentUser.displayName || this.currentUser.email}`;
                 }
-                if (modeBadge) {
-                    modeBadge.innerHTML =
-                        `<span class="w-1.5 h-1.5 rounded-full bg-[#15B2CB] animate-ping"></span> Live`;
-                }
+                // Never claim "Live" here — show the real connection mode.
+                this._updateSyncBadge();
                 this._autoGrowFields(dashView);
             } else {
                 authView.classList.remove("hidden");
@@ -2349,155 +2393,161 @@
                 teamPhotos[inp.getAttribute("data-team-photo-key")] = inp.value.trim();
             });
 
-            await db.updateSiteConfig({
-                teamPhotos,
-                spotlight: {
-                    monthLabel: getVal("#spotMonthLabel", "January"),
-                    title: getVal("#spotTitle", "UMRAH PACKAGE") || "UMRAH PACKAGE",
-                    startingPrice,
-                    priceUnit: getVal("#spotPriceUnit", "PER PERSON (SHARING)") || "PER PERSON (SHARING)",
-                    departureDate: getVal("#spotDepartureDate", "Jan 26, 2026"),
-                    returnDate: getVal("#spotReturnDate", "Feb 09, 2026") || "Feb 09, 2026",
-                    duration: getVal("#spotDuration", "14 Nights") || "14 Nights",
-                    madinahImageUrl: madinahImageUrl || this.siteConfig.spotlight.madinahImageUrl,
-                    makkahImageUrl: makkahImageUrl || this.siteConfig.spotlight.makkahImageUrl,
-                    promotionalFlyerUrl,
-                    showFlyerOnHomepage,
-                    servicesIncluded: {
-                        roundTrip: this.container.querySelector("#srvRoundTrip").checked,
-                        visa: this.container.querySelector("#srvVisa").checked,
-                        hotel: this.container.querySelector("#srvHotel").checked,
-                        transport: this.container.querySelector("#srvTransport").checked
+            let result;
+            try {
+                result = await db.updateSiteConfig({
+                    teamPhotos,
+                    spotlight: {
+                        monthLabel: getVal("#spotMonthLabel", "January"),
+                        title: getVal("#spotTitle", "UMRAH PACKAGE") || "UMRAH PACKAGE",
+                        startingPrice,
+                        priceUnit: getVal("#spotPriceUnit", "PER PERSON (SHARING)") || "PER PERSON (SHARING)",
+                        departureDate: getVal("#spotDepartureDate", "Jan 26, 2026"),
+                        returnDate: getVal("#spotReturnDate", "Feb 09, 2026") || "Feb 09, 2026",
+                        duration: getVal("#spotDuration", "14 Nights") || "14 Nights",
+                        madinahImageUrl: madinahImageUrl || this.siteConfig.spotlight.madinahImageUrl,
+                        makkahImageUrl: makkahImageUrl || this.siteConfig.spotlight.makkahImageUrl,
+                        promotionalFlyerUrl,
+                        showFlyerOnHomepage,
+                        servicesIncluded: {
+                            roundTrip: this.container.querySelector("#srvRoundTrip").checked,
+                            visa: this.container.querySelector("#srvVisa").checked,
+                            hotel: this.container.querySelector("#srvHotel").checked,
+                            transport: this.container.querySelector("#srvTransport").checked
+                        }
+                    },
+                    calculatorRates: {
+                        autoCalculateTiers: this.container.querySelector("#calcAutoScaleToggle").checked,
+                        sharingPrice,
+                        quadPrice,
+                        triplePrice,
+                        doublePrice,
+                        dur10NightsOffset: Number(getVal("#rateDur10", "-18000")),
+                        dur21NightsOffset: Number(getVal("#rateDur21", "35000")),
+                        dur28NightsOffset: Number(getVal("#rateDur28", "65000")),
+                        hotel3StarAddon: Number(getVal("#rateHotel3Star", "45000")),
+                        hotel5StarAddon: Number(getVal("#rateHotel5Star", "115000"))
+                    },
+                    contacts: {
+                        agencyName: getVal("#contactAgencyName", "Zakir Travel & Tours"),
+                        taglinePrimary: getVal("#contactTagline1", "Your Journey Our Priority"),
+                        taglineSecondary: getVal("#contactTagline2", "Your Journey Our Responsibility"),
+                        managerName: getVal("#contactManagerName", "Inam Khan (Manager)"),
+                        managerPhone,
+                        managerWhatsApp,
+                        secondaryName: getVal("#contactSecondaryName", "Sadiq Ullah"),
+                        secondaryPhone,
+                        secondaryWhatsApp,
+                        activeBookingWhatsApp,
+                        officeAddress: getVal("#contactOfficeAddress", ""),
+                        officeHours: getVal("#contactOfficeHours", "Monday to Saturday: 9:30 AM \u2013 8:00 PM (Sunday Closed / WhatsApp Support Active)"),
+                        officeEmail: getVal("#contactOfficeEmail", "info@zakirtravels.com / inam@zakirtravels.com"),
+                        mapEmbedUrl: getVal("#contactMapEmbedUrl", "")
+                    },
+                    pageContent: {
+                        home: {
+                            heroBadge: getVal("#homeHeroBadgeInput"),
+                            heroHeadingMain: getVal("#homeHeroHeadingMainInput"),
+                            heroDescription: getVal("#homeHeroDescriptionInput"),
+                            aboutBadge: getVal("#homeAboutBadgeInput"),
+                            aboutHeading: getVal("#homeAboutHeadingInput"),
+                            aboutDescription: getVal("#homeAboutDescInput"),
+                            missionTitle: getVal("#homeMissionTitleInput"),
+                            missionDesc: getVal("#homeMissionDescInput"),
+                            visionTitle: getVal("#homeVisionTitleInput"),
+                            visionDesc: getVal("#homeVisionDescInput"),
+                            branch1Title: getVal("#homeBranch1TitleInput"),
+                            branch1Address: getVal("#homeBranch1AddrInput"),
+                            branch1Desc: getVal("#homeBranch1DescInput"),
+                            branch2Title: getVal("#homeBranch2TitleInput"),
+                            branch2Address: getVal("#homeBranch2AddrInput"),
+                            branch2Desc: getVal("#homeBranch2DescInput"),
+                            stat1Number: getVal("#homeStat1NumInput"),
+                            stat1Label: getVal("#homeStat1LblInput"),
+                            stat2Number: getVal("#homeStat2NumInput"),
+                            stat2Label: getVal("#homeStat2LblInput"),
+                            stat3Number: getVal("#homeStat3NumInput"),
+                            stat3Label: getVal("#homeStat3LblInput"),
+                            stat4Number: getVal("#homeStat4NumInput"),
+                            stat4Label: getVal("#homeStat4LblInput"),
+                            why1Title: getVal("#homeWhy1TitleInput"),
+                            why1Desc: getVal("#homeWhy1DescInput"),
+                            why2Title: getVal("#homeWhy2TitleInput"),
+                            why2Desc: getVal("#homeWhy2DescInput"),
+                            why3Title: getVal("#homeWhy3TitleInput"),
+                            why3Desc: getVal("#homeWhy3DescInput"),
+                            srv1Title: getVal("#homeSrv1TitleInput"),
+                            srv1Desc: getVal("#homeSrv1DescInput"),
+                            srv2Title: getVal("#homeSrv2TitleInput"),
+                            srv2Desc: getVal("#homeSrv2DescInput"),
+                            srv3Title: getVal("#homeSrv3TitleInput"),
+                            srv3Desc: getVal("#homeSrv3DescInput"),
+                            srv4Title: getVal("#homeSrv4TitleInput"),
+                            srv4Desc: getVal("#homeSrv4DescInput")
+                        },
+                        umrah: {
+                            heroBadge: getVal("#umrahHeroBadgeInput"),
+                            heroTitle: getVal("#umrahHeroTitleInput"),
+                            heroSubtitle: getVal("#umrahHeroSubtitleInput"),
+                            inc1Title: getVal("#umrahInc1TitleInput"),
+                            inc1Bullets: getVal("#umrahInc1BulletsInput"),
+                            inc2Title: getVal("#umrahInc2TitleInput"),
+                            inc2Bullets: getVal("#umrahInc2BulletsInput"),
+                            inc3Title: getVal("#umrahInc3TitleInput"),
+                            inc3Bullets: getVal("#umrahInc3BulletsInput"),
+                            familyBannerTitle: getVal("#umrahFamilyTitleInput"),
+                            familyBannerDesc: getVal("#umrahFamilyDescInput")
+                        },
+                        visas: {
+                            heroBadge: getVal("#visaHeroBadgeInput"),
+                            heroTitle: getVal("#visaHeroTitleInput"),
+                            heroSubtitle: getVal("#visaHeroSubtitleInput"),
+                            flightHeading: getVal("#visaFlightHeadingInput"),
+                            flightDescription: getVal("#visaFlightDescInput"),
+                            flightBullets: getVal("#visaFlightBulletsInput"),
+                            partnerAirlines: getVal("#visaPartnerAirlinesInput"),
+                            step1Title: getVal("#visaStep1TitleInput"),
+                            step1Desc: getVal("#visaStep1DescInput"),
+                            step2Title: getVal("#visaStep2TitleInput"),
+                            step2Desc: getVal("#visaStep2DescInput"),
+                            step3Title: getVal("#visaStep3TitleInput"),
+                            step3Desc: getVal("#visaStep3DescInput")
+                        },
+                        calculator: {
+                            heroBadge: getVal("#calcHeroBadgeInput"),
+                            heroTitle: getVal("#calcHeroTitleInput"),
+                            heroSubtitle: getVal("#calcHeroSubtitleInput"),
+                            includedBullets: getVal("#calcIncludedBulletsInput")
+                        },
+                        workPermit: {
+                            heroBadge: getVal("#wpHeroBadgeInput"),
+                            heroTitle: getVal("#wpHeroTitleInput"),
+                            heroScript: getVal("#wpHeroScriptInput"),
+                            heroSubtitle: getVal("#wpHeroSubtitleInput"),
+                            featuredScript: getVal("#wpFeaturedScriptInput"),
+                            featuredDesc: getVal("#wpFeaturedDescInput"),
+                            destinationsHeading: getVal("#wpDestinationsHeadingInput"),
+                            destinationsDesc: getVal("#wpDestinationsDescInput"),
+                            benefitsHeading: getVal("#wpBenefitsHeadingInput"),
+                            processHeading: getVal("#wpProcessHeadingInput"),
+                            checklistHeading: getVal("#wpChecklistHeadingInput"),
+                            checklistDesc: getVal("#wpChecklistDescInput"),
+                            assessmentHeading: getVal("#wpAssessmentHeadingInput"),
+                            faqHeading: getVal("#wpFaqHeadingInput")
+                        },
+                        contact: {
+                            heroBadge: getVal("#contactHeroBadgeInput"),
+                            heroTitle: getVal("#contactHeroTitleInput"),
+                            heroSubtitle: getVal("#contactHeroSubtitleInput")
+                        }
                     }
-                },
-                calculatorRates: {
-                    autoCalculateTiers: this.container.querySelector("#calcAutoScaleToggle").checked,
-                    sharingPrice,
-                    quadPrice,
-                    triplePrice,
-                    doublePrice,
-                    dur10NightsOffset: Number(getVal("#rateDur10", "-18000")),
-                    dur21NightsOffset: Number(getVal("#rateDur21", "35000")),
-                    dur28NightsOffset: Number(getVal("#rateDur28", "65000")),
-                    hotel3StarAddon: Number(getVal("#rateHotel3Star", "45000")),
-                    hotel5StarAddon: Number(getVal("#rateHotel5Star", "115000"))
-                },
-                contacts: {
-                    agencyName: getVal("#contactAgencyName", "Zakir Travel & Tours"),
-                    taglinePrimary: getVal("#contactTagline1", "Your Journey Our Priority"),
-                    taglineSecondary: getVal("#contactTagline2", "Your Journey Our Responsibility"),
-                    managerName: getVal("#contactManagerName", "Inam Khan (Manager)"),
-                    managerPhone,
-                    managerWhatsApp,
-                    secondaryName: getVal("#contactSecondaryName", "Sadiq Ullah"),
-                    secondaryPhone,
-                    secondaryWhatsApp,
-                    activeBookingWhatsApp,
-                    officeAddress: getVal("#contactOfficeAddress", ""),
-                    officeHours: getVal("#contactOfficeHours", "Monday to Saturday: 9:30 AM \u2013 8:00 PM (Sunday Closed / WhatsApp Support Active)"),
-                    officeEmail: getVal("#contactOfficeEmail", "info@zakirtravels.com / inam@zakirtravels.com"),
-                    mapEmbedUrl: getVal("#contactMapEmbedUrl", "")
-                },
-                pageContent: {
-                    home: {
-                        heroBadge: getVal("#homeHeroBadgeInput"),
-                        heroHeadingMain: getVal("#homeHeroHeadingMainInput"),
-                        heroDescription: getVal("#homeHeroDescriptionInput"),
-                        aboutBadge: getVal("#homeAboutBadgeInput"),
-                        aboutHeading: getVal("#homeAboutHeadingInput"),
-                        aboutDescription: getVal("#homeAboutDescInput"),
-                        missionTitle: getVal("#homeMissionTitleInput"),
-                        missionDesc: getVal("#homeMissionDescInput"),
-                        visionTitle: getVal("#homeVisionTitleInput"),
-                        visionDesc: getVal("#homeVisionDescInput"),
-                        branch1Title: getVal("#homeBranch1TitleInput"),
-                        branch1Address: getVal("#homeBranch1AddrInput"),
-                        branch1Desc: getVal("#homeBranch1DescInput"),
-                        branch2Title: getVal("#homeBranch2TitleInput"),
-                        branch2Address: getVal("#homeBranch2AddrInput"),
-                        branch2Desc: getVal("#homeBranch2DescInput"),
-                        stat1Number: getVal("#homeStat1NumInput"),
-                        stat1Label: getVal("#homeStat1LblInput"),
-                        stat2Number: getVal("#homeStat2NumInput"),
-                        stat2Label: getVal("#homeStat2LblInput"),
-                        stat3Number: getVal("#homeStat3NumInput"),
-                        stat3Label: getVal("#homeStat3LblInput"),
-                        stat4Number: getVal("#homeStat4NumInput"),
-                        stat4Label: getVal("#homeStat4LblInput"),
-                        why1Title: getVal("#homeWhy1TitleInput"),
-                        why1Desc: getVal("#homeWhy1DescInput"),
-                        why2Title: getVal("#homeWhy2TitleInput"),
-                        why2Desc: getVal("#homeWhy2DescInput"),
-                        why3Title: getVal("#homeWhy3TitleInput"),
-                        why3Desc: getVal("#homeWhy3DescInput"),
-                        srv1Title: getVal("#homeSrv1TitleInput"),
-                        srv1Desc: getVal("#homeSrv1DescInput"),
-                        srv2Title: getVal("#homeSrv2TitleInput"),
-                        srv2Desc: getVal("#homeSrv2DescInput"),
-                        srv3Title: getVal("#homeSrv3TitleInput"),
-                        srv3Desc: getVal("#homeSrv3DescInput"),
-                        srv4Title: getVal("#homeSrv4TitleInput"),
-                        srv4Desc: getVal("#homeSrv4DescInput")
-                    },
-                    umrah: {
-                        heroBadge: getVal("#umrahHeroBadgeInput"),
-                        heroTitle: getVal("#umrahHeroTitleInput"),
-                        heroSubtitle: getVal("#umrahHeroSubtitleInput"),
-                        inc1Title: getVal("#umrahInc1TitleInput"),
-                        inc1Bullets: getVal("#umrahInc1BulletsInput"),
-                        inc2Title: getVal("#umrahInc2TitleInput"),
-                        inc2Bullets: getVal("#umrahInc2BulletsInput"),
-                        inc3Title: getVal("#umrahInc3TitleInput"),
-                        inc3Bullets: getVal("#umrahInc3BulletsInput"),
-                        familyBannerTitle: getVal("#umrahFamilyTitleInput"),
-                        familyBannerDesc: getVal("#umrahFamilyDescInput")
-                    },
-                    visas: {
-                        heroBadge: getVal("#visaHeroBadgeInput"),
-                        heroTitle: getVal("#visaHeroTitleInput"),
-                        heroSubtitle: getVal("#visaHeroSubtitleInput"),
-                        flightHeading: getVal("#visaFlightHeadingInput"),
-                        flightDescription: getVal("#visaFlightDescInput"),
-                        flightBullets: getVal("#visaFlightBulletsInput"),
-                        partnerAirlines: getVal("#visaPartnerAirlinesInput"),
-                        step1Title: getVal("#visaStep1TitleInput"),
-                        step1Desc: getVal("#visaStep1DescInput"),
-                        step2Title: getVal("#visaStep2TitleInput"),
-                        step2Desc: getVal("#visaStep2DescInput"),
-                        step3Title: getVal("#visaStep3TitleInput"),
-                        step3Desc: getVal("#visaStep3DescInput")
-                    },
-                    calculator: {
-                        heroBadge: getVal("#calcHeroBadgeInput"),
-                        heroTitle: getVal("#calcHeroTitleInput"),
-                        heroSubtitle: getVal("#calcHeroSubtitleInput"),
-                        includedBullets: getVal("#calcIncludedBulletsInput")
-                    },
-                    workPermit: {
-                        heroBadge: getVal("#wpHeroBadgeInput"),
-                        heroTitle: getVal("#wpHeroTitleInput"),
-                        heroScript: getVal("#wpHeroScriptInput"),
-                        heroSubtitle: getVal("#wpHeroSubtitleInput"),
-                        featuredScript: getVal("#wpFeaturedScriptInput"),
-                        featuredDesc: getVal("#wpFeaturedDescInput"),
-                        destinationsHeading: getVal("#wpDestinationsHeadingInput"),
-                        destinationsDesc: getVal("#wpDestinationsDescInput"),
-                        benefitsHeading: getVal("#wpBenefitsHeadingInput"),
-                        processHeading: getVal("#wpProcessHeadingInput"),
-                        checklistHeading: getVal("#wpChecklistHeadingInput"),
-                        checklistDesc: getVal("#wpChecklistDescInput"),
-                        assessmentHeading: getVal("#wpAssessmentHeadingInput"),
-                        faqHeading: getVal("#wpFaqHeadingInput")
-                    },
-                    contact: {
-                        heroBadge: getVal("#contactHeroBadgeInput"),
-                        heroTitle: getVal("#contactHeroTitleInput"),
-                        heroSubtitle: getVal("#contactHeroSubtitleInput")
-                    }
-                }
-            });
+                });
+            } catch (err) {
+                this.showToast(err.message || "Could not save. Please try again.", "error");
+                return false;
+            }
 
-            this.showToast("Saved & Pushed All Changes Live to Website!");
+            this._showSyncToast(result, "Saved & Pushed All Changes Live to Website!");
             return true;
         }
 
@@ -2994,10 +3044,10 @@
                 const statusEl = e.target && e.target.closest ? e.target.closest("[data-enquiry-status]") : null;
                 if (!statusEl) return;
                 try {
-                    await db.updateEnquiry(statusEl.getAttribute("data-enquiry-status"), {
+                    const result = await db.updateEnquiry(statusEl.getAttribute("data-enquiry-status"), {
                         status: statusEl.value
                     });
-                    this.showToast("Enquiry status updated.");
+                    this._showSyncToast(result, "Enquiry status updated.");
                 } catch (err) {
                     this.showToast(err.message || "Could not update enquiry.", "error");
                 }
@@ -3159,36 +3209,40 @@
                         return;
                     }
 
-                    await db.saveSpecialDeal({
-                        id: this.container.querySelector("#dealEditId").value || undefined,
-                        monthLabel: this.container.querySelector("#dealEditMonth").value.trim(),
-                        title: this.container.querySelector("#dealEditTitle").value.trim(),
-                        startingPrice,
-                        priceUnit: this.container.querySelector("#dealEditUnit").value.trim(),
-                        badgeTag: this.container.querySelector("#dealEditBadgeTag").value.trim(),
-                        departureDate: this.container.querySelector("#dealEditDep").value.trim(),
-                        returnDate: this.container.querySelector("#dealEditRet").value.trim(),
-                        duration: this.container.querySelector("#dealEditDuration").value.trim(),
-                        leftFrameTitle: this.container.querySelector("#dealEditLeftTitle").value.trim(),
-                        leftFrameBadge: this.container.querySelector("#dealEditLeftBadge").value.trim(),
-                        madinahHotel: this.container.querySelector("#dealEditMadinahHotel").value.trim(),
-                        madinahImageUrl: this.container.querySelector("#dealEditMadinahUrl").value.trim(),
-                        rightFrameTitle: this.container.querySelector("#dealEditRightTitle").value.trim(),
-                        rightFrameBadge: this.container.querySelector("#dealEditRightBadge").value.trim(),
-                        makkahHotel: this.container.querySelector("#dealEditMakkahHotel").value.trim(),
-                        makkahImageUrl: this.container.querySelector("#dealEditMakkahUrl").value.trim(),
-                        servicesIncluded: {
-                            roundTrip: this.container.querySelector("#dealSrvRoundTrip").checked,
-                            visa: this.container.querySelector("#dealSrvVisa").checked,
-                            hotel: this.container.querySelector("#dealSrvHotel").checked,
-                            transport: this.container.querySelector("#dealSrvTransport").checked
-                        },
-                        isActive: this.container.querySelector("#dealEditActive").checked,
-                        isPrimary: this.container.querySelector("#dealEditPrimary").checked
-                    });
+                    try {
+                        const result = await db.saveSpecialDeal({
+                            id: this.container.querySelector("#dealEditId").value || undefined,
+                            monthLabel: this.container.querySelector("#dealEditMonth").value.trim(),
+                            title: this.container.querySelector("#dealEditTitle").value.trim(),
+                            startingPrice,
+                            priceUnit: this.container.querySelector("#dealEditUnit").value.trim(),
+                            badgeTag: this.container.querySelector("#dealEditBadgeTag").value.trim(),
+                            departureDate: this.container.querySelector("#dealEditDep").value.trim(),
+                            returnDate: this.container.querySelector("#dealEditRet").value.trim(),
+                            duration: this.container.querySelector("#dealEditDuration").value.trim(),
+                            leftFrameTitle: this.container.querySelector("#dealEditLeftTitle").value.trim(),
+                            leftFrameBadge: this.container.querySelector("#dealEditLeftBadge").value.trim(),
+                            madinahHotel: this.container.querySelector("#dealEditMadinahHotel").value.trim(),
+                            madinahImageUrl: this.container.querySelector("#dealEditMadinahUrl").value.trim(),
+                            rightFrameTitle: this.container.querySelector("#dealEditRightTitle").value.trim(),
+                            rightFrameBadge: this.container.querySelector("#dealEditRightBadge").value.trim(),
+                            makkahHotel: this.container.querySelector("#dealEditMakkahHotel").value.trim(),
+                            makkahImageUrl: this.container.querySelector("#dealEditMakkahUrl").value.trim(),
+                            servicesIncluded: {
+                                roundTrip: this.container.querySelector("#dealSrvRoundTrip").checked,
+                                visa: this.container.querySelector("#dealSrvVisa").checked,
+                                hotel: this.container.querySelector("#dealSrvHotel").checked,
+                                transport: this.container.querySelector("#dealSrvTransport").checked
+                            },
+                            isActive: this.container.querySelector("#dealEditActive").checked,
+                            isPrimary: this.container.querySelector("#dealEditPrimary").checked
+                        });
 
-                    this.container.querySelector("#dealCrudModal").classList.add("hidden");
-                    this.showToast("Special Flyer Deal Saved & Published Live!");
+                        this.container.querySelector("#dealCrudModal").classList.add("hidden");
+                        this._showSyncToast(result, "Special Flyer Deal Saved & Published Live!");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not save the deal.", "error");
+                    }
                 });
             }
 
@@ -3212,28 +3266,32 @@
                         return;
                     }
 
-                    await db.saveUmrahPackage({
-                        id: this.container.querySelector("#pkgEditId").value || undefined,
-                        title: this.container.querySelector("#pkgEditTitle").value.trim(),
-                        badgeText: this.container.querySelector("#pkgEditBadge").value.trim(),
-                        price,
-                        roomType: this.container.querySelector("#pkgEditRoom").value.trim(),
-                        duration: this.container.querySelector("#pkgEditDuration").value.trim(),
-                        departureDate: this.container.querySelector("#pkgEditDep").value.trim(),
-                        returnDate: this.container.querySelector("#pkgEditRet").value.trim(),
-                        makkahHotelDist: this.container.querySelector("#pkgEditMakkahDist").value.trim(),
-                        madinahHotelDist: this.container.querySelector("#pkgEditMadinahDist").value.trim(),
-                        services: this.container
-                            .querySelector("#pkgEditServices")
-                            .value.split(",")
-                            .map((s) => s.trim())
-                            .filter(Boolean),
-                        isActive: this.container.querySelector("#pkgEditActive").checked,
-                        isFeatured: this.container.querySelector("#pkgEditFeatured").checked
-                    });
+                    try {
+                        const result = await db.saveUmrahPackage({
+                            id: this.container.querySelector("#pkgEditId").value || undefined,
+                            title: this.container.querySelector("#pkgEditTitle").value.trim(),
+                            badgeText: this.container.querySelector("#pkgEditBadge").value.trim(),
+                            price,
+                            roomType: this.container.querySelector("#pkgEditRoom").value.trim(),
+                            duration: this.container.querySelector("#pkgEditDuration").value.trim(),
+                            departureDate: this.container.querySelector("#pkgEditDep").value.trim(),
+                            returnDate: this.container.querySelector("#pkgEditRet").value.trim(),
+                            makkahHotelDist: this.container.querySelector("#pkgEditMakkahDist").value.trim(),
+                            madinahHotelDist: this.container.querySelector("#pkgEditMadinahDist").value.trim(),
+                            services: this.container
+                                .querySelector("#pkgEditServices")
+                                .value.split(",")
+                                .map((s) => s.trim())
+                                .filter(Boolean),
+                            isActive: this.container.querySelector("#pkgEditActive").checked,
+                            isFeatured: this.container.querySelector("#pkgEditFeatured").checked
+                        });
 
-                    this.container.querySelector("#pkgCrudModal").classList.add("hidden");
-                    this.showToast("Umrah Package Saved & Published Live!");
+                        this.container.querySelector("#pkgCrudModal").classList.add("hidden");
+                        this._showSyncToast(result, "Umrah Package Saved & Published Live!");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not save the package.", "error");
+                    }
                 });
             }
 
@@ -3248,20 +3306,24 @@
                         return;
                     }
 
-                    await db.saveVisaService({
-                        id: this.container.querySelector("#visaEditId").value || undefined,
-                        countryName: this.container.querySelector("#visaEditCountry").value.trim(),
-                        flagEmoji: this.container.querySelector("#visaEditFlag").value.trim(),
-                        visaType: this.container.querySelector("#visaEditType").value.trim(),
-                        processingTime: this.container.querySelector("#visaEditTime").value.trim(),
-                        pricePKR,
-                        imageUrl: this.container.querySelector("#visaEditImage").value.trim(),
-                        requirementsSummary: this.container.querySelector("#visaEditReqs").value.trim(),
-                        isActive: this.container.querySelector("#visaEditActive").checked
-                    });
+                    try {
+                        const result = await db.saveVisaService({
+                            id: this.container.querySelector("#visaEditId").value || undefined,
+                            countryName: this.container.querySelector("#visaEditCountry").value.trim(),
+                            flagEmoji: this.container.querySelector("#visaEditFlag").value.trim(),
+                            visaType: this.container.querySelector("#visaEditType").value.trim(),
+                            processingTime: this.container.querySelector("#visaEditTime").value.trim(),
+                            pricePKR,
+                            imageUrl: this.container.querySelector("#visaEditImage").value.trim(),
+                            requirementsSummary: this.container.querySelector("#visaEditReqs").value.trim(),
+                            isActive: this.container.querySelector("#visaEditActive").checked
+                        });
 
-                    this.container.querySelector("#visaCrudModal").classList.add("hidden");
-                    this.showToast("Country Visa Saved & Published Live!");
+                        this.container.querySelector("#visaCrudModal").classList.add("hidden");
+                        this._showSyncToast(result, "Country Visa Saved & Published Live!");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not save the visa.", "error");
+                    }
                 });
             }
 
@@ -3282,26 +3344,30 @@
                         .map((t) => t.trim())
                         .filter(Boolean);
 
-                    await db.saveWorkPermit({
-                        id: this.container.querySelector("#wpEditId").value || undefined,
-                        countryName,
-                        cardTitle: this.container.querySelector("#wpEditTitle").value.trim(),
-                        flagClass: this.container.querySelector("#wpEditFlag").value.trim(),
-                        tagText: this.container.querySelector("#wpEditTag").value.trim(),
-                        tagStyle: this.container.querySelector("#wpEditTagStyle").value,
-                        timeline: this.container.querySelector("#wpEditTimeline").value.trim(),
-                        permitType: this.container.querySelector("#wpEditPermitType").value.trim(),
-                        visaCode: this.container.querySelector("#wpEditVisaCode").value.trim(),
-                        contract: this.container.querySelector("#wpEditContract").value.trim(),
-                        residence: this.container.querySelector("#wpEditResidence").value.trim(),
-                        sectors: this.container.querySelector("#wpEditSectors").value.trim(),
-                        ticks,
-                        isActive: this.container.querySelector("#wpEditActive").checked,
-                        isFeatured: this.container.querySelector("#wpEditFeatured").checked
-                    });
+                    try {
+                        const result = await db.saveWorkPermit({
+                            id: this.container.querySelector("#wpEditId").value || undefined,
+                            countryName,
+                            cardTitle: this.container.querySelector("#wpEditTitle").value.trim(),
+                            flagClass: this.container.querySelector("#wpEditFlag").value.trim(),
+                            tagText: this.container.querySelector("#wpEditTag").value.trim(),
+                            tagStyle: this.container.querySelector("#wpEditTagStyle").value,
+                            timeline: this.container.querySelector("#wpEditTimeline").value.trim(),
+                            permitType: this.container.querySelector("#wpEditPermitType").value.trim(),
+                            visaCode: this.container.querySelector("#wpEditVisaCode").value.trim(),
+                            contract: this.container.querySelector("#wpEditContract").value.trim(),
+                            residence: this.container.querySelector("#wpEditResidence").value.trim(),
+                            sectors: this.container.querySelector("#wpEditSectors").value.trim(),
+                            ticks,
+                            isActive: this.container.querySelector("#wpEditActive").checked,
+                            isFeatured: this.container.querySelector("#wpEditFeatured").checked
+                        });
 
-                    this.container.querySelector("#workPermitCrudModal").classList.add("hidden");
-                    this.showToast("Work Permit Country Saved & Published Live!");
+                        this.container.querySelector("#workPermitCrudModal").classList.add("hidden");
+                        this._showSyncToast(result, "Work Permit Country Saved & Published Live!");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not save the work permit.", "error");
+                    }
                 });
             }
 
@@ -3368,9 +3434,13 @@
                         isActive: this.container.querySelector("#wpProgEditActive").checked
                     };
 
-                    await db.saveWorkPermitProgramme(programmeData);
-                    this.container.querySelector("#wpProgrammeCrudModal").classList.add("hidden");
-                    this.showToast("Featured Work Permit Programme Saved & Published Live!");
+                    try {
+                        const result = await db.saveWorkPermitProgramme(programmeData);
+                        this.container.querySelector("#wpProgrammeCrudModal").classList.add("hidden");
+                        this._showSyncToast(result, "Featured Work Permit Programme Saved & Published Live!");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not save the programme.", "error");
+                    }
                 });
             }
 
@@ -3408,29 +3478,49 @@
                     const deal = this.specialDeals.find((d) => d.id === actionEl.getAttribute("data-id"));
                     if (deal) this._openDealModal(deal);
                 } else if (action === "duplicate-deal") {
-                    await db.duplicateSpecialDeal(actionEl.getAttribute("data-id"));
-                    this.showToast("Special Flyer Deal cloned & published!");
+                    try {
+                        const result = await db.duplicateSpecialDeal(actionEl.getAttribute("data-id"));
+                        this._showSyncToast(result, "Special Flyer Deal cloned & published!");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not clone the deal.", "error");
+                    }
                 } else if (action === "set-primary-deal") {
                     const deal = this.specialDeals.find((d) => d.id === actionEl.getAttribute("data-id"));
                     if (deal) {
-                        await db.saveSpecialDeal({ ...deal, isPrimary: true, isActive: true });
-                        this.showToast(`"${deal.monthLabel}" set as Primary Deal!`);
+                        try {
+                            const result = await db.saveSpecialDeal({ ...deal, isPrimary: true, isActive: true });
+                            this._showSyncToast(result, `"${deal.monthLabel}" set as Primary Deal!`);
+                        } catch (err) {
+                            this.showToast(err.message || "Could not set the primary deal.", "error");
+                        }
                     }
                 } else if (action === "toggle-deal-active") {
                     const deal = this.specialDeals.find((d) => d.id === actionEl.getAttribute("data-id"));
                     if (deal) {
-                        await db.saveSpecialDeal({ ...deal, isActive: !deal.isActive });
-                        this.showToast(`Special Deal ${!deal.isActive ? "shown" : "hidden"} live.`);
+                        try {
+                            const result = await db.saveSpecialDeal({ ...deal, isActive: !deal.isActive });
+                            this._showSyncToast(
+                                result,
+                                `Special Deal ${!deal.isActive ? "shown" : "hidden"} live.`
+                            );
+                        } catch (err) {
+                            this.showToast(err.message || "Could not update the deal.", "error");
+                        }
                     }
                 } else if (action === "move-deal") {
-                    await db.reorderSpecialDeal(
-                        actionEl.getAttribute("data-id"),
-                        actionEl.getAttribute("data-dir")
-                    );
+                    try {
+                        const result = await db.reorderSpecialDeal(
+                            actionEl.getAttribute("data-id"),
+                            actionEl.getAttribute("data-dir")
+                        );
+                        this._showSyncToast(result, "Deal order updated live.");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not reorder deals.", "error");
+                    }
                 } else if (action === "delete-deal") {
                     try {
-                        await db.deleteSpecialDeal(actionEl.getAttribute("data-id"));
-                        this.showToast("Special Flyer Deal deleted.", "warning");
+                        const result = await db.deleteSpecialDeal(actionEl.getAttribute("data-id"));
+                        this._showSyncToast(result, "Special Flyer Deal deleted.", "warning");
                     } catch (err) {
                         this.showToast(err.message, "error");
                     }
@@ -3442,19 +3532,32 @@
                     const pkg = this.packages.find((p) => p.id === actionEl.getAttribute("data-id"));
                     if (pkg) this._openPkgModal(pkg);
                 } else if (action === "delete-pkg") {
-                    await db.deleteUmrahPackage(actionEl.getAttribute("data-id"));
-                    this.showToast("Package deleted.", "warning");
+                    try {
+                        const result = await db.deleteUmrahPackage(actionEl.getAttribute("data-id"));
+                        this._showSyncToast(result, "Package deleted.", "warning");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not delete the package.", "error");
+                    }
                 } else if (action === "toggle-pkg-active") {
                     const pkg = this.packages.find((p) => p.id === actionEl.getAttribute("data-id"));
                     if (pkg) {
-                        await db.saveUmrahPackage({ ...pkg, isActive: !pkg.isActive });
-                        this.showToast(`Package ${!pkg.isActive ? "shown" : "hidden"} live.`);
+                        try {
+                            const result = await db.saveUmrahPackage({ ...pkg, isActive: !pkg.isActive });
+                            this._showSyncToast(result, `Package ${!pkg.isActive ? "shown" : "hidden"} live.`);
+                        } catch (err) {
+                            this.showToast(err.message || "Could not update the package.", "error");
+                        }
                     }
                 } else if (action === "move-pkg") {
-                    await db.reorderUmrahPackage(
-                        actionEl.getAttribute("data-id"),
-                        actionEl.getAttribute("data-dir")
-                    );
+                    try {
+                        const result = await db.reorderUmrahPackage(
+                            actionEl.getAttribute("data-id"),
+                            actionEl.getAttribute("data-dir")
+                        );
+                        this._showSyncToast(result, "Package order updated live.");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not reorder packages.", "error");
+                    }
                 } else if (action === "open-visa-modal") {
                     this._openVisaModal(null);
                 } else if (action === "close-visa-modal") {
@@ -3463,19 +3566,32 @@
                     const visa = this.visas.find((v) => v.id === actionEl.getAttribute("data-id"));
                     if (visa) this._openVisaModal(visa);
                 } else if (action === "delete-visa") {
-                    await db.deleteVisaService(actionEl.getAttribute("data-id"));
-                    this.showToast("Visa destination deleted.", "warning");
+                    try {
+                        const result = await db.deleteVisaService(actionEl.getAttribute("data-id"));
+                        this._showSyncToast(result, "Visa destination deleted.", "warning");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not delete the visa.", "error");
+                    }
                 } else if (action === "toggle-visa-active") {
                     const visa = this.visas.find((v) => v.id === actionEl.getAttribute("data-id"));
                     if (visa) {
-                        await db.saveVisaService({ ...visa, isActive: !visa.isActive });
-                        this.showToast(`Visa card ${!visa.isActive ? "shown" : "hidden"} live.`);
+                        try {
+                            const result = await db.saveVisaService({ ...visa, isActive: !visa.isActive });
+                            this._showSyncToast(result, `Visa card ${!visa.isActive ? "shown" : "hidden"} live.`);
+                        } catch (err) {
+                            this.showToast(err.message || "Could not update the visa.", "error");
+                        }
                     }
                 } else if (action === "move-visa") {
-                    await db.reorderVisaService(
-                        actionEl.getAttribute("data-id"),
-                        actionEl.getAttribute("data-dir")
-                    );
+                    try {
+                        const result = await db.reorderVisaService(
+                            actionEl.getAttribute("data-id"),
+                            actionEl.getAttribute("data-dir")
+                        );
+                        this._showSyncToast(result, "Visa order updated live.");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not reorder visas.", "error");
+                    }
                 } else if (action === "open-workpermit-modal") {
                     this._openWorkPermitModal(null);
                 } else if (action === "close-workpermit-modal") {
@@ -3484,19 +3600,35 @@
                     const permit = this.workPermits.find((p) => p.id === actionEl.getAttribute("data-id"));
                     if (permit) this._openWorkPermitModal(permit);
                 } else if (action === "delete-workpermit") {
-                    await db.deleteWorkPermit(actionEl.getAttribute("data-id"));
-                    this.showToast("Work permit destination deleted.", "warning");
+                    try {
+                        const result = await db.deleteWorkPermit(actionEl.getAttribute("data-id"));
+                        this._showSyncToast(result, "Work permit destination deleted.", "warning");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not delete the work permit.", "error");
+                    }
                 } else if (action === "toggle-workpermit-active") {
                     const permit = this.workPermits.find((p) => p.id === actionEl.getAttribute("data-id"));
                     if (permit) {
-                        await db.saveWorkPermit({ ...permit, isActive: !permit.isActive });
-                        this.showToast(`Work permit card ${!permit.isActive ? "shown" : "hidden"} live.`);
+                        try {
+                            const result = await db.saveWorkPermit({ ...permit, isActive: !permit.isActive });
+                            this._showSyncToast(
+                                result,
+                                `Work permit card ${!permit.isActive ? "shown" : "hidden"} live.`
+                            );
+                        } catch (err) {
+                            this.showToast(err.message || "Could not update the work permit.", "error");
+                        }
                     }
                 } else if (action === "move-workpermit") {
-                    await db.reorderWorkPermit(
-                        actionEl.getAttribute("data-id"),
-                        actionEl.getAttribute("data-dir")
-                    );
+                    try {
+                        const result = await db.reorderWorkPermit(
+                            actionEl.getAttribute("data-id"),
+                            actionEl.getAttribute("data-dir")
+                        );
+                        this._showSyncToast(result, "Work permit order updated live.");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not reorder work permits.", "error");
+                    }
                 } else if (action === "open-wp-programme-modal") {
                     this._openWorkPermitProgrammeModal(null);
                 } else if (action === "close-wp-programme-modal") {
@@ -3505,23 +3637,39 @@
                     const prog = this.workPermitProgrammes.find((p) => p.id === actionEl.getAttribute("data-id"));
                     if (prog) this._openWorkPermitProgrammeModal(prog);
                 } else if (action === "duplicate-wp-programme") {
-                    await db.duplicateWorkPermitProgramme(actionEl.getAttribute("data-id"));
-                    this.showToast("Featured Programme cloned & published!");
+                    try {
+                        const result = await db.duplicateWorkPermitProgramme(actionEl.getAttribute("data-id"));
+                        this._showSyncToast(result, "Featured Programme cloned & published!");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not clone the programme.", "error");
+                    }
                 } else if (action === "toggle-wp-programme-active") {
                     const prog = this.workPermitProgrammes.find((p) => p.id === actionEl.getAttribute("data-id"));
                     if (prog) {
-                        await db.saveWorkPermitProgramme({ ...prog, isActive: !prog.isActive });
-                        this.showToast(`Featured Programme ${!prog.isActive ? "shown" : "hidden"} live.`);
+                        try {
+                            const result = await db.saveWorkPermitProgramme({ ...prog, isActive: !prog.isActive });
+                            this._showSyncToast(
+                                result,
+                                `Featured Programme ${!prog.isActive ? "shown" : "hidden"} live.`
+                            );
+                        } catch (err) {
+                            this.showToast(err.message || "Could not update the programme.", "error");
+                        }
                     }
                 } else if (action === "move-wp-programme") {
-                    await db.reorderWorkPermitProgramme(
-                        actionEl.getAttribute("data-id"),
-                        actionEl.getAttribute("data-dir")
-                    );
+                    try {
+                        const result = await db.reorderWorkPermitProgramme(
+                            actionEl.getAttribute("data-id"),
+                            actionEl.getAttribute("data-dir")
+                        );
+                        this._showSyncToast(result, "Programme order updated live.");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not reorder programmes.", "error");
+                    }
                 } else if (action === "delete-wp-programme") {
                     try {
-                        await db.deleteWorkPermitProgramme(actionEl.getAttribute("data-id"));
-                        this.showToast("Featured Programme deleted.", "warning");
+                        const result = await db.deleteWorkPermitProgramme(actionEl.getAttribute("data-id"));
+                        this._showSyncToast(result, "Featured Programme deleted.", "warning");
                     } catch (err) {
                         this.showToast(err.message, "error");
                     }
@@ -3537,16 +3685,24 @@
                 } else if (action === "enquiry-export") {
                     this._exportEnquiriesCsv();
                 } else if (action === "enquiry-delete") {
-                    await db.deleteEnquiry(actionEl.getAttribute("data-id"));
-                    this.showToast("Enquiry deleted.", "warning");
+                    try {
+                        const result = await db.deleteEnquiry(actionEl.getAttribute("data-id"));
+                        this._showSyncToast(result, "Enquiry deleted.", "warning");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not delete the enquiry.", "error");
+                    }
                 } else if (action === "reset-flyer-defaults") {
                     this.container.querySelector("#resetConfirmModal").classList.remove("hidden");
                 } else if (action === "cancel-reset-modal") {
                     this.container.querySelector("#resetConfirmModal").classList.add("hidden");
                 } else if (action === "confirm-reset-defaults") {
-                    await db.resetToFlyerDefaults();
-                    this.container.querySelector("#resetConfirmModal").classList.add("hidden");
-                    this.showToast("Restored Original January Flyer Defaults (PKR 232,000)!");
+                    try {
+                        const result = await db.resetToFlyerDefaults();
+                        this.container.querySelector("#resetConfirmModal").classList.add("hidden");
+                        this._showSyncToast(result, "Restored Original January Flyer Defaults (PKR 232,000)!");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not restore defaults.", "error");
+                    }
                 }
             });
         }
