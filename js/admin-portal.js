@@ -40,6 +40,11 @@
         { id: "salim", name: "Salim", role: "Office Boy", initials: "S" }
     ];
 
+    // Persistent Activity log (admin feedback): every toast is also written
+    // here as a timestamped entry, kept in LocalStorage (newest 100).
+    const ACTIVITY_LOG_KEY = "zakir_admin_activity_v1";
+    const ACTIVITY_LOG_MAX_ENTRIES = 100;
+
     // Inject sleek animations and modern glassmorphic styles
     function ensureAdminAnimationsStyle() {
         if (document.getElementById("zakir-admin-animations-css")) return;
@@ -125,6 +130,8 @@
             this.enquiryFilter = "all";
             this.enquirySearch = "";
             this.currentUser = db.getCurrentUser();
+            this._lastSeenMode = null; // last Firebase mode seen by _updateSyncBadge (for change logging)
+            this._activityPanelOpen = false;
 
             this._detectRoutingRole(this.siteConfig);
             this._init();
@@ -209,41 +216,208 @@
             }
         }
 
-        showToast(message, type = "success") {
+        // Single choke point for ALL admin feedback: every toast is also
+        // written to the persistent Activity log, so no message is ever
+        // lost when the toast disappears. `detail` is an extra line shown
+        // only in the log (e.g. file name, size, destination).
+        showToast(message, type = "success", detail = "") {
+            const text = String(message == null ? "" : message);
+            // Log first, so the record survives even if the toast DOM is gone.
+            this._logActivity(text, type, detail);
+
             const toastContainer = this.container.querySelector("#adminToastContainer");
             if (!toastContainer) return;
 
             const toast = document.createElement("div");
-            const bgClass =
-                type === "error"
-                    ? "bg-rose-600 border-rose-400"
-                    : type === "warning"
-                    ? "bg-[#B8860B] border-[#D4AF37]"
-                    : "bg-[#0D8A9E] border-[#15B2CB]";
-            const iconClass =
-                type === "error"
-                    ? "fa-circle-exclamation"
-                    : type === "warning"
-                    ? "fa-triangle-exclamation"
-                    : "fa-circle-check";
+            const styleByType = {
+                error: { bg: "bg-rose-600 border-rose-400", icon: "fa-circle-exclamation" },
+                warning: { bg: "bg-[#B8860B] border-[#D4AF37]", icon: "fa-triangle-exclamation" },
+                info: { bg: "bg-[#0B2D5B] border-[#0D8A9E]", icon: "fa-circle-info" },
+                success: { bg: "bg-[#0D8A9E] border-[#15B2CB]", icon: "fa-circle-check" }
+            };
+            const style = styleByType[type] || styleByType.success;
+            const persistent = type === "error" || type === "warning";
 
-            toast.className = `${bgClass} text-white px-4 py-3.5 rounded-2xl shadow-2xl border flex items-center gap-3 text-sm font-bold transform transition-all duration-300 translate-y-2 opacity-0`;
+            toast.className = `${style.bg} text-white px-4 py-3.5 rounded-2xl shadow-2xl border flex items-start gap-3 text-sm font-bold transform transition-all duration-300 translate-y-2 opacity-0 pointer-events-auto`;
             toast.innerHTML = `
-                <i class="fa-solid ${iconClass} text-lg"></i>
-                <span></span>
+                <i class="fa-solid ${style.icon} text-lg mt-0.5"></i>
+                <span class="flex-1 leading-snug"></span>
+                ${
+                    persistent
+                        ? `<button type="button" class="toast-close shrink-0 w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center transition-colors" title="Dismiss" aria-label="Dismiss notification"><i class="fa-solid fa-xmark text-xs"></i></button>`
+                        : ""
+                }
             `;
             const toastLabel = toast.querySelector("span");
-            if (toastLabel) toastLabel.textContent = String(message == null ? "" : message);
+            if (toastLabel) toastLabel.textContent = text;
+            const closeBtn = toast.querySelector(".toast-close");
+            if (closeBtn) {
+                closeBtn.addEventListener("click", () => this._dismissToast(toast));
+            }
             toastContainer.appendChild(toast);
 
             requestAnimationFrame(() => {
                 toast.classList.remove("translate-y-2", "opacity-0");
             });
 
-            setTimeout(() => {
-                toast.classList.add("opacity-0", "translate-y-2");
-                setTimeout(() => toast.remove(), 300);
-            }, 3200);
+            // Success and in-progress ("info") toasts auto-dismiss after 5s.
+            // Errors and warnings stay on screen until the user dismisses
+            // them — they are also kept in the Activity log.
+            if (!persistent) {
+                setTimeout(() => this._dismissToast(toast), 5000);
+            }
+            return toast;
+        }
+
+        _dismissToast(toast) {
+            if (!toast || !toast.isConnected) return;
+            toast.classList.add("opacity-0", "translate-y-2");
+            setTimeout(() => toast.remove(), 300);
+        }
+
+        // ----------------------------------------------------------------
+        // ACTIVITY LOG — persistent, timestamped record of every admin
+        // action (uploads, saves, deletes, login/logout, errors...).
+        // Stored in LocalStorage (newest 100), survives page reloads.
+        // ----------------------------------------------------------------
+        _loadActivityLog() {
+            try {
+                const raw = localStorage.getItem(ACTIVITY_LOG_KEY);
+                if (!raw) return [];
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (_) {
+                return [];
+            }
+        }
+
+        _saveActivityLog(entries) {
+            try {
+                localStorage.setItem(ACTIVITY_LOG_KEY, JSON.stringify(entries));
+            } catch (_) {
+                // Never let a full/blocked LocalStorage break the admin.
+            }
+        }
+
+        _logActivity(action, type = "success", detail = "") {
+            const entry = {
+                id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                time: new Date().toISOString(),
+                action: String(action == null ? "" : action),
+                detail: String(detail == null ? "" : detail),
+                type: type === "error" || type === "warning" || type === "info" ? type : "success",
+                // Errors/warnings start unread (red badge); success/info do not.
+                read: !(type === "error" || type === "warning")
+            };
+            const entries = this._loadActivityLog();
+            entries.unshift(entry);
+            this._saveActivityLog(entries.slice(0, ACTIVITY_LOG_MAX_ENTRIES));
+            this._refreshActivityBadge();
+            if (this._activityPanelOpen) this._renderActivityLog();
+            return entry;
+        }
+
+        _getUnreadActivityCount() {
+            return this._loadActivityLog().filter((e) => !e.read).length;
+        }
+
+        _refreshActivityBadge() {
+            const badge = this.container && this.container.querySelector
+                ? this.container.querySelector("#activityUnreadBadge")
+                : null;
+            if (!badge) return;
+            const count = this._getUnreadActivityCount();
+            badge.textContent = count > 99 ? "99+" : String(count);
+            badge.classList.toggle("hidden", count === 0);
+        }
+
+        _formatActivityTime(iso) {
+            try {
+                return new Date(iso).toLocaleString([], {
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
+            } catch (_) {
+                return String(iso || "");
+            }
+        }
+
+        _formatFileSize(bytes) {
+            const n = Number(bytes);
+            if (!n || n <= 0) return "";
+            if (n < 1024) return `${n} B`;
+            if (n < 1024 * 1024) return `${Math.round(n / 1024)} KB`;
+            return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+        }
+
+        _renderActivityLog() {
+            const listEl = this.container.querySelector("#adminActivityList");
+            if (!listEl) return;
+            const entries = this._loadActivityLog();
+            if (!entries.length) {
+                listEl.innerHTML = `
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-center">
+                        <i class="fa-solid fa-clock-rotate-left text-2xl text-slate-300 mb-2"></i>
+                        <p class="text-sm font-bold text-slate-600">No activity yet</p>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed">Everything you do in the admin — uploads, saves, deletes, logins — will appear here with its time and result.</p>
+                    </div>`;
+                return;
+            }
+            const dotByType = {
+                success: "bg-emerald-500",
+                info: "bg-[#0D8A9E]",
+                warning: "bg-amber-500",
+                error: "bg-rose-500"
+            };
+            const labelByType = {
+                success: "Success",
+                info: "Info",
+                warning: "Warning",
+                error: "Error"
+            };
+            listEl.innerHTML = entries
+                .map((e) => {
+                    const dot = dotByType[e.type] || dotByType.success;
+                    const label = labelByType[e.type] || "Success";
+                    return `
+                    <div class="bg-white border ${e.type === "error" ? "border-rose-200" : e.type === "warning" ? "border-amber-200" : "border-slate-200"} rounded-2xl p-3 shadow-sm">
+                        <div class="flex items-start gap-2.5">
+                            <span class="w-2.5 h-2.5 rounded-full ${dot} mt-1.5 shrink-0"></span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-[13px] font-bold text-[#0B2D5B] leading-snug">${escapeHtml(e.action)}</p>
+                                ${e.detail ? `<p class="text-xs text-slate-500 mt-0.5 leading-relaxed">${escapeHtml(e.detail)}</p>` : ""}
+                                <p class="text-[11px] text-slate-400 mt-1">${escapeHtml(this._formatActivityTime(e.time))} · ${label}</p>
+                            </div>
+                        </div>
+                    </div>`;
+                })
+                .join("");
+        }
+
+        _setActivityPanelOpen(open) {
+            const panel = this.container.querySelector("#adminActivityPanel");
+            if (!panel) return;
+            this._activityPanelOpen = Boolean(open);
+            panel.classList.toggle("hidden", !this._activityPanelOpen);
+            if (this._activityPanelOpen) {
+                // Opening the log marks every error/warning as read.
+                const entries = this._loadActivityLog();
+                entries.forEach((e) => {
+                    e.read = true;
+                });
+                this._saveActivityLog(entries);
+                this._refreshActivityBadge();
+                this._renderActivityLog();
+            }
+        }
+
+        _clearActivityLog() {
+            this._saveActivityLog([]);
+            this._renderActivityLog();
+            this._refreshActivityBadge();
+            this.showToast("Activity log cleared.");
         }
 
         // Honest save feedback. db save methods return { synced, ... }:
@@ -273,6 +447,22 @@
             const db = window.zakirDB;
             const current = mode || (db ? db.mode : "local-realtime");
             const live = current === "firebase";
+            // Record connection changes in the Activity log (and as a toast):
+            // the first observation is just the starting state, later
+            // transitions mean Firebase connected or dropped out.
+            if (this._lastSeenMode === null) {
+                this._lastSeenMode = current;
+            } else if (this._lastSeenMode !== current) {
+                this._lastSeenMode = current;
+                if (live) {
+                    this.showToast("Connected to Firebase — changes will publish live.");
+                } else {
+                    this.showToast(
+                        "Connection lost — changes save only on this device until Firebase reconnects.",
+                        "warning"
+                    );
+                }
+            }
             badge.className =
                 "text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full flex items-center gap-1 " +
                 (live
@@ -288,8 +478,29 @@
 
         renderShell() {
             this.container.innerHTML = `
-                <!-- Toast Notification Container -->
-                <div id="adminToastContainer" class="fixed bottom-5 right-5 z-[95] flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+                <!-- Toast Notification Container (above the Activity panel) -->
+                <div id="adminToastContainer" class="fixed bottom-5 right-5 z-[97] flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+                <!-- Activity Log Slide-Over Panel -->
+                <div id="adminActivityPanel" class="fixed inset-0 z-[96] hidden">
+                    <div class="absolute inset-0 bg-[#0B2D5B]/40" data-action="close-activity-log"></div>
+                    <aside class="absolute right-0 top-0 h-full w-full max-w-md bg-[#F8FAFC] shadow-2xl flex flex-col">
+                        <div class="flex items-center justify-between gap-2 px-4 py-3 bg-white border-b border-slate-200">
+                            <h2 class="font-black text-base text-[#0B2D5B] flex items-center gap-2">
+                                <i class="fa-solid fa-clock-rotate-left text-[#0D8A9E]"></i>
+                                Activity
+                            </h2>
+                            <div class="flex items-center gap-2">
+                                <button type="button" data-action="clear-activity-log" class="text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-2 rounded-xl transition-colors">Clear</button>
+                                <button type="button" data-action="close-activity-log" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors" title="Close Activity" aria-label="Close Activity">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="adminActivityList" class="flex-1 overflow-y-auto px-4 py-3 space-y-2"></div>
+                        <p class="px-4 py-2.5 text-[11px] text-slate-400 bg-white border-t border-slate-200 leading-relaxed">Newest first · kept on this device (last 100 entries) · errors &amp; warnings stay here until cleared.</p>
+                    </aside>
+                </div>
 
                 <!-- ============================================================== -->
                 <!-- 1. AUTHENTICATION LOGIN SCREEN                                 -->
@@ -387,6 +598,12 @@
                                             <span class="hidden sm:inline">Live Website</span>
                                            </a>`
                                 }
+
+                                <button type="button" data-action="open-activity-log" class="relative bg-white hover:bg-slate-50 border border-slate-200 text-[#0B2D5B] text-xs font-bold px-3 py-2.5 rounded-xl flex items-center gap-1.5 transition-all" title="Activity log — every action and error, with its time">
+                                    <i class="fa-solid fa-clock-rotate-left text-[#0D8A9E]"></i>
+                                    <span class="hidden sm:inline">Activity</span>
+                                    <span id="activityUnreadBadge" class="hidden absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-black flex items-center justify-center">0</span>
+                                </button>
 
                                 <button type="button" data-action="logout" class="bg-slate-100 hover:bg-slate-200 border border-slate-200 text-[#0B2D5B] text-xs font-bold px-3 py-2.5 rounded-xl flex items-center gap-1.5 transition-all" title="Lock / Logout">
                                     <i class="fa-solid fa-lock"></i>
@@ -1893,6 +2110,9 @@
                 </div>
 
             `;
+            // The header now contains the Activity unread badge — restore
+            // its count from the persisted log after every re-render.
+            this._refreshActivityBadge();
         }
 
         _updateTabCounters() {
@@ -3067,6 +3287,7 @@
                     } catch (err) {
                         errEl.textContent = err.message;
                         errEl.classList.remove("hidden");
+                        this.showToast(err.message || "Sign-in failed. Check your email and password.", "error");
                     }
                 });
             }
@@ -3133,9 +3354,11 @@
                     if (!file) return;
                     const targetInputId = fileInput.getAttribute("data-upload-target");
                     const previewImgId = fileInput.getAttribute("data-preview-target");
+                    const sizeText = this._formatFileSize(file.size);
+                    const fileDesc = sizeText ? `${file.name} (${sizeText})` : file.name;
 
                     try {
-                        this.showToast("Uploading & optimizing image...", "warning");
+                        this.showToast(`Uploading image ${fileDesc}…`, "info", "Destination: Firebase Storage (zakir_media)");
                         const url = await db.uploadMediaFile(file);
                         const urlInput = this.container.querySelector(`#${targetInputId}`);
                         if (urlInput) urlInput.value = url;
@@ -3149,12 +3372,12 @@
                             if (ph) ph.classList.add("hidden");
                         }
                         if (url.startsWith("data:")) {
-                            this.showToast("Image stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning");
+                            this.showToast("Image stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning", `Upload: ${fileDesc} · fell back to a local copy`);
                         } else {
-                            this.showToast("Image ready! Click Save & Push to Website.");
+                            this.showToast(`Image uploaded to Storage ✓ ${fileDesc} — click Save & Push to Website.`, "success", "Destination: Firebase Storage (zakir_media)");
                         }
                     } catch (err) {
-                        this.showToast(err.message || "Failed to upload image.", "error");
+                        this.showToast(`Upload failed: ${err.message || "Unknown error"}`, "error", `Upload: ${fileDesc}`);
                     }
                 });
             });
@@ -3165,17 +3388,21 @@
                     const file = e.target.files && e.target.files[0];
                     if (!file) return;
                     const memberId = fileInput.getAttribute("data-team-photo-upload");
+                    const member = TEAM_MEMBERS.find((m) => m.id === memberId);
+                    const memberName = member ? member.name : memberId;
+                    const sizeText = this._formatFileSize(file.size);
+                    const fileDesc = sizeText ? `${file.name} (${sizeText})` : file.name;
                     try {
-                        this.showToast("Uploading & optimizing team photo...", "warning");
+                        this.showToast(`Uploading team photo ${fileDesc}…`, "info", `Team photo · ${memberName} · Destination: Firebase Storage (zakir_team)`);
                         const url = await db.uploadMediaFile(file, "zakir_team");
                         this._setTeamPhotoPreview(memberId, url);
                         if (url.startsWith("data:")) {
-                            this.showToast("Photo stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning");
+                            this.showToast("Photo stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning", `Team photo · ${memberName} · ${fileDesc} · fell back to a local copy`);
                         } else {
-                            this.showToast("Photo ready! Click Save & Push to Website.");
+                            this.showToast(`Team photo uploaded to Storage ✓ ${fileDesc} — click Save & Push to Website.`, "success", `Team photo · ${memberName} · Destination: Firebase Storage (zakir_team)`);
                         }
                     } catch (err) {
-                        this.showToast(err.message || "Failed to upload photo.", "error");
+                        this.showToast(`Upload failed: ${err.message || "Unknown error"}`, "error", `Team photo · ${memberName} · ${fileDesc}`);
                     } finally {
                         fileInput.value = "";
                     }
@@ -3194,18 +3421,20 @@
                     const file = e.target.files && e.target.files[0];
                     if (!file) return;
                     const targetId = fileInput.getAttribute("data-deal-upload");
+                    const sizeText = this._formatFileSize(file.size);
+                    const fileDesc = sizeText ? `${file.name} (${sizeText})` : file.name;
                     try {
-                        this.showToast("Optimizing deal image...", "warning");
+                        this.showToast(`Optimizing deal image ${fileDesc}…`, "info", "Destination: Firebase Storage (zakir_media)");
                         const url = await db.uploadMediaFile(file);
                         const inputEl = this.container.querySelector(`#${targetId}`);
                         if (inputEl) inputEl.value = url;
                         if (url.startsWith("data:")) {
-                            this.showToast("Image stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning");
+                            this.showToast("Image stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning", `Deal image · ${fileDesc} · fell back to a local copy`);
                         } else {
-                            this.showToast("Deal image uploaded!");
+                            this.showToast(`Deal image uploaded to Storage ✓ ${fileDesc} — save the deal to keep it.`, "success", "Destination: Firebase Storage (zakir_media)");
                         }
                     } catch (err) {
-                        this.showToast(err.message || "Image upload failed.", "error");
+                        this.showToast(`Upload failed: ${err.message || "Unknown error"}`, "error", `Deal image · ${fileDesc}`);
                     }
                 });
             });
@@ -3394,18 +3623,20 @@
                 fileInput.addEventListener("change", async (e) => {
                     const file = e.target.files && e.target.files[0];
                     if (!file) return;
+                    const sizeText = this._formatFileSize(file.size);
+                    const fileDesc = sizeText ? `${file.name} (${sizeText})` : file.name;
                     try {
-                        this.showToast("Optimizing programme image...", "warning");
+                        this.showToast(`Optimizing programme image ${fileDesc}…`, "info", "Destination: Firebase Storage (zakir_work_permits)");
                         const url = await db.uploadMediaFile(file, "zakir_work_permits");
                         const inputEl = this.container.querySelector(`#${targetId}`);
                         if (inputEl) inputEl.value = url;
                         if (url.startsWith("data:")) {
-                            this.showToast("Image stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning");
+                            this.showToast("Image stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning", `Programme image · ${fileDesc} · fell back to a local copy`);
                         } else {
-                            this.showToast("Programme image uploaded!");
+                            this.showToast(`Programme image uploaded to Storage ✓ ${fileDesc} — save the programme to keep it.`, "success", "Destination: Firebase Storage (zakir_work_permits)");
                         }
                     } catch (err) {
-                        this.showToast(err.message || "Image upload failed.", "error");
+                        this.showToast(`Upload failed: ${err.message || "Unknown error"}`, "error", `Programme image · ${fileDesc}`);
                     }
                 });
             });
@@ -3483,6 +3714,12 @@
                 } else if (action === "logout") {
                     await db.logout();
                     this.showToast("Admin session locked.", "warning");
+                } else if (action === "open-activity-log") {
+                    this._setActivityPanelOpen(true);
+                } else if (action === "close-activity-log") {
+                    this._setActivityPanelOpen(false);
+                } else if (action === "clear-activity-log") {
+                    this._clearActivityLog();
                 } else if (action === "close-drawer") {
                     await this.saveAllPortalChanges();
                     this.onCloseDrawer();
