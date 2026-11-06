@@ -1470,6 +1470,43 @@
             return { synced, config: updated };
         }
 
+        // Re-read a document straight from the Firestore server (never
+        // the local cache) and check the saved values are really there.
+        // The admin uses this after a save to prove the change is
+        // actually live on the website before saying so.
+        // Returns { verified: true } or { verified: false, reason }.
+        // Never throws: a failed read, a missing document, a value
+        // mismatch or a timeout all come back as verified: false, so a
+        // slow or flaky check can never break a save that succeeded.
+        async verifyDocSaved(collection, docId, expected = {}, timeoutMs = 8000) {
+            if (this.mode !== "firebase" || !this.db) {
+                return { verified: false, reason: "offline" };
+            }
+            if (!collection || !docId) {
+                return { verified: false, reason: "missing-doc" };
+            }
+            try {
+                const docRef = this.db.collection(collection).doc(docId);
+                const timeout = new Promise((resolve) => setTimeout(() => resolve(null), timeoutMs));
+                const snap = await Promise.race([docRef.get({ source: "server" }), timeout]);
+                if (!snap) {
+                    return { verified: false, reason: "timeout" };
+                }
+                if (!snap.exists) {
+                    return { verified: false, reason: "not-found" };
+                }
+                const data = snap.data() || {};
+                for (const [key, value] of Object.entries(expected)) {
+                    if (data[key] !== value) {
+                        return { verified: false, reason: "mismatch", field: key };
+                    }
+                }
+                return { verified: true };
+            } catch (err) {
+                return { verified: false, reason: (err && err.message) || "read-failed" };
+            }
+        }
+
         async publishQuickUpdate({ startingPrice, departureDate, monthLabel }) {
             const cleanPrice = Number(startingPrice);
             if (!cleanPrice || cleanPrice <= 0) {
