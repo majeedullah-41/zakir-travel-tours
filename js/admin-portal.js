@@ -3407,7 +3407,7 @@
                             .toLowerCase()
                             .replace(/[^a-z0-9-]/g, "") || "flag-eu";
                     const flagHtml = p.flagUrl
-                        ? `<img src="${escapeHtml(p.flagUrl)}" alt="" class="flag object-cover mr-2">`
+                        ? `<img src="${escapeHtml(p.flagUrl)}" alt="" class="w-[22px] h-[15px] object-cover rounded-[3px] mr-2 shrink-0">`
                         : `<span class="flag ${flagClass} mr-2"></span>`;
                     return `
                 <div class="admin-card-hover bg-white rounded-3xl p-5 border ${p.isActive ? "border-slate-200" : "border-slate-200 opacity-60 bg-slate-50"} shadow-card flex flex-col justify-between gap-4">
