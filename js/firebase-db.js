@@ -560,6 +560,7 @@
         VISA_SERVICES: "zakir_db_visa_services_v1",
         WORK_PERMITS: "zakir_db_work_permits_v1",
         WORK_PERMIT_PROGRAMMES: "zakir_db_work_permit_programmes_v1",
+        ENQUIRIES: "zakir_db_enquiries_v1",
         AUTH_SESSION: "zakir_auth_session_v1",
         LOCAL_ADMIN_PASS: "zakir_db_local_admin_pass_v1"
     };
@@ -579,6 +580,7 @@
                 visa_services: new Set(),
                 work_permits: new Set(),
                 work_permit_programmes: new Set(),
+                enquiries: new Set(),
                 auth: new Set()
             };
 
@@ -610,7 +612,8 @@
                     e.key === STORAGE_KEYS.UMRAH_PACKAGES ||
                     e.key === STORAGE_KEYS.VISA_SERVICES ||
                     e.key === STORAGE_KEYS.WORK_PERMITS ||
-                    e.key === STORAGE_KEYS.WORK_PERMIT_PROGRAMMES
+                    e.key === STORAGE_KEYS.WORK_PERMIT_PROGRAMMES ||
+                    e.key === STORAGE_KEYS.ENQUIRIES
                 ) {
                     this._notifyLocalListeners();
                 } else if (e.key === STORAGE_KEYS.AUTH_SESSION) {
@@ -665,6 +668,9 @@
                         STORAGE_KEYS.WORK_PERMIT_PROGRAMMES,
                         JSON.stringify(FLYER_DEFAULTS.work_permit_programmes)
                     );
+                }
+                if (!localStorage.getItem(STORAGE_KEYS.ENQUIRIES)) {
+                    localStorage.setItem(STORAGE_KEYS.ENQUIRIES, JSON.stringify([]));
                 }
             } catch (err) {
                 console.warn("LocalStorage seed warning:", err);
@@ -832,13 +838,39 @@
                     this.listeners.work_permit_programmes.forEach((cb) => cb(list));
                 });
 
+            const unsubEnquiries = this.db
+                .collection("enquiries")
+                .orderBy("createdAt", "desc")
+                .limit(500)
+                .onSnapshot(
+                    (snap) => {
+                        const list = [];
+                        snap.forEach((d) => list.push({ id: d.id, ...this._normaliseEnquiry(d.data()) }));
+                        // Keep locally-saved leads that have not synced yet
+                        // (e.g. a Firestore write was rejected) — a snapshot
+                        // must never wipe an unsynced lead.
+                        const pending = this.getLocalEnquiries().filter((e) => e.syncPending);
+                        pending.forEach((p) => {
+                            if (!list.some((e) => e.id === p.id)) list.push(p);
+                        });
+                        list.sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+                        localStorage.setItem(STORAGE_KEYS.ENQUIRIES, JSON.stringify(list));
+                        this.listeners.enquiries.forEach((cb) => cb(list));
+                    },
+                    () => {
+                        // If the enquiries query fails (e.g. rules not deployed yet),
+                        // keep the local copy — submissions still work via local fallback.
+                    }
+                );
+
             this.firebaseUnsubscribes.push(
                 unsubConfig,
                 unsubDeals,
                 unsubPkgs,
                 unsubVisas,
                 unsubWorkPermits,
-                unsubWorkPermitProgrammes
+                unsubWorkPermitProgrammes,
+                unsubEnquiries
             );
         }
 
@@ -882,6 +914,12 @@
             return () => this.listeners.work_permit_programmes.delete(callback);
         }
 
+        onEnquiriesSnapshot(callback) {
+            this.listeners.enquiries.add(callback);
+            callback(this.getLocalEnquiries());
+            return () => this.listeners.enquiries.delete(callback);
+        }
+
         onAuthSnapshot(callback) {
             this.listeners.auth.add(callback);
             callback(this.getCurrentUser());
@@ -895,6 +933,7 @@
             const visas = this.getLocalVisaServices();
             const workPermits = this.getLocalWorkPermits();
             const workPermitProgrammes = this.getLocalWorkPermitProgrammes();
+            const enquiries = this.getLocalEnquiries();
 
             this.listeners.site_config.forEach((cb) => cb(siteConfig));
             this.listeners.special_deals.forEach((cb) => cb(deals));
@@ -902,6 +941,7 @@
             this.listeners.visa_services.forEach((cb) => cb(visas));
             this.listeners.work_permits.forEach((cb) => cb(workPermits));
             this.listeners.work_permit_programmes.forEach((cb) => cb(workPermitProgrammes));
+            this.listeners.enquiries.forEach((cb) => cb(enquiries));
         }
 
         _broadcastChange(type = "DB_UPDATED") {
@@ -1023,6 +1063,144 @@
                 console.error("Error reading work_permit_programmes:", e);
             }
             return JSON.parse(JSON.stringify(FLYER_DEFAULTS.work_permit_programmes));
+        }
+
+        // --------------------------------------------------------------------
+        // ENQUIRIES (LEAD CAPTURE)
+        // Every public form saves here first, then opens WhatsApp. Leads are
+        // never wiped by resetToFlyerDefaults(). LocalStorage is the fallback
+        // when Firebase is offline or rules are not deployed yet; Firestore
+        // is the source of truth when it is available.
+        // --------------------------------------------------------------------
+
+        _normaliseEnquiry(data) {
+            const d = data || {};
+            let createdAt = d.createdAt;
+            if (createdAt && typeof createdAt === "object" && typeof createdAt.toDate === "function") {
+                try {
+                    createdAt = createdAt.toDate().toISOString();
+                } catch (_) {
+                    createdAt = new Date().toISOString();
+                }
+            }
+            if (!createdAt || typeof createdAt !== "string") createdAt = new Date().toISOString();
+            return {
+                id: String(d.id || ""),
+                createdAt,
+                status: ["new", "contacted", "booked", "closed"].includes(d.status) ? d.status : "new",
+                source: String(d.source || "website").slice(0, 50),
+                service: String(d.service || "General enquiry").slice(0, 120),
+                name: String(d.name || "").slice(0, 100),
+                phone: String(d.phone || "").slice(0, 30),
+                details: String(d.details || "").slice(0, 1000),
+                whatsappNumber: String(d.whatsappNumber || "").slice(0, 20),
+                whatsappSent: Boolean(d.whatsappSent),
+                syncPending: Boolean(d.syncPending)
+            };
+        }
+
+        getLocalEnquiries() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.ENQUIRIES);
+                if (raw) {
+                    const list = JSON.parse(raw);
+                    if (Array.isArray(list)) {
+                        return list
+                            .map((e) => this._normaliseEnquiry(e))
+                            .sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+                    }
+                }
+            } catch (e) {
+                console.error("Error reading enquiries:", e);
+            }
+            return [];
+        }
+
+        async saveEnquiry(data) {
+            const clean = (v, max) => String(v == null ? "" : v).trim().slice(0, max);
+            const name = clean(data && data.name, 100);
+            const phone = clean(data && data.phone, 30);
+            if (!name || !phone) {
+                throw new Error("Enquiry needs a name and a phone number.");
+            }
+            const record = this._normaliseEnquiry({
+                id: `enq_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                createdAt: new Date().toISOString(),
+                status: "new",
+                source: clean(data.source, 50) || "website",
+                service: clean(data.service, 120) || "General enquiry",
+                name,
+                phone,
+                details: clean(data.details, 1000),
+                whatsappNumber: clean(data.whatsappNumber, 20),
+                whatsappSent: Boolean(data.whatsappSent),
+                syncPending: false
+            });
+
+            const list = this.getLocalEnquiries();
+            list.unshift(record);
+            localStorage.setItem(STORAGE_KEYS.ENQUIRIES, JSON.stringify(list.slice(0, 500)));
+            this.listeners.enquiries.forEach((cb) => cb(this.getLocalEnquiries()));
+            this._broadcastChange("DB_UPDATED");
+
+            if (this.mode === "firebase" && this.db) {
+                try {
+                    const { syncPending, ...firestoreRecord } = record;
+                    await this.db.collection("enquiries").doc(record.id).set(firestoreRecord);
+                } catch (err) {
+                    // Keep the local copy and flag it — the admin can still see
+                    // it on this device, and it will retry on the next save.
+                    console.warn("Enquiry saved locally, Firestore sync failed:", err);
+                    const pending = this.getLocalEnquiries();
+                    const idx = pending.findIndex((e) => e.id === record.id);
+                    if (idx !== -1) {
+                        pending[idx].syncPending = true;
+                        localStorage.setItem(STORAGE_KEYS.ENQUIRIES, JSON.stringify(pending));
+                    }
+                    record.syncPending = true;
+                }
+            } else {
+                record.syncPending = true;
+                const pending = this.getLocalEnquiries();
+                const idx = pending.findIndex((e) => e.id === record.id);
+                if (idx !== -1) {
+                    pending[idx].syncPending = true;
+                    localStorage.setItem(STORAGE_KEYS.ENQUIRIES, JSON.stringify(pending));
+                }
+            }
+            return record;
+        }
+
+        async updateEnquiry(enquiryId, patch) {
+            const allowedStatus = ["new", "contacted", "booked", "closed"];
+            const cleanPatch = {};
+            if (patch.status && allowedStatus.includes(patch.status)) cleanPatch.status = patch.status;
+            if (typeof patch.whatsappSent === "boolean") cleanPatch.whatsappSent = patch.whatsappSent;
+            if (typeof patch.details === "string") cleanPatch.details = patch.details.slice(0, 1000);
+            if (!Object.keys(cleanPatch).length) return null;
+
+            const list = this.getLocalEnquiries();
+            const idx = list.findIndex((e) => e.id === enquiryId);
+            if (idx === -1) throw new Error("Enquiry not found.");
+            list[idx] = { ...list[idx], ...cleanPatch };
+            localStorage.setItem(STORAGE_KEYS.ENQUIRIES, JSON.stringify(list));
+            this.listeners.enquiries.forEach((cb) => cb(this.getLocalEnquiries()));
+            this._broadcastChange("DB_UPDATED");
+
+            if (this.mode === "firebase" && this.db) {
+                await this.db.collection("enquiries").doc(enquiryId).set(cleanPatch, { merge: true });
+            }
+            return list[idx];
+        }
+
+        async deleteEnquiry(enquiryId) {
+            const list = this.getLocalEnquiries().filter((e) => e.id !== enquiryId);
+            localStorage.setItem(STORAGE_KEYS.ENQUIRIES, JSON.stringify(list));
+            this.listeners.enquiries.forEach((cb) => cb(this.getLocalEnquiries()));
+            this._broadcastChange("DB_UPDATED");
+            if (this.mode === "firebase" && this.db) {
+                await this.db.collection("enquiries").doc(enquiryId).delete();
+            }
         }
 
         // --------------------------------------------------------------------
