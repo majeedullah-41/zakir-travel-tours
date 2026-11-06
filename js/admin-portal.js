@@ -1341,7 +1341,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Return / Schedule (Right)</label>
-                                    <input type="text" id="dealEditRet" required placeholder="Nov 10, 2026" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B]">
+                                    <input type="text" id="dealEditRet" required placeholder="Feb 09, 2026" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B]">
                                 </div>
                             </div>
 
@@ -1832,7 +1832,7 @@
                         </div>
                         <h3 class="text-xl font-black text-[#0B2D5B]">Reset to Original January Flyer Defaults?</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            This will restore the Featured Umrah Price to <strong>PKR 232,000</strong>, dates to <strong>Jan 26 \u2013 Nov 10, 2026 (14 Nights)</strong>, and reset all offers, room rates, packages, visas, and contact details.
+                            This will restore the Featured Umrah Price to <strong>PKR 232,000</strong>, dates to <strong>Jan 26 \u2013 Feb 09, 2026 (14 Nights)</strong>, and reset all offers, room rates, packages, visas, and contact details.
                         </p>
                         <div class="flex gap-3 pt-2">
                             <button type="button" data-action="cancel-reset-modal" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-xs">
@@ -1956,7 +1956,7 @@
             setVal("#spotStartingPrice", s.startingPrice ?? 232000);
             setVal("#spotPriceUnit", s.priceUnit ?? "PER PERSON (SHARING)");
             setVal("#spotDepartureDate", s.departureDate ?? "Jan 26, 2026");
-            setVal("#spotReturnDate", s.returnDate ?? "Nov 10, 2026");
+            setVal("#spotReturnDate", s.returnDate ?? "Feb 09, 2026");
             setVal("#spotDuration", s.duration ?? "14 Nights");
 
             setChk("#srvRoundTrip", srv.roundTrip !== false);
@@ -2357,7 +2357,7 @@
                     startingPrice,
                     priceUnit: getVal("#spotPriceUnit", "PER PERSON (SHARING)") || "PER PERSON (SHARING)",
                     departureDate: getVal("#spotDepartureDate", "Jan 26, 2026"),
-                    returnDate: getVal("#spotReturnDate", "Nov 10, 2026") || "Nov 10, 2026",
+                    returnDate: getVal("#spotReturnDate", "Feb 09, 2026") || "Feb 09, 2026",
                     duration: getVal("#spotDuration", "14 Nights") || "14 Nights",
                     madinahImageUrl: madinahImageUrl || this.siteConfig.spotlight.madinahImageUrl,
                     makkahImageUrl: makkahImageUrl || this.siteConfig.spotlight.makkahImageUrl,

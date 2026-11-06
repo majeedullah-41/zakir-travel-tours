@@ -37,6 +37,8 @@ service cloud.firestore {
     // Lead capture: anyone may CREATE one enquiry (public forms), but only
     // admins may read, update or delete them, so leads are not public.
     // Creates are validated so the collection cannot be used as free storage.
+    // NOTE: 'service' is a reserved word in Firestore Rules, so it must be
+    // accessed as data['service'] — data.service fails to parse (lines 51-52).
     match /enquiries/{enquiryId} {
       allow create: if request.resource.data.keys().hasAll(
           ['name', 'phone', 'service', 'source', 'status', 'createdAt']
@@ -48,9 +50,9 @@ service cloud.firestore {
         && request.resource.data.phone is string
         && request.resource.data.phone.size() >= 7
         && request.resource.data.phone.size() <= 30
-        && request.resource.data.service is string
-        && request.resource.data.service.size() >= 1
-        && request.resource.data.service.size() <= 120
+        && request.resource.data['service'] is string
+        && request.resource.data['service'].size() >= 1
+        && request.resource.data['service'].size() <= 120
         && request.resource.data.source is string
         && request.resource.data.source.size() >= 1
         && request.resource.data.source.size() <= 50
