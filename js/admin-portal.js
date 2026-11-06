@@ -1526,7 +1526,7 @@
                                     <div class="border-t border-slate-100 pt-4 space-y-3">
                                         <div class="flex items-center justify-between">
                                             <span class="text-[10px] font-black uppercase text-[#0D8A9E] block"><i class="fa-solid fa-users mr-1"></i>About Us - Team Member Photos</span>
-                                            <span class="text-[10px] font-bold text-slate-400">Upload, then click Save &amp; Push</span>
+                                            <span class="text-[10px] font-bold text-slate-400">Upload, adjust if needed, then click Save &amp; Push</span>
                                         </div>
                                         <div id="teamPhotosAdminGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                             ${TEAM_MEMBERS.map((m) => `
@@ -1545,6 +1545,9 @@
                                                         <i class="fa-solid fa-upload mr-1"></i>Upload
                                                         <input type="file" accept="image/*" class="hidden" data-team-photo-upload="${m.id}">
                                                     </label>
+                                                    <button type="button" data-team-photo-adjust="${m.id}" class="hidden bg-[#0D8A9E]/10 hover:bg-[#0D8A9E] text-[#0D8A9E] hover:text-white text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors" title="Adjust photo">
+                                                        <i class="fa-solid fa-crop mr-1"></i>Adjust
+                                                    </button>
                                                     <button type="button" data-team-photo-remove="${m.id}" class="bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors" title="Remove photo">
                                                         <i class="fa-solid fa-trash"></i>
                                                     </button>
@@ -2506,6 +2509,268 @@
                 }
             }
             if (initials) initials.classList.toggle("hidden", !!url);
+            const adjustBtn = this.container.querySelector(`[data-team-photo-adjust="${memberId}"]`);
+            if (adjustBtn) adjustBtn.classList.toggle("hidden", !url);
+        }
+
+        // --------------------------------------------------------------------
+        // TEAM PHOTO ADJUST — circular crop editor (zoom + drag + rotate).
+        // The editor shows the photo exactly as the site shows it (a circle),
+        // renders the adjusted crop to a 600x600 JPEG, and feeds the result
+        // back through the normal upload path (Storage or DataURL fallback).
+        // Nothing is saved to the site until "Save & Push to Website".
+        // --------------------------------------------------------------------
+
+        // Pure crop math: given the image size, a zoom (1..3) and a pan
+        // offset in image pixels (relative to the image centre), return the
+        // square source rectangle to draw. The rectangle always stays
+        // inside the image. Used by the preview AND the final export, so
+        // what Majeed sees in the circle is exactly what gets saved.
+        _photoCropSourceRect(imgW, imgH, zoom, panX, panY) {
+            const cover = Math.min(imgW, imgH);
+            const size = cover / Math.max(1, zoom);
+            const maxPanX = (imgW - size) / 2;
+            const maxPanY = (imgH - size) / 2;
+            const cx = imgW / 2 + Math.max(-maxPanX, Math.min(maxPanX, panX || 0));
+            const cy = imgH / 2 + Math.max(-maxPanY, Math.min(maxPanY, panY || 0));
+            return { sx: cx - size / 2, sy: cy - size / 2, sw: size, sh: size };
+        }
+
+        _ensurePhotoAdjustModal() {
+            let modal = this.container.querySelector("#teamPhotoAdjustModal");
+            if (modal) return modal;
+
+            const wrap = document.createElement("div");
+            wrap.innerHTML = `
+                <div id="teamPhotoAdjustModal" class="fixed inset-0 z-[97] hidden bg-[#05162E]/80 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl max-h-[92vh] overflow-y-auto anim-scale-in">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-black text-[#0B2D5B]">Adjust Photo</h3>
+                            <button type="button" data-action="close-photo-adjust" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center shrink-0" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <p id="photoAdjustName" class="text-xs font-bold text-[#0D8A9E] mb-4"></p>
+                        <div id="photoAdjustStage" class="relative mx-auto w-[260px] h-[260px] rounded-full overflow-hidden bg-slate-900 ring-4 ring-[#0D8A9E]/30 select-none" style="touch-action:none">
+                            <canvas id="photoAdjustCanvas" width="520" height="520" class="w-full h-full block"></canvas>
+                        </div>
+                        <p class="text-center text-[11px] font-bold text-slate-400 mt-3">Drag the photo to move it</p>
+                        <div class="mt-4">
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="photoAdjustZoom" class="text-xs font-bold uppercase text-slate-600">Zoom</label>
+                                <span id="photoAdjustZoomLabel" class="text-xs font-black text-[#0B2D5B]">1.0&times;</span>
+                            </div>
+                            <input id="photoAdjustZoom" type="range" min="1" max="3" step="0.01" value="1" class="w-full h-10 accent-[#0D8A9E]">
+                        </div>
+                        <div class="flex gap-2 mt-4">
+                            <button type="button" id="photoAdjustRotate" class="flex-1 bg-slate-100 hover:bg-slate-200 text-[#0B2D5B] text-sm font-black py-3 rounded-xl transition-colors"><i class="fa-solid fa-rotate-right mr-2"></i>Rotate</button>
+                            <button type="button" id="photoAdjustCancel" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-black py-3 rounded-xl transition-colors">Cancel</button>
+                            <button type="button" id="photoAdjustApply" class="flex-[2] bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-sm font-black py-3 rounded-xl transition-colors">Apply</button>
+                        </div>
+                    </div>
+                </div>`;
+            modal = wrap.firstElementChild;
+            this.container.appendChild(modal);
+
+            modal.querySelector("[data-action='close-photo-adjust']").addEventListener("click", () => this._closePhotoAdjust(true));
+            modal.querySelector("#photoAdjustCancel").addEventListener("click", () => this._closePhotoAdjust(true));
+            modal.querySelector("#photoAdjustApply").addEventListener("click", () => this._applyPhotoAdjust());
+            modal.querySelector("#photoAdjustRotate").addEventListener("click", () => this._rotatePhotoAdjust());
+            modal.addEventListener("click", (e) => {
+                if (e.target === modal) this._closePhotoAdjust(true);
+            });
+            modal.querySelector("#photoAdjustZoom").addEventListener("input", (e) => {
+                const st = this._photoAdjust;
+                if (!st) return;
+                st.zoom = parseFloat(e.target.value) || 1;
+                this._syncPhotoAdjustControls();
+                this._redrawPhotoAdjust();
+            });
+
+            // Drag to move: pointer events cover mouse AND touch. The photo
+            // follows the finger/pointer; the crop window moves the other way.
+            const stage = modal.querySelector("#photoAdjustStage");
+            let drag = null;
+            stage.addEventListener("pointerdown", (e) => {
+                if (!this._photoAdjust) return;
+                e.preventDefault();
+                drag = { x: e.clientX, y: e.clientY };
+                try {
+                    stage.setPointerCapture(e.pointerId);
+                } catch (_) {
+                    // Older browsers: dragging still works without capture.
+                }
+            });
+            stage.addEventListener("pointermove", (e) => {
+                const st = this._photoAdjust;
+                if (!st || !drag || !st.img) return;
+                const rect = this._photoCropSourceRect(st.img.width, st.img.height, st.zoom, st.panX, st.panY);
+                const displaySize = stage.clientWidth || 260;
+                const scale = rect.sw / displaySize;
+                st.panX -= (e.clientX - drag.x) * scale;
+                st.panY -= (e.clientY - drag.y) * scale;
+                drag = { x: e.clientX, y: e.clientY };
+                this._redrawPhotoAdjust();
+            });
+            const endDrag = () => {
+                drag = null;
+            };
+            stage.addEventListener("pointerup", endDrag);
+            stage.addEventListener("pointercancel", endDrag);
+
+            return modal;
+        }
+
+        _syncPhotoAdjustControls() {
+            const st = this._photoAdjust;
+            const modal = this.container.querySelector("#teamPhotoAdjustModal");
+            if (!st || !modal) return;
+            const slider = modal.querySelector("#photoAdjustZoom");
+            const label = modal.querySelector("#photoAdjustZoomLabel");
+            if (slider) slider.value = String(st.zoom);
+            if (label) label.textContent = `${st.zoom.toFixed(1)}×`;
+        }
+
+        _redrawPhotoAdjust() {
+            const st = this._photoAdjust;
+            if (!st || !st.img) return;
+            const canvas = this.container.querySelector("#photoAdjustCanvas");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            const rect = this._photoCropSourceRect(st.img.width, st.img.height, st.zoom, st.panX, st.panY);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(st.img, rect.sx, rect.sy, rect.sw, rect.sh, 0, 0, canvas.width, canvas.height);
+        }
+
+        _rotatePhotoAdjust() {
+            const st = this._photoAdjust;
+            if (!st || !st.img) return;
+            // Rotate the working image onto a fresh canvas (90° clockwise)
+            // and keep using it as the source — the crop math is unchanged.
+            const src = st.img;
+            const tmp = document.createElement("canvas");
+            tmp.width = src.height;
+            tmp.height = src.width;
+            const ctx = tmp.getContext("2d");
+            ctx.translate(tmp.width / 2, tmp.height / 2);
+            ctx.rotate(Math.PI / 2);
+            ctx.drawImage(src, -src.width / 2, -src.height / 2);
+            st.img = tmp;
+            st.zoom = 1;
+            st.panX = 0;
+            st.panY = 0;
+            this._syncPhotoAdjustControls();
+            this._redrawPhotoAdjust();
+        }
+
+        _openPhotoAdjust(memberId, memberName, src, fileName) {
+            const modal = this._ensurePhotoAdjustModal();
+            const img = new Image();
+            // crossOrigin so an already-saved Storage photo can be drawn to
+            // a canvas and exported. Local uploads (blob:/data: URLs) are
+            // unaffected. If the photo cannot be loaded this way, the error
+            // handler below tells Majeed to upload it again.
+            img.crossOrigin = "anonymous";
+            img.onload = () => {
+                this._photoAdjust = {
+                    memberId,
+                    memberName,
+                    fileName: fileName || `${memberId}-photo.jpg`,
+                    img,
+                    zoom: 1,
+                    panX: 0,
+                    panY: 0,
+                    src
+                };
+                const nameEl = modal.querySelector("#photoAdjustName");
+                if (nameEl) nameEl.textContent = memberName;
+                this._syncPhotoAdjustControls();
+                this._redrawPhotoAdjust();
+                modal.classList.remove("hidden");
+            };
+            img.onerror = () => {
+                if (typeof src === "string" && src.startsWith("blob:")) {
+                    try {
+                        URL.revokeObjectURL(src);
+                    } catch (_) {
+                        // Ignore — the URL is already gone.
+                    }
+                }
+                this.showToast("Could not open this photo for editing. Try uploading it again.", "error", `Team photo · ${memberName}`);
+            };
+            img.src = src;
+        }
+
+        _closePhotoAdjust(cancelled) {
+            const modal = this.container.querySelector("#teamPhotoAdjustModal");
+            if (modal) modal.classList.add("hidden");
+            const st = this._photoAdjust;
+            if (st && typeof st.src === "string" && st.src.startsWith("blob:")) {
+                try {
+                    URL.revokeObjectURL(st.src);
+                } catch (_) {
+                    // Ignore — the URL is already gone.
+                }
+            }
+            this._photoAdjust = null;
+            if (cancelled) {
+                this.showToast("Adjustment cancelled — photo unchanged.", "info", "Team photo");
+            }
+        }
+
+        async _applyPhotoAdjust() {
+            const st = this._photoAdjust;
+            if (!st || !st.img) return;
+            const rect = this._photoCropSourceRect(st.img.width, st.img.height, st.zoom, st.panX, st.panY);
+            const out = document.createElement("canvas");
+            out.width = 600;
+            out.height = 600;
+            const ctx = out.getContext("2d");
+            ctx.drawImage(st.img, rect.sx, rect.sy, rect.sw, rect.sh, 0, 0, 600, 600);
+            let blob;
+            try {
+                blob = await new Promise((resolve, reject) => {
+                    out.toBlob((b) => (b ? resolve(b) : reject(new Error("Could not create image."))), "image/jpeg", 0.85);
+                });
+            } catch (err) {
+                // Happens if the canvas is tainted (e.g. a saved Storage
+                // photo loaded without CORS permission) — re-uploading the
+                // original file fixes it.
+                this.showToast("Could not save the adjusted photo. Try uploading the photo again.", "error", `Team photo · ${st.memberName}`);
+                return;
+            }
+            const baseName = String(st.fileName || `${st.memberId}-photo.jpg`).replace(/\.[^.]+$/, "");
+            let file;
+            try {
+                file = new File([blob], `${baseName}.jpg`, { type: "image/jpeg" });
+            } catch (_) {
+                // Very old browsers without the File constructor: a Blob
+                // with a name still works with uploadMediaFile.
+                blob.name = `${baseName}.jpg`;
+                file = blob;
+            }
+            const memberId = st.memberId;
+            const memberName = st.memberName;
+            this._closePhotoAdjust(false);
+            await this._uploadAdjustedTeamPhoto(memberId, memberName, file);
+        }
+
+        // The normal team-photo upload path, unchanged apart from the
+        // "adjusted" wording: Storage upload or DataURL fallback, preview
+        // staging, and the reminder to click Save & Push to Website.
+        async _uploadAdjustedTeamPhoto(memberId, memberName, file) {
+            const sizeText = this._formatFileSize(file.size);
+            const fileDesc = sizeText ? `${file.name} (${sizeText})` : file.name;
+            try {
+                this.showToast(`Uploading team photo ${fileDesc}…`, "info", `Team photo · ${memberName} · Destination: Firebase Storage (zakir_team)`);
+                const url = await db.uploadMediaFile(file, "zakir_team");
+                this._setTeamPhotoPreview(memberId, url);
+                if (url.startsWith("data:")) {
+                    this.showToast("Photo adjusted and saved as a local copy — click Save & Push to Website.", "warning", `Team photo · ${memberName} · ${fileDesc} · fell back to a local copy`);
+                } else {
+                    this.showToast(`Photo adjusted ✓ ${fileDesc} — click Save & Push to Website.`, "success", `Team photo · ${memberName} · Destination: Firebase Storage (zakir_team)`);
+                }
+            } catch (err) {
+                this.showToast(`Upload failed: ${err.message || "Unknown error"}`, "error", `Team photo · ${memberName} · ${fileDesc}`);
+            }
         }
 
         // --------------------------------------------------------------------
@@ -3482,30 +3747,35 @@
                 });
             });
 
-            // About Us - Team Member Photo Uploads
+            // About Us - Team Member Photo Uploads (opens the adjust editor;
+            // the photo is only uploaded when Majeed taps Apply in the editor)
             this.container.querySelectorAll("input[type='file'][data-team-photo-upload]").forEach((fileInput) => {
-                fileInput.addEventListener("change", async (e) => {
+                fileInput.addEventListener("change", (e) => {
                     const file = e.target.files && e.target.files[0];
+                    fileInput.value = "";
                     if (!file) return;
                     const memberId = fileInput.getAttribute("data-team-photo-upload");
                     const member = TEAM_MEMBERS.find((m) => m.id === memberId);
                     const memberName = member ? member.name : memberId;
-                    const sizeText = this._formatFileSize(file.size);
-                    const fileDesc = sizeText ? `${file.name} (${sizeText})` : file.name;
-                    try {
-                        this.showToast(`Uploading team photo ${fileDesc}…`, "info", `Team photo · ${memberName} · Destination: Firebase Storage (zakir_team)`);
-                        const url = await db.uploadMediaFile(file, "zakir_team");
-                        this._setTeamPhotoPreview(memberId, url);
-                        if (url.startsWith("data:")) {
-                            this.showToast("Photo stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning", `Team photo · ${memberName} · ${fileDesc} · fell back to a local copy`);
-                        } else {
-                            this.showToast(`Team photo uploaded to Storage ✓ ${fileDesc} — click Save & Push to Website.`, "success", `Team photo · ${memberName} · Destination: Firebase Storage (zakir_team)`);
-                        }
-                    } catch (err) {
-                        this.showToast(`Upload failed: ${err.message || "Unknown error"}`, "error", `Team photo · ${memberName} · ${fileDesc}`);
-                    } finally {
-                        fileInput.value = "";
+                    if (!file.type || !file.type.startsWith("image/")) {
+                        this.showToast("Please pick an image file.", "error", `Team photo · ${memberName}`);
+                        return;
                     }
+                    this._openPhotoAdjust(memberId, memberName, URL.createObjectURL(file), file.name);
+                });
+            });
+            this.container.querySelectorAll("[data-team-photo-adjust]").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const memberId = btn.getAttribute("data-team-photo-adjust");
+                    const member = TEAM_MEMBERS.find((m) => m.id === memberId);
+                    const memberName = member ? member.name : memberId;
+                    const urlInput = this.container.querySelector(`#teamPhotoUrl-${memberId}`);
+                    const currentUrl = urlInput ? urlInput.value.trim() : "";
+                    if (!currentUrl) {
+                        this.showToast("Upload a photo first, then you can adjust it.", "warning", `Team photo · ${memberName}`);
+                        return;
+                    }
+                    this._openPhotoAdjust(memberId, memberName, currentUrl, `${memberId}-photo.jpg`);
                 });
             });
             this.container.querySelectorAll("[data-team-photo-remove]").forEach((btn) => {
