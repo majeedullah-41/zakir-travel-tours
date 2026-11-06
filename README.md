@@ -71,10 +71,10 @@ python3 -m http.server 8000
 
 ## Still to do (owner decisions needed)
 
-- **Real live domain:** no live domain was found in the repo, so
-  `robots.txt`, `sitemap.xml` and the Open Graph tags use the placeholder
-  `https://www.example.com` — replace it with the real domain (search for
-  `TODO` / `www.example.com`).
+- **Live domain:** the live site is `https://zakir-travel-tours.vercel.app/`
+  (Vercel-hosted, no custom domain bought). `robots.txt`, `sitemap.xml` and
+  the Open Graph tags all use this URL. If a custom domain is bought later,
+  search for `zakir-travel-tours.vercel.app` and replace it.
 - **Team photos:** the team section on `contact.html` shows initials only
   until real photo URLs are added in the admin portal.
 - **Deal dates/prices:** the featured deal is seeded as Jan 26 – Feb 09, 2026
