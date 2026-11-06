@@ -231,7 +231,27 @@
             this.renderShell();
             this._bindGlobalEvents();
 
-            db.onAuthSnapshot((user) => {
+            db.onAuthSnapshot(async (user) => {
+                // Firebase mode only: only the owner or an allowlisted email
+                // may use the portal. Checked on login AND on session
+                // restore (page reload), before the dashboard is shown.
+                // Local-realtime (offline passphrase) logins are untouched
+                // — the allowlist only applies in firebase mode.
+                if (user && db.mode === "firebase" && typeof db.verifyAdminAccess === "function") {
+                    let allowed = false;
+                    try {
+                        allowed = await db.verifyAdminAccess(user);
+                    } catch (_) {
+                        allowed = false;
+                    }
+                    if (!allowed) {
+                        this.showToast("This account doesn't have admin access. Ask the owner to add it.", "error");
+                        try {
+                            await db.logout();
+                        } catch (_) {}
+                        return;
+                    }
+                }
                 this.currentUser = user;
                 this._updateAuthView();
             });
@@ -811,9 +831,9 @@
                     <main class="max-w-7xl mx-auto px-4 pt-6 space-y-6">
 
                         <!-- ========================================================== -->
-                        <!-- 6 MANAGEMENT TABS NAVIGATION                               -->
+                        <!-- 7 MANAGEMENT TABS NAVIGATION                               -->
                         <!-- ========================================================== -->
-                        <nav class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 bg-white p-2 rounded-2xl shadow-card border border-slate-200/80">
+                        <nav class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2 bg-white p-2 rounded-2xl shadow-card border border-slate-200/80">
                             <button type="button" data-tab="spotlight" class="admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] text-white font-extrabold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-md transition-all ring-1 ring-[#D4AF37]/60">
                                 <i class="fa-solid fa-house text-[#FDE68A]"></i>
                                 <span>1. Home Page</span>
@@ -842,6 +862,14 @@
                                 <i class="fa-solid fa-inbox text-[#0D8A9E]"></i>
                                 <span>6. Enquiries</span>
                                 <span id="tabBadgeEnquiries" class="bg-rose-100 text-rose-700 text-[10px] font-black px-2 py-0.5 rounded-full" title="New enquiries">0</span>
+                            </button>
+                            <!-- Owner only: who may open the admin portal. Hidden for
+                                 everyone else (see _updateAccessTabVisibility); on
+                                 small screens it sits as a full-width row of its own
+                                 so the grid stays tidy, on desktop it joins the row. -->
+                            <button type="button" data-tab="access" class="admin-tab-btn hidden text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all">
+                                <i class="fa-solid fa-user-shield text-[#D4AF37]"></i>
+                                <span>7. Admin Access</span>
                             </button>
                         </nav>
 
@@ -1750,6 +1778,55 @@
                             </div>
                         </div>
 
+                        <!-- ========================================================== -->
+                        <!-- TAB 7: ADMIN ACCESS (OWNER ONLY)                           -->
+                        <!-- ========================================================== -->
+                        <div id="admin-panel-access" class="admin-tab-panel hidden space-y-6 anim-fade-up">
+                            <div class="bg-white rounded-3xl p-6 shadow-card border border-slate-200/80 space-y-5">
+                                <div class="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 pb-4">
+                                    <div>
+                                        <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Admin Access</span>
+                                        <h3 class="text-lg font-black text-[#0B2D5B]">Who can open the admin portal</h3>
+                                        <p class="text-xs text-slate-500 mt-0.5">Only you (the owner) can see this tab. Add another person's email to let them sign in with their own account, or create a new account for them.</p>
+                                    </div>
+                                    <span class="bg-[#FEF3C7] text-[#8A6D0B] text-[10px] font-black px-2.5 py-1 rounded-full uppercase">Owner only</span>
+                                </div>
+
+                                <div id="accessRulesNote" class="hidden text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3"></div>
+
+                                <div id="accessAdminList" class="space-y-2">
+                                    <div class="bg-slate-50 rounded-2xl p-6 text-center text-slate-500 text-sm">Loading the admin list…</div>
+                                </div>
+
+                                <form id="accessAddForm" class="space-y-3 border-t border-slate-100 pt-4">
+                                    <div class="flex flex-wrap gap-4 text-xs font-bold text-slate-600">
+                                        <label class="flex items-center gap-1.5 cursor-pointer">
+                                            <input type="radio" name="accessAddMode" value="existing" checked class="accent-[#0D8A9E]">
+                                            Add an existing account
+                                        </label>
+                                        <label class="flex items-center gap-1.5 cursor-pointer">
+                                            <input type="radio" name="accessAddMode" value="create" class="accent-[#0D8A9E]">
+                                            Create a new account
+                                        </label>
+                                    </div>
+                                    <div class="grid sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Email address</label>
+                                            <input type="email" id="accessAddEmail" required placeholder="person@example.com" autocomplete="off" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-medium focus:outline-none focus:border-[#0D8A9E]">
+                                        </div>
+                                        <div id="accessTempPassWrap" class="hidden">
+                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Temporary password</label>
+                                            <input type="password" id="accessAddTempPass" placeholder="At least 8 characters" autocomplete="new-password" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-medium focus:outline-none focus:border-[#0D8A9E]">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg transition-all">
+                                        <span id="accessAddBtnLabel">Add admin</span>
+                                    </button>
+                                    <p class="text-[11px] text-slate-400 leading-relaxed">Removing someone only stops them opening the admin — their sign-in account stays and is not deleted. For a new account, share the temporary password with them yourself; there is no password-change screen in the portal yet.</p>
+                                </form>
+                            </div>
+                        </div>
+
                     </main>
                 </div>
 
@@ -2386,6 +2463,7 @@
                 }
                 // Never claim "Live" here — show the real connection mode.
                 this._updateSyncBadge();
+                this._updateAccessTabVisibility();
                 this._autoGrowFields(dashView);
             } else {
                 authView.classList.remove("hidden");
@@ -3718,6 +3796,12 @@
         }
 
         _switchTab(tabName) {
+            // Admin Access is owner-only: never open its panel for anyone
+            // else, even if the tab button is somehow reached.
+            if (tabName === "access" && !this._isOwnerUser()) {
+                this.showToast("Only the owner can manage admin access.", "error");
+                return;
+            }
             this.activeTab = tabName;
             this.container.querySelectorAll(".admin-tab-btn").forEach((btn) => {
                 const isMatch = btn.getAttribute("data-tab") === tabName;
@@ -3725,13 +3809,20 @@
                     ? `admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] text-white font-extrabold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-md transition-all ring-1 ring-[#D4AF37]/60`
                     : `admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all`;
             });
+            // The class rewrite above wipes the access button's hidden +
+            // span classes, so re-apply them here.
+            this._updateAccessTabVisibility();
 
-            ["spotlight", "umrah", "visas", "workpermit", "contacts", "enquiries"].forEach((t) => {
+            ["spotlight", "umrah", "visas", "workpermit", "contacts", "enquiries", "access"].forEach((t) => {
                 const panel = this.container.querySelector(`#admin-panel-${t}`);
                 if (panel) {
                     panel.classList.toggle("hidden", t !== tabName);
                 }
             });
+
+            if (tabName === "access") {
+                this._loadAdminAccessList();
+            }
 
             this._autoGrowFields(this.container.querySelector(`#admin-panel-${tabName}`));
         }
@@ -3741,6 +3832,239 @@
                 this._switchTab("umrah");
             } else if (subtab === "visas") {
                 this._switchTab("visas");
+            }
+        }
+
+        // ----------------------------------------------------------------
+        // ADMIN ACCESS (owner only): who may open the admin portal.
+        // ----------------------------------------------------------------
+
+        // True when the signed-in user is the owner (by Firebase UID).
+        // In local-realtime (offline) mode there is no UID, so this is
+        // false — access management needs Firebase.
+        _isOwnerUser() {
+            const db = window.zakirDB;
+            return Boolean(db && typeof db.isOwner === "function" && db.isOwner(this.currentUser));
+        }
+
+        // Shows the "7. Admin Access" tab button only for the owner.
+        // On small screens it sits as a full-width row of its own so the
+        // grid stays tidy; on desktop it joins the row. Called from
+        // _updateAuthView and _switchTab (whose class rewrite wipes it).
+        _updateAccessTabVisibility() {
+            const btn = this.container.querySelector('[data-tab="access"]');
+            if (!btn) return;
+            btn.classList.toggle("hidden", !this._isOwnerUser());
+            btn.classList.add("col-span-2", "sm:col-span-3", "lg:col-span-1");
+        }
+
+        // Loads the allowlist and renders it. On the owner's first visit
+        // the document is created automatically, seeded with the owner's
+        // own email, so the list always exists from then on.
+        async _loadAdminAccessList() {
+            const db = window.zakirDB;
+            const listEl = this.container.querySelector("#accessAdminList");
+            const noteEl = this.container.querySelector("#accessRulesNote");
+            const formEl = this.container.querySelector("#accessAddForm");
+            if (noteEl) noteEl.classList.add("hidden");
+            if (!db || db.mode !== "firebase" || typeof db.getAdminAllowlist !== "function") {
+                if (formEl) formEl.classList.add("hidden");
+                if (listEl) {
+                    listEl.innerHTML = `<div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center text-amber-800 text-sm font-bold">Connect to Firebase to manage admin access. Access settings do not work in offline mode.</div>`;
+                }
+                return;
+            }
+            if (formEl) formEl.classList.remove("hidden");
+            try {
+                let list = await db.getAdminAllowlist();
+                if (!list) {
+                    const ownerEmail = String((this.currentUser && this.currentUser.email) || "").trim().toLowerCase();
+                    await db.saveAdminAllowlist(ownerEmail ? [ownerEmail] : [], ownerEmail);
+                    list = await db.getAdminAllowlist();
+                }
+                this._renderAdminAccessList(list ? list.emails : []);
+            } catch (err) {
+                // Most likely the new Firestore rules have not been
+                // published yet, so the allowlist cannot be read or
+                // written. Say so plainly instead of failing silently.
+                if (noteEl) {
+                    noteEl.textContent =
+                        "Could not load the admin list — publish the new Firestore rules first (Firestore → Rules → Publish), then reopen this tab.";
+                    noteEl.classList.remove("hidden");
+                }
+                this.showToast("Could not load the admin list. Publish the new Firestore rules first.", "error");
+                if (listEl) {
+                    listEl.innerHTML = `<div class="bg-slate-50 rounded-2xl p-6 text-center text-slate-500 text-sm">The admin list could not be loaded.</div>`;
+                }
+            }
+        }
+
+        _renderAdminAccessList(emails) {
+            const listEl = this.container.querySelector("#accessAdminList");
+            if (!listEl) return;
+            const ownerEmail = String((this.currentUser && this.currentUser.email) || "").trim().toLowerCase();
+            const list = [...new Set((emails || []).map((e) => String(e || "").trim().toLowerCase()).filter(Boolean))];
+            this._accessEmails = list;
+            if (!list.length) {
+                listEl.innerHTML = `<div class="bg-slate-50 rounded-2xl p-6 text-center text-slate-500 text-sm">No admins yet — only the owner can open the admin portal.</div>`;
+                return;
+            }
+            listEl.innerHTML = list
+                .map((email) => {
+                    const isOwner = email === ownerEmail;
+                    return `
+                <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 rounded-2xl px-4 py-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="w-9 h-9 rounded-xl ${
+                            isOwner
+                                ? "bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] text-white"
+                                : "bg-[#E6F6F8] text-[#0D8A9E]"
+                        } flex items-center justify-center shrink-0">
+                            <i class="fa-solid ${isOwner ? "fa-crown" : "fa-user"}"></i>
+                        </span>
+                        <div class="min-w-0">
+                            <div class="text-sm font-bold text-[#0B2D5B] truncate">${escapeHtml(email)}</div>
+                            <div class="text-[11px] text-slate-500">${
+                                isOwner ? "Owner — can add and remove admins" : "Admin — can manage the website"
+                            }</div>
+                        </div>
+                    </div>
+                    ${
+                        isOwner
+                            ? `<span class="text-[10px] font-black uppercase bg-[#FEF3C7] text-[#8A6D0B] px-2.5 py-1 rounded-full shrink-0">Owner</span>`
+                            : `<button type="button" data-action="access-remove" data-email="${escapeHtml(email)}" class="text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 px-3 py-2 rounded-xl transition-all shrink-0">Remove</button>`
+                    }
+                </div>`;
+                })
+                .join("");
+        }
+
+        // Shows/hides the temporary-password field for the "Create a new
+        // account" mode, and updates the submit button label.
+        _updateAccessAddMode() {
+            const form = this.container.querySelector("#accessAddForm");
+            if (!form) return;
+            const mode = (form.querySelector('input[name="accessAddMode"]:checked') || {}).value || "existing";
+            const passWrap = this.container.querySelector("#accessTempPassWrap");
+            const passInput = this.container.querySelector("#accessAddTempPass");
+            const label = this.container.querySelector("#accessAddBtnLabel");
+            if (passWrap) passWrap.classList.toggle("hidden", mode !== "create");
+            if (passInput) passInput.required = mode === "create";
+            if (label) label.textContent = mode === "create" ? "Create account & add admin" : "Add admin";
+        }
+
+        // Adds an admin: either an existing Auth account (email only) or a
+        // brand-new Auth account (email + temporary password, created on a
+        // secondary Firebase app so the owner's session is untouched).
+        // Either way the email lands on the allowlist, confirmed with the
+        // usual save feedback. The temporary password is never logged.
+        async _handleAccessAdd(submitBtn) {
+            const db = window.zakirDB;
+            const form = this.container.querySelector("#accessAddForm");
+            if (!form || !db) return;
+            const mode = (form.querySelector('input[name="accessAddMode"]:checked') || {}).value || "existing";
+            const email = String(this.container.querySelector("#accessAddEmail").value || "").trim().toLowerCase();
+            const tempPass = String(this.container.querySelector("#accessAddTempPass").value || "");
+            const ownerEmail = String((this.currentUser && this.currentUser.email) || "").trim().toLowerCase();
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                this.showToast("Enter a valid email address.", "error");
+                return;
+            }
+            if (mode === "create" && tempPass.length < 8) {
+                this.showToast("Temporary password must be at least 8 characters.", "error");
+                return;
+            }
+            const existing = this._accessEmails || [];
+            if (existing.includes(email)) {
+                this.showToast(`${email} is already an admin.`, "warning");
+                return;
+            }
+            try {
+                const result = await this._runSaveWithFeedback(submitBtn, async () => {
+                    if (mode === "create") {
+                        if (typeof db.createAdminAuthUser !== "function") {
+                            throw new Error("Account creation needs the latest admin code — reload the admin page and try again.");
+                        }
+                        // Auth account first; if the allowlist save below
+                        // fails, the account exists without access and can
+                        // be added again with "Add an existing account".
+                        const created = await db.createAdminAuthUser(email, tempPass);
+                        return db.saveAdminAllowlist([...existing, created.email], ownerEmail);
+                    }
+                    return db.saveAdminAllowlist([...existing, email], ownerEmail);
+                });
+                // NOTE: no verify descriptor here — verifyDocSaved compares
+                // fields with strict equality, which can never match an
+                // emails array. _showSyncToast without verify still
+                // confirms the save reached Firebase (or warns it didn't).
+                this._showSyncToast(
+                    result,
+                    mode === "create"
+                        ? `Account created for ${email} — share the temporary password with them, then they can sign in.`
+                        : `${email} can now open the admin portal.`
+                );
+                const list = await db.getAdminAllowlist();
+                this._accessEmails = list ? list.emails : [...existing, email];
+                this._renderAdminAccessList(this._accessEmails);
+                form.reset();
+                this._updateAccessAddMode();
+            } catch (err) {
+                let msg = err && err.message ? err.message : "Could not add this admin.";
+                if (err && err.code === "auth/email-already-in-use") {
+                    msg = "An account with this email already exists — use 'Add an existing account' instead.";
+                } else if (err && err.code === "auth/invalid-email") {
+                    msg = "That email address doesn't look right.";
+                } else if (err && (err.code === "permission-denied" || /permission/i.test(msg))) {
+                    msg = "Could not save — publish the new Firestore rules first (Firestore → Rules → Publish), then try again.";
+                }
+                this.showToast(msg, "error");
+            }
+        }
+
+        // Removes an admin from the allowlist. Two taps: the first arms
+        // the button ("Tap again to remove"), the second confirms, so a
+        // stray tap can't revoke someone. Removing only revokes portal
+        // access — the Firebase Auth account is NOT deleted. The owner
+        // row has no remove button at all, and this guards it anyway.
+        async _handleAccessRemove(email, button) {
+            const db = window.zakirDB;
+            const cleanEmail = String(email || "").trim().toLowerCase();
+            if (!cleanEmail || !db) return;
+            const ownerEmail = String((this.currentUser && this.currentUser.email) || "").trim().toLowerCase();
+            if (cleanEmail === ownerEmail) {
+                this.showToast("The owner cannot be removed.", "error");
+                return;
+            }
+            if (this._accessRemoveArmed !== cleanEmail) {
+                this._accessRemoveArmed = cleanEmail;
+                if (button) {
+                    button.textContent = "Tap again to remove";
+                    button.classList.add("bg-rose-600", "text-white");
+                }
+                clearTimeout(this._accessRemoveTimer);
+                this._accessRemoveTimer = setTimeout(() => {
+                    this._accessRemoveArmed = null;
+                    this._renderAdminAccessList(this._accessEmails || []);
+                }, 5000);
+                return;
+            }
+            clearTimeout(this._accessRemoveTimer);
+            this._accessRemoveArmed = null;
+            const remaining = (this._accessEmails || []).filter((e) => e !== cleanEmail);
+            try {
+                const result = await this._runSaveWithFeedback(button, () =>
+                    db.saveAdminAllowlist(remaining, ownerEmail)
+                );
+                this._showSyncToast(result, `Removed ${cleanEmail} — they can no longer open the admin.`);
+                this._accessEmails = remaining;
+                this._renderAdminAccessList(remaining);
+            } catch (err) {
+                let msg = err && err.message ? err.message : "Could not remove this admin.";
+                if (err && (err.code === "permission-denied" || /permission/i.test(msg))) {
+                    msg = "Could not save — publish the new Firestore rules first (Firestore → Rules → Publish), then try again.";
+                }
+                this.showToast(msg, "error");
+                this._renderAdminAccessList(this._accessEmails || []);
             }
         }
 
@@ -3790,6 +4114,20 @@
                         errEl.classList.remove("hidden");
                         this.showToast(err.message || "Sign-in failed. Check your email and password.", "error");
                     }
+                });
+            }
+
+            // Admin Access (owner only): add an existing account or create
+            // a new one, and switch the temporary-password field on/off.
+            const accessForm = this.container.querySelector("#accessAddForm");
+            if (accessForm) {
+                accessForm.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    const submitBtn = e.submitter || accessForm.querySelector("button[type='submit']");
+                    await this._handleAccessAdd(submitBtn);
+                });
+                accessForm.querySelectorAll('input[name="accessAddMode"]').forEach((radio) => {
+                    radio.addEventListener("change", () => this._updateAccessAddMode());
                 });
             }
 
@@ -4349,6 +4687,8 @@
                 } else if (action === "logout") {
                     await db.logout();
                     this.showToast("Admin session locked.", "warning");
+                } else if (action === "access-remove") {
+                    await this._handleAccessRemove(actionEl.getAttribute("data-email"), actionEl);
                 } else if (action === "open-activity-log") {
                     this._setActivityPanelOpen(true);
                 } else if (action === "close-activity-log") {

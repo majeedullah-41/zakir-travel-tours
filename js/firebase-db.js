@@ -15,6 +15,15 @@
     // feedback at all while the upload is stuck.
     const STORAGE_UPLOAD_TIMEOUT_MS = 10000;
 
+    // The portal owner (Majeed). The owner UID is the ultimate fallback in
+    // firestore.rules too, so the owner can never lock himself out of the
+    // admin — even if his email were ever removed from the allowlist.
+    const OWNER_UID = "m7HIPZAuMRdO3IxAq4y6amGsdN53";
+    const ADMIN_ALLOWLIST_COLLECTION = "admin_users";
+    const ADMIN_ALLOWLIST_DOC = "allowed";
+    const ADMIN_ACCESS_DENIED_MESSAGE =
+        "This account doesn't have admin access. Ask the owner to add it.";
+
     function formatPKR(val) {
         const num = Number(val);
         if (isNaN(num)) return "0";
@@ -2127,6 +2136,7 @@
                 if (!this.auth || !this.auth.currentUser) return null;
                 const u = this.auth.currentUser;
                 return {
+                    uid: u.uid,
                     email: u.email,
                     displayName: u.displayName || u.email,
                     role: "Admin"
@@ -2151,7 +2161,18 @@
 
             if (this.mode === "firebase" && this.auth) {
                 const cred = await this.auth.signInWithEmailAndPassword(cleanEmail, cleanPass);
+                // Only the owner or an allowlisted email may use the admin
+                // portal. Anyone else is signed straight back out — the
+                // portal never opens for them.
+                const allowed = await this.verifyAdminAccess(cred.user);
+                if (!allowed) {
+                    try {
+                        await this.auth.signOut();
+                    } catch (_) {}
+                    throw new Error(ADMIN_ACCESS_DENIED_MESSAGE);
+                }
                 const userObj = {
+                    uid: cred.user.uid,
                     email: cred.user.email,
                     displayName: cred.user.displayName || cred.user.email,
                     role: "Admin",
@@ -2194,6 +2215,141 @@
             }
             this._notifyAuthListeners(null);
             this._broadcastChange("AUTH_UPDATED");
+        }
+
+        // --------------------------------------------------------------------
+        // ADMIN ACCESS (allowlist): who may open the admin portal besides the
+        // owner. Source of truth is the Firestore document
+        // admin_users/allowed: { emails: string[], updatedAt, updatedBy }.
+        // The owner is identified by UID and never needs the list; the
+        // Firestore rules mirror this (claim OR owner UID OR allowlisted
+        // email), so the client-side check here is only UX — the rules are
+        // the real gate. Local-realtime (offline passphrase) logins are
+        // untouched: the allowlist only applies in firebase mode.
+        // --------------------------------------------------------------------
+
+        // True when the given user (or the current user) is the owner.
+        isOwner(user) {
+            const u = user || this.getCurrentUser();
+            return Boolean(u && u.uid && u.uid === OWNER_UID);
+        }
+
+        // True when the user may use the admin portal: owner UID, or an
+        // email on the allowlist. A missing allowlist document, a denied
+        // read, or any error denies safely — never fails open.
+        async verifyAdminAccess(user) {
+            const u = user || this.getCurrentUser();
+            if (!u) return false;
+            if (u.uid && u.uid === OWNER_UID) return true;
+            const email = String(u.email || "").trim().toLowerCase();
+            if (!email) return false;
+            try {
+                const list = await this.getAdminAllowlist();
+                if (!list) return false;
+                return (list.emails || []).includes(email);
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // Reads the allowlist. Returns null when the document does not
+        // exist yet (the owner seeds it on first opening Admin Access),
+        // and throws on read errors (e.g. permission denied because the
+        // new Firestore rules have not been published yet) so the caller
+        // can tell "no list yet" apart from "cannot read the list".
+        async getAdminAllowlist() {
+            if (this.mode !== "firebase" || !this.db) return null;
+            const snap = await this.db
+                .collection(ADMIN_ALLOWLIST_COLLECTION)
+                .doc(ADMIN_ALLOWLIST_DOC)
+                .get();
+            if (!snap.exists) return null;
+            const data = snap.data() || {};
+            const emails = Array.isArray(data.emails)
+                ? [...new Set(data.emails.map((e) => String(e || "").trim().toLowerCase()).filter(Boolean))]
+                : [];
+            return { emails, updatedAt: data.updatedAt || null, updatedBy: data.updatedBy || "" };
+        }
+
+        // Saves the allowlist. The owner's email is always forced back
+        // into the list, so the owner can never be removed from it.
+        // Returns { synced } like the other save methods: synced is true
+        // only when the write actually reached Firestore.
+        async saveAdminAllowlist(emails, ownerEmail) {
+            if (this.mode !== "firebase" || !this.db) return { synced: false };
+            const owner = String(ownerEmail || "").trim().toLowerCase();
+            const clean = [
+                ...new Set(
+                    (emails || [])
+                        .map((e) => String(e || "").trim().toLowerCase())
+                        .filter((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e))
+                )
+            ];
+            if (owner && !clean.includes(owner)) clean.push(owner);
+            if (!clean.length) {
+                throw new Error("The admin list cannot be empty.");
+            }
+            const me = this.getCurrentUser();
+            await this.db
+                .collection(ADMIN_ALLOWLIST_COLLECTION)
+                .doc(ADMIN_ALLOWLIST_DOC)
+                .set(
+                    {
+                        emails: clean,
+                        updatedAt: new Date().toISOString(),
+                        updatedBy: (me && me.email) || owner || ""
+                    },
+                    { merge: true }
+                );
+            return { synced: true };
+        }
+
+        // A second Firebase app instance ("secondary") so creating a new
+        // Auth account does NOT disturb the owner's signed-in session on
+        // the main app. The secondary session is signed out again right
+        // after creation, so no second account stays signed in.
+        _getSecondaryAuth() {
+            if (!window.firebase || !window.firebase.apps) return null;
+            const config = this.getFirebaseConfig();
+            if (!config) return null;
+            let app = null;
+            try {
+                app = window.firebase.app("secondary");
+            } catch (_) {
+                app = null;
+            }
+            if (!app) {
+                app = window.firebase.initializeApp(config, "secondary");
+            }
+            return app.auth();
+        }
+
+        // Creates a Firebase Auth account for a new admin. This only
+        // creates the sign-in account — portal access itself comes from
+        // the allowlist, so the caller must add the email to it next
+        // (saveAdminAllowlist). The temporary password is never logged
+        // anywhere; the owner shares it with the new admin directly.
+        async createAdminAuthUser(email, tempPassword) {
+            if (this.mode !== "firebase") {
+                throw new Error("Connect to Firebase to create an admin account.");
+            }
+            const cleanEmail = String(email || "").trim().toLowerCase();
+            const cleanPass = String(tempPassword || "");
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+                throw new Error("Enter a valid email address.");
+            }
+            if (cleanPass.length < 8) {
+                throw new Error("Temporary password must be at least 8 characters.");
+            }
+            const secAuth = this._getSecondaryAuth();
+            if (!secAuth) {
+                throw new Error("Could not start a separate sign-up session. Try again.");
+            }
+            const cred = await secAuth.createUserWithEmailAndPassword(cleanEmail, cleanPass);
+            try {
+                await secAuth.signOut();
+            } catch (_) {}
+            return { email: cred.user.email, uid: cred.user.uid };
         }
 
         _notifyAuthListeners(userOverride) {
