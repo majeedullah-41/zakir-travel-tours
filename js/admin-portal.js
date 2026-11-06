@@ -95,15 +95,92 @@
             .admin-card-hover:hover {
                 transform: translateY(-3px);
                 box-shadow: 0 16px 35px -10px rgba(11, 45, 91, 0.14);
+                border-color: rgba(212, 175, 55, 0.45);
+            }
+            /* ---- Website look, copied small from the public site ---- */
+            /* Gentle 3D levitation, gold pulse ring, flowing gradient
+               border and flowing gradient text — same keyframes and values
+               as index.html, so the admin matches the website. */
+            @keyframes floatSlow {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-8px); }
+            }
+            @keyframes goldPulse {
+                0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.45); }
+                70% { box-shadow: 0 0 0 12px rgba(251, 191, 36, 0); }
+                100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
+            }
+            @keyframes borderFlow {
+                0%, 100% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+            }
+            @keyframes textGradientFlow {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+            @keyframes shimmerSweep {
+                0% { transform: translateX(-120%) skewX(-20deg); }
+                100% { transform: translateX(220%) skewX(-20deg); }
+            }
+            /* Logo card: gentle float + soft gold pulse, like the site. */
+            .admin-logo-glow {
+                animation: floatSlow 6s ease-in-out infinite, goldPulse 2.6s infinite;
+            }
+            /* Flowing navy-teal-gold gradient text, like site headings. */
+            .admin-gradient-text {
+                background: linear-gradient(90deg, #0B2D5B, #0D8A9E, #D4AF37, #0D8A9E, #0B2D5B);
+                background-size: 220% auto;
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+                animation: textGradientFlow 6s ease infinite;
+            }
+            /* Gradient strip under the sticky header (navy-teal-gold). */
+            .admin-header-accent {
+                background: linear-gradient(135deg, rgba(56, 189, 248, 0.65), rgba(251, 191, 36, 0.55), rgba(13, 138, 158, 0.7), rgba(255, 255, 255, 0.25));
+                background-size: 250% 250%;
+                animation: borderFlow 8s ease infinite;
+            }
+            /* Glossy shimmer sweep across gradient buttons, like the site. */
+            .admin-btn-shimmer {
+                position: relative;
+                overflow: hidden;
+            }
+            .admin-btn-shimmer::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 45%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+                transform: translateX(-120%) skewX(-20deg);
+                animation: shimmerSweep 4.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+                pointer-events: none;
             }
             textarea {
                 field-sizing: content;
                 overflow-y: hidden;
                 resize: vertical;
             }
-            input[type="text"] {
-                field-sizing: content;
-            }
+            /* NOTE: text inputs deliberately do NOT use field-sizing: content.
+               It makes an input's min-content width equal to its value, so a
+               long value (e.g. "Happy Clients & Pilgrims Served") forces its
+               2-column grid track wider than a phone screen — the whole page
+               then overflows horizontally and the browser shrinks it, leaving
+               a dead strip down the right side. All text inputs here are
+               w-full anyway, so this rule changed nothing visually. */
+            /* Let grid children shrink below their content size on narrow
+               screens (same overflow cause as above: a default 20-char input
+               alone is ~130px of min-content, so two of them side by side
+               already overflow a 360px phone). Inputs scroll their text
+               internally when squeezed, so nothing is lost. */
+            #standaloneAdminRoot .grid > * { min-width: 0; }
+            /* Safety net: clip any residual horizontal overflow inside the
+               admin instead of letting it widen the whole page again.
+               Using clip (unlike hidden) does not break the sticky header. */
+            #standaloneAdminRoot { overflow-x: clip; }
         `;
         document.head.appendChild(style);
     }
@@ -596,7 +673,7 @@
         renderShell() {
             this.container.innerHTML = `
                 <!-- Toast Notification Container (above the Activity panel) -->
-                <div id="adminToastContainer" class="fixed bottom-5 right-5 z-[97] flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+                <div id="adminToastContainer" class="fixed inset-x-4 bottom-5 sm:inset-x-auto sm:right-5 sm:w-full sm:max-w-sm z-[97] flex flex-col gap-2 pointer-events-none"></div>
 
                 <!-- Activity Log Slide-Over Panel -->
                 <div id="adminActivityPanel" class="fixed inset-0 z-[96] hidden">
@@ -626,12 +703,12 @@
                     <div class="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-white/30 anim-scale-in">
                         <div class="flex items-center justify-between mb-6">
                             <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-lg border border-slate-200/80">
+                                <div class="w-12 h-12 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-lg border border-slate-200/80 admin-logo-glow">
                                     <img src="./assets/logo-mark.png" alt="Zakir Travel Logo" class="w-full h-full object-contain">
                                 </div>
                                 <div>
                                     <span class="text-[10px] font-extrabold uppercase tracking-widest text-[#0D8A9E] block">Admin Portal</span>
-                                    <h1 class="text-xl font-black text-[#0B2D5B]">Zakir Travel Admin</h1>
+                                    <h1 class="text-xl font-black admin-gradient-text">Zakir Travel Admin</h1>
                                 </div>
                             </div>
                             ${
@@ -665,7 +742,7 @@
                                 <input type="password" id="adminLoginPassword" required placeholder="Enter your password" autocomplete="current-password" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#0D8A9E] focus:ring-2 focus:ring-[#0D8A9E]/20 transition-all">
                             </div>
                             <div id="adminLoginError" class="hidden text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl p-3"></div>
-                            <button type="submit" class="w-full bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-extrabold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                            <button type="submit" class="w-full admin-btn-shimmer bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-extrabold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-arrow-right-to-bracket"></i>
                                 <span>Sign In</span>
                             </button>
@@ -682,12 +759,12 @@
                     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md text-[#0B2D5B] shadow-card border-b border-slate-200">
                         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
                             <div class="flex items-center gap-3">
-                                <div class="w-11 h-11 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-sm border border-slate-200">
+                                <div class="w-11 h-11 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-sm border border-slate-200 admin-logo-glow">
                                     <img src="./assets/logo-mark.png" alt="Zakir Travel Logo" class="w-full h-full object-contain">
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <h1 class="font-black text-base sm:text-lg tracking-tight leading-none text-[#0B2D5B]">Zakir Travel Admin</h1>
+                                        <h1 class="font-black text-base sm:text-lg tracking-tight leading-none admin-gradient-text">Zakir Travel Admin</h1>
                                         <span id="dbModeBadge" class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-1" title="Firebase is not connected yet — changes save only in this browser.">
                                             <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Offline — changes save only on this device
                                         </span>
@@ -699,7 +776,7 @@
                             <!-- Action Buttons -->
                             <div class="flex flex-wrap items-center gap-2 sm:gap-2.5 ml-auto">
                                 <!-- Save & Push to Website Button -->
-                                <button type="button" id="headerSavePushBtn" data-action="save-push-all" class="anim-pulse-teal bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-lg transition-all active:scale-95">
+                                <button type="button" id="headerSavePushBtn" data-action="save-push-all" class="anim-pulse-teal admin-btn-shimmer bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white text-xs font-black px-3 sm:px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-lg transition-all active:scale-95">
                                     <i class="fa-solid fa-circle-check text-sm"></i>
                                     <span>Save & Push to Website</span>
                                 </button>
@@ -728,6 +805,7 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="h-[3px] admin-header-accent"></div>
                     </header>
 
                     <main class="max-w-7xl mx-auto px-4 pt-6 space-y-6">
@@ -736,7 +814,7 @@
                         <!-- 6 MANAGEMENT TABS NAVIGATION                               -->
                         <!-- ========================================================== -->
                         <nav class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 bg-white p-2 rounded-2xl shadow-card border border-slate-200/80">
-                            <button type="button" data-tab="spotlight" class="admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] text-white font-extrabold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-md transition-all">
+                            <button type="button" data-tab="spotlight" class="admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] text-white font-extrabold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-md transition-all ring-1 ring-[#D4AF37]/60">
                                 <i class="fa-solid fa-house text-[#FDE68A]"></i>
                                 <span>1. Home Page</span>
                             </button>
@@ -756,11 +834,11 @@
                                 <span>4. Work Permit</span>
                                 <span id="tabBadgeWorkPermits" class="bg-[#E6F6F8] text-[#0D8A9E] text-[10px] font-black px-2 py-0.5 rounded-full">6</span>
                             </button>
-                            <button type="button" data-tab="contacts" class="admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all col-span-2 sm:col-span-1">
+                            <button type="button" data-tab="contacts" class="admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all">
                                 <i class="fa-brands fa-whatsapp text-[#128C7E] text-base"></i>
                                 <span>5. Contact & Office</span>
                             </button>
-                            <button type="button" data-tab="enquiries" class="admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all col-span-2 sm:col-span-1">
+                            <button type="button" data-tab="enquiries" class="admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all">
                                 <i class="fa-solid fa-inbox text-[#0D8A9E]"></i>
                                 <span>6. Enquiries</span>
                                 <span id="tabBadgeEnquiries" class="bg-rose-100 text-rose-700 text-[10px] font-black px-2 py-0.5 rounded-full" title="New enquiries">0</span>
@@ -1562,7 +1640,7 @@
                                                     <div class="text-[10px] font-bold text-[#0D8A9E]">${m.role}</div>
                                                 </div>
                                                 <input type="hidden" id="teamPhotoUrl-${m.id}" data-team-photo-key="${m.id}">
-                                                <div class="flex items-center gap-1.5">
+                                                <div class="flex flex-wrap items-center justify-center gap-1.5">
                                                     <label class="cursor-pointer bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-colors">
                                                         <i class="fa-solid fa-upload mr-1"></i>Upload
                                                         <input type="file" accept="image/*" class="hidden" data-team-photo-upload="${m.id}">
@@ -1737,7 +1815,7 @@
                                     <input type="text" id="dealEditLeftBadge" required placeholder="Ziyarat & Stay" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
                                     <input type="text" id="dealEditMadinahHotel" required placeholder="Madinah Hotel Name (e.g. Al Eiman Taibah / Similar)" class="w-full bg-[#F0FAFC] border border-[#0D8A9E]/40 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
                                     <div class="flex gap-2">
-                                        <input type="text" id="dealEditMadinahUrl" required placeholder="Left Image Link" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                        <input type="text" id="dealEditMadinahUrl" required placeholder="Left Image Link" class="flex-1 min-w-0 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
                                         <label class="bg-[#0D8A9E] hover:bg-[#096979] text-white text-xs font-bold px-3 py-2 rounded-xl cursor-pointer flex items-center gap-1 shrink-0">
                                             <i class="fa-solid fa-upload"></i>
                                             <input type="file" accept="image/*" data-deal-upload="dealEditMadinahUrl" class="hidden">
@@ -1751,7 +1829,7 @@
                                     <input type="text" id="dealEditRightBadge" required placeholder="Haram View Options" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
                                     <input type="text" id="dealEditMakkahHotel" required placeholder="Makkah Hotel Name (e.g. Emaar Al Khalil / Similar)" class="w-full bg-[#F3F6FB] border border-[#0B2D5B]/30 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
                                     <div class="flex gap-2">
-                                        <input type="text" id="dealEditMakkahUrl" required placeholder="Right Image Link" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                        <input type="text" id="dealEditMakkahUrl" required placeholder="Right Image Link" class="flex-1 min-w-0 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
                                         <label class="bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-xs font-bold px-3 py-2 rounded-xl cursor-pointer flex items-center gap-1 shrink-0">
                                             <i class="fa-solid fa-upload"></i>
                                             <input type="file" accept="image/*" data-deal-upload="dealEditMakkahUrl" class="hidden">
@@ -1962,7 +2040,7 @@
                                 <div class="sm:col-span-2">
                                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Country Flag Image</label>
                                     <input type="hidden" id="wpEditFlagUrl">
-                                    <div class="flex items-center gap-3">
+                                    <div class="flex flex-wrap items-center gap-3">
                                         <img id="wpEditFlagPreview" alt="Flag preview" class="hidden w-11 h-8 object-cover rounded-md shadow-sm ring-1 ring-slate-200">
                                         <button type="button" data-wp-flag-upload class="px-3.5 py-2.5 bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-2">
                                             <i class="fa-solid fa-cloud-arrow-up"></i> Upload Flag
@@ -2096,7 +2174,7 @@
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-600 mb-1">Image URL / Path</label>
                                         <div class="flex items-center gap-1.5">
-                                            <input type="text" id="wpProgEditLeftUrl" required placeholder="./assets/warsaw-poland.jpg" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                            <input type="text" id="wpProgEditLeftUrl" required placeholder="./assets/warsaw-poland.jpg" class="w-full min-w-0 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
                                             <div class="relative shrink-0">
                                                 <input type="file" accept="image/*" class="hidden">
                                                 <button type="button" data-wp-prog-image-target="wpProgEditLeftUrl" class="px-2.5 py-2 bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-[11px] font-bold rounded-xl whitespace-nowrap">
@@ -2124,7 +2202,7 @@
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-600 mb-1">Image URL / Path</label>
                                         <div class="flex items-center gap-1.5">
-                                            <input type="text" id="wpProgEditRightUrl" required placeholder="./assets/krakow-wroclaw-poland.jpg" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                            <input type="text" id="wpProgEditRightUrl" required placeholder="./assets/krakow-wroclaw-poland.jpg" class="w-full min-w-0 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
                                             <div class="relative shrink-0">
                                                 <input type="file" accept="image/*" class="hidden">
                                                 <button type="button" data-wp-prog-image-target="wpProgEditRightUrl" class="px-2.5 py-2 bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-[11px] font-bold rounded-xl whitespace-nowrap">
@@ -2586,7 +2664,7 @@
                             <button type="button" data-action="close-photo-adjust" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center shrink-0" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
                         </div>
                         <p id="photoAdjustName" class="text-xs font-bold text-[#0D8A9E] mb-4"></p>
-                        <div id="photoAdjustStage" class="relative mx-auto w-[260px] h-[260px] rounded-full overflow-hidden bg-slate-900 ring-4 ring-[#0D8A9E]/30 select-none" style="touch-action:none">
+                        <div id="photoAdjustStage" class="relative mx-auto w-[min(260px,100%)] aspect-square rounded-full overflow-hidden bg-slate-900 ring-4 ring-[#0D8A9E]/30 select-none" style="touch-action:none">
                             <canvas id="photoAdjustCanvas" width="520" height="520" class="w-full h-full block"></canvas>
                         </div>
                         <p class="text-center text-[11px] font-bold text-slate-400 mt-3">Drag the photo to move it</p>
@@ -3628,10 +3706,9 @@
             this.activeTab = tabName;
             this.container.querySelectorAll(".admin-tab-btn").forEach((btn) => {
                 const isMatch = btn.getAttribute("data-tab") === tabName;
-                const extraColSpan = btn.getAttribute("data-tab") === "contacts" ? " col-span-2 sm:col-span-1" : "";
                 btn.className = isMatch
-                    ? `admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] text-white font-extrabold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-md transition-all${extraColSpan}`
-                    : `admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all${extraColSpan}`;
+                    ? `admin-tab-btn bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] text-white font-extrabold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-md transition-all ring-1 ring-[#D4AF37]/60`
+                    : `admin-tab-btn text-slate-600 hover:bg-[#E6F6F8] font-bold text-xs sm:text-sm py-3 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all`;
             });
 
             ["spotlight", "umrah", "visas", "workpermit", "contacts", "enquiries"].forEach((t) => {
