@@ -23,9 +23,14 @@ service cloud.firestore {
     }
 
     // Admin allowlist: who may open the admin portal besides the owner.
-    // Never public — only admins may read or change it.
+    // Never public. Only the owner (UID) or a custom-claim admin may
+    // CHANGE the allowlist — an allowlisted admin must not be able to
+    // mint new admins for themselves or anyone else. Any admin may read
+    // it (the portal lists it), but writes are owner/claim-only.
     match /admin_users/{docId} {
-      allow read, write: if isAdmin();
+      allow read: if isAdmin();
+      allow write: if request.auth != null
+        && (request.auth.token.admin == true || request.auth.uid == "m7HIPZAuMRdO3IxAq4y6amGsdN53");
     }
 
     // Public read access for real-time homepage listeners; writes restricted to admins
@@ -63,6 +68,12 @@ service cloud.firestore {
       allow create: if request.resource.data.keys().hasAll(
           ['name', 'phone', 'service', 'source', 'status', 'createdAt']
         )
+        // The client (js/firebase-db.js saveEnquiry) writes exactly
+        // these 10 keys — nothing else may be smuggled into a lead.
+        && request.resource.data.keys().hasOnly(
+          ['name', 'phone', 'service', 'source', 'status', 'createdAt',
+           'details', 'whatsappNumber', 'whatsappSent', 'id']
+        )
         && request.resource.data.status == 'new'
         && request.resource.data.name is string
         && request.resource.data.name.size() >= 1
@@ -76,8 +87,16 @@ service cloud.firestore {
         && request.resource.data.source is string
         && request.resource.data.source.size() >= 1
         && request.resource.data.source.size() <= 50
+        && request.resource.data.createdAt is string
+        && request.resource.data.createdAt.size() >= 10
+        && request.resource.data.createdAt.size() <= 50
         && (!('details' in request.resource.data) || request.resource.data.details is string)
-        && (!('details' in request.resource.data) || request.resource.data.details.size() <= 1000);
+        && (!('details' in request.resource.data) || request.resource.data.details.size() <= 1000)
+        && (!('whatsappNumber' in request.resource.data) || request.resource.data.whatsappNumber is string)
+        && (!('whatsappNumber' in request.resource.data) || request.resource.data.whatsappNumber.size() <= 30)
+        && (!('whatsappSent' in request.resource.data) || request.resource.data.whatsappSent is bool)
+        && (!('id' in request.resource.data) || request.resource.data.id is string)
+        && (!('id' in request.resource.data) || request.resource.data.id.size() <= 100);
       allow read, update, delete: if isAdmin();
     }
   }

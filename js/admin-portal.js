@@ -2054,7 +2054,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Flag Emoji / Code</label>
-                                    <input type="text" id="visaEditFlag" placeholder="e.g. Saudi Arabia flag" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+                                    <input type="text" id="visaEditFlag" placeholder="e.g. 🇸🇦" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
                                 </div>
                                 <div class="sm:col-span-2">
                                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Flag Image</label>
@@ -2976,7 +2976,7 @@
                 );
                 this._setTeamPhotoPreview(memberId, url);
                 if (url.startsWith("data:")) {
-                    this.showToast("Photo adjusted and saved as a local copy — click Save & Push to Website.", "warning", `Team photo · ${memberName} · ${fileDesc} · fell back to a local copy`);
+                    this.showToast("Photo adjusted — Storage upload failed, so it will be stored in the database instead when you click Save & Push to Website (counts toward the size limit).", "warning", `Team photo · ${memberName} · ${fileDesc} · fell back to a DataURL (stored in the database on save)`);
                 } else {
                     this.showToast(`Photo adjusted ✓ ${fileDesc} — click Save & Push to Website.`, "success", `Team photo · ${memberName} · Destination: Firebase Storage (zakir_team)`);
                 }
@@ -3424,7 +3424,14 @@
                 this.showToast("No enquiries to export for this filter.", "warning");
                 return;
             }
-            const esc = (v) => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
+            // Prefix fields starting with =, +, -, @, tab or CR with a
+            // single quote, so Excel/Sheets cannot execute them as
+            // formulas when the CSV is opened (formula injection).
+            const esc = (v) => {
+                const text = String(v == null ? "" : v);
+                const safe = /^[=+\-@\t\r]/.test(text) ? `'${text}` : text;
+                return `"${safe.replace(/"/g, '""')}"`;
+            };
             const rows = [["Date", "Name", "Phone", "Service", "Source", "Status", "Details"]].concat(
                 list.map((e) => [e.createdAt, e.name, e.phone, e.service, e.source, e.status, e.details].map(esc))
             );
@@ -4068,8 +4075,59 @@
             }
         }
 
+        // Two-tap delete confirmation, mirroring _handleAccessRemove: the
+        // first tap arms the button ("Sure?"), the second tap (within 5s)
+        // deletes. A stray tap can never delete content. Returns true
+        // when the delete should run, false when this tap only armed it.
+        _armDeleteConfirm(actionEl, key) {
+            if (this._deleteArmedKey === key) {
+                // Second tap: restore the button, then run the delete.
+                this._disarmDeleteConfirm();
+                return true;
+            }
+            this._disarmDeleteConfirm();
+            this._deleteArmedKey = key;
+            this._deleteArmedButton = actionEl;
+            if (actionEl) {
+                actionEl.dataset.deleteOrigHtml = actionEl.innerHTML;
+                actionEl.dataset.deleteOrigClass = actionEl.className;
+                actionEl.innerHTML = '<span class="text-[10px] font-black px-1">Sure?</span>';
+                actionEl.style.width = "auto";
+                actionEl.style.minWidth = "64px";
+                actionEl.classList.remove("bg-rose-50", "text-rose-600");
+                actionEl.classList.add("bg-rose-600", "text-white");
+            }
+            this._deleteArmedTimer = setTimeout(() => this._disarmDeleteConfirm(), 5000);
+            return false;
+        }
+
+        _disarmDeleteConfirm() {
+            clearTimeout(this._deleteArmedTimer);
+            const btn = this._deleteArmedButton;
+            if (btn && btn.isConnected && btn.dataset.deleteOrigHtml !== undefined) {
+                btn.innerHTML = btn.dataset.deleteOrigHtml;
+                btn.className = btn.dataset.deleteOrigClass;
+                btn.style.width = "";
+                btn.style.minWidth = "";
+                delete btn.dataset.deleteOrigHtml;
+                delete btn.dataset.deleteOrigClass;
+            }
+            this._deleteArmedKey = null;
+            this._deleteArmedButton = null;
+        }
+
         _bindGlobalEvents() {
             const db = window.zakirDB;
+
+            // Surface browser-storage quota warnings from the database
+            // layer (photos stored as DataURLs can fill LocalStorage) as
+            // a toast — the save itself still goes through to Firestore.
+            window.addEventListener("zakir-storage-quota", (e) => {
+                const message =
+                    (e && e.detail && e.detail.message) ||
+                    "Browser storage is full — the local copy was not saved on this device.";
+                this.showToast(message, "warning");
+            });
 
             this.container.addEventListener("input", (e) => {
                 const target = e.target;
@@ -4214,7 +4272,7 @@
                             if (ph) ph.classList.add("hidden");
                         }
                         if (url.startsWith("data:")) {
-                            this.showToast("Image stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning", `Upload: ${fileDesc} · fell back to a local copy`);
+                            this.showToast("Storage upload failed — the image will be stored in the database instead when you save (counts toward the size limit). Check your connection, then upload again.", "warning", `Upload: ${fileDesc} · fell back to a DataURL (stored in the database on save)`);
                         } else {
                             this.showToast(`Image uploaded to Storage ✓ ${fileDesc} — click Save & Push to Website.`, "success", "Destination: Firebase Storage (zakir_media)");
                         }
@@ -4279,7 +4337,7 @@
                         const inputEl = this.container.querySelector(`#${targetId}`);
                         if (inputEl) inputEl.value = url;
                         if (url.startsWith("data:")) {
-                            this.showToast("Image stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning", `Deal image · ${fileDesc} · fell back to a local copy`);
+                            this.showToast("Storage upload failed — the image will be stored in the database instead when you save (counts toward the size limit). Check your connection, then upload again.", "warning", `Deal image · ${fileDesc} · fell back to a DataURL (stored in the database on save)`);
                         } else {
                             this.showToast(`Deal image uploaded to Storage ✓ ${fileDesc} — save the deal to keep it.`, "success", "Destination: Firebase Storage (zakir_media)");
                         }
@@ -4510,7 +4568,7 @@
                         this.container.querySelector("#wpEditFlagUrl").value = url;
                         this._setWpFlagPreview(url);
                         if (url.startsWith("data:")) {
-                            this.showToast("Flag stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning", `Country flag · ${countryName} · ${fileDesc} · fell back to a local copy`);
+                            this.showToast("Storage upload failed — the flag will be stored in the database instead when you save (counts toward the size limit). Check your connection, then upload again.", "warning", `Country flag · ${countryName} · ${fileDesc} · fell back to a DataURL (stored in the database on save)`);
                         } else {
                             this.showToast(`Flag uploaded to Storage ✓ ${fileDesc} — save the country to keep it.`, "success", `Country flag · ${countryName} · Destination: Firebase Storage (zakir_work_permits)`);
                         }
@@ -4555,7 +4613,7 @@
                         this.container.querySelector("#visaEditFlagUrl").value = url;
                         this._setVisaFlagPreview(url);
                         if (url.startsWith("data:")) {
-                            this.showToast("Flag stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning", `Visa flag · ${countryName} · ${fileDesc} · fell back to a local copy`);
+                            this.showToast("Storage upload failed — the flag will be stored in the database instead when you save (counts toward the size limit). Check your connection, then upload again.", "warning", `Visa flag · ${countryName} · ${fileDesc} · fell back to a DataURL (stored in the database on save)`);
                         } else {
                             this.showToast(`Flag uploaded to Storage ✓ ${fileDesc} — save the visa to keep it.`, "success", `Visa flag · ${countryName} · Destination: Firebase Storage (zakir_media)`);
                         }
@@ -4598,7 +4656,7 @@
                         const inputEl = this.container.querySelector(`#${targetId}`);
                         if (inputEl) inputEl.value = url;
                         if (url.startsWith("data:")) {
-                            this.showToast("Image stored on this device only — Storage upload failed. Check your connection, then upload again.", "warning", `Programme image · ${fileDesc} · fell back to a local copy`);
+                            this.showToast("Storage upload failed — the image will be stored in the database instead when you save (counts toward the size limit). Check your connection, then upload again.", "warning", `Programme image · ${fileDesc} · fell back to a DataURL (stored in the database on save)`);
                         } else {
                             this.showToast(`Programme image uploaded to Storage ✓ ${fileDesc} — save the programme to keep it.`, "success", "Destination: Firebase Storage (zakir_work_permits)");
                         }
@@ -4746,6 +4804,7 @@
                         this.showToast(err.message || "Could not reorder deals.", "error");
                     }
                 } else if (action === "delete-deal") {
+                    if (!this._armDeleteConfirm(actionEl, "delete-deal:" + actionEl.getAttribute("data-id"))) return;
                     try {
                         const result = await db.deleteSpecialDeal(actionEl.getAttribute("data-id"));
                         this._showSyncToast(result, "Special Flyer Deal deleted.", "warning");
@@ -4760,6 +4819,7 @@
                     const pkg = this.packages.find((p) => p.id === actionEl.getAttribute("data-id"));
                     if (pkg) this._openPkgModal(pkg);
                 } else if (action === "delete-pkg") {
+                    if (!this._armDeleteConfirm(actionEl, "delete-pkg:" + actionEl.getAttribute("data-id"))) return;
                     try {
                         const result = await db.deleteUmrahPackage(actionEl.getAttribute("data-id"));
                         this._showSyncToast(result, "Package deleted.", "warning");
@@ -4794,6 +4854,7 @@
                     const visa = this.visas.find((v) => v.id === actionEl.getAttribute("data-id"));
                     if (visa) this._openVisaModal(visa);
                 } else if (action === "delete-visa") {
+                    if (!this._armDeleteConfirm(actionEl, "delete-visa:" + actionEl.getAttribute("data-id"))) return;
                     try {
                         const result = await db.deleteVisaService(actionEl.getAttribute("data-id"));
                         this._showSyncToast(result, "Visa destination deleted.", "warning");
@@ -4828,6 +4889,7 @@
                     const permit = this.workPermits.find((p) => p.id === actionEl.getAttribute("data-id"));
                     if (permit) this._openWorkPermitModal(permit);
                 } else if (action === "delete-workpermit") {
+                    if (!this._armDeleteConfirm(actionEl, "delete-workpermit:" + actionEl.getAttribute("data-id"))) return;
                     try {
                         const result = await db.deleteWorkPermit(actionEl.getAttribute("data-id"));
                         this._showSyncToast(result, "Work permit destination deleted.", "warning");
@@ -4895,6 +4957,7 @@
                         this.showToast(err.message || "Could not reorder programmes.", "error");
                     }
                 } else if (action === "delete-wp-programme") {
+                    if (!this._armDeleteConfirm(actionEl, "delete-wp-programme:" + actionEl.getAttribute("data-id"))) return;
                     try {
                         const result = await db.deleteWorkPermitProgramme(actionEl.getAttribute("data-id"));
                         this._showSyncToast(result, "Featured Programme deleted.", "warning");

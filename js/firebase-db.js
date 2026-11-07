@@ -15,6 +15,12 @@
     // feedback at all while the upload is stuck.
     const STORAGE_UPLOAD_TIMEOUT_MS = 10000;
 
+    // Firestore caps a single document at 1 MiB. Refuse to save a
+    // site_config document past 900 KB (usually too many photos stored
+    // as DataURLs in the database because Storage uploads failed) so
+    // the admin gets a clear error instead of a failed Firestore write.
+    const SITE_CONFIG_MAX_BYTES = 900000;
+
     // The portal owner (Majeed). The owner UID is the ultimate fallback in
     // firestore.rules too, so the owner can never lock himself out of the
     // admin — even if his email were ever removed from the allowlist.
@@ -777,6 +783,11 @@
                 await this._ensureFirestoreSeed();
                 this._bindFirestoreSnapshots();
 
+                // Leads saved while offline (syncPending) are retried now
+                // that Firebase is ready — doc IDs are stable and the
+                // write uses merge, so a retry can never duplicate a lead.
+                this._flushPendingEnquiries();
+
                 this.auth.onAuthStateChanged((user) => {
                     this._notifyAuthListeners(user);
                 });
@@ -798,6 +809,68 @@
             }
         }
 
+        // LocalStorage writes that can hold DataURLs (photos) can hit the
+        // browser quota (~5 MB). A quota error must never abort the
+        // Firestore write that follows, so swallow it with a warning the
+        // admin can see (console + a window event the admin portal turns
+        // into a toast) and report whether the write landed. Other
+        // storage errors still throw, as before.
+        _safeLocalSet(key, value, context) {
+            try {
+                localStorage.setItem(key, value);
+                return true;
+            } catch (err) {
+                if (err && (err.name === "QuotaExceededError" || err.code === 22 || err.code === 1014)) {
+                    const message =
+                        "Browser storage is full — " +
+                        (context || "the local copy") +
+                        " was not saved on this device. The website copy is unaffected. Remove some photos or clear browser data.";
+                    console.warn(message, err);
+                    try {
+                        window.dispatchEvent(
+                            new CustomEvent("zakir-storage-quota", { detail: { message } })
+                        );
+                    } catch (_) {}
+                    return false;
+                }
+                throw err;
+            }
+        }
+
+        // Retry Firestore writes for enquiries saved while offline
+        // (syncPending). Doc IDs are stable and the write uses merge,
+        // so a retry can never duplicate a lead. Never throws: a failed
+        // retry keeps its flag and is retried on the next init/save.
+        async _flushPendingEnquiries() {
+            if (this.mode !== "firebase" || !this.db) return;
+            try {
+                const pending = this.getLocalEnquiries().filter((e) => e.syncPending);
+                for (const enquiry of pending) {
+                    try {
+                        const { syncPending, ...firestoreRecord } = enquiry;
+                        await this.db
+                            .collection("enquiries")
+                            .doc(enquiry.id)
+                            .set(firestoreRecord, { merge: true });
+                        const list = this.getLocalEnquiries();
+                        const idx = list.findIndex((e) => e.id === enquiry.id);
+                        if (idx !== -1) {
+                            list[idx].syncPending = false;
+                            this._safeLocalSet(
+                                STORAGE_KEYS.ENQUIRIES,
+                                JSON.stringify(list),
+                                "pending enquiries"
+                            );
+                        }
+                    } catch (err) {
+                        console.warn("Pending enquiry sync failed, will retry later:", err);
+                    }
+                }
+            } catch (err) {
+                console.warn("Pending enquiry flush failed:", err);
+            }
+        }
+
         _bindFirestoreSnapshots() {
             if (this.mode !== "firebase" || !this.db) return;
 
@@ -814,7 +887,7 @@
                 .onSnapshot((snap) => {
                     if (snap.exists) {
                         const data = snap.data();
-                        localStorage.setItem(STORAGE_KEYS.SITE_CONFIG, JSON.stringify(data));
+                        this._safeLocalSet(STORAGE_KEYS.SITE_CONFIG, JSON.stringify(data), "site settings");
                         const merged = this.getLocalSiteConfig();
                         this.listeners.site_config.forEach((cb) => cb(merged));
                     }
@@ -823,11 +896,12 @@
             const unsubDeals = this.db
                 .collection("special_deals")
                 .orderBy("sortOrder", "asc")
+                .limit(200)
                 .onSnapshot((snap) => {
                     const list = [];
                     snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
                     if (list.length) {
-                        localStorage.setItem(STORAGE_KEYS.SPECIAL_DEALS, JSON.stringify(list));
+                        this._safeLocalSet(STORAGE_KEYS.SPECIAL_DEALS, JSON.stringify(list), "special deals");
                         this.listeners.special_deals.forEach((cb) => cb(list));
                     }
                 });
@@ -835,40 +909,48 @@
             const unsubPkgs = this.db
                 .collection("umrah_packages")
                 .orderBy("sortOrder", "asc")
+                .limit(200)
                 .onSnapshot((snap) => {
                     const list = [];
                     snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
-                    localStorage.setItem(STORAGE_KEYS.UMRAH_PACKAGES, JSON.stringify(list));
+                    this._safeLocalSet(STORAGE_KEYS.UMRAH_PACKAGES, JSON.stringify(list), "Umrah packages");
                     this.listeners.umrah_packages.forEach((cb) => cb(list));
                 });
 
             const unsubVisas = this.db
                 .collection("visa_services")
                 .orderBy("sortOrder", "asc")
+                .limit(200)
                 .onSnapshot((snap) => {
                     const list = [];
                     snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
-                    localStorage.setItem(STORAGE_KEYS.VISA_SERVICES, JSON.stringify(list));
+                    this._safeLocalSet(STORAGE_KEYS.VISA_SERVICES, JSON.stringify(list), "visa services");
                     this.listeners.visa_services.forEach((cb) => cb(list));
                 });
 
             const unsubWorkPermits = this.db
                 .collection("work_permits")
                 .orderBy("sortOrder", "asc")
+                .limit(200)
                 .onSnapshot((snap) => {
                     const list = [];
                     snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
-                    localStorage.setItem(STORAGE_KEYS.WORK_PERMITS, JSON.stringify(list));
+                    this._safeLocalSet(STORAGE_KEYS.WORK_PERMITS, JSON.stringify(list), "work permits");
                     this.listeners.work_permits.forEach((cb) => cb(list));
                 });
 
             const unsubWorkPermitProgrammes = this.db
                 .collection("work_permit_programmes")
                 .orderBy("sortOrder", "asc")
+                .limit(200)
                 .onSnapshot((snap) => {
                     const list = [];
                     snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
-                    localStorage.setItem(STORAGE_KEYS.WORK_PERMIT_PROGRAMMES, JSON.stringify(list));
+                    this._safeLocalSet(
+                        STORAGE_KEYS.WORK_PERMIT_PROGRAMMES,
+                        JSON.stringify(list),
+                        "work permit programmes"
+                    );
                     this.listeners.work_permit_programmes.forEach((cb) => cb(list));
                 });
 
@@ -888,7 +970,7 @@
                             if (!list.some((e) => e.id === p.id)) list.push(p);
                         });
                         list.sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
-                        localStorage.setItem(STORAGE_KEYS.ENQUIRIES, JSON.stringify(list));
+                        this._safeLocalSet(STORAGE_KEYS.ENQUIRIES, JSON.stringify(list), "enquiries");
                         this.listeners.enquiries.forEach((cb) => cb(list));
                     },
                     () => {
@@ -1060,7 +1142,9 @@
                 const raw = localStorage.getItem(STORAGE_KEYS.UMRAH_PACKAGES);
                 if (raw) {
                     const list = JSON.parse(raw);
-                    return [...list].sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+                    if (Array.isArray(list) && list.length > 0) {
+                        return [...list].sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+                    }
                 }
             } catch (e) {
                 console.error("Error reading umrah_packages:", e);
@@ -1073,7 +1157,9 @@
                 const raw = localStorage.getItem(STORAGE_KEYS.VISA_SERVICES);
                 if (raw) {
                     const list = JSON.parse(raw);
-                    return [...list].sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+                    if (Array.isArray(list) && list.length > 0) {
+                        return [...list].sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+                    }
                 }
             } catch (e) {
                 console.error("Error reading visa_services:", e);
@@ -1086,7 +1172,9 @@
                 const raw = localStorage.getItem(STORAGE_KEYS.WORK_PERMITS);
                 if (raw) {
                     const list = JSON.parse(raw);
-                    return [...list].sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+                    if (Array.isArray(list) && list.length > 0) {
+                        return [...list].sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+                    }
                 }
             } catch (e) {
                 console.error("Error reading work_permits:", e);
@@ -1099,7 +1187,9 @@
                 const raw = localStorage.getItem(STORAGE_KEYS.WORK_PERMIT_PROGRAMMES);
                 if (raw) {
                     const list = JSON.parse(raw);
-                    return [...list].sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+                    if (Array.isArray(list) && list.length > 0) {
+                        return [...list].sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+                    }
                 }
             } catch (e) {
                 console.error("Error reading work_permit_programmes:", e);
@@ -1276,7 +1366,7 @@
                             ...(list[idx].servicesIncluded || DEFAULT_PRIMARY_DEAL.servicesIncluded),
                             ...(dealData.servicesIncluded || {})
                         },
-                        sortOrder: Number(dealData.sortOrder ?? list[idx].sortOrder ?? idx + 1)
+                        sortOrder: (Number(dealData.sortOrder ?? list[idx].sortOrder ?? idx + 1) || 0)
                     };
                     list[idx] = targetDeal;
                 }
@@ -1295,7 +1385,7 @@
                     },
                     isPrimary: list.length === 0 ? true : Boolean(dealData.isPrimary),
                     isActive: dealData.isActive !== undefined ? Boolean(dealData.isActive) : true,
-                    sortOrder: Number(dealData.sortOrder ?? list.length + 1)
+                    sortOrder: (Number(dealData.sortOrder ?? list.length + 1) || 0)
                 };
                 list.push(targetDeal);
             }
@@ -1445,7 +1535,27 @@
                 };
             }
 
-            localStorage.setItem(STORAGE_KEYS.SITE_CONFIG, JSON.stringify(updated));
+            // Firestore caps a document at 1 MiB — refuse a site_config
+            // that is already past 900 KB (usually too many photos stored
+            // as DataURLs in the database because Storage uploads failed),
+            // measured on the merged document about to be written, so the
+            // admin gets a clear error instead of a failed Firestore write.
+            const configBytes = new TextEncoder().encode(JSON.stringify(updated)).length;
+            if (configBytes > SITE_CONFIG_MAX_BYTES) {
+                throw new Error(
+                    `This page data is too full (${Math.round(configBytes / 1024)} KB) to save — too many photos are stored in the database. Remove some photos or fix Storage uploads, then save again.`
+                );
+            }
+
+            this._safeLocalSet(STORAGE_KEYS.SITE_CONFIG, JSON.stringify(updated), "site settings");
+
+            // The spotlight is mirrored into the primary deal and the
+            // featured Umrah package. Those mirrors must reach Firestore
+            // too — otherwise the next snapshot silently reverts them.
+            // Only the docs that actually changed are written, with the
+            // same merge-set pattern as the other saves.
+            let syncedDeal = null;
+            let syncedPkg = null;
 
             if (partialOrFullConfig.spotlight && !options.skipDealSync) {
                 const deals = this.getLocalSpecialDeals();
@@ -1458,6 +1568,7 @@
                         id: deals[targetIdx].id,
                         isPrimary: true
                     };
+                    syncedDeal = deals[targetIdx];
                     localStorage.setItem(STORAGE_KEYS.SPECIAL_DEALS, JSON.stringify(deals));
                 }
             }
@@ -1472,6 +1583,7 @@
                         departureDate: updated.spotlight.departureDate || pkgs[featuredIdx].departureDate,
                         duration: updated.spotlight.duration || pkgs[featuredIdx].duration
                     };
+                    syncedPkg = pkgs[featuredIdx];
                     localStorage.setItem(STORAGE_KEYS.UMRAH_PACKAGES, JSON.stringify(pkgs));
                 }
             }
@@ -1482,6 +1594,12 @@
             const synced = this.mode === "firebase" && this.db;
             if (synced) {
                 await this.db.collection("site_config").doc("main_settings").set(updated, { merge: true });
+                if (syncedDeal) {
+                    await this.db.collection("special_deals").doc(syncedDeal.id).set(syncedDeal, { merge: true });
+                }
+                if (syncedPkg) {
+                    await this.db.collection("umrah_packages").doc(syncedPkg.id).set(syncedPkg, { merge: true });
+                }
             }
 
             return { synced, config: updated };
@@ -1572,7 +1690,7 @@
                         ...list[idx],
                         ...pkgData,
                         price: cleanPrice,
-                        sortOrder: Number(pkgData.sortOrder ?? list[idx].sortOrder ?? idx + 1)
+                        sortOrder: (Number(pkgData.sortOrder ?? list[idx].sortOrder ?? idx + 1) || 0)
                     };
                     list[idx] = targetPkg;
                 }
@@ -1599,7 +1717,7 @@
                               .filter(Boolean),
                     isFeatured: Boolean(pkgData.isFeatured),
                     isActive: pkgData.isActive !== undefined ? Boolean(pkgData.isActive) : true,
-                    sortOrder: Number(pkgData.sortOrder ?? list.length + 1)
+                    sortOrder: (Number(pkgData.sortOrder ?? list.length + 1) || 0)
                 };
                 list.push(targetPkg);
             }
@@ -1668,8 +1786,8 @@
         async saveVisaService(visaData) {
             const list = this.getLocalVisaServices();
             const cleanPrice = Number(visaData.pricePKR);
-            if (isNaN(cleanPrice) || cleanPrice < 0) {
-                throw new Error("Visa price must be 0 or a positive PKR amount.");
+            if (!cleanPrice || cleanPrice <= 0) {
+                throw new Error("Visa price must be greater than 0 PKR.");
             }
 
             let targetVisa;
@@ -1680,7 +1798,7 @@
                         ...list[idx],
                         ...visaData,
                         pricePKR: cleanPrice,
-                        sortOrder: Number(visaData.sortOrder ?? list[idx].sortOrder ?? idx + 1)
+                        sortOrder: (Number(visaData.sortOrder ?? list[idx].sortOrder ?? idx + 1) || 0)
                     };
                     list[idx] = targetVisa;
                 }
@@ -1701,7 +1819,7 @@
                         visaData.imageUrl ||
                         "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80",
                     isActive: visaData.isActive !== undefined ? Boolean(visaData.isActive) : true,
-                    sortOrder: Number(visaData.sortOrder ?? list.length + 1)
+                    sortOrder: (Number(visaData.sortOrder ?? list.length + 1) || 0)
                 };
                 list.push(targetVisa);
             }
@@ -1762,6 +1880,9 @@
         }
 
         async saveWorkPermit(permitData) {
+            if (!String((permitData && permitData.countryName) || "").trim()) {
+                throw new Error("Work permit needs a country name.");
+            }
             const list = this.getLocalWorkPermits();
             const ticks = Array.isArray(permitData.ticks)
                 ? permitData.ticks
@@ -1778,7 +1899,7 @@
                         ...list[idx],
                         ...permitData,
                         ticks,
-                        sortOrder: Number(permitData.sortOrder ?? list[idx].sortOrder ?? idx + 1)
+                        sortOrder: (Number(permitData.sortOrder ?? list[idx].sortOrder ?? idx + 1) || 0)
                     };
                     list[idx] = targetPermit;
                 }
@@ -1803,7 +1924,7 @@
                     ticks,
                     isFeatured: Boolean(permitData.isFeatured),
                     isActive: permitData.isActive !== undefined ? Boolean(permitData.isActive) : true,
-                    sortOrder: Number(permitData.sortOrder ?? list.length + 1)
+                    sortOrder: (Number(permitData.sortOrder ?? list.length + 1) || 0)
                 };
                 list.push(targetPermit);
             }
@@ -1868,6 +1989,9 @@
         // --------------------------------------------------------------------
 
         async saveWorkPermitProgramme(programmeData) {
+            if (!String((programmeData && programmeData.countryName) || "").trim()) {
+                throw new Error("Featured programme needs a country name.");
+            }
             const list = this.getLocalWorkPermitProgrammes();
             let targetProgramme;
             if (programmeData.id) {
@@ -1876,7 +2000,7 @@
                     targetProgramme = {
                         ...list[idx],
                         ...programmeData,
-                        sortOrder: Number(programmeData.sortOrder ?? list[idx].sortOrder ?? idx + 1)
+                        sortOrder: (Number(programmeData.sortOrder ?? list[idx].sortOrder ?? idx + 1) || 0)
                     };
                     list[idx] = targetProgramme;
                 }
@@ -1888,8 +2012,16 @@
                     ...(FLYER_DEFAULTS.work_permit_programmes[0] || {}),
                     ...programmeData,
                     id: newId,
+                    // New programmes inherit the seed programme's fields —
+                    // including Poland's image fallbacks. Clear them unless
+                    // the admin supplied their own, so a new country never
+                    // shows Poland's fallback photos. (An empty fallback is
+                    // handled gracefully on the homepage: it falls back to
+                    // the generic Unsplash image instead.)
+                    leftImageFallback: programmeData.leftImageFallback || "",
+                    rightImageFallback: programmeData.rightImageFallback || "",
                     isActive: programmeData.isActive !== undefined ? Boolean(programmeData.isActive) : true,
-                    sortOrder: Number(programmeData.sortOrder ?? list.length + 1)
+                    sortOrder: (Number(programmeData.sortOrder ?? list.length + 1) || 0)
                 };
                 list.push(targetProgramme);
             }
@@ -1976,28 +2108,45 @@
             if (!file) throw new Error("No file selected.");
 
             if (this.mode === "firebase" && this.storage) {
-                // Give the Storage upload one bounded window (put + getting
-                // its download URL). If it stalls, cancel the task so it
-                // stops retrying in the background and fall through to the
+                // Give the Storage upload a bounded window. Each step gets
+                // its OWN full 10s budget: one shared timeout would leave
+                // the download-URL fetch with only whatever time the put
+                // did not use (a 9s upload would leave 1s for the URL).
+                // If either step stalls, cancel the task so it stops
+                // retrying in the background and fall through to the
                 // DataURL fallback below instead of hanging forever.
+                const startTimeout = () => {
+                    let timer = null;
+                    const promise = new Promise((_, reject) => {
+                        timer = setTimeout(
+                            () =>
+                                reject(
+                                    new Error(
+                                        `Storage upload timed out after ${STORAGE_UPLOAD_TIMEOUT_MS / 1000}s`
+                                    )
+                                ),
+                            STORAGE_UPLOAD_TIMEOUT_MS
+                        );
+                    });
+                    return { promise, clear: () => clearTimeout(timer) };
+                };
                 let task = null;
-                let timeoutTimer = null;
-                const timeout = new Promise((_, reject) => {
-                    timeoutTimer = setTimeout(
-                        () => reject(new Error(`Storage upload timed out after ${STORAGE_UPLOAD_TIMEOUT_MS / 1000}s`)),
-                        STORAGE_UPLOAD_TIMEOUT_MS
-                    );
-                });
+                let putTimeout = null;
+                let urlTimeout = null;
                 try {
                     const safeName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
                     const ref = this.storage.ref(`${folder}/${safeName}`);
                     task = ref.put(file);
-                    const snap = await Promise.race([task, timeout]);
-                    const url = await Promise.race([snap.ref.getDownloadURL(), timeout]);
-                    clearTimeout(timeoutTimer);
+                    putTimeout = startTimeout();
+                    const snap = await Promise.race([task, putTimeout.promise]);
+                    putTimeout.clear();
+                    urlTimeout = startTimeout();
+                    const url = await Promise.race([snap.ref.getDownloadURL(), urlTimeout.promise]);
+                    urlTimeout.clear();
                     return url;
                 } catch (err) {
-                    clearTimeout(timeoutTimer);
+                    if (putTimeout) putTimeout.clear();
+                    if (urlTimeout) urlTimeout.clear();
                     if (task) {
                         try {
                             task.cancel();
@@ -2043,6 +2192,13 @@
 
         async resetToFlyerDefaults() {
             const defaultConfig = JSON.parse(JSON.stringify(FLYER_DEFAULTS.site_config.main_settings));
+            // A reset must not wipe the team's photos: the seed has no
+            // teamPhotos, and the Firestore write below is a non-merge
+            // set, so re-apply whatever the admin has already uploaded.
+            const existingTeamPhotos = (this.getLocalSiteConfig() || {}).teamPhotos;
+            if (existingTeamPhotos && Object.keys(existingTeamPhotos).length) {
+                defaultConfig.teamPhotos = JSON.parse(JSON.stringify(existingTeamPhotos));
+            }
             const defaultDeals = JSON.parse(JSON.stringify(FLYER_DEFAULTS.special_deals));
             const defaultPkgs = JSON.parse(JSON.stringify(FLYER_DEFAULTS.umrah_packages));
             const defaultVisas = JSON.parse(JSON.stringify(FLYER_DEFAULTS.visa_services));
@@ -2066,6 +2222,9 @@
 
             const synced = this.mode === "firebase" && this.db;
             if (synced) {
+                // NOTE: a Firestore batch holds at most 500 operations —
+                // the deletes + sets here stay under it for this site's
+                // data. Do not grow the reset without splitting the batch.
                 const batch = this.db.batch();
                 batch.set(this.db.collection("site_config").doc("main_settings"), defaultConfig);
 
