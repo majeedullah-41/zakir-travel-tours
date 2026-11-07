@@ -1,34 +1,27 @@
 /**
- * Zakir Travel & Tours - Full-Stack Database, Auth & Storage Service
+ * Zakir Travel & Tours - Local-Only Database, Auth & Media Service
  * Works natively on both file:// (direct browser open) and http/https servers!
- * Supports Firebase (Auth, Firestore, Storage) + instant real-time cross-tab sync
- * (BroadcastChannel + storage events + LocalStorage persistence).
+ * Local-only test build: no server, no cloud backend. All data lives in
+ * LocalStorage on this device (seeded from FLYER_DEFAULTS), with instant
+ * real-time cross-tab sync (BroadcastChannel + storage events).
+ * Admin login is a per-browser passphrase (first login sets it).
+ * Photos are stored as canvas-compressed DataURLs (max 1100px JPEG 0.82).
+ * Nothing syncs anywhere: every save method returns { synced: false }.
+ *
+ * Same global (window.zakirDB) and same method names / return shapes as
+ * the previous implementation, so js/admin-portal.js and
+ * js/homepage-live.js need no changes. The PHP + MySQL backend
+ * (js/api-db.js) loads after this file and replaces window.zakirDB
+ * only when localStorage 'zakir_backend' is exactly 'api'.
  */
 (function (window) {
     "use strict";
 
-    // How long a Firebase Storage upload may take before we give up on it
-    // and fall back to the compressed DataURL instead. Storage is broken
-    // for this project right now (rules unpublished in the console, billing
-    // not set up), so an upload can hang indefinitely while Firebase
-    // retries — without this timeout the admin shows no preview and no
-    // feedback at all while the upload is stuck.
-    const STORAGE_UPLOAD_TIMEOUT_MS = 10000;
-
-    // Firestore caps a single document at 1 MiB. Refuse to save a
-    // site_config document past 900 KB (usually too many photos stored
-    // as DataURLs in the database because Storage uploads failed) so
-    // the admin gets a clear error instead of a failed Firestore write.
+    // Browser storage is small — refuse to save a site_config
+    // document past 900 KB (usually too many photos stored as DataURLs
+    // in the database), so the admin gets a clear error instead of a
+    // failed or truncated save.
     const SITE_CONFIG_MAX_BYTES = 900000;
-
-    // The portal owner (Majeed). The owner UID is the ultimate fallback in
-    // firestore.rules too, so the owner can never lock himself out of the
-    // admin — even if his email were ever removed from the allowlist.
-    const OWNER_UID = "m7HIPZAuMRdO3IxAq4y6amGsdN53";
-    const ADMIN_ALLOWLIST_COLLECTION = "admin_users";
-    const ADMIN_ALLOWLIST_DOC = "allowed";
-    const ADMIN_ACCESS_DENIED_MESSAGE =
-        "This account doesn't have admin access. Ask the owner to add it.";
 
     function formatPKR(val) {
         const num = Number(val);
@@ -572,11 +565,10 @@
     }
 
     // ============================================================================
-    // 3. DUAL-ENGINE DATABASE & AUTH LAYER (FIREBASE + LOCAL REAL-TIME SYNC)
+    // 3. LOCAL-ONLY DATABASE & AUTH LAYER (LOCAL REAL-TIME SYNC)
     // ============================================================================
 
     const STORAGE_KEYS = {
-        FIREBASE_CONFIG: "zakir_firebase_config_v1",
         SITE_CONFIG: "zakir_db_site_config_v1",
         SPECIAL_DEALS: "zakir_db_special_deals_v1",
         UMRAH_PACKAGES: "zakir_db_umrah_packages_v1",
@@ -590,11 +582,9 @@
 
     class ZakirBackendService {
         constructor() {
+            // Local-only: the mode never changes. There is no server to
+            // connect to, so every save stays on this device.
             this.mode = "local-realtime";
-            this.app = null;
-            this.auth = null;
-            this.db = null;
-            this.storage = null;
 
             this.listeners = {
                 site_config: new Set(),
@@ -605,13 +595,12 @@
                 work_permit_programmes: new Set(),
                 enquiries: new Set(),
                 auth: new Set(),
-                // Connection-mode listeners: notified whenever the backend
-                // switches between "firebase" and "local-realtime", so the
-                // admin badge always shows the real connection state.
+                // Connection-mode listeners: the mode is always
+                // "local-realtime" in this build, but the admin badge
+                // still subscribes the same way and is told the mode
+                // immediately on subscribe.
                 mode: new Set()
             };
-
-            this.firebaseUnsubscribes = [];
 
             try {
                 this.channel =
@@ -649,7 +638,6 @@
             });
 
             this._ensureLocalSeed();
-            this._tryInitializeFirebase();
         }
 
         _ensureLocalSeed() {
@@ -704,117 +692,12 @@
             }
         }
 
-        getFirebaseConfig() {
-            try {
-                if (window.ZAKIR_FIREBASE_CONFIG && window.ZAKIR_FIREBASE_CONFIG.apiKey) {
-                    return window.ZAKIR_FIREBASE_CONFIG;
-                }
-                const raw = localStorage.getItem(STORAGE_KEYS.FIREBASE_CONFIG);
-                if (!raw) return null;
-                const parsed = JSON.parse(raw);
-                if (parsed && parsed.apiKey && parsed.projectId) {
-                    return parsed;
-                }
-            } catch (err) {
-                console.warn("Invalid stored Firebase config:", err);
-            }
-            return null;
-        }
-
-        async saveFirebaseConfig(configObj) {
-            if (!configObj || !configObj.apiKey || !configObj.projectId) {
-                throw new Error("Firebase config must include at least apiKey and projectId.");
-            }
-            localStorage.setItem(STORAGE_KEYS.FIREBASE_CONFIG, JSON.stringify(configObj));
-            await this._tryInitializeFirebase();
-            return this.mode;
-        }
-
-        disconnectFirebaseConfig() {
-            localStorage.removeItem(STORAGE_KEYS.FIREBASE_CONFIG);
-            this.firebaseUnsubscribes.forEach((unsub) => {
-                try {
-                    unsub();
-                } catch (_) {}
-            });
-            this.firebaseUnsubscribes = [];
-            this._setMode("local-realtime");
-            this._notifyLocalListeners();
-        }
-
-        // Single place that changes the connection mode, so every change is
-        // announced to mode listeners (the admin connection badge).
-        _setMode(mode) {
-            if (this.mode !== mode) {
-                this.mode = mode;
-                this._notifyModeListeners();
-            }
-        }
-
-        _notifyModeListeners() {
-            this.listeners.mode.forEach((cb) => cb(this.mode));
-        }
-
-        async _tryInitializeFirebase() {
-            const config = this.getFirebaseConfig();
-            if (!config || !window.firebase) {
-                this._setMode("local-realtime");
-                return;
-            }
-
-            try {
-                if (!window.firebase.apps.length) {
-                    this.app = window.firebase.initializeApp(config);
-                } else {
-                    this.app = window.firebase.app();
-                }
-                this.auth = window.firebase.auth();
-                this.db = window.firebase.firestore();
-                this.storage = null;
-                if (window.firebase.storage) {
-                    try {
-                        this.storage = window.firebase.storage();
-                    } catch (_) {
-                        this.storage = null;
-                    }
-                }
-                this._setMode("firebase");
-
-                await this._ensureFirestoreSeed();
-                this._bindFirestoreSnapshots();
-
-                // Leads saved while offline (syncPending) are retried now
-                // that Firebase is ready — doc IDs are stable and the
-                // write uses merge, so a retry can never duplicate a lead.
-                this._flushPendingEnquiries();
-
-                this.auth.onAuthStateChanged((user) => {
-                    this._notifyAuthListeners(user);
-                });
-            } catch (err) {
-                console.warn("Firebase initialization fell back to local-realtime mode:", err);
-                this._setMode("local-realtime");
-            }
-        }
-
-        async _ensureFirestoreSeed() {
-            if (this.mode !== "firebase" || !this.db) return;
-            try {
-                const snap = await this.db.collection("site_config").doc("main_settings").get();
-                if (!snap.exists) {
-                    await this.resetToFlyerDefaults();
-                }
-            } catch (err) {
-                console.warn("Could not check Firestore seed status:", err);
-            }
-        }
-
         // LocalStorage writes that can hold DataURLs (photos) can hit the
-        // browser quota (~5 MB). A quota error must never abort the
-        // Firestore write that follows, so swallow it with a warning the
-        // admin can see (console + a window event the admin portal turns
-        // into a toast) and report whether the write landed. Other
-        // storage errors still throw, as before.
+        // browser quota (~5 MB). A quota error must never break the save
+        // flow, so swallow it with a warning the admin can see (console
+        // + a window event the admin portal turns into a toast) and
+        // report whether the write landed. Other storage errors still
+        // throw, as before.
         _safeLocalSet(key, value, context) {
             try {
                 localStorage.setItem(key, value);
@@ -837,160 +720,6 @@
             }
         }
 
-        // Retry Firestore writes for enquiries saved while offline
-        // (syncPending). Doc IDs are stable and the write uses merge,
-        // so a retry can never duplicate a lead. Never throws: a failed
-        // retry keeps its flag and is retried on the next init/save.
-        async _flushPendingEnquiries() {
-            if (this.mode !== "firebase" || !this.db) return;
-            try {
-                const pending = this.getLocalEnquiries().filter((e) => e.syncPending);
-                for (const enquiry of pending) {
-                    try {
-                        const { syncPending, ...firestoreRecord } = enquiry;
-                        await this.db
-                            .collection("enquiries")
-                            .doc(enquiry.id)
-                            .set(firestoreRecord, { merge: true });
-                        const list = this.getLocalEnquiries();
-                        const idx = list.findIndex((e) => e.id === enquiry.id);
-                        if (idx !== -1) {
-                            list[idx].syncPending = false;
-                            this._safeLocalSet(
-                                STORAGE_KEYS.ENQUIRIES,
-                                JSON.stringify(list),
-                                "pending enquiries"
-                            );
-                        }
-                    } catch (err) {
-                        console.warn("Pending enquiry sync failed, will retry later:", err);
-                    }
-                }
-            } catch (err) {
-                console.warn("Pending enquiry flush failed:", err);
-            }
-        }
-
-        _bindFirestoreSnapshots() {
-            if (this.mode !== "firebase" || !this.db) return;
-
-            this.firebaseUnsubscribes.forEach((u) => {
-                try {
-                    u();
-                } catch (_) {}
-            });
-            this.firebaseUnsubscribes = [];
-
-            const unsubConfig = this.db
-                .collection("site_config")
-                .doc("main_settings")
-                .onSnapshot((snap) => {
-                    if (snap.exists) {
-                        const data = snap.data();
-                        this._safeLocalSet(STORAGE_KEYS.SITE_CONFIG, JSON.stringify(data), "site settings");
-                        const merged = this.getLocalSiteConfig();
-                        this.listeners.site_config.forEach((cb) => cb(merged));
-                    }
-                });
-
-            const unsubDeals = this.db
-                .collection("special_deals")
-                .orderBy("sortOrder", "asc")
-                .limit(200)
-                .onSnapshot((snap) => {
-                    const list = [];
-                    snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
-                    if (list.length) {
-                        this._safeLocalSet(STORAGE_KEYS.SPECIAL_DEALS, JSON.stringify(list), "special deals");
-                        this.listeners.special_deals.forEach((cb) => cb(list));
-                    }
-                });
-
-            const unsubPkgs = this.db
-                .collection("umrah_packages")
-                .orderBy("sortOrder", "asc")
-                .limit(200)
-                .onSnapshot((snap) => {
-                    const list = [];
-                    snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
-                    this._safeLocalSet(STORAGE_KEYS.UMRAH_PACKAGES, JSON.stringify(list), "Umrah packages");
-                    this.listeners.umrah_packages.forEach((cb) => cb(list));
-                });
-
-            const unsubVisas = this.db
-                .collection("visa_services")
-                .orderBy("sortOrder", "asc")
-                .limit(200)
-                .onSnapshot((snap) => {
-                    const list = [];
-                    snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
-                    this._safeLocalSet(STORAGE_KEYS.VISA_SERVICES, JSON.stringify(list), "visa services");
-                    this.listeners.visa_services.forEach((cb) => cb(list));
-                });
-
-            const unsubWorkPermits = this.db
-                .collection("work_permits")
-                .orderBy("sortOrder", "asc")
-                .limit(200)
-                .onSnapshot((snap) => {
-                    const list = [];
-                    snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
-                    this._safeLocalSet(STORAGE_KEYS.WORK_PERMITS, JSON.stringify(list), "work permits");
-                    this.listeners.work_permits.forEach((cb) => cb(list));
-                });
-
-            const unsubWorkPermitProgrammes = this.db
-                .collection("work_permit_programmes")
-                .orderBy("sortOrder", "asc")
-                .limit(200)
-                .onSnapshot((snap) => {
-                    const list = [];
-                    snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
-                    this._safeLocalSet(
-                        STORAGE_KEYS.WORK_PERMIT_PROGRAMMES,
-                        JSON.stringify(list),
-                        "work permit programmes"
-                    );
-                    this.listeners.work_permit_programmes.forEach((cb) => cb(list));
-                });
-
-            const unsubEnquiries = this.db
-                .collection("enquiries")
-                .orderBy("createdAt", "desc")
-                .limit(500)
-                .onSnapshot(
-                    (snap) => {
-                        const list = [];
-                        snap.forEach((d) => list.push({ id: d.id, ...this._normaliseEnquiry(d.data()) }));
-                        // Keep locally-saved leads that have not synced yet
-                        // (e.g. a Firestore write was rejected) — a snapshot
-                        // must never wipe an unsynced lead.
-                        const pending = this.getLocalEnquiries().filter((e) => e.syncPending);
-                        pending.forEach((p) => {
-                            if (!list.some((e) => e.id === p.id)) list.push(p);
-                        });
-                        list.sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
-                        this._safeLocalSet(STORAGE_KEYS.ENQUIRIES, JSON.stringify(list), "enquiries");
-                        this.listeners.enquiries.forEach((cb) => cb(list));
-                    },
-                    () => {
-                        // If the enquiries query fails (e.g. rules not deployed yet),
-                        // keep the local copy — submissions still work via local fallback.
-                    }
-                );
-
-            this.firebaseUnsubscribes.push(
-                unsubConfig,
-                unsubDeals,
-                unsubPkgs,
-                unsubVisas,
-                unsubWorkPermits,
-                unsubWorkPermitProgrammes,
-                unsubEnquiries
-            );
-        }
-
-        // --------------------------------------------------------------------
         // SNAPSHOT LISTENERS
         // --------------------------------------------------------------------
 
@@ -1200,21 +929,14 @@
         // --------------------------------------------------------------------
         // ENQUIRIES (LEAD CAPTURE)
         // Every public form saves here first, then opens WhatsApp. Leads are
-        // never wiped by resetToFlyerDefaults(). LocalStorage is the fallback
-        // when Firebase is offline or rules are not deployed yet; Firestore
-        // is the source of truth when it is available.
+        // never wiped by resetToFlyerDefaults(). Local-only: leads live in
+        // LocalStorage on the visitor's own device — there is no shared
+        // inbox until the PHP + MySQL backend is deployed.
         // --------------------------------------------------------------------
 
         _normaliseEnquiry(data) {
             const d = data || {};
             let createdAt = d.createdAt;
-            if (createdAt && typeof createdAt === "object" && typeof createdAt.toDate === "function") {
-                try {
-                    createdAt = createdAt.toDate().toISOString();
-                } catch (_) {
-                    createdAt = new Date().toISOString();
-                }
-            }
             if (!createdAt || typeof createdAt !== "string") createdAt = new Date().toISOString();
             return {
                 id: String(d.id || ""),
@@ -1275,33 +997,16 @@
             this.listeners.enquiries.forEach((cb) => cb(this.getLocalEnquiries()));
             this._broadcastChange("DB_UPDATED");
 
-            if (this.mode === "firebase" && this.db) {
-                try {
-                    const { syncPending, ...firestoreRecord } = record;
-                    await this.db.collection("enquiries").doc(record.id).set(firestoreRecord);
-                    record.synced = true;
-                } catch (err) {
-                    // Keep the local copy and flag it — the admin can still see
-                    // it on this device, and it will retry on the next save.
-                    console.warn("Enquiry saved locally, Firestore sync failed:", err);
-                    const pending = this.getLocalEnquiries();
-                    const idx = pending.findIndex((e) => e.id === record.id);
-                    if (idx !== -1) {
-                        pending[idx].syncPending = true;
-                        localStorage.setItem(STORAGE_KEYS.ENQUIRIES, JSON.stringify(pending));
-                    }
-                    record.syncPending = true;
-                    record.synced = false;
-                }
-            } else {
-                record.syncPending = true;
-                record.synced = false;
-                const pending = this.getLocalEnquiries();
-                const idx = pending.findIndex((e) => e.id === record.id);
-                if (idx !== -1) {
-                    pending[idx].syncPending = true;
-                    localStorage.setItem(STORAGE_KEYS.ENQUIRIES, JSON.stringify(pending));
-                }
+            // Local-only: nothing syncs anywhere. The lead stays on this
+            // device and is flagged as not synced, so the admin can see
+            // it was never published.
+            record.syncPending = true;
+            record.synced = false;
+            const pending = this.getLocalEnquiries();
+            const idx = pending.findIndex((e) => e.id === record.id);
+            if (idx !== -1) {
+                pending[idx].syncPending = true;
+                localStorage.setItem(STORAGE_KEYS.ENQUIRIES, JSON.stringify(pending));
             }
             return record;
         }
@@ -1323,12 +1028,8 @@
             this._broadcastChange("DB_UPDATED");
 
             // Result object: `synced` tells the caller (admin) whether the
-            // change actually reached Firestore. Firestore errors throw.
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                await this.db.collection("enquiries").doc(enquiryId).set(cleanPatch, { merge: true });
-            }
-            return { synced, enquiry: list[idx] };
+            // change actually reached a server. Local-only: always false.
+            return { synced: false, enquiry: list[idx] };
         }
 
         async deleteEnquiry(enquiryId) {
@@ -1336,11 +1037,7 @@
             localStorage.setItem(STORAGE_KEYS.ENQUIRIES, JSON.stringify(list));
             this.listeners.enquiries.forEach((cb) => cb(this.getLocalEnquiries()));
             this._broadcastChange("DB_UPDATED");
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                await this.db.collection("enquiries").doc(enquiryId).delete();
-            }
-            return { synced };
+            return { synced: false };
         }
 
         // --------------------------------------------------------------------
@@ -1414,12 +1111,7 @@
                 this._broadcastChange("DB_UPDATED");
             }
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                await this.db.collection("special_deals").doc(targetDeal.id).set(targetDeal, { merge: true });
-            }
-
-            return { synced, deal: targetDeal };
+            return { synced: false, deal: targetDeal };
         }
 
         async deleteSpecialDeal(dealId) {
@@ -1441,11 +1133,7 @@
                 this._broadcastChange("DB_UPDATED");
             }
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                await this.db.collection("special_deals").doc(dealId).delete();
-            }
-            return { synced };
+            return { synced: false };
         }
 
         async reorderSpecialDeal(dealId, direction) {
@@ -1467,15 +1155,7 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                const batch = this.db.batch();
-                list.forEach((item) => {
-                    batch.set(this.db.collection("special_deals").doc(item.id), item, { merge: true });
-                });
-                await batch.commit();
-            }
-            return { synced };
+            return { synced: false };
         }
 
         async duplicateSpecialDeal(dealId) {
@@ -1535,28 +1215,24 @@
                 };
             }
 
-            // Firestore caps a document at 1 MiB — refuse a site_config
-            // that is already past 900 KB (usually too many photos stored
-            // as DataURLs in the database because Storage uploads failed),
-            // measured on the merged document about to be written, so the
-            // admin gets a clear error instead of a failed Firestore write.
+            // Browser storage is small — refuse a site_config that is
+            // already past 900 KB (usually too many photos stored as
+            // DataURLs in the database), measured on the merged document
+            // about to be written, so the admin gets a clear error
+            // instead of a failed or truncated save.
             const configBytes = new TextEncoder().encode(JSON.stringify(updated)).length;
             if (configBytes > SITE_CONFIG_MAX_BYTES) {
                 throw new Error(
-                    `This page data is too full (${Math.round(configBytes / 1024)} KB) to save — too many photos are stored in the database. Remove some photos or fix Storage uploads, then save again.`
+                    `This page data is too full (${Math.round(configBytes / 1024)} KB) to save — too many photos are stored in the database. Remove some photos, then save again.`
                 );
             }
 
             this._safeLocalSet(STORAGE_KEYS.SITE_CONFIG, JSON.stringify(updated), "site settings");
 
             // The spotlight is mirrored into the primary deal and the
-            // featured Umrah package. Those mirrors must reach Firestore
-            // too — otherwise the next snapshot silently reverts them.
-            // Only the docs that actually changed are written, with the
-            // same merge-set pattern as the other saves.
-            let syncedDeal = null;
-            let syncedPkg = null;
-
+            // featured Umrah package, so the homepage, the deals list
+            // and the calculator always agree. Only the records that
+            // actually changed are written.
             if (partialOrFullConfig.spotlight && !options.skipDealSync) {
                 const deals = this.getLocalSpecialDeals();
                 const primaryIdx = deals.findIndex((d) => d.isPrimary);
@@ -1568,7 +1244,6 @@
                         id: deals[targetIdx].id,
                         isPrimary: true
                     };
-                    syncedDeal = deals[targetIdx];
                     localStorage.setItem(STORAGE_KEYS.SPECIAL_DEALS, JSON.stringify(deals));
                 }
             }
@@ -1583,7 +1258,6 @@
                         departureDate: updated.spotlight.departureDate || pkgs[featuredIdx].departureDate,
                         duration: updated.spotlight.duration || pkgs[featuredIdx].duration
                     };
-                    syncedPkg = pkgs[featuredIdx];
                     localStorage.setItem(STORAGE_KEYS.UMRAH_PACKAGES, JSON.stringify(pkgs));
                 }
             }
@@ -1591,46 +1265,50 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                await this.db.collection("site_config").doc("main_settings").set(updated, { merge: true });
-                if (syncedDeal) {
-                    await this.db.collection("special_deals").doc(syncedDeal.id).set(syncedDeal, { merge: true });
-                }
-                if (syncedPkg) {
-                    await this.db.collection("umrah_packages").doc(syncedPkg.id).set(syncedPkg, { merge: true });
-                }
-            }
-
-            return { synced, config: updated };
+            return { synced: false, config: updated };
         }
 
-        // Re-read a document straight from the Firestore server (never
-        // the local cache) and check the saved values are really there.
-        // The admin uses this after a save to prove the change is
-        // actually live on the website before saying so.
-        // Returns { verified: true } or { verified: false, reason }.
-        // Never throws: a failed read, a missing document, a value
-        // mismatch or a timeout all come back as verified: false, so a
-        // slow or flaky check can never break a save that succeeded.
+        // Re-read a document from local storage (never a cache) and check
+        // the saved values are really there. The admin uses this after a
+        // save to prove the change is actually stored before saying so.
+        // Returns { verified: true } or { verified: false, reason, field? }.
+        // Never throws: a missing document, a value mismatch or a bad
+        // argument all come back as verified: false, so a failed check
+        // can never break a save that succeeded. Local-only: the
+        // "server" is this browser's LocalStorage, so the re-read proves
+        // the save landed on this device — not that it reached any other.
+        // timeoutMs is accepted for signature compatibility; the local
+        // re-read is synchronous, so there is nothing to time out.
         async verifyDocSaved(collection, docId, expected = {}, timeoutMs = 8000) {
-            if (this.mode !== "firebase" || !this.db) {
-                return { verified: false, reason: "offline" };
-            }
-            if (!collection || !docId) {
-                return { verified: false, reason: "missing-doc" };
-            }
+            void timeoutMs;
             try {
-                const docRef = this.db.collection(collection).doc(docId);
-                const timeout = new Promise((resolve) => setTimeout(() => resolve(null), timeoutMs));
-                const snap = await Promise.race([docRef.get({ source: "server" }), timeout]);
-                if (!snap) {
-                    return { verified: false, reason: "timeout" };
+                if (!collection || !docId) {
+                    return { verified: false, reason: "missing-doc" };
                 }
-                if (!snap.exists) {
+                let data = null;
+                if (collection === "site_config") {
+                    if (docId !== "main_settings") {
+                        return { verified: false, reason: "not-found" };
+                    }
+                    data = this.getLocalSiteConfig();
+                } else {
+                    const lists = {
+                        special_deals: this.getLocalSpecialDeals(),
+                        umrah_packages: this.getLocalUmrahPackages(),
+                        visa_services: this.getLocalVisaServices(),
+                        work_permits: this.getLocalWorkPermits(),
+                        work_permit_programmes: this.getLocalWorkPermitProgrammes(),
+                        enquiries: this.getLocalEnquiries()
+                    };
+                    const list = lists[collection];
+                    if (!list) {
+                        return { verified: false, reason: "not-found" };
+                    }
+                    data = list.find((item) => item && item.id === docId) || null;
+                }
+                if (!data) {
                     return { verified: false, reason: "not-found" };
                 }
-                const data = snap.data() || {};
                 for (const [key, value] of Object.entries(expected)) {
                     if (data[key] !== value) {
                         return { verified: false, reason: "mismatch", field: key };
@@ -1732,12 +1410,7 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                await this.db.collection("umrah_packages").doc(targetPkg.id).set(targetPkg, { merge: true });
-            }
-
-            return { synced, package: targetPkg };
+            return { synced: false, package: targetPkg };
         }
 
         async deleteUmrahPackage(pkgId) {
@@ -1746,11 +1419,7 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                await this.db.collection("umrah_packages").doc(pkgId).delete();
-            }
-            return { synced };
+            return { synced: false };
         }
 
         async reorderUmrahPackage(pkgId, direction) {
@@ -1772,15 +1441,7 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                const batch = this.db.batch();
-                list.forEach((item) => {
-                    batch.set(this.db.collection("umrah_packages").doc(item.id), item, { merge: true });
-                });
-                await batch.commit();
-            }
-            return { synced };
+            return { synced: false };
         }
 
         async saveVisaService(visaData) {
@@ -1828,12 +1489,7 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                await this.db.collection("visa_services").doc(targetVisa.id).set(targetVisa, { merge: true });
-            }
-
-            return { synced, visa: targetVisa };
+            return { synced: false, visa: targetVisa };
         }
 
         async deleteVisaService(visaId) {
@@ -1842,11 +1498,7 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                await this.db.collection("visa_services").doc(visaId).delete();
-            }
-            return { synced };
+            return { synced: false };
         }
 
         async reorderVisaService(visaId, direction) {
@@ -1868,15 +1520,7 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                const batch = this.db.batch();
-                list.forEach((item) => {
-                    batch.set(this.db.collection("visa_services").doc(item.id), item, { merge: true });
-                });
-                await batch.commit();
-            }
-            return { synced };
+            return { synced: false };
         }
 
         async saveWorkPermit(permitData) {
@@ -1933,12 +1577,7 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                await this.db.collection("work_permits").doc(targetPermit.id).set(targetPermit, { merge: true });
-            }
-
-            return { synced, permit: targetPermit };
+            return { synced: false, permit: targetPermit };
         }
 
         async deleteWorkPermit(permitId) {
@@ -1947,11 +1586,7 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                await this.db.collection("work_permits").doc(permitId).delete();
-            }
-            return { synced };
+            return { synced: false };
         }
 
         async reorderWorkPermit(permitId, direction) {
@@ -1973,15 +1608,7 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                const batch = this.db.batch();
-                list.forEach((item) => {
-                    batch.set(this.db.collection("work_permits").doc(item.id), item, { merge: true });
-                });
-                await batch.commit();
-            }
-            return { synced };
+            return { synced: false };
         }
 
         // --------------------------------------------------------------------
@@ -2030,15 +1657,7 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                await this.db
-                    .collection("work_permit_programmes")
-                    .doc(targetProgramme.id)
-                    .set(targetProgramme, { merge: true });
-            }
-
-            return { synced, programme: targetProgramme };
+            return { synced: false, programme: targetProgramme };
         }
 
         async deleteWorkPermitProgramme(programmeId) {
@@ -2051,11 +1670,7 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                await this.db.collection("work_permit_programmes").doc(programmeId).delete();
-            }
-            return { synced };
+            return { synced: false };
         }
 
         async reorderWorkPermitProgramme(programmeId, direction) {
@@ -2077,15 +1692,7 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                const batch = this.db.batch();
-                list.forEach((item) => {
-                    batch.set(this.db.collection("work_permit_programmes").doc(item.id), item, { merge: true });
-                });
-                await batch.commit();
-            }
-            return { synced };
+            return { synced: false };
         }
 
         async duplicateWorkPermitProgramme(programmeId) {
@@ -2104,59 +1711,14 @@
             return this.saveWorkPermitProgramme(copy);
         }
 
+        // Compress an image to a DataURL (max 1100px, JPEG 0.82) and
+        // return it. Local-only: there is no remote storage, so the
+        // DataURL is the stored photo itself (it is saved into the
+        // database by the caller when the record is saved). The `folder`
+        // argument is accepted for signature compatibility and ignored.
         async uploadMediaFile(file, folder = "zakir_media") {
+            void folder;
             if (!file) throw new Error("No file selected.");
-
-            if (this.mode === "firebase" && this.storage) {
-                // Give the Storage upload a bounded window. Each step gets
-                // its OWN full 10s budget: one shared timeout would leave
-                // the download-URL fetch with only whatever time the put
-                // did not use (a 9s upload would leave 1s for the URL).
-                // If either step stalls, cancel the task so it stops
-                // retrying in the background and fall through to the
-                // DataURL fallback below instead of hanging forever.
-                const startTimeout = () => {
-                    let timer = null;
-                    const promise = new Promise((_, reject) => {
-                        timer = setTimeout(
-                            () =>
-                                reject(
-                                    new Error(
-                                        `Storage upload timed out after ${STORAGE_UPLOAD_TIMEOUT_MS / 1000}s`
-                                    )
-                                ),
-                            STORAGE_UPLOAD_TIMEOUT_MS
-                        );
-                    });
-                    return { promise, clear: () => clearTimeout(timer) };
-                };
-                let task = null;
-                let putTimeout = null;
-                let urlTimeout = null;
-                try {
-                    const safeName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-                    const ref = this.storage.ref(`${folder}/${safeName}`);
-                    task = ref.put(file);
-                    putTimeout = startTimeout();
-                    const snap = await Promise.race([task, putTimeout.promise]);
-                    putTimeout.clear();
-                    urlTimeout = startTimeout();
-                    const url = await Promise.race([snap.ref.getDownloadURL(), urlTimeout.promise]);
-                    urlTimeout.clear();
-                    return url;
-                } catch (err) {
-                    if (putTimeout) putTimeout.clear();
-                    if (urlTimeout) urlTimeout.clear();
-                    if (task) {
-                        try {
-                            task.cancel();
-                        } catch (_) {
-                            // Already finished or already cancelled — nothing to stop.
-                        }
-                    }
-                    console.warn("Firebase Storage fallback to compressed DataURL:", err);
-                }
-            }
 
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -2193,8 +1755,9 @@
         async resetToFlyerDefaults() {
             const defaultConfig = JSON.parse(JSON.stringify(FLYER_DEFAULTS.site_config.main_settings));
             // A reset must not wipe the team's photos: the seed has no
-            // teamPhotos, and the Firestore write below is a non-merge
-            // set, so re-apply whatever the admin has already uploaded.
+            // teamPhotos, and the reset below overwrites the whole
+            // site_config, so re-apply whatever the admin has already
+            // uploaded.
             const existingTeamPhotos = (this.getLocalSiteConfig() || {}).teamPhotos;
             if (existingTeamPhotos && Object.keys(existingTeamPhotos).length) {
                 defaultConfig.teamPhotos = JSON.parse(JSON.stringify(existingTeamPhotos));
@@ -2220,49 +1783,8 @@
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
 
-            const synced = this.mode === "firebase" && this.db;
-            if (synced) {
-                // NOTE: a Firestore batch holds at most 500 operations —
-                // the deletes + sets here stay under it for this site's
-                // data. Do not grow the reset without splitting the batch.
-                const batch = this.db.batch();
-                batch.set(this.db.collection("site_config").doc("main_settings"), defaultConfig);
-
-                const existingDeals = await this.db.collection("special_deals").get();
-                existingDeals.forEach((d) => batch.delete(d.ref));
-                defaultDeals.forEach((deal) => {
-                    batch.set(this.db.collection("special_deals").doc(deal.id), deal);
-                });
-
-                const existingPkgs = await this.db.collection("umrah_packages").get();
-                existingPkgs.forEach((d) => batch.delete(d.ref));
-                defaultPkgs.forEach((pkg) => {
-                    batch.set(this.db.collection("umrah_packages").doc(pkg.id), pkg);
-                });
-
-                const existingVisas = await this.db.collection("visa_services").get();
-                existingVisas.forEach((d) => batch.delete(d.ref));
-                defaultVisas.forEach((visa) => {
-                    batch.set(this.db.collection("visa_services").doc(visa.id), visa);
-                });
-
-                const existingWorkPermits = await this.db.collection("work_permits").get();
-                existingWorkPermits.forEach((d) => batch.delete(d.ref));
-                defaultWorkPermits.forEach((permit) => {
-                    batch.set(this.db.collection("work_permits").doc(permit.id), permit);
-                });
-
-                const existingWpProgs = await this.db.collection("work_permit_programmes").get();
-                existingWpProgs.forEach((d) => batch.delete(d.ref));
-                defaultWorkPermitProgrammes.forEach((prog) => {
-                    batch.set(this.db.collection("work_permit_programmes").doc(prog.id), prog);
-                });
-
-                await batch.commit();
-            }
-
             return {
-                synced,
+                synced: false,
                 defaults: {
                     site_config: defaultConfig,
                     special_deals: defaultDeals,
@@ -2291,16 +1813,6 @@
         }
 
         getCurrentUser() {
-            if (this.mode === "firebase") {
-                if (!this.auth || !this.auth.currentUser) return null;
-                const u = this.auth.currentUser;
-                return {
-                    uid: u.uid,
-                    email: u.email,
-                    displayName: u.displayName || u.email,
-                    role: "Admin"
-                };
-            }
             if (!this.hasLocalAdminPassphrase()) return null;
             try {
                 const raw = localStorage.getItem(STORAGE_KEYS.AUTH_SESSION);
@@ -2318,34 +1830,10 @@
                 throw new Error("Please enter your password.");
             }
 
-            if (this.mode === "firebase" && this.auth) {
-                const cred = await this.auth.signInWithEmailAndPassword(cleanEmail, cleanPass);
-                // Only the owner or an allowlisted email may use the admin
-                // portal. Anyone else is signed straight back out — the
-                // portal never opens for them.
-                const allowed = await this.verifyAdminAccess(cred.user);
-                if (!allowed) {
-                    try {
-                        await this.auth.signOut();
-                    } catch (_) {}
-                    throw new Error(ADMIN_ACCESS_DENIED_MESSAGE);
-                }
-                const userObj = {
-                    uid: cred.user.uid,
-                    email: cred.user.email,
-                    displayName: cred.user.displayName || cred.user.email,
-                    role: "Admin",
-                    loggedInAt: new Date().toISOString()
-                };
-                localStorage.setItem(STORAGE_KEYS.AUTH_SESSION, JSON.stringify(userObj));
-                this._notifyAuthListeners(userObj);
-                this._broadcastChange("AUTH_UPDATED");
-                try {
-                    await this._ensureFirestoreSeed();
-                } catch (_) {}
-                return userObj;
-            }
-
+            // Local-only passphrase login: the first login on this
+            // browser sets the passphrase (min 8 chars); later logins
+            // must match it. The session lasts until logout and lives
+            // only in this browser.
             if (!this.hasLocalAdminPassphrase()) {
                 this.setLocalAdminPassphrase(cleanPass);
             } else if (localStorage.getItem(STORAGE_KEYS.LOCAL_ADMIN_PASS) !== cleanPass) {
@@ -2367,148 +1855,52 @@
 
         async logout() {
             localStorage.removeItem(STORAGE_KEYS.AUTH_SESSION);
-            if (this.mode === "firebase" && this.auth) {
-                try {
-                    await this.auth.signOut();
-                } catch (_) {}
-            }
             this._notifyAuthListeners(null);
             this._broadcastChange("AUTH_UPDATED");
         }
 
         // --------------------------------------------------------------------
-        // ADMIN ACCESS (allowlist): who may open the admin portal besides the
-        // owner. Source of truth is the Firestore document
-        // admin_users/allowed: { emails: string[], updatedAt, updatedBy }.
-        // The owner is identified by UID and never needs the list; the
-        // Firestore rules mirror this (claim OR owner UID OR allowlisted
-        // email), so the client-side check here is only UX — the rules are
-        // the real gate. Local-realtime (offline passphrase) logins are
-        // untouched: the allowlist only applies in firebase mode.
+        // --------------------------------------------------------------------
+        // ADMIN ACCESS: local test mode has no admin list and no accounts.
+        // There is a single admin — whoever knows this browser's
+        // passphrase. isOwner() is always false (no owner concept),
+        // verifyAdminAccess() is true when a local session exists, and
+        // the allowlist / account-creation methods are unavailable.
         // --------------------------------------------------------------------
 
-        // True when the given user (or the current user) is the owner.
+        // No owner concept in local mode.
         isOwner(user) {
-            const u = user || this.getCurrentUser();
-            return Boolean(u && u.uid && u.uid === OWNER_UID);
+            void user;
+            return false;
         }
 
-        // True when the user may use the admin portal: owner UID, or an
-        // email on the allowlist. A missing allowlist document, a denied
-        // read, or any error denies safely — never fails open.
+        // True when there is a current local session user.
         async verifyAdminAccess(user) {
-            const u = user || this.getCurrentUser();
-            if (!u) return false;
-            if (u.uid && u.uid === OWNER_UID) return true;
-            const email = String(u.email || "").trim().toLowerCase();
-            if (!email) return false;
-            try {
-                const list = await this.getAdminAllowlist();
-                if (!list) return false;
-                return (list.emails || []).includes(email);
-            } catch (_) {
-                return false;
-            }
+            void user;
+            return Boolean(this.getCurrentUser());
         }
 
-        // Reads the allowlist. Returns null when the document does not
-        // exist yet (the owner seeds it on first opening Admin Access),
-        // and throws on read errors (e.g. permission denied because the
-        // new Firestore rules have not been published yet) so the caller
-        // can tell "no list yet" apart from "cannot read the list".
+        // No allowlist exists in local mode.
         async getAdminAllowlist() {
-            if (this.mode !== "firebase" || !this.db) return null;
-            const snap = await this.db
-                .collection(ADMIN_ALLOWLIST_COLLECTION)
-                .doc(ADMIN_ALLOWLIST_DOC)
-                .get();
-            if (!snap.exists) return null;
-            const data = snap.data() || {};
-            const emails = Array.isArray(data.emails)
-                ? [...new Set(data.emails.map((e) => String(e || "").trim().toLowerCase()).filter(Boolean))]
-                : [];
-            return { emails, updatedAt: data.updatedAt || null, updatedBy: data.updatedBy || "" };
+            return null;
         }
 
-        // Saves the allowlist. The owner's email is always forced back
-        // into the list, so the owner can never be removed from it.
-        // Returns { synced } like the other save methods: synced is true
-        // only when the write actually reached Firestore.
+        // Admin access cannot be managed in local mode.
         async saveAdminAllowlist(emails, ownerEmail) {
-            if (this.mode !== "firebase" || !this.db) return { synced: false };
-            const owner = String(ownerEmail || "").trim().toLowerCase();
-            const clean = [
-                ...new Set(
-                    (emails || [])
-                        .map((e) => String(e || "").trim().toLowerCase())
-                        .filter((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e))
-                )
-            ];
-            if (owner && !clean.includes(owner)) clean.push(owner);
-            if (!clean.length) {
-                throw new Error("The admin list cannot be empty.");
-            }
-            const me = this.getCurrentUser();
-            await this.db
-                .collection(ADMIN_ALLOWLIST_COLLECTION)
-                .doc(ADMIN_ALLOWLIST_DOC)
-                .set(
-                    {
-                        emails: clean,
-                        updatedAt: new Date().toISOString(),
-                        updatedBy: (me && me.email) || owner || ""
-                    },
-                    { merge: true }
-                );
-            return { synced: true };
+            void emails;
+            void ownerEmail;
+            throw new Error(
+                "not available in local test mode — admin access is a single per-browser passphrase"
+            );
         }
 
-        // A second Firebase app instance ("secondary") so creating a new
-        // Auth account does NOT disturb the owner's signed-in session on
-        // the main app. The secondary session is signed out again right
-        // after creation, so no second account stays signed in.
-        _getSecondaryAuth() {
-            if (!window.firebase || !window.firebase.apps) return null;
-            const config = this.getFirebaseConfig();
-            if (!config) return null;
-            let app = null;
-            try {
-                app = window.firebase.app("secondary");
-            } catch (_) {
-                app = null;
-            }
-            if (!app) {
-                app = window.firebase.initializeApp(config, "secondary");
-            }
-            return app.auth();
-        }
-
-        // Creates a Firebase Auth account for a new admin. This only
-        // creates the sign-in account — portal access itself comes from
-        // the allowlist, so the caller must add the email to it next
-        // (saveAdminAllowlist). The temporary password is never logged
-        // anywhere; the owner shares it with the new admin directly.
+        // Admin accounts cannot be created in local mode.
         async createAdminAuthUser(email, tempPassword) {
-            if (this.mode !== "firebase") {
-                throw new Error("Connect to Firebase to create an admin account.");
-            }
-            const cleanEmail = String(email || "").trim().toLowerCase();
-            const cleanPass = String(tempPassword || "");
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
-                throw new Error("Enter a valid email address.");
-            }
-            if (cleanPass.length < 8) {
-                throw new Error("Temporary password must be at least 8 characters.");
-            }
-            const secAuth = this._getSecondaryAuth();
-            if (!secAuth) {
-                throw new Error("Could not start a separate sign-up session. Try again.");
-            }
-            const cred = await secAuth.createUserWithEmailAndPassword(cleanEmail, cleanPass);
-            try {
-                await secAuth.signOut();
-            } catch (_) {}
-            return { email: cred.user.email, uid: cred.user.uid };
+            void email;
+            void tempPassword;
+            throw new Error(
+                "not available in local test mode — admin access is a single per-browser passphrase"
+            );
         }
 
         _notifyAuthListeners(userOverride) {
