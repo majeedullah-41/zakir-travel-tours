@@ -369,7 +369,7 @@
 
             <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight uppercase leading-[1.15]">
                 <span id="visaHeroTitle" class="block">Worldwide Visas &amp; Air Tickets</span>
-                <span class="font-serif italic font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-teal-light to-sky-200 animated-gradient-text block mt-1 text-2xl sm:text-4xl lg:text-5xl">Seamless Approvals, Guaranteed Fares.</span>
+                <span id="visaHeroScript" class="font-serif italic font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-teal-light to-sky-200 animated-gradient-text block mt-1 text-2xl sm:text-4xl lg:text-5xl">Seamless Approvals, Guaranteed Fares.</span>
             </h1>
 
             <p id="visaHeroSubtitle" class="mt-4 text-base sm:text-lg text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed">
@@ -390,20 +390,20 @@
             <!-- Executive Trust Strip -->
             <div class="mt-10 pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-4xl mx-auto text-center">
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
-                    <div class="text-xl sm:text-2xl font-extrabold text-amber-300">100K+</div>
-                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Visas &amp; Tickets Issued</div>
+                    <div id="visaTrustStat1Number" class="text-xl sm:text-2xl font-extrabold text-amber-300">100K+</div>
+                    <div id="visaTrustStat1Label" class="text-[11px] font-semibold text-slate-300 mt-0.5">Visas &amp; Tickets Issued</div>
                 </div>
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
-                    <div class="text-xl sm:text-2xl font-extrabold text-teal-light">Swat Matta</div>
-                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Central Head Office</div>
+                    <div id="visaTrustStat2Number" class="text-xl sm:text-2xl font-extrabold text-teal-light">Swat Matta</div>
+                    <div id="visaTrustStat2Label" class="text-[11px] font-semibold text-slate-300 mt-0.5">Central Head Office</div>
                 </div>
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
-                    <div class="text-xl sm:text-2xl font-extrabold text-white">50+</div>
-                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Partner Global Airlines</div>
+                    <div id="visaTrustStat3Number" class="text-xl sm:text-2xl font-extrabold text-white">50+</div>
+                    <div id="visaTrustStat3Label" class="text-[11px] font-semibold text-slate-300 mt-0.5">Partner Global Airlines</div>
                 </div>
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
-                    <div class="text-xl sm:text-2xl font-extrabold text-emerald-400">99%</div>
-                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Documentation Accuracy</div>
+                    <div id="visaTrustStat4Number" class="text-xl sm:text-2xl font-extrabold text-emerald-400">99%</div>
+                    <div id="visaTrustStat4Label" class="text-[11px] font-semibold text-slate-300 mt-0.5">Documentation Accuracy</div>
                 </div>
             </div>
         </div>
@@ -415,9 +415,9 @@
             <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
                 <div>
                     <span class="text-xs font-bold uppercase tracking-widest text-teal">Fast E-Visa &amp; Embassy Visas</span>
-                    <h2 class="text-3xl sm:text-4xl font-black text-navy mt-1">Top Visa Destinations &amp; Fees</h2>
+                    <h2 id="visaDestinationsHeading" class="text-3xl sm:text-4xl font-black text-navy mt-1">Top Visa Destinations &amp; Fees</h2>
                 </div>
-                <p class="text-xs sm:text-sm text-slate-600 max-w-md">
+                <p id="visaDestinationsNote" class="text-xs sm:text-sm text-slate-600 max-w-md">
                     Updated live by our Swat Head Office and Islamabad visa consultants with required documentation, processing timeline, and starting PKR fees.
                 </p>
             </div>
@@ -434,7 +434,7 @@
             <div class="grid lg:grid-cols-12 gap-10 items-center">
                 
                 <div class="lg:col-span-5 space-y-4">
-                    <span class="bg-teal-accent text-teal text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">
+                    <span id="visaFlightEyebrow" class="bg-teal-accent text-teal text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">
                         Guaranteed Best Fares
                     </span>
                     <h2 id="visaFlightHeading" class="text-3xl sm:text-4xl font-black text-navy leading-tight">
@@ -487,7 +487,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Destination City</label>
-                                    <input type="text" id="flightTo" placeholder="e.g. Jeddah, Dubai, London" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-navy focus:outline-none focus:border-teal">
+                                    <input type="text" id="flightTo" placeholder="e.g. Your destination city" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-navy focus:outline-none focus:border-teal">
                                 </div>
                             </div>
 
@@ -511,7 +511,7 @@
 
                             <div>
                                 <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Your Name & WhatsApp Number</label>
-                                <input type="text" id="clientPhone" required placeholder="e.g. Tariq Mehmood - 0349 0558345" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-teal">
+                                <input type="text" id="clientPhone" required placeholder="e.g. Your name - 03XX XXXXXXX" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-teal">
                             </div>
 
                             <button type="submit" class="w-full bg-gradient-to-r from-navy to-teal hover:from-navy-dark hover:to-teal-dark text-white font-extrabold py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
@@ -533,94 +533,37 @@
                     <div class="absolute right-0 inset-y-0 w-16 sm:w-28 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
                     
                     <div id="visaPartnerAirlinesList" class="airline-marquee-track flex items-center gap-4 sm:gap-6">
-                        <!-- Set 1 -->
-                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer">
-                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
-                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
-                            </span>
-                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">PIA (Pakistan International)</span>
-                        </div>
-                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer">
-                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
-                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
-                            </span>
-                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Saudia Airlines</span>
-                        </div>
-                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer">
-                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
-                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
-                            </span>
-                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Emirates</span>
-                        </div>
-                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer">
-                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
-                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
-                            </span>
-                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Qatar Airways</span>
-                        </div>
-                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer">
-                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
-                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
-                            </span>
-                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Airblue</span>
-                        </div>
-                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer">
-                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
-                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
-                            </span>
-                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Serene Air</span>
-                        </div>
-                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer">
-                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
-                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
-                            </span>
-                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Fly Jinnah</span>
-                        </div>
-
-                        <!-- Duplicate Set for continuous infinite marquee -->
-                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer" aria-hidden="true">
-                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
-                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
-                            </span>
-                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">PIA (Pakistan International)</span>
-                        </div>
-                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer" aria-hidden="true">
-                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
-                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
-                            </span>
-                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Saudia Airlines</span>
-                        </div>
-                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer" aria-hidden="true">
-                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
-                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
-                            </span>
-                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Emirates</span>
-                        </div>
-                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer" aria-hidden="true">
-                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
-                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
-                            </span>
-                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Qatar Airways</span>
-                        </div>
-                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer" aria-hidden="true">
-                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
-                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
-                            </span>
-                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Airblue</span>
-                        </div>
-                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer" aria-hidden="true">
-                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
-                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
-                            </span>
-                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Serene Air</span>
-                        </div>
-                        <div class="airline-box inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal hover:-translate-y-1.5 transition-all duration-300 text-slate-800 hover:text-navy group shrink-0 cursor-pointer" aria-hidden="true">
-                            <span class="w-7 h-7 rounded-xl bg-teal-accent text-teal group-hover:bg-teal group-hover:text-white flex items-center justify-center transition-all duration-300">
-                                <i class="fa-solid fa-plane-departure text-xs group-hover:rotate-12 transition-transform"></i>
-                            </span>
-                            <span class="font-extrabold text-xs sm:text-sm tracking-tight whitespace-nowrap">Fly Jinnah</span>
-                        </div>
+                        <!-- Populated in real-time by js/homepage-live.js from pageContent.visas.partnerAirlines -->
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Visa 3-Step Process (bound to pageContent.visas.step1–3Title/Desc — edited in Admin → Visas & Flights) -->
+    <section id="process-section" class="py-16 lg:py-24 bg-slate-50 border-t border-slate-200 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span class="text-xs font-bold uppercase tracking-widest text-teal">How It Works</span>
+            </div>
+            <div class="grid sm:grid-cols-3 gap-6">
+                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 text-center card-hover-lift">
+                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-navy text-white text-xl font-black shadow-md">1</span>
+                    <div class="w-12 h-12 rounded-2xl bg-teal-accent text-teal flex items-center justify-center text-2xl mx-auto mt-4 mb-3"><i class="fa-solid fa-passport"></i></div>
+                    <h4 id="visaStep1Title" class="font-extrabold text-navy text-lg leading-tight">Send Passports &amp; Photos</h4>
+                    <p id="visaStep1Desc" class="text-sm text-slate-500 mt-2 leading-relaxed">Share clear scans of your passport copy and white-background photographs via WhatsApp or drop them off at our Potohar Plaza Blue Area office.</p>
+                </div>
+                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 text-center card-hover-lift">
+                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-navy text-white text-xl font-black shadow-md">2</span>
+                    <div class="w-12 h-12 rounded-2xl bg-teal-accent text-teal flex items-center justify-center text-2xl mx-auto mt-4 mb-3"><i class="fa-solid fa-clipboard-check"></i></div>
+                    <h4 id="visaStep2Title" class="font-extrabold text-navy text-lg leading-tight">Document Verification</h4>
+                    <p id="visaStep2Desc" class="text-sm text-slate-500 mt-2 leading-relaxed">Our experts check eligibility, prepare embassy cover letters, book biometric appointments, and process your online electronic visa file.</p>
+                </div>
+                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 text-center card-hover-lift">
+                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-navy text-white text-xl font-black shadow-md">3</span>
+                    <div class="w-12 h-12 rounded-2xl bg-teal-accent text-teal flex items-center justify-center text-2xl mx-auto mt-4 mb-3"><i class="fa-solid fa-circle-check"></i></div>
+                    <h4 id="visaStep3Title" class="font-extrabold text-navy text-lg leading-tight">Receive Approved Visa</h4>
+                    <p id="visaStep3Desc" class="text-sm text-slate-500 mt-2 leading-relaxed">Receive your verified electronic PDF visa via WhatsApp and email, or collect your stamped physical passport from our office desk.</p>
                 </div>
             </div>
         </div>
@@ -641,7 +584,7 @@
                             <span id="footerTaglinePrimary" class="text-[11px] uppercase tracking-widest text-teal-light font-semibold">Your Journey Our Priority</span>
                         </div>
                     </div>
-                    <p class="text-xs text-slate-400 leading-relaxed max-w-sm">
+                    <p id="footerDescription" class="text-xs text-slate-400 leading-relaxed max-w-sm">
                         Headquartered in Swat Matta and trusted by over 100,000+ pilgrims and travelers for Umrah & Ziyarat packages, domestic & international air ticketing, and global visa consultancy.
                     </p>
                     <div class="pt-1 space-y-2 text-xs">
@@ -682,7 +625,7 @@
                         </div>
                         <div class="bg-white/5 rounded-2xl p-3.5 border border-white/10">
                             <strong class="text-teal-light block mb-1">Islamabad Branch</strong>
-                            <p class="text-slate-300 leading-relaxed">Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad</p>
+                            <p id="footerBranch2Address" class="text-slate-300 leading-relaxed">Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad</p>
                         </div>
                     </div>
                 </div>
@@ -703,9 +646,9 @@
     </footer>
 
     <!-- Floating WhatsApp Quick-Connect Button -->
-    <a href="https://wa.me/923490558345?text=Assalam-o-Alaikum%20Zakir%20Travel%20%26%20Tours!%20I%20would%20like%20to%20inquire%20about%20your%20visa%20and%20ticketing%20services." target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-40 group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-3.5 rounded-full shadow-2xl transition-all hover:scale-105 pulse-emerald-ring">
+    <a id="floatingWhatsAppBtn" href="https://wa.me/923490558345?text=Assalam-o-Alaikum%20Zakir%20Travel%20%26%20Tours!%20I%20would%20like%20to%20inquire%20about%20your%20visa%20and%20ticketing%20services." target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-40 group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-3.5 rounded-full shadow-2xl transition-all hover:scale-105 pulse-emerald-ring">
         <i class="fa-brands fa-whatsapp text-2xl"></i>
-        <span class="hidden sm:inline text-xs font-extrabold tracking-wide pr-1">Chat with Swat Head Office</span>
+        <span id="floatingWhatsAppLabel" class="hidden sm:inline text-xs font-extrabold tracking-wide pr-1">Chat with Swat Head Office</span>
     </a>
 
     <!-- Interactive Booking / Inquiry Modal -->

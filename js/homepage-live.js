@@ -20,6 +20,7 @@
     let liveWorkPermitProgrammes = zakirDB.getLocalWorkPermitProgrammes
         ? zakirDB.getLocalWorkPermitProgrammes()
         : [];
+    let liveWorkPermitFaqs = zakirDB.getLocalWorkPermitFaqs ? zakirDB.getLocalWorkPermitFaqs() : [];
     let selectedSpecialDealFilter = "ALL"; // "ALL" or specific deal.id
     let selectedWorkPermitProgrammeFilter = "ALL"; // "ALL" or specific programme.id
     let adminDrawerInstance = null;
@@ -101,6 +102,7 @@
             renderWorkPermitsGrid(liveWorkPermits);
             renderCountryPills(liveWorkPermits);
             renderFeaturedWorkPermitsShowcase(liveWorkPermitProgrammes);
+            renderWorkPermitFaqs(liveWorkPermitFaqs);
             populateHeroUmrahDropdown(livePackages, liveSpecialDeals, config);
             updateCalculator();
         });
@@ -130,6 +132,7 @@
                 liveWorkPermits = Array.isArray(permits) ? permits : [];
                 renderWorkPermitsGrid(liveWorkPermits);
                 renderCountryPills(liveWorkPermits);
+                rebuildWorkPermitAssessmentSelects();
             });
         }
 
@@ -137,6 +140,13 @@
             zakirDB.onWorkPermitProgrammesSnapshot((programmes) => {
                 liveWorkPermitProgrammes = Array.isArray(programmes) ? programmes : [];
                 renderFeaturedWorkPermitsShowcase(liveWorkPermitProgrammes);
+            });
+        }
+
+        if (zakirDB.onWorkPermitFaqsSnapshot) {
+            zakirDB.onWorkPermitFaqsSnapshot((faqs) => {
+                liveWorkPermitFaqs = Array.isArray(faqs) ? faqs : [];
+                renderWorkPermitFaqs(liveWorkPermitFaqs);
             });
         }
 
@@ -150,6 +160,9 @@
             liveWorkPermitProgrammes = zakirDB.getLocalWorkPermitProgrammes
                 ? zakirDB.getLocalWorkPermitProgrammes()
                 : [];
+            liveWorkPermitFaqs = zakirDB.getLocalWorkPermitFaqs
+                ? zakirDB.getLocalWorkPermitFaqs()
+                : [];
             renderSiteConfigToDOM(liveSiteConfig);
             renderSpecialDealsShowcase(liveSpecialDeals);
             renderUmrahPackagesGrid(livePackages);
@@ -157,6 +170,7 @@
             renderWorkPermitsGrid(liveWorkPermits);
             renderCountryPills(liveWorkPermits);
             renderFeaturedWorkPermitsShowcase(liveWorkPermitProgrammes);
+            renderWorkPermitFaqs(liveWorkPermitFaqs);
             populateHeroUmrahDropdown(livePackages, liveSpecialDeals, liveSiteConfig);
             updateCalculator();
         });
@@ -192,6 +206,12 @@
             const wpApplyBtn = target.closest("[data-wp-apply]");
             if (wpApplyBtn && typeof window.selectWorkPermitCountry === "function") {
                 window.selectWorkPermitCountry(wpApplyBtn.getAttribute("data-wp-apply"));
+                return;
+            }
+            const posterBtn = target.closest("[data-programme-poster]");
+            if (posterBtn) {
+                window.openProgrammePosterModal(posterBtn.getAttribute("data-programme-poster"));
+                return;
             }
         });
 
@@ -255,6 +275,74 @@
             if (el) el.textContent = text;
         };
 
+        // --- SEO: per-page title + description (A-03) ---
+        // The phone inside the description is composed from the manager's
+        // stored phone, never typed into the stored description string.
+        // The stored seoDescription ends either with "…WhatsApp" (phone
+        // follows directly) or with a full stop (a "WhatsApp …" clause
+        // is appended), so the rendered text matches the old hardcoded
+        // meta descriptions exactly.
+        const setMetaContent = (selector, value) => {
+            const el = document.querySelector(selector);
+            if (el && value) el.setAttribute("content", value);
+        };
+        const composeSeoDescription = (desc) => {
+            const d = String(desc || "").trim();
+            if (!d) return "";
+            const phone = c.managerPhone || "+92 349 0558345";
+            return /whatsapp\s*$/i.test(d) ? `${d} ${phone}.` : `${d} WhatsApp ${phone}.`;
+        };
+        const pageFile = (window.location.pathname || "").split("/").pop() || "index.html";
+        const seoPageKey =
+            pageFile === "umrah-packages.html"
+                ? "umrah"
+                : pageFile === "visa-services.html"
+                  ? "visas"
+                  : pageFile === "work-permit.html"
+                    ? "workPermit"
+                    : pageFile === "contact.html"
+                      ? "contact"
+                      : pageFile === "404.html"
+                        ? "notFound"
+                        : "home";
+        const pContentForSeo = config.pageContent || {};
+        const seoPage = pContentForSeo[seoPageKey] || {};
+        if (seoPageKey === "notFound") {
+            document.title = `Page Not Found (404) | ${agencyName}`;
+            const notFoundDesc = composeSeoDescription(
+                "This page could not be found on " +
+                    agencyName +
+                    ". Visit our homepage for Umrah packages, visa services and Europe work permits, or reach us on WhatsApp"
+            );
+            setMetaContent('meta[name="description"]', notFoundDesc);
+            setMetaContent('meta[property="og:description"]', notFoundDesc);
+            setMetaContent('meta[name="twitter:description"]', notFoundDesc);
+        } else if (seoPage.seoTitle || seoPage.seoDescription) {
+            if (seoPage.seoTitle) document.title = seoPage.seoTitle;
+            const seoDesc = composeSeoDescription(seoPage.seoDescription);
+            setMetaContent('meta[name="description"]', seoDesc);
+            setMetaContent('meta[property="og:description"]', seoDesc);
+            setMetaContent('meta[name="twitter:description"]', seoDesc);
+            setMetaContent('meta[property="og:title"]', document.title);
+            setMetaContent('meta[name="twitter:title"]', document.title);
+        }
+
+        const generalWAMsg = encodeURIComponent(
+            `Assalam-o-Alaikum ${agencyName}! I would like to inquire about your travel & Umrah services.`
+        );
+        // --- Floating WhatsApp button (A-04) + 404 WhatsApp link (A-06) ---
+        // The number follows the admin's resolved active WhatsApp; each
+        // page's own pre-written message text is kept, not replaced.
+        const rewriteWhatsAppHref = (el) => {
+            if (!el) return;
+            const existing = el.getAttribute("href") || "";
+            const match = existing.match(/[?&]text=([^&]*)/);
+            const text = match ? match[1] : generalWAMsg;
+            el.href = `https://wa.me/${activeWA}?text=${text}`;
+        };
+        rewriteWhatsAppHref(document.getElementById("floatingWhatsAppBtn"));
+        rewriteWhatsAppHref(document.getElementById("notFoundWhatsAppBtn"));
+
         // --- Top Contact Bar (header AND footer copies) ---
         setText("topBarOfficeAddress", officeAddress);
         setText("topBarManagerName", cleanManagerDisplayName);
@@ -288,9 +376,6 @@
         setText("headerTaglinePrimary", taglinePrimary.toUpperCase());
 
         // --- Navbar & Mobile Menu WhatsApp Links ---
-        const generalWAMsg = encodeURIComponent(
-            `Assalam-o-Alaikum ${agencyName}! I would like to inquire about your travel & Umrah services.`
-        );
         const navWALink = document.getElementById("navWhatsAppBtn");
         if (navWALink) navWALink.href = `https://wa.me/${activeWA}?text=${generalWAMsg}`;
 
@@ -322,6 +407,22 @@
         const pWorkPermit = pContent.workPermit || {};
 
         // --- Page-Specific Content: HOME PAGE ---
+        const renderCheckBullets = (listId, rawLines) => {
+            const listEl = document.getElementById(listId);
+            if (!listEl || !rawLines) return;
+            const lines = String(rawLines)
+                .split(/\r?\n|\|/)
+                .map((l) => l.trim())
+                .filter(Boolean);
+            if (!lines.length) return;
+            listEl.innerHTML = lines
+                .map(
+                    (line) =>
+                        `<li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-teal mt-1"></i> <span>${escapeHtmlAttr(line)}</span></li>`
+                )
+                .join("");
+        };
+
         if (pHome.heroBadge) setText("homeHeroBadge", pHome.heroBadge);
         if (pHome.heroHeadingMain) setText("homeHeroHeadingMain", pHome.heroHeadingMain);
         if (pHome.heroDescription) setText("homeHeroDescription", pHome.heroDescription);
@@ -375,31 +476,113 @@
         if (pHome.srv4Title) setText("homeSrv4Title", pHome.srv4Title);
         if (pHome.srv4Desc) setText("homeSrv4Desc", pHome.srv4Desc);
 
+        // --- Footer (A-01/A-02) + floating chat label (A-04) ---
+        if (pHome.footerDescription) setText("footerDescription", pHome.footerDescription);
+        if (pHome.branch2Address) setText("footerBranch2Address", pHome.branch2Address);
+        if (pHome.floatingChatLabel) setText("floatingWhatsAppLabel", pHome.floatingChatLabel);
+
+        // --- Hero trust strip (B-01) — different cells from stat1–4 ---
+        if (pHome.heroStat1Number) setText("homeHeroStat1Number", pHome.heroStat1Number);
+        if (pHome.heroStat1Label) setText("homeHeroStat1Label", pHome.heroStat1Label);
+        if (pHome.heroStat2Number) setText("homeHeroStat2Number", pHome.heroStat2Number);
+        if (pHome.heroStat2Label) setText("homeHeroStat2Label", pHome.heroStat2Label);
+        if (pHome.heroStat3Number) setText("homeHeroStat3Number", pHome.heroStat3Number);
+        if (pHome.heroStat3Label) setText("homeHeroStat3Label", pHome.heroStat3Label);
+        if (pHome.heroStat4Number) setText("homeHeroStat4Number", pHome.heroStat4Number);
+        if (pHome.heroStat4Label) setText("homeHeroStat4Label", pHome.heroStat4Label);
+
+        // --- Client Trust medallion (B-02) + hero card header (B-03) ---
+        if (pHome.trustBadgeText) setText("homeTrustBadgeText", pHome.trustBadgeText);
+        if (pHome.heroCardEyebrow) setText("homeHeroCardEyebrow", pHome.heroCardEyebrow);
+        if (pHome.heroCardTitle) setText("homeHeroCardTitle", pHome.heroCardTitle);
+        if (pHome.heroCardHoursBadge) setText("homeHeroCardHoursBadge", pHome.heroCardHoursBadge);
+
+        // --- About highlight badges (B-04) ---
+        if (pHome.aboutBadge1) setText("homeAboutBadge1", pHome.aboutBadge1);
+        if (pHome.aboutBadge2) setText("homeAboutBadge2", pHome.aboutBadge2);
+        if (pHome.aboutBadge3) setText("homeAboutBadge3", pHome.aboutBadge3);
+
+        // --- Executive Management Desk (B-05): names composed from contacts ---
+        setText(
+            "homeManagementNames",
+            `${c.managerName || "Inam Khan (Manager)"} & ${cleanSecondaryDisplayName}`
+        );
+        if (pHome.managementNote) setText("homeManagementNote", pHome.managementNote);
+
+        // --- Mission checklist + badge (B-06) ---
+        renderCheckBullets("homeMissionPointsList", pHome.missionPoints);
+        if (pHome.missionBadge) setText("homeMissionBadge", pHome.missionBadge);
+
+        // --- Vision branch pills + address bar (B-07): bound to the
+        // existing branch titles/address (admin-editable in Tab 1) ---
+        if (pHome.branch1Title) setText("homeVisionBranch1Name", pHome.branch1Title);
+        if (pHome.branch2Title) setText("homeVisionBranch2Name", pHome.branch2Title);
+        setText("homeVisionBranch1AddressLine", `Head Office: ${branch1Address}`);
+
+        // --- Branch opening hours (B-08): per-branch, officeHours untouched ---
+        if (c.branch1Hours) setText("homeBranch1Hours", c.branch1Hours);
+        if (c.branch2Hours) setText("homeBranch2Hours", c.branch2Hours);
+
+        // --- Services section heading + intro (B-09) ---
+        // The intro is bound as whole text (the inline agency-name span
+        // it used to carry is replaced by the live agency name, so a
+        // rename still flows through).
+        if (pHome.servicesHeading) setText("homeServicesHeading", pHome.servicesHeading);
+        if (pHome.servicesIntro) {
+            setText("homeServicesIntro", String(pHome.servicesIntro).replace(/Zakir Travel & Tours/g, agencyName));
+        }
+
+        // --- Service card badges + bullets (B-10) ---
+        if (pHome.srv1Badge) setText("homeSrv1Badge", pHome.srv1Badge);
+        if (pHome.srv2Badge) setText("homeSrv2Badge", pHome.srv2Badge);
+        if (pHome.srv3Badge) setText("homeSrv3Badge", pHome.srv3Badge);
+        if (pHome.srv4Badge) setText("homeSrv4Badge", pHome.srv4Badge);
+        renderCheckBullets("homeSrv1Bullets", pHome.srv1Bullets);
+        renderCheckBullets("homeSrv2Bullets", pHome.srv2Bullets);
+        renderCheckBullets("homeSrv3Bullets", pHome.srv3Bullets);
+        renderCheckBullets("homeSrv4Bullets", pHome.srv4Bullets);
+
+        // --- Branches section heading + intro (B-11) ---
+        if (pHome.branchesHeading) setText("homeBranchesHeading", pHome.branchesHeading);
+        if (pHome.branchesIntro) setText("homeBranchesIntro", pHome.branchesIntro);
+
+        // --- How it works: heading, intro + 4 steps (B-12) ---
+        if (pHome.processHeading) setText("homeProcessHeading", pHome.processHeading);
+        if (pHome.processIntro) setText("homeProcessIntro", pHome.processIntro);
+        if (pHome.process1Title) setText("homeProcess1Title", pHome.process1Title);
+        if (pHome.process1Desc) setText("homeProcess1Desc", pHome.process1Desc);
+        if (pHome.process2Title) setText("homeProcess2Title", pHome.process2Title);
+        if (pHome.process2Desc) setText("homeProcess2Desc", pHome.process2Desc);
+        if (pHome.process3Title) setText("homeProcess3Title", pHome.process3Title);
+        if (pHome.process3Desc) setText("homeProcess3Desc", pHome.process3Desc);
+        if (pHome.process4Title) setText("homeProcess4Title", pHome.process4Title);
+        if (pHome.process4Desc) setText("homeProcess4Desc", pHome.process4Desc);
+
         // --- Page-Specific Content: UMRAH PACKAGES PAGE ---
         if (pUmrah.heroBadge) setText("umrahHeroBadge", pUmrah.heroBadge);
         if (pUmrah.heroTitle) setText("umrahHeroTitle", pUmrah.heroTitle);
+        if (pUmrah.heroScript) setText("umrahHeroScript", pUmrah.heroScript);
         if (pUmrah.heroSubtitle) setText("umrahHeroSubtitle", pUmrah.heroSubtitle);
+        // --- Umrah hero trust strip (C-02) ---
+        if (pUmrah.trustStat1Number) setText("umrahTrustStat1Number", pUmrah.trustStat1Number);
+        if (pUmrah.trustStat1Label) setText("umrahTrustStat1Label", pUmrah.trustStat1Label);
+        if (pUmrah.trustStat2Number) setText("umrahTrustStat2Number", pUmrah.trustStat2Number);
+        if (pUmrah.trustStat2Label) setText("umrahTrustStat2Label", pUmrah.trustStat2Label);
+        if (pUmrah.trustStat3Number) setText("umrahTrustStat3Number", pUmrah.trustStat3Number);
+        if (pUmrah.trustStat3Label) setText("umrahTrustStat3Label", pUmrah.trustStat3Label);
+        if (pUmrah.trustStat4Number) setText("umrahTrustStat4Number", pUmrah.trustStat4Number);
+        if (pUmrah.trustStat4Label) setText("umrahTrustStat4Label", pUmrah.trustStat4Label);
+        // --- Compare heading + desk note (C-03) ---
+        if (pUmrah.compareHeading) setText("umrahCompareHeading", pUmrah.compareHeading);
+        if (pUmrah.compareNote) setText("umrahCompareNote", pUmrah.compareNote);
+        // --- Inclusions heading + intro (C-04) ---
+        if (pUmrah.includedHeading) setText("umrahIncludedHeading", pUmrah.includedHeading);
+        if (pUmrah.includedIntro) setText("umrahIncludedIntro", pUmrah.includedIntro);
         if (pUmrah.inc1Title) setText("umrahInc1Title", pUmrah.inc1Title);
         if (pUmrah.inc2Title) setText("umrahInc2Title", pUmrah.inc2Title);
         if (pUmrah.inc3Title) setText("umrahInc3Title", pUmrah.inc3Title);
         if (pUmrah.familyBannerTitle) setText("umrahFamilyBannerTitle", pUmrah.familyBannerTitle);
         if (pUmrah.familyBannerDesc) setText("umrahFamilyBannerDesc", pUmrah.familyBannerDesc);
-
-        const renderCheckBullets = (listId, rawLines) => {
-            const listEl = document.getElementById(listId);
-            if (!listEl || !rawLines) return;
-            const lines = String(rawLines)
-                .split(/\r?\n|\|/)
-                .map((l) => l.trim())
-                .filter(Boolean);
-            if (!lines.length) return;
-            listEl.innerHTML = lines
-                .map(
-                    (line) =>
-                        `<li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-teal mt-1"></i> <span>${escapeHtmlAttr(line)}</span></li>`
-                )
-                .join("");
-        };
 
         renderCheckBullets("umrahInc1List", pUmrah.inc1Bullets);
         renderCheckBullets("umrahInc2List", pUmrah.inc2Bullets);
@@ -408,9 +591,23 @@
         // --- Page-Specific Content: VISAS & FLIGHTS PAGE ---
         if (pVisas.heroBadge) setText("visaHeroBadge", pVisas.heroBadge);
         if (pVisas.heroTitle) setText("visaHeroTitle", pVisas.heroTitle);
+        if (pVisas.heroScript) setText("visaHeroScript", pVisas.heroScript);
         if (pVisas.heroSubtitle) setText("visaHeroSubtitle", pVisas.heroSubtitle);
+        if (pVisas.trustStat1Number) setText("visaTrustStat1Number", pVisas.trustStat1Number);
+        if (pVisas.trustStat1Label) setText("visaTrustStat1Label", pVisas.trustStat1Label);
+        if (pVisas.trustStat2Number) setText("visaTrustStat2Number", pVisas.trustStat2Number);
+        if (pVisas.trustStat2Label) setText("visaTrustStat2Label", pVisas.trustStat2Label);
+        if (pVisas.trustStat3Number) setText("visaTrustStat3Number", pVisas.trustStat3Number);
+        if (pVisas.trustStat3Label) setText("visaTrustStat3Label", pVisas.trustStat3Label);
+        if (pVisas.trustStat4Number) setText("visaTrustStat4Number", pVisas.trustStat4Number);
+        if (pVisas.trustStat4Label) setText("visaTrustStat4Label", pVisas.trustStat4Label);
+        if (pVisas.destinationsHeading) setText("visaDestinationsHeading", pVisas.destinationsHeading);
+        if (pVisas.destinationsNote) setText("visaDestinationsNote", pVisas.destinationsNote);
+        if (pVisas.flightEyebrow) setText("visaFlightEyebrow", pVisas.flightEyebrow);
         if (pVisas.flightHeading) setText("visaFlightHeading", pVisas.flightHeading);
         if (pVisas.flightDescription) setText("visaFlightDescription", pVisas.flightDescription);
+        const flightFromEl = document.getElementById("flightFrom");
+        if (flightFromEl && pVisas.defaultDepartureCity) flightFromEl.value = pVisas.defaultDepartureCity;
         if (pVisas.step1Title) setText("visaStep1Title", pVisas.step1Title);
         if (pVisas.step1Desc) setText("visaStep1Desc", pVisas.step1Desc);
         if (pVisas.step2Title) setText("visaStep2Title", pVisas.step2Title);
@@ -465,6 +662,7 @@
         if (pCalc.heroBadge) setText("calcHeroBadge", pCalc.heroBadge);
         if (pCalc.heroTitle) setText("calcHeroTitle", pCalc.heroTitle);
         if (pCalc.heroSubtitle) setText("calcHeroSubtitle", pCalc.heroSubtitle);
+        if (pCalc.ratesNote) setText("calcRatesNote", pCalc.ratesNote);
 
         const calcBulletsEl = document.getElementById("calcIncludedBulletsList");
         if (calcBulletsEl && pCalc.includedBullets) {
@@ -478,6 +676,7 @@
         }
 
         // --- Page-Specific Content: WORK PERMIT PAGE ---
+        if (pWorkPermit.topBarTagline) setText("workPermitTopBarTagline", pWorkPermit.topBarTagline);
         if (pWorkPermit.heroBadge) setText("workPermitHeroBadge", pWorkPermit.heroBadge);
         if (pWorkPermit.heroTitle) setText("workPermitHeroTitle", pWorkPermit.heroTitle);
         if (pWorkPermit.heroScript) setText("workPermitHeroScript", pWorkPermit.heroScript);
@@ -492,6 +691,48 @@
         if (pWorkPermit.checklistDesc) setText("workPermitChecklistDesc", pWorkPermit.checklistDesc);
         if (pWorkPermit.assessmentHeading) setText("workPermitAssessmentHeading", pWorkPermit.assessmentHeading);
         if (pWorkPermit.faqHeading) setText("workPermitFaqHeading", pWorkPermit.faqHeading);
+        if (pWorkPermit.trustStat1Number) setText("workPermitTrustStat1Number", pWorkPermit.trustStat1Number);
+        if (pWorkPermit.trustStat1Label) setText("workPermitTrustStat1Label", pWorkPermit.trustStat1Label);
+        if (pWorkPermit.trustStat2Number) setText("workPermitTrustStat2Number", pWorkPermit.trustStat2Number);
+        if (pWorkPermit.trustStat2Label) setText("workPermitTrustStat2Label", pWorkPermit.trustStat2Label);
+        if (pWorkPermit.trustStat3Number) setText("workPermitTrustStat3Number", pWorkPermit.trustStat3Number);
+        if (pWorkPermit.trustStat3Label) setText("workPermitTrustStat3Label", pWorkPermit.trustStat3Label);
+        if (pWorkPermit.trustStat4Number) setText("workPermitTrustStat4Number", pWorkPermit.trustStat4Number);
+        if (pWorkPermit.trustStat4Label) setText("workPermitTrustStat4Label", pWorkPermit.trustStat4Label);
+        // "More Destinations" heading: built from the editable country
+        // list ("Looking for Malta, Lithuania, Serbia or another
+        // country?") so the list and the heading can never drift apart;
+        // the stored title is the fallback when the list is empty.
+        const moreDestCountries = String(pWorkPermit.moreDestinationsCountries || "")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+        if (moreDestCountries.length) {
+            setText("workPermitMoreDestinationsTitle", `Looking for ${moreDestCountries.join(", ")} or another country?`);
+        } else if (pWorkPermit.moreDestinationsTitle) {
+            setText("workPermitMoreDestinationsTitle", pWorkPermit.moreDestinationsTitle);
+        }
+        if (pWorkPermit.moreDestinationsDesc) setText("workPermitMoreDestinationsDesc", pWorkPermit.moreDestinationsDesc);
+        if (pWorkPermit.benefit1Title) setText("workPermitBenefit1Title", pWorkPermit.benefit1Title);
+        if (pWorkPermit.benefit1Desc) setText("workPermitBenefit1Desc", pWorkPermit.benefit1Desc);
+        if (pWorkPermit.benefit2Title) setText("workPermitBenefit2Title", pWorkPermit.benefit2Title);
+        if (pWorkPermit.benefit2Desc) setText("workPermitBenefit2Desc", pWorkPermit.benefit2Desc);
+        if (pWorkPermit.benefit3Title) setText("workPermitBenefit3Title", pWorkPermit.benefit3Title);
+        if (pWorkPermit.benefit3Desc) setText("workPermitBenefit3Desc", pWorkPermit.benefit3Desc);
+        if (pWorkPermit.benefit4Title) setText("workPermitBenefit4Title", pWorkPermit.benefit4Title);
+        if (pWorkPermit.benefit4Desc) setText("workPermitBenefit4Desc", pWorkPermit.benefit4Desc);
+        if (pWorkPermit.processIntro) setText("workPermitProcessIntro", pWorkPermit.processIntro);
+        if (pWorkPermit.process1Title) setText("workPermitProcess1Title", pWorkPermit.process1Title);
+        if (pWorkPermit.process1Desc) setText("workPermitProcess1Desc", pWorkPermit.process1Desc);
+        if (pWorkPermit.process2Title) setText("workPermitProcess2Title", pWorkPermit.process2Title);
+        if (pWorkPermit.process2Desc) setText("workPermitProcess2Desc", pWorkPermit.process2Desc);
+        if (pWorkPermit.process3Title) setText("workPermitProcess3Title", pWorkPermit.process3Title);
+        if (pWorkPermit.process3Desc) setText("workPermitProcess3Desc", pWorkPermit.process3Desc);
+        if (pWorkPermit.process4Title) setText("workPermitProcess4Title", pWorkPermit.process4Title);
+        if (pWorkPermit.process4Desc) setText("workPermitProcess4Desc", pWorkPermit.process4Desc);
+        if (pWorkPermit.assessmentNote) setText("workPermitAssessmentNote", pWorkPermit.assessmentNote);
+        renderWorkPermitChecklist(pWorkPermit.checklistItems);
+        rebuildWorkPermitAssessmentSelects();
 
         const heroRoomSelect = document.getElementById("umrahRoom");
         if (heroRoomSelect) {
@@ -566,6 +807,68 @@
         if (pContact.heroBadge && !legacyContactBadges.includes(pContact.heroBadge)) setText("contactHeroBadge", pContact.heroBadge);
         if (pContact.heroTitle && !legacyContactTitles.includes(pContact.heroTitle)) setText("contactHeroTitle", pContact.heroTitle);
         if (pContact.heroSubtitle && !isLegacyContactSubtitle) setText("contactHeroSubtitle", pContact.heroSubtitle);
+        if (pContact.heroScript) setText("contactHeroScript", pContact.heroScript);
+        if (pContact.trustStat1Number) setText("contactTrustStat1Number", pContact.trustStat1Number);
+        if (pContact.trustStat1Label) setText("contactTrustStat1Label", pContact.trustStat1Label);
+        if (pContact.trustStat2Number) setText("contactTrustStat2Number", pContact.trustStat2Number);
+        if (pContact.trustStat2Label) setText("contactTrustStat2Label", pContact.trustStat2Label);
+        if (pContact.trustStat3Number) setText("contactTrustStat3Number", pContact.trustStat3Number);
+        if (pContact.trustStat3Label) setText("contactTrustStat3Label", pContact.trustStat3Label);
+        if (pContact.trustStat4Number) setText("contactTrustStat4Number", pContact.trustStat4Number);
+        if (pContact.trustStat4Label) setText("contactTrustStat4Label", pContact.trustStat4Label);
+        if (pContact.leadershipHeading) setText("contactLeadershipHeading", pContact.leadershipHeading);
+        if (pContact.leadershipIntro) setText("contactLeadershipIntro", pContact.leadershipIntro);
+        if (pContact.expertsHeading) setText("contactExpertsHeading", pContact.expertsHeading);
+        if (pContact.expertsIntro) setText("contactExpertsIntro", pContact.expertsIntro);
+        if (pContact.teamHeading) setText("contactTeamHeading", pContact.teamHeading);
+        if (pContact.teamIntro) setText("contactTeamIntro", pContact.teamIntro);
+        if (pContact.contactHeading) setText("contactHeading", pContact.contactHeading);
+        if (pContact.contactIntro) setText("contactIntro", pContact.contactIntro);
+        rebuildContactServiceOptions(pContact.serviceOptions);
+
+        // --- About Us: Team Member Names & Roles (edited in Admin, keyed by member id) ---
+        // textContent only — admin-entered text is never injected as HTML.
+        // An element keeps its hardcoded text when no edited value exists,
+        // so the page can never render a blank name or role.
+        const teamMembers = config.teamMembers || {};
+        document.querySelectorAll("[data-team-name]").forEach((el) => {
+            const saved = teamMembers[el.getAttribute("data-team-name")] || {};
+            const name = String(saved.name || "").trim();
+            if (name) el.textContent = name;
+        });
+        document.querySelectorAll("[data-team-role]").forEach((el) => {
+            const saved = teamMembers[el.getAttribute("data-team-role")] || {};
+            const role = String(saved.role || "").trim();
+            if (role) el.textContent = role;
+        });
+
+        // --- About Us: CEO quote (G-04, from the teamMembers.ceo record) ---
+        const ceoRecord = teamMembers.ceo || {};
+        if (String(ceoRecord.quote || "").trim()) {
+            setText("ceoQuote", String(ceoRecord.quote).trim());
+        }
+
+        // --- About Us: CEO tag pills (G-05, pipe-separated list) ---
+        const ceoTagsEl = document.getElementById("ceoTagsList");
+        if (ceoTagsEl && pContact.ceoTags) {
+            const tags = String(pContact.ceoTags)
+                .split(/\r?\n|\|/)
+                .map((t) => t.trim())
+                .filter(Boolean);
+            if (tags.length) {
+                const tagIcons = [
+                    "fa-building-flag text-amber-300",
+                    "fa-kaaba text-teal-light",
+                    "fa-earth-asia text-sky-300"
+                ];
+                ceoTagsEl.innerHTML = tags
+                    .map(
+                        (tag, i) =>
+                            `<span class="bg-white/10 border border-white/15 px-3.5 py-2 rounded-xl flex items-center gap-2"><i class="fa-solid ${tagIcons[i % tagIcons.length]}"></i>${escapeHtmlAttr(tag)}</span>`
+                    )
+                    .join("");
+            }
+        }
 
         // --- About Us: Team Member Photos (uploaded by Admin, keyed by member id) ---
         const teamPhotos = config.teamPhotos || {};
@@ -575,6 +878,13 @@
             const img = slot.querySelector(".team-photo-img");
             const placeholder = slot.querySelector(".team-photo-placeholder");
             if (!img) return;
+            // Alt text follows the effective name/role (edited in Admin,
+            // else the page's own hardcoded text) — never blank.
+            const nameEl = document.querySelector(`[data-team-name="${key}"]`);
+            const roleEl = document.querySelector(`[data-team-role="${key}"]`);
+            const altName = nameEl ? nameEl.textContent.trim() : "";
+            const altRole = roleEl ? roleEl.textContent.trim() : "";
+            if (altName) img.alt = altRole ? `${altName} - ${altRole}` : altName;
             if (url) {
                 if (img.getAttribute("src") !== url) img.src = url;
                 img.classList.remove("hidden");
@@ -590,8 +900,23 @@
         setText("contactSectionAgencyName", agencyName);
         setText("contactSectionTagline", `"${taglineSecondary}"`);
         setText("contactSectionAddress", officeAddress);
+        if (pHome.branch2Address) setText("contactBranch2Address", pHome.branch2Address);
+        if (c.branch1Hours) setText("contactBranch1Hours", c.branch1Hours);
+        if (c.branch2Hours) setText("contactBranch2Hours", c.branch2Hours);
+        if (pHome.branch1Note) setText("contactBranch1Note", pHome.branch1Note);
+        if (pHome.branch2Note) setText("contactBranch2Note", pHome.branch2Note);
+        if (c.supportNote) setText("contactSupportNote", c.supportNote);
         if (c.officeHours) setText("contactSectionHours", c.officeHours);
         if (c.officeEmail) setText("contactSectionEmail", c.officeEmail);
+        // Map section headings (G-09): composed from the branch titles /
+        // addresses, like switchMapBranch does — but only until the
+        // visitor switches branch, so a switch is never undone by a
+        // later config re-render.
+        const mapIframeForHeadings = document.getElementById("contactMapIframe");
+        if (mapIframeForHeadings && !mapIframeForHeadings.getAttribute("data-switched")) {
+            if (pHome.branch1Title) setText("mapHeadingTitle", `${pHome.branch1Title} Location`);
+            if (branch1Address) setText("mapHeadingSubtitle", branch1Address);
+        }
 
         const mapIframe = document.getElementById("contactMapIframe");
         if (mapIframe && !mapIframe.getAttribute("data-switched")) {
@@ -660,6 +985,16 @@
         setText("footerAgencyName", agencyName);
         setText("footerTaglinePrimary", taglinePrimary);
         setText("footerCopyrightAgency", agencyName);
+
+        // --- 404 page footer line (A-06): composed from stored addresses
+        // and the manager's phone, never re-typed ---
+        const notFoundInfo = document.getElementById("notFoundFooterInfo");
+        if (notFoundInfo) {
+            notFoundInfo.textContent =
+                `${agencyName} — Head Office: ${branch1Address} · Branch: ` +
+                `${pHome.branch2Address || "Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad"} · WhatsApp: ` +
+                `${c.managerPhone || "+92 349 0558345"}`;
+        }
 
         const modalAgentSelect = document.getElementById("modalAgentPhone");
         if (modalAgentSelect) {
@@ -1431,6 +1766,22 @@
             (liveSiteConfig && liveSiteConfig.contacts && liveSiteConfig.contacts.agencyName) ||
             "Zakir Travel & Tours";
 
+        // Programme services (F-04): one shared admin-editable list
+        // ("Title|detail" lines), the same for every programme.
+        const programmeServices = parseTitleDetailList(
+            (liveSiteConfig &&
+                liveSiteConfig.pageContent &&
+                liveSiteConfig.pageContent.workPermit &&
+                liveSiteConfig.pageContent.workPermit.programmeServices) ||
+                ""
+        );
+        const programmeServiceIcons = [
+            "fa-headset",
+            "fa-clipboard-check",
+            "fa-file-lines",
+            "fa-layer-group"
+        ];
+
         container.innerHTML = progsToShow
             .map((prog, idx) => {
                 const country = String(prog.countryName || "Poland");
@@ -1561,32 +1912,19 @@
 
                         <!-- Services Included -->
                         <div class="mt-3.5 sm:mt-7 text-center">
+                            ${programmeServices.length ? `
                             <div class="inline-flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-navy via-teal to-navy text-white font-extrabold uppercase tracking-wider px-5 sm:px-8 py-1.5 sm:py-2.5 rounded-full shadow-md text-[10px] sm:text-sm">
-                                <span class="text-[9px] sm:text-xs">◆</span><span>Our Services</span><span class="text-[9px] sm:text-xs">◆</span>
+                                <span class="text-[9px] sm:text-xs">\u25c6</span><span>Our Services</span><span class="text-[9px] sm:text-xs">\u25c6</span>
                             </div>
 
                             <div class="grid grid-cols-4 gap-1.5 sm:gap-5 mt-3 sm:mt-6 max-w-4xl mx-auto">
+                                ${programmeServices.map((srv, i) => `
                                 <div class="bg-slate-50 hover:bg-teal-accent/60 border border-slate-200 hover:border-teal/40 hover:-translate-y-1 shadow-sm rounded-xl sm:rounded-2xl p-2 sm:p-5 flex flex-col items-center transition-all duration-300 group">
-                                    <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all"><i class="fa-solid fa-headset"></i></div>
-                                    <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">Visa Consultation</h4>
-                                    <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">One-to-one guidance</p>
-                                </div>
-                                <div class="bg-slate-50 hover:bg-teal-accent/60 border border-slate-200 hover:border-teal/40 hover:-translate-y-1 shadow-sm rounded-xl sm:rounded-2xl p-2 sm:p-5 flex flex-col items-center transition-all duration-300 group">
-                                    <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all"><i class="fa-solid fa-clipboard-check"></i></div>
-                                    <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">Eligibility Assessment</h4>
-                                    <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">Profile &amp; skill match</p>
-                                </div>
-                                <div class="bg-slate-50 hover:bg-teal-accent/60 border border-slate-200 hover:border-teal/40 hover:-translate-y-1 shadow-sm rounded-xl sm:rounded-2xl p-2 sm:p-5 flex flex-col items-center transition-all duration-300 group">
-                                    <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all"><i class="fa-solid fa-file-lines"></i></div>
-                                    <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">Document Preparation</h4>
-                                    <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">Translation &amp; attestation</p>
-                                </div>
-                                <div class="bg-slate-50 hover:bg-teal-accent/60 border border-slate-200 hover:border-teal/40 hover:-translate-y-1 shadow-sm rounded-xl sm:rounded-2xl p-2 sm:p-5 flex flex-col items-center transition-all duration-300 group">
-                                    <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all"><i class="fa-solid fa-layer-group"></i></div>
-                                    <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">Application Assistance</h4>
-                                    <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">Embassy filing &amp; follow-up</p>
-                                </div>
-                            </div>
+                                    <div class="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-2xl bg-white shadow-sm flex items-center justify-center text-navy group-hover:text-teal group-hover:scale-110 text-sm sm:text-2xl mb-1.5 sm:mb-3 transition-all"><i class="fa-solid ${programmeServiceIcons[i % programmeServiceIcons.length]}"></i></div>
+                                    <h4 class="font-extrabold text-navy text-[10px] sm:text-base leading-tight">${escapeHtmlAttr(srv.title)}</h4>
+                                    <p class="text-[8px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-tight">${escapeHtmlAttr(srv.detail)}</p>
+                                </div>`).join("")}
+                            </div>` : ""}
 
                             <!-- Popular Job Categories -->
                             ${
@@ -1607,9 +1945,10 @@
                                 <a href="https://wa.me/${activeWA}?text=${waText}" target="_blank" rel="noopener noreferrer" class="bg-teal hover:bg-teal-dark text-white font-bold px-3.5 sm:px-8 py-2.5 sm:py-3.5 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
                                     <i class="fa-brands fa-whatsapp text-sm sm:text-xl"></i><span>Inquire via WhatsApp</span>
                                 </a>
-                                <button type="button" onclick="openPolandPosterModal()" class="bg-slate-100 hover:bg-teal-accent text-navy font-bold px-3.5 sm:px-6 py-2.5 sm:py-3.5 rounded-xl border border-teal/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
+                                ${prog.posterImageUrl ? `
+                                <button type="button" data-programme-poster="${escapeHtmlAttr(prog.posterImageUrl)}" class="bg-slate-100 hover:bg-teal-accent text-navy font-bold px-3.5 sm:px-6 py-2.5 sm:py-3.5 rounded-xl border border-teal/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
                                     <i class="fa-solid fa-file-image text-teal"></i><span>View Official Flyer</span>
-                                </button>
+                                </button>` : ""}
                             </div>
                         </div>
                     </div>
@@ -1642,8 +1981,7 @@
     // Country quick pills in the work-permit hero, rendered from the SAME
     // admin-provided work_permits collection as the destinations grid — so a
     // country only appears here when the admin provides it. Returns null when
-    // there is nothing to show, so the caller can leave the hardcoded
-    // fallback pills in the HTML untouched. Pure (no DOM) so it is testable.
+    // there is nothing to show. Pure (no DOM) so it is testable.
     function buildCountryPillsHtml(permits) {
         const activePermits = (permits || [])
             .filter((p) => p && p.isActive !== false)
@@ -1675,9 +2013,9 @@
         const wrap = document.getElementById("countryPills");
         if (!wrap) return;
         const html = buildCountryPillsHtml(permits);
-        if (html) wrap.innerHTML = html;
-        // When there is nothing to show, leave the hardcoded fallback pills
-        // in the HTML alone so visitors never see an empty row.
+        // F-02: the hardcoded fallback pills are gone, so an empty
+        // collection leaves an empty row instead of stale pills.
+        wrap.innerHTML = html || "";
     }
 
     function renderWorkPermitsGrid(permits) {
@@ -1757,6 +2095,156 @@
             .join("");
     }
 
+    // Split a "Title|detail" list (one item per line; ";" also
+    // separates items) into [{title, detail}]. Pure, so it stays
+    // testable like buildCountryPillsHtml.
+    function parseTitleDetailList(raw) {
+        return String(raw || "")
+            .split(/\r?\n|;/)
+            .map((line) => line.trim())
+            .filter(Boolean)
+            .map((line) => {
+                const sep = line.indexOf("|");
+                if (sep === -1) return { title: line, detail: "" };
+                return { title: line.slice(0, sep).trim(), detail: line.slice(sep + 1).trim() };
+            })
+            .filter((item) => item.title);
+    }
+
+    // Split a pipe-separated list (newlines also separate items).
+    function parsePipeList(raw) {
+        return String(raw || "")
+            .split(/\r?\n|\|/)
+            .map((s) => s.trim())
+            .filter(Boolean);
+    }
+
+    // Document checklist (E-05): one "Title | detail" line per item.
+    // Leaves the HTML fallback alone when the list is empty.
+    function renderWorkPermitChecklist(rawItems) {
+        const listEl = document.getElementById("workPermitChecklistList");
+        if (!listEl || !rawItems) return;
+        const items = parseTitleDetailList(rawItems);
+        if (!items.length) return;
+        listEl.innerHTML = items
+            .map(
+                (item) =>
+                    `<li class="check-item"><i class="fa-solid fa-circle-check"></i><div><strong>${escapeHtmlAttr(item.title)}</strong>${item.detail ? `<span>${escapeHtmlAttr(item.detail)}</span>` : ""}</div></li>`
+            )
+            .join("");
+    }
+
+    // FAQ (E-08): renders the work_permit_faqs collection as <details>
+    // items, first one open — same markup as the HTML fallback.
+    function renderWorkPermitFaqs(faqs) {
+        const wrap = document.getElementById("workPermitFaqList");
+        if (!wrap) return;
+        const active = (faqs || [])
+            .filter((f) => f && f.isActive !== false)
+            .slice()
+            .sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+        if (!active.length) {
+            wrap.innerHTML = `<div class="bg-slate-50 rounded-2xl p-8 text-center text-slate-500 text-sm">No FAQs yet — contact our desk on WhatsApp for answers.</div>`;
+            return;
+        }
+        wrap.innerHTML = active
+            .map(
+                (f, idx) =>
+                    `<details class="faq-item"${idx === 0 ? " open" : ""}>
+                        <summary>${escapeHtmlAttr(f.question)}<i class="fa-solid fa-chevron-down"></i></summary>
+                        <p>${escapeHtmlAttr(f.answer)}</p>
+                    </details>`
+            )
+            .join("");
+    }
+
+    // Assessment form dropdowns (E-06): rebuilt at runtime from the
+    // admin data, keeping the visitor's current choice when it still
+    // exists. Country from the work_permits collection (open countries
+    // keep their "(Applications Open)" suffix); sectors from the
+    // pageContent.workPermit.sectors list; office from the branch
+    // titles. "Other / Not Sure" and "Online / WhatsApp" stay as the
+    // generic fallbacks.
+    function rebuildWorkPermitAssessmentSelects() {
+        const pWork =
+            (liveSiteConfig && liveSiteConfig.pageContent && liveSiteConfig.pageContent.workPermit) || {};
+        const pHome =
+            (liveSiteConfig && liveSiteConfig.pageContent && liveSiteConfig.pageContent.home) || {};
+
+        const countrySelect = document.getElementById("wpCountry");
+        if (countrySelect) {
+            const prevCountry = countrySelect.value;
+            const activePermits = (liveWorkPermits || [])
+                .filter((p) => p && p.isActive !== false)
+                .slice()
+                .sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+            if (activePermits.length) {
+                const options = activePermits.map((p) => {
+                    const country = String(p.countryName || "Country");
+                    const label = /open/i.test(String(p.tagText || ""))
+                        ? `${country} (Applications Open)`
+                        : country;
+                    return `<option value="${escapeHtmlAttr(country)}">${escapeHtmlAttr(label)}</option>`;
+                });
+                options.push(`<option value="Other European Country">Other / Not Sure — Advise Me</option>`);
+                countrySelect.innerHTML = options.join("");
+                if (prevCountry && [...countrySelect.options].some((o) => o.value === prevCountry)) {
+                    countrySelect.value = prevCountry;
+                }
+            }
+        }
+
+        const sectorSelect = document.getElementById("wpSector");
+        if (sectorSelect && pWork.sectors) {
+            const sectors = parsePipeList(pWork.sectors);
+            if (sectors.length) {
+                const prevSector = sectorSelect.value;
+                sectorSelect.innerHTML = sectors
+                    .map((s) => `<option value="${escapeHtmlAttr(s)}">${escapeHtmlAttr(s)}</option>`)
+                    .join("");
+                if (prevSector && [...sectorSelect.options].some((o) => o.value === prevSector)) {
+                    sectorSelect.value = prevSector;
+                }
+            }
+        }
+
+        const branchSelect = document.getElementById("wpBranch");
+        if (branchSelect) {
+            const prevBranch = branchSelect.value;
+            const titles = [pHome.branch1Title, pHome.branch2Title]
+                .map((t) => String(t || "").trim())
+                .filter(Boolean);
+            if (titles.length) {
+                branchSelect.innerHTML =
+                    titles
+                        .map((t) => `<option value="${escapeHtmlAttr(t)}">${escapeHtmlAttr(t)}</option>`)
+                        .join("") + `<option value="Online / WhatsApp">Online / WhatsApp</option>`;
+                if (prevBranch && [...branchSelect.options].some((o) => o.value === prevBranch)) {
+                    branchSelect.value = prevBranch;
+                }
+            }
+        }
+    }
+
+    // "Service Required" dropdown (G-08): rebuilt from
+    // pageContent.contact.serviceOptions ("Label|value" lines). Only
+    // runs when the element is a <select> — on other pages the same id
+    // is the booking modal's readonly text input, which is untouched.
+    function rebuildContactServiceOptions(rawOptions) {
+        const select = document.getElementById("modalServiceInput");
+        if (!select || select.tagName !== "SELECT" || !rawOptions) return;
+        const options = parseTitleDetailList(rawOptions);
+        if (!options.length) return;
+        const prev = select.value;
+        select.innerHTML = options
+            .map(
+                (o) =>
+                    `<option value="${escapeHtmlAttr(o.detail || o.title)}">${escapeHtmlAttr(o.title)}</option>`
+            )
+            .join("");
+        if (prev && [...select.options].some((o) => o.value === prev)) select.value = prev;
+    }
+
     // ============================================================================
     // 5. PROMOTIONAL FLYER MODAL & ADMIN PORTAL DRAWER
     // ============================================================================
@@ -1764,7 +2252,17 @@
     function updateFlyerModalContent(config, specificDeal) {
         const s = specificDeal || (config && config.spotlight) || {};
         const c = (config && config.contacts) || {};
+        const pUmrah = (config && config.pageContent && config.pageContent.umrah) || {};
         const activeWA = getResolvedActiveWhatsApp(config);
+
+        const setTxt = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val;
+        };
+
+        // --- Flyer modal headings (C-07) ---
+        if (pUmrah.flyerModalEyebrow) setTxt("flyerModalEyebrow", pUmrah.flyerModalEyebrow);
+        setTxt("flyerModalTitle", `${c.agencyName || "Zakir Travel & Tours"} Flyer`);
 
         const customImg = document.getElementById("flyerModalCustomImage");
         const digitalCard = document.getElementById("flyerModalDigitalPreview");
@@ -1779,11 +2277,6 @@
                 digitalCard.classList.remove("hidden");
             }
         }
-
-        const setTxt = (id, val) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = val;
-        };
 
         setTxt("flyerPreviewMonth", s.monthLabel || "January");
         setTxt("flyerPreviewTitle", s.title || "UMRAH PACKAGE");
@@ -1878,6 +2371,44 @@
     // 6. GLOBAL INTERACTIVE HANDLERS (CALCULATOR, BOOKING MODAL)
     // ============================================================================
 
+    // Branch map data comes from the stored site config — never literals
+    // (E-10 / G-09). The Swat embed URL is contacts.mapEmbedUrl;
+    // Islamabad has its own contacts.branch2MapEmbedUrl /
+    // branch2MapSearchUrl. Headings are composed from the branch titles
+    // and addresses, so an admin edit flows through everywhere.
+    function getBranchMapData(branch) {
+        const cfg = liveSiteConfig || {};
+        const c = cfg.contacts || {};
+        const pHome = (cfg.pageContent && cfg.pageContent.home) || {};
+        if (branch === "islamabad") {
+            return {
+                embedUrl: c.branch2MapEmbedUrl || "",
+                searchUrl: c.branch2MapSearchUrl || "",
+                title: String(pHome.branch2Title || "Islamabad Branch"),
+                address: String(pHome.branch2Address || "")
+            };
+        }
+        return {
+            embedUrl: c.mapEmbedUrl || "",
+            searchUrl: c.branch1MapSearchUrl || "",
+            title: String(pHome.branch1Title || "Swat Head Office"),
+            address: String(pHome.branch1Address || "")
+        };
+    }
+
+    function isAllowedGoogleMapEmbedUrl(url) {
+        try {
+            const mapUrl = new URL(String(url || ""));
+            return (
+                mapUrl.protocol === "https:" &&
+                /(^|\.)google\.com$/.test(mapUrl.hostname) &&
+                mapUrl.pathname.startsWith("/maps")
+            );
+        } catch (_) {
+            return false;
+        }
+    }
+
     window.switchMapBranch = function (branch) {
         const iframe = document.getElementById("contactMapIframe");
         const heading = document.getElementById("mapHeadingTitle");
@@ -1889,20 +2420,46 @@
 
         iframe.setAttribute("data-switched", "true");
 
-        if (branch === "islamabad") {
-            iframe.src = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3318.847503714243!2d73.0645624!3d33.7128613!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfbf9df175e11d%3A0xe54d6faeebdae812!2sPotohar%20Plaza%2C%20Fazal-e-Haq%20Rd%2C%20Blue%20Area%2C%20Islamabad!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s";
-            if (heading) heading.textContent = "Islamabad Branch Location";
-            if (subtitle) subtitle.textContent = "Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad";
-            if (openBtn) openBtn.href = "https://www.google.com/maps/search/?api=1&query=Potohar+Plaza,+Blue+Area,+Islamabad";
-            if (btnSwat) btnSwat.className = "px-4 py-2 rounded-xl text-slate-600 hover:text-navy hover:bg-white/80 transition-all flex items-center gap-1.5";
-            if (btnIsb) btnIsb.className = "px-4 py-2 rounded-xl bg-navy text-white shadow-sm transition-all flex items-center gap-1.5";
-        } else {
-            iframe.src = "https://maps.google.com/maps?q=Hayat+Market,+Matta,+Swat,+Pakistan&t=&z=16&ie=UTF8&iwloc=&output=embed";
-            if (heading) heading.textContent = "Swat Head Office Location";
-            if (subtitle) subtitle.textContent = "2nd Floor, Hayat Market, Matta Swat, Khyber Pakhtunkhwa, Pakistan";
-            if (openBtn) openBtn.href = "https://www.google.com/maps/search/?api=1&query=Hayat+Market,+Matta,+Swat";
-            if (btnSwat) btnSwat.className = "px-4 py-2 rounded-xl bg-navy text-white shadow-sm transition-all flex items-center gap-1.5";
-            if (btnIsb) btnIsb.className = "px-4 py-2 rounded-xl text-slate-600 hover:text-navy hover:bg-white/80 transition-all flex items-center gap-1.5";
+        const isIslamabad = branch === "islamabad";
+        const data = getBranchMapData(isIslamabad ? "islamabad" : "swat");
+        // A missing or non-Google embed URL falls back to the Swat map,
+        // the same fallback the initial render uses.
+        const swatFallbackMap =
+            "https://maps.google.com/maps?q=Hayat+Market,+Matta,+Swat,+Pakistan&t=&z=16&ie=UTF8&iwloc=&output=embed";
+        iframe.src = isAllowedGoogleMapEmbedUrl(data.embedUrl) ? data.embedUrl : swatFallbackMap;
+        if (heading) heading.textContent = `${data.title} Location`;
+        if (subtitle) subtitle.textContent = data.address;
+        if (openBtn) {
+            openBtn.href =
+                data.searchUrl ||
+                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.address)}`;
+        }
+        if (btnSwat) {
+            btnSwat.className = isIslamabad
+                ? "px-4 py-2 rounded-xl text-slate-600 hover:text-navy hover:bg-white/80 transition-all flex items-center gap-1.5"
+                : "px-4 py-2 rounded-xl bg-navy text-white shadow-sm transition-all flex items-center gap-1.5";
+        }
+        if (btnIsb) {
+            btnIsb.className = isIslamabad
+                ? "px-4 py-2 rounded-xl bg-navy text-white shadow-sm transition-all flex items-center gap-1.5"
+                : "px-4 py-2 rounded-xl text-slate-600 hover:text-navy hover:bg-white/80 transition-all flex items-center gap-1.5";
+        }
+    };
+
+    // Programme flyer poster (E-09): show this programme's poster image
+    // in the shared poster modal. Falls back to toggling the modal
+    // directly when the page's own openPolandPosterModal is unavailable.
+    window.openProgrammePosterModal = function (posterUrl) {
+        const img = document.getElementById("polandPosterImg");
+        if (img && posterUrl) img.src = posterUrl;
+        if (typeof window.openPolandPosterModal === "function") {
+            window.openPolandPosterModal();
+            return;
+        }
+        const m = document.getElementById("polandPosterModal");
+        if (m) {
+            m.classList.remove("hidden");
+            m.classList.add("flex");
         }
     };
 

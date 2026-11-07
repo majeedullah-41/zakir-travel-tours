@@ -76,6 +76,63 @@
             heroHeadingMain: "Your Spiritual & Global Journey,",
             heroDescription:
                 "Headquartered on 2nd Floor, Hayat Market, Matta Swat with a branch office in Islamabad, Zakir Travel & Tours has proudly served over 100,000+ happy pilgrims and travelers. We specialize in Umrah & Ziyarat pilgrimages, domestic & international air ticketing, and worldwide visa consultancy.",
+            seoTitle: "Zakir Travel & Tours | Official Travel & Umrah Agency — Swat Head Office",
+            seoDescription:
+                "Zakir Travel & Tours — Umrah packages, worldwide visa services, air tickets and Europe work permits from our Swat (Matta) head office and Islamabad branch.",
+            footerDescription:
+                "Headquartered in Swat Matta and trusted by over 100,000+ pilgrims and travelers for Umrah & Ziyarat packages, domestic & international air ticketing, and global visa consultancy.",
+            floatingChatLabel: "Chat with Swat Head Office",
+            heroStat1Number: "100K+",
+            heroStat1Label: "Pilgrims & Travelers",
+            heroStat2Number: "Swat HQ",
+            heroStat2Label: "2nd Floor, Hayat Market, Matta Swat",
+            heroStat3Number: "50+",
+            heroStat3Label: "Partner Airlines",
+            heroStat4Number: "24/7",
+            heroStat4Label: "Dedicated Support",
+            trustBadgeText: "100,000+ Served",
+            heroCardEyebrow: "Headquartered in Swat",
+            heroCardTitle: "Swat Head Office & Branch",
+            heroCardHoursBadge: "Open Mon–Sat",
+            aboutBadge1: "Swat Matta Headquarters",
+            aboutBadge2: "100K+ Pilgrims & Clients",
+            aboutBadge3: "Fast-Track Visas & Tickets",
+            managementNote: "Personal oversight on every Umrah, Visa & Air Ticket file.",
+            missionPoints: "Honest Pricing & Zero Hidden Fees|Verified Haramain Hotels & Airlines",
+            missionBadge: "100% Transparent Documentation",
+            servicesHeading: "Specialized Travel & Visa Solutions",
+            servicesIntro:
+                "Whether you are travelling for Umrah, family vacation, business, or visiting loved ones abroad, Zakir Travel & Tours provides end-to-end assistance.",
+            srv1Badge: "Haramain",
+            srv1Bullets:
+                "Electronic Umrah Visa & Insurance|Walking Distance & Shuttle Hotels|Guided Makkah & Madinah Ziyarat",
+            srv2Badge: "50+ Airlines",
+            srv2Bullets:
+                "Direct & Connecting Global Routes|Special Group & Family Fares|Date Change & Rebooking Support",
+            srv3Badge: "Global Visas",
+            srv3Bullets:
+                "Fast E-Visas (UAE, KSA, Baku, Asia)|Complete Embassy File Preparation|Appointment & Document Review",
+            srv4Badge: "Hospitality",
+            srv4Bullets:
+                "Economy to 5-Star Clock Tower Stays|Jeddah & Madinah Airport Transfers|Custom Family & Group Vehicles",
+            branchesHeading: "Swat Head Office & Regional Branch",
+            branchesIntro:
+                "Visit our central Head Office on 2nd Floor, Hayat Market, Matta Swat for personal consultation and passport submission, or connect with our branch office in Islamabad.",
+            processHeading: "How Zakir Travel & Tours Works",
+            processIntro:
+                "Whether you walk into our Swat Matta Head Office at 2nd Floor, Hayat Market, connect with our Islamabad branch, or message us on WhatsApp, every client enjoys a structured 4-step experience.",
+            process1Title: "Personal Consultation",
+            process1Desc:
+                "Visit our Swat Matta Head Office or message our management desk on WhatsApp with your travel goals and preferred dates.",
+            process2Title: "Tailored Travel Plan",
+            process2Desc:
+                "We compare airline routes, visa requirements, and hotel proximities to give you transparent options with zero hidden fees.",
+            process3Title: "Fast Documentation",
+            process3Desc:
+                "Submit your passports at our Swat Matta Head Office (or via WhatsApp scan). We process your e-visa, air tickets, and hotel vouchers rapidly.",
+            process4Title: "24/7 On-Trip Support",
+            process4Desc:
+                "From airport departure to Makkah/Madinah hotel check-ins and your return flight, our team stays in touch 24/7.",
             aboutBadge: "About Zakir Travel & Tours",
             aboutHeading: "Swat's Trusted Partner for Spiritual & Worldwide Travel",
             aboutDescription:
@@ -90,10 +147,12 @@
             branch1Address: "2nd Floor, Hayat Market, Matta Swat, Khyber Pakhtunkhwa, Pakistan",
             branch1Desc:
                 "Our central headquarters in Swat Matta providing families, elders, and travelers across Swat and Malakand Division with direct walk-in Umrah bookings, air ticketing, and visa consultancy.",
+            branch1Note: "Walk-in pilgrims & group bookings welcome",
             branch2Title: "Islamabad Branch Office",
             branch2Address: "Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad",
             branch2Desc:
                 "Our branch office in Blue Area, Islamabad supporting embassy documentation, flight departures, and travelers in the twin cities.",
+            branch2Note: "Embassy file preparation & flights",
             stat1Number: "100K+",
             stat1Label: "Happy Clients & Pilgrims Served",
             stat2Number: "24/7",
@@ -127,6 +186,23 @@
         umrah: {
             heroBadge: "Direct Departures from Islamabad (ISB)",
             heroTitle: "All-Inclusive Umrah Packages",
+            heroScript: "Sacred Journey, Pure Peace.",
+            seoTitle: "Umrah Packages 2026 | Zakir Travel & Tours",
+            seoDescription:
+                "Affordable Umrah packages 2026 from Pakistan — 14-night economy, 3-star, 4-star and 5-star packages with visa, flights and hotels. Book on WhatsApp",
+            trustStat1Number: "100K+",
+            trustStat1Label: "Pilgrims Served",
+            trustStat2Number: "Swat Matta",
+            trustStat2Label: "Central Head Office",
+            trustStat3Number: "Verified",
+            trustStat3Label: "Near Haram Hotels",
+            trustStat4Number: "24/7",
+            trustStat4Label: "Haramain Support",
+            compareHeading: "Compare Umrah Packages",
+            compareNote: "Updated live by our Islamabad booking desk — select any package to book on WhatsApp.",
+            includedHeading: "What Is Included in Every Umrah Package?",
+            includedIntro: "Zero hidden charges. Here is exactly what our agency guarantees for every pilgrim.",
+            flyerModalEyebrow: "Official Monthly Flyer",
             heroSubtitle:
                 "Experience spiritual peace with complete ease. From verified walking-distance Makkah and Madinah hotels to fast-track Saudi Umrah visas, return airline tickets, luxury AC ground transport, and guided historical Ziyarat.",
             inc1Title: "Flights & Visas",
@@ -145,6 +221,23 @@
         visas: {
             heroBadge: "Fast Processing & Embassy File Preparation",
             heroTitle: "Worldwide Visas & Air Tickets",
+            heroScript: "Seamless Approvals, Guaranteed Fares.",
+            seoTitle: "Worldwide Visa Services & Air Tickets | Zakir Travel & Tours",
+            seoDescription:
+                "Worldwide visa services and air tickets — visit, work, study and Umrah visas with expert guidance from Zakir Travel & Tours, Swat & Islamabad.",
+            trustStat1Number: "100K+",
+            trustStat1Label: "Visas & Tickets Issued",
+            trustStat2Number: "Swat Matta",
+            trustStat2Label: "Central Head Office",
+            trustStat3Number: "50+",
+            trustStat3Label: "Partner Global Airlines",
+            trustStat4Number: "99%",
+            trustStat4Label: "Documentation Accuracy",
+            destinationsHeading: "Top Visa Destinations & Fees",
+            destinationsNote:
+                "Updated live by our Swat Head Office and Islamabad visa consultants with required documentation, processing timeline, and starting PKR fees.",
+            flightEyebrow: "Guaranteed Best Fares",
+            defaultDepartureCity: "Islamabad (ISB)",
             heroSubtitle:
                 "Whether you need a rapid Saudi Umrah e-visa, UAE 30/60 days tourist visa, Turkey e-visa, or complex UK/USA/Schengen file preparation, our Islamabad visa desk delivers high approval rates with zero stress.",
             flightHeading: "Domestic & International Air Ticket Booking",
@@ -167,6 +260,8 @@
         calculator: {
             heroBadge: "Live Real-Time Cost Estimator",
             heroTitle: "Umrah Package Budget Calculator",
+            ratesNote:
+                "Rates auto-scale from live hotel contract prices set by our Swat Head Office & Islamabad booking desks.",
             heroSubtitle:
                 "Estimate your custom Umrah package in seconds! Select your stay duration, room sharing tier (Quad, Triple, Double, Sharing), hotel courtyard distance, and number of pilgrims.",
             includedBullets:
@@ -175,6 +270,29 @@
         contact: {
             heroBadge: "Head Office: Blue Area, Islamabad",
             heroTitle: "Contact Our Travel Desk",
+            heroScript: "The People Behind Your Journey.",
+            seoTitle: "About Us, Our Team & Contact | Zakir Travel & Tours",
+            seoDescription:
+                "Contact Zakir Travel & Tours — head office in Matta, Swat and branch in Blue Area, Islamabad. Meet our team or reach us on WhatsApp",
+            trustStat1Number: "Swat Matta",
+            trustStat1Label: "Central Head Office",
+            trustStat2Number: "Islamabad",
+            trustStat2Label: "Potohar Plaza Branch",
+            trustStat3Number: "Direct",
+            trustStat3Label: "Management Care",
+            trustStat4Number: "24/7",
+            trustStat4Label: "WhatsApp Helpline",
+            leadershipHeading: "Leadership & Vision",
+            leadershipIntro: "Built on honesty, transparency and personal care for every pilgrim and traveler.",
+            expertsHeading: "Our Experts",
+            expertsIntro: "Experienced specialists who oversee every Umrah, visa and ticketing file personally.",
+            teamHeading: "Our Team",
+            teamIntro: "The dedicated people who process, manage and support your travel every single day.",
+            contactHeading: "Contact Us",
+            contactIntro: "Visit our offices, call our desk, or message us directly on WhatsApp.",
+            serviceOptions:
+                "Umrah Package Inquiry|Umrah Package Booking\nWorldwide Visa Assistance|Worldwide Visa Assistance\nDomestic / International Flight Tickets|Air Ticket Booking\nHaram Hotel & Ground Transport|Hotel & Transport Reservation\nCustom Family Group Package|Custom Family Package",
+            ceoTags: "Swat Matta Head Office|Umrah & Ziyarat|Global Visas & Tickets",
             heroSubtitle:
                 "We are always here to assist your spiritual journey and global travel. Visit our Blue Area office or speak directly with our manager and consultant via phone or WhatsApp."
         },
@@ -182,6 +300,10 @@
             heroBadge: "EU & Schengen Employment \u2022 Legal Work Permits",
             heroTitle: "Europe Work Permits",
             heroScript: "Build Your Career Abroad \u2014 The Legal Way.",
+            seoTitle: "Europe Work Permits | Poland & EU Employment Visas | Zakir Travel & Tours",
+            seoDescription:
+                "Europe work permits — Poland and EU employment visas with complete documentation support from Zakir Travel & Tours, Swat & Islamabad.",
+            topBarTagline: "Europe Work Permits & Overseas Employment",
             heroSubtitle:
                 "A work permit allows you to legally live and work in a foreign country. From our Head Office in Matta Swat, Zakir Travel & Tours guides you through every stage of European employment \u2014 consultation, eligibility, documents and embassy filing \u2014 for Poland and other leading EU destinations.",
             featuredScript: "Now Accepting Applications",
@@ -190,6 +312,49 @@
             destinationsHeading: "Work Permit Programmes Across Europe",
             destinationsDesc:
                 "Compare permit types, timelines and in-demand sectors. Availability depends on employer demand and quotas \u2014 contact our desk for the latest openings.",
+            trustStat1Number: "7+ Countries",
+            trustStat1Label: "EU Destinations Covered",
+            trustStat2Number: "100% Legal",
+            trustStat2Label: "Government-Issued Permits",
+            trustStat3Number: "Schengen",
+            trustStat3Label: "Travel Mobility Rights",
+            trustStat4Number: "Free",
+            trustStat4Label: "Initial Profile Review",
+            moreDestinationsTitle: "Looking for Malta, Lithuania, Serbia or another country?",
+            moreDestinationsDesc:
+                "Openings change with employer demand. Share your profile and our team will advise on the best current option.",
+            moreDestinationsCountries: "Malta, Lithuania, Serbia",
+            benefit1Title: "Legal Employment",
+            benefit1Desc: "Registered contracts with full EU labour-law protection and minimum-wage guarantees.",
+            benefit2Title: "Schengen Mobility",
+            benefit2Desc:
+                "Travel across Schengen member states for short visits while holding a valid residence permit.",
+            benefit3Title: "Health & Social Security",
+            benefit3Desc:
+                "State health insurance and social security contributions from your first salary.",
+            benefit4Title: "Residency Pathway",
+            benefit4Desc:
+                "Renew your permit in-country and build towards long-term residence and family reunion.",
+            processIntro: "A transparent, step-by-step process managed from our Swat Head Office.",
+            process1Title: "Consultation",
+            process1Desc:
+                "Discuss your goals, preferred country and work background with our visa consultant.",
+            process2Title: "Eligibility & Job Match",
+            process2Desc:
+                "We assess your age, education and skills, and match your profile with suitable employer demand.",
+            process3Title: "Permit & Documents",
+            process3Desc:
+                "Work permit filing, sworn translations, attestations, police clearance and Europass CV preparation.",
+            process4Title: "Embassy & Departure",
+            process4Desc:
+                "Embassy appointment, interview preparation, visa collection and pre-departure briefing.",
+            checklistItems:
+                "Valid Passport|Minimum 12–18 months validity with blank pages\nCNIC & Passport Photographs|White background, embassy specification\nEducational Certificates|Attested by HEC / Board and MOFA where required\nExperience Letters|Trade certificates, NAVTTC / technical diplomas\nPolice Character Certificate|Issued and attested for the destination country\nMedical & Insurance|Fitness certificate and travel health insurance",
+            sectors:
+                "Warehouse & Logistics|Construction & Building Trades|Factory & Production|Heavy Commercial Driving (CE)|Hospitality & Restaurant|Agriculture & Farming|Welding & Technical Trades|Other / General Labour",
+            assessmentNote: "100% confidential. Your profile is reviewed directly by our visa consultants.",
+            programmeServices:
+                "Visa Consultation|One-to-one guidance\nEligibility Assessment|Profile & skill match\nDocument Preparation|Translation & attestation\nApplication Assistance|Embassy filing & follow-up",
             benefitsHeading: "Benefits of a European Work Permit",
             processHeading: "Your Path to Working in Europe",
             checklistHeading: "General Document Checklist",
@@ -229,9 +394,38 @@
                     activeBookingWhatsApp: "923490558345",
                     officeAddress: "2nd Floor, Hayat Market, Matta Swat, Khyber Pakhtunkhwa, Pakistan",
                     officeHours: "Monday to Saturday: 9:30 AM – 8:00 PM (Sunday Closed / WhatsApp Support Active)",
+                    branch1Hours: "Monday – Saturday: 9:30 AM to 8:00 PM",
+                    branch2Hours: "Monday – Saturday: 9:30 AM to 8:00 PM",
                     officeEmail: "info@zakirtravels.com / inam@zakirtravels.com",
+                    supportNote: "24/7 WhatsApp Support Active",
                     mapEmbedUrl:
-                        "https://maps.google.com/maps?q=Hayat+Market,+Matta,+Swat,+Pakistan&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                        "https://maps.google.com/maps?q=Hayat+Market,+Matta,+Swat,+Pakistan&t=&z=16&ie=UTF8&iwloc=&output=embed",
+                    branch1MapSearchUrl:
+                        "https://www.google.com/maps/search/?api=1&query=Hayat+Market,+Matta,+Swat",
+                    branch2MapEmbedUrl:
+                        "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3318.847503714243!2d73.0645624!3d33.7128613!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfbf9df175e11d%3A0xe54d6faeebdae812!2sPotohar%20Plaza%2C%20Fazal-e-Haq%20Rd%2C%20Blue%20Area%2C%20Islamabad!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s",
+                    branch2MapSearchUrl:
+                        "https://www.google.com/maps/search/?api=1&query=Potohar+Plaza,+Blue+Area,+Islamabad"
+                },
+                // About Us team members (ids must match data-team-photo in
+                // contact.html and TEAM_MEMBERS in js/admin-portal.js).
+                // Edited in the admin portal; the public page falls back
+                // to its hardcoded text when a value is missing/blank.
+                teamMembers: {
+                    ceo: {
+                        name: "Zakir Ullah",
+                        role: "Chief Executive Officer",
+                        quote: "Our mission has always been simple — to serve every pilgrim, family and traveler as if they were our own. From our Head Office in Swat Matta, we built Zakir Travel & Tours on honesty, transparent pricing and complete personal responsibility, so that every journey — whether to the Haramain or across the world — is peaceful and worry-free."
+                    },
+                    inam: { name: "Inam Ullah", role: "Manager" },
+                    hafizullah: { name: "Hafizullah", role: "Visa Officer" },
+                    fida: { name: "Fida Hussain", role: "Umrah Officer" },
+                    sadiq: { name: "Sadiq", role: "Visa Consultant" },
+                    faisal: { name: "Faisal", role: "Visa Processing" },
+                    suliman: { name: "Suliman", role: "Umrah Visa Officer" },
+                    mazhar: { name: "Mazhar", role: "Accountant" },
+                    saad: { name: "Saad Khan", role: "Social Media Manager" },
+                    salim: { name: "Salim", role: "Office Boy" }
                 },
                 pageContent: JSON.parse(JSON.stringify(DEFAULT_PAGE_CONTENT)),
                 updatedAt: new Date().toISOString()
@@ -519,9 +713,47 @@
                 residenceNote: "TRC",
                 jobCategories:
                     "Warehouse & Logistics|Construction|Factory & Production|CE Drivers|Hospitality|Agriculture",
+                posterImageUrl: "./assets/poland-work-permit.jpg",
                 applyCountry: "Poland",
                 isActive: true,
                 sortOrder: 1
+            }
+        ],
+        work_permit_faqs: [
+            {
+                id: "faq_open_country",
+                question: "Which European country is currently open for applications?",
+                answer: "Poland is our featured programme and is currently accepting applications. Other destinations such as Romania, Croatia, Hungary, Czech Republic and Portugal depend on live employer demand — contact our desk for the latest openings.",
+                isActive: true,
+                sortOrder: 1
+            },
+            {
+                id: "faq_timeline",
+                question: "How long does a European work permit take?",
+                answer: "Most programmes take approximately 2–6 months from document submission to visa decision, depending on the country, the permit authority and embassy appointment availability. Timelines shown on this page are indicative.",
+                isActive: true,
+                sortOrder: 2
+            },
+            {
+                id: "faq_schengen",
+                question: "Can I travel to other Schengen countries with my work visa?",
+                answer: "Yes. A valid national D-visa or residence permit from a Schengen member state generally allows short visits (up to 90 days in any 180-day period) to other Schengen countries. Your employment, however, remains tied to the issuing country.",
+                isActive: true,
+                sortOrder: 3
+            },
+            {
+                id: "faq_renew_family",
+                question: "Can I renew my permit or bring my family later?",
+                answer: "Most EU countries allow in-country renewal of work and residence permits (for example the Karta Pobytu in Poland), and many offer family reunion after meeting income and residence conditions.",
+                isActive: true,
+                sortOrder: 4
+            },
+            {
+                id: "faq_submit_docs",
+                question: "Where do I submit my original documents?",
+                answer: "You can visit our Head Office at 2nd Floor, Hayat Market, Matta Swat, or our Islamabad branch at Potohar Plaza, Blue Area. Both offices are open Monday to Saturday for walk-in consultations.",
+                isActive: true,
+                sortOrder: 5
             }
         ]
     };
@@ -539,29 +771,70 @@
         };
     }
 
+    // Generic deep merge for pageContent: defaults <- stored base <-
+    // incoming. Unknown sections and unknown keys inside a section are
+    // kept (not dropped), so new pageContent.* keys added later survive
+    // a save round-trip. The legacy-home guard below only resets the
+    // known legacy-sensitive home fields to the defaults — it never
+    // wipes keys the defaults do not know about.
     function mergePageContent(baseContent, incomingContent) {
         const base = baseContent || DEFAULT_PAGE_CONTENT;
         const inc = incomingContent || {};
-        const incHome = { ...(inc.home || {}) };
-        if (
-            !incHome.branch2Address ||
+        const sections = new Set([
+            ...Object.keys(DEFAULT_PAGE_CONTENT),
+            ...Object.keys(base),
+            ...Object.keys(inc)
+        ]);
+        const out = {};
+        sections.forEach((key) => {
+            const def = DEFAULT_PAGE_CONTENT[key] || {};
+            const baseSection = base[key] || {};
+            const incSection = inc[key] || {};
+            out[key] = { ...def, ...baseSection, ...incSection };
+        });
+        const incHome = inc.home || {};
+        // Legacy-data guard: only the explicit legacy markers trigger
+        // it (a "100%" stat, a Blue Area / 24-7 stat 4, or "Islamabad"
+        // in the badge / heading / branch-1 title). A missing
+        // branch2Address alone does NOT trigger it — the merge above
+        // already backfills any absent key from the defaults, and a
+        // partial update (one or two home keys, no branch2Address)
+        // must never wipe the stored home section. When the guard
+        // fires it resets only the fields it polices, so newer keys
+        // (footerDescription, heroStat1Number, …) always survive.
+        const legacyMarkers =
             incHome.stat1Number === "100%" ||
             incHome.stat4Number === "Blue Area" ||
             incHome.stat4Number === "24/7" ||
             (incHome.aboutHeading && incHome.aboutHeading.includes("Islamabad")) ||
             (incHome.heroBadge && incHome.heroBadge.includes("Islamabad")) ||
-            (incHome.branch1Title && incHome.branch1Title.includes("Islamabad"))
-        ) {
-            Object.assign(incHome, DEFAULT_PAGE_CONTENT.home);
+            (incHome.branch1Title && incHome.branch1Title.includes("Islamabad"));
+        if (legacyMarkers) {
+            out.home = {
+                ...out.home,
+                branch2Address: DEFAULT_PAGE_CONTENT.home.branch2Address,
+                stat1Number: DEFAULT_PAGE_CONTENT.home.stat1Number,
+                stat4Number: DEFAULT_PAGE_CONTENT.home.stat4Number,
+                aboutHeading: DEFAULT_PAGE_CONTENT.home.aboutHeading,
+                heroBadge: DEFAULT_PAGE_CONTENT.home.heroBadge,
+                branch1Title: DEFAULT_PAGE_CONTENT.home.branch1Title
+            };
         }
-        return {
-            home: { ...DEFAULT_PAGE_CONTENT.home, ...(base.home || {}), ...incHome },
-            umrah: { ...DEFAULT_PAGE_CONTENT.umrah, ...(base.umrah || {}), ...(inc.umrah || {}) },
-            visas: { ...DEFAULT_PAGE_CONTENT.visas, ...(base.visas || {}), ...(inc.visas || {}) },
-            calculator: { ...DEFAULT_PAGE_CONTENT.calculator, ...(base.calculator || {}), ...(inc.calculator || {}) },
-            contact: { ...DEFAULT_PAGE_CONTENT.contact, ...(base.contact || {}), ...(inc.contact || {}) },
-            workPermit: { ...DEFAULT_PAGE_CONTENT.workPermit, ...(base.workPermit || {}), ...(inc.workPermit || {}) }
-        };
+        return out;
+    }
+
+    // Per-member merge for teamMembers: defaults <- stored. A browser
+    // seeded before a field existed (e.g. the CEO quote) still picks up
+    // the new default instead of losing the field, while edited
+    // names/roles always win.
+    function mergeTeamMembers(baseMembers, incomingMembers) {
+        const base = baseMembers || {};
+        const inc = incomingMembers || {};
+        const out = {};
+        new Set([...Object.keys(base), ...Object.keys(inc)]).forEach((id) => {
+            out[id] = { ...(base[id] || {}), ...(inc[id] || {}) };
+        });
+        return out;
     }
 
     // ============================================================================
@@ -575,6 +848,7 @@
         VISA_SERVICES: "zakir_db_visa_services_v1",
         WORK_PERMITS: "zakir_db_work_permits_v1",
         WORK_PERMIT_PROGRAMMES: "zakir_db_work_permit_programmes_v1",
+        WORK_PERMIT_FAQS: "zakir_db_work_permit_faqs_v1",
         ENQUIRIES: "zakir_db_enquiries_v1",
         AUTH_SESSION: "zakir_auth_session_v1",
         LOCAL_ADMIN_PASS: "zakir_db_local_admin_pass_v1"
@@ -593,6 +867,7 @@
                 visa_services: new Set(),
                 work_permits: new Set(),
                 work_permit_programmes: new Set(),
+                work_permit_faqs: new Set(),
                 enquiries: new Set(),
                 auth: new Set(),
                 // Connection-mode listeners: the mode is always
@@ -629,6 +904,7 @@
                     e.key === STORAGE_KEYS.VISA_SERVICES ||
                     e.key === STORAGE_KEYS.WORK_PERMITS ||
                     e.key === STORAGE_KEYS.WORK_PERMIT_PROGRAMMES ||
+                    e.key === STORAGE_KEYS.WORK_PERMIT_FAQS ||
                     e.key === STORAGE_KEYS.ENQUIRIES
                 ) {
                     this._notifyLocalListeners();
@@ -682,6 +958,12 @@
                     localStorage.setItem(
                         STORAGE_KEYS.WORK_PERMIT_PROGRAMMES,
                         JSON.stringify(FLYER_DEFAULTS.work_permit_programmes)
+                    );
+                }
+                if (!localStorage.getItem(STORAGE_KEYS.WORK_PERMIT_FAQS)) {
+                    localStorage.setItem(
+                        STORAGE_KEYS.WORK_PERMIT_FAQS,
+                        JSON.stringify(FLYER_DEFAULTS.work_permit_faqs)
                     );
                 }
                 if (!localStorage.getItem(STORAGE_KEYS.ENQUIRIES)) {
@@ -759,6 +1041,12 @@
             return () => this.listeners.work_permit_programmes.delete(callback);
         }
 
+        onWorkPermitFaqsSnapshot(callback) {
+            this.listeners.work_permit_faqs.add(callback);
+            callback(this.getLocalWorkPermitFaqs());
+            return () => this.listeners.work_permit_faqs.delete(callback);
+        }
+
         onEnquiriesSnapshot(callback) {
             this.listeners.enquiries.add(callback);
             callback(this.getLocalEnquiries());
@@ -786,6 +1074,7 @@
             const visas = this.getLocalVisaServices();
             const workPermits = this.getLocalWorkPermits();
             const workPermitProgrammes = this.getLocalWorkPermitProgrammes();
+            const workPermitFaqs = this.getLocalWorkPermitFaqs();
             const enquiries = this.getLocalEnquiries();
 
             this.listeners.site_config.forEach((cb) => cb(siteConfig));
@@ -794,6 +1083,7 @@
             this.listeners.visa_services.forEach((cb) => cb(visas));
             this.listeners.work_permits.forEach((cb) => cb(workPermits));
             this.listeners.work_permit_programmes.forEach((cb) => cb(workPermitProgrammes));
+            this.listeners.work_permit_faqs.forEach((cb) => cb(workPermitFaqs));
             this.listeners.enquiries.forEach((cb) => cb(enquiries));
         }
 
@@ -833,6 +1123,10 @@
                             ...FLYER_DEFAULTS.site_config.main_settings.contacts,
                             ...(parsed.contacts || {})
                         },
+                        teamMembers: mergeTeamMembers(
+                            FLYER_DEFAULTS.site_config.main_settings.teamMembers,
+                            parsed.teamMembers
+                        ),
                         pageContent: mergePageContent(DEFAULT_PAGE_CONTENT, parsed.pageContent)
                     };
                 }
@@ -924,6 +1218,21 @@
                 console.error("Error reading work_permit_programmes:", e);
             }
             return JSON.parse(JSON.stringify(FLYER_DEFAULTS.work_permit_programmes));
+        }
+
+        getLocalWorkPermitFaqs() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.WORK_PERMIT_FAQS);
+                if (raw) {
+                    const list = JSON.parse(raw);
+                    if (Array.isArray(list) && list.length > 0) {
+                        return [...list].sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+                    }
+                }
+            } catch (e) {
+                console.error("Error reading work_permit_faqs:", e);
+            }
+            return JSON.parse(JSON.stringify(FLYER_DEFAULTS.work_permit_faqs));
         }
 
         // --------------------------------------------------------------------
@@ -1199,6 +1508,10 @@
                     ...current.contacts,
                     ...(partialOrFullConfig.contacts || {})
                 },
+                teamMembers: mergeTeamMembers(
+                    current.teamMembers,
+                    partialOrFullConfig.teamMembers
+                ),
                 pageContent: mergePageContent(current.pageContent, partialOrFullConfig.pageContent),
                 updatedAt: new Date().toISOString()
             };
@@ -1298,6 +1611,7 @@
                         visa_services: this.getLocalVisaServices(),
                         work_permits: this.getLocalWorkPermits(),
                         work_permit_programmes: this.getLocalWorkPermitProgrammes(),
+                        work_permit_faqs: this.getLocalWorkPermitFaqs(),
                         enquiries: this.getLocalEnquiries()
                     };
                     const list = lists[collection];
@@ -1711,6 +2025,78 @@
             return this.saveWorkPermitProgramme(copy);
         }
 
+        // --------------------------------------------------------------------
+        // MUTATIONS: WORK PERMIT FAQS (E-08 — same CRUD shape as visas)
+        // --------------------------------------------------------------------
+
+        async saveWorkPermitFaq(faqData) {
+            if (!String((faqData && faqData.question) || "").trim()) {
+                throw new Error("FAQ needs a question.");
+            }
+            const list = this.getLocalWorkPermitFaqs();
+            let targetFaq;
+            if (faqData.id) {
+                const idx = list.findIndex((f) => f.id === faqData.id);
+                if (idx !== -1) {
+                    targetFaq = {
+                        ...list[idx],
+                        ...faqData,
+                        sortOrder: (Number(faqData.sortOrder ?? list[idx].sortOrder ?? idx + 1) || 0)
+                    };
+                    list[idx] = targetFaq;
+                }
+            }
+
+            if (!targetFaq) {
+                const newId = faqData.id || `faq_${Date.now()}`;
+                targetFaq = {
+                    id: newId,
+                    question: String(faqData.question || "").trim(),
+                    answer: String(faqData.answer || "").trim(),
+                    isActive: faqData.isActive !== undefined ? Boolean(faqData.isActive) : true,
+                    sortOrder: (Number(faqData.sortOrder ?? list.length + 1) || 0)
+                };
+                list.push(targetFaq);
+            }
+
+            localStorage.setItem(STORAGE_KEYS.WORK_PERMIT_FAQS, JSON.stringify(list));
+            this._notifyLocalListeners();
+            this._broadcastChange("DB_UPDATED");
+
+            return { synced: false, faq: targetFaq };
+        }
+
+        async deleteWorkPermitFaq(faqId) {
+            const list = this.getLocalWorkPermitFaqs().filter((f) => f.id !== faqId);
+            localStorage.setItem(STORAGE_KEYS.WORK_PERMIT_FAQS, JSON.stringify(list));
+            this._notifyLocalListeners();
+            this._broadcastChange("DB_UPDATED");
+
+            return { synced: false };
+        }
+
+        async reorderWorkPermitFaq(faqId, direction) {
+            const list = this.getLocalWorkPermitFaqs();
+            const idx = list.findIndex((f) => f.id === faqId);
+            if (idx === -1) return;
+            const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+            if (swapIdx < 0 || swapIdx >= list.length) return;
+
+            const temp = list[idx];
+            list[idx] = list[swapIdx];
+            list[swapIdx] = temp;
+
+            list.forEach((item, index) => {
+                item.sortOrder = index + 1;
+            });
+
+            localStorage.setItem(STORAGE_KEYS.WORK_PERMIT_FAQS, JSON.stringify(list));
+            this._notifyLocalListeners();
+            this._broadcastChange("DB_UPDATED");
+
+            return { synced: false };
+        }
+
         // Compress an image to a DataURL (max 1100px, JPEG 0.82) and
         // return it. Local-only: there is no remote storage, so the
         // DataURL is the stored photo itself (it is saved into the
@@ -1762,6 +2148,13 @@
             if (existingTeamPhotos && Object.keys(existingTeamPhotos).length) {
                 defaultConfig.teamPhotos = JSON.parse(JSON.stringify(existingTeamPhotos));
             }
+            // Same for edited team names/roles: the seed carries the
+            // original names, so re-apply the admin's edits or a reset
+            // would silently restore the old names.
+            const existingTeamMembers = (this.getLocalSiteConfig() || {}).teamMembers;
+            if (existingTeamMembers && Object.keys(existingTeamMembers).length) {
+                defaultConfig.teamMembers = JSON.parse(JSON.stringify(existingTeamMembers));
+            }
             const defaultDeals = JSON.parse(JSON.stringify(FLYER_DEFAULTS.special_deals));
             const defaultPkgs = JSON.parse(JSON.stringify(FLYER_DEFAULTS.umrah_packages));
             const defaultVisas = JSON.parse(JSON.stringify(FLYER_DEFAULTS.visa_services));
@@ -1769,6 +2162,7 @@
             const defaultWorkPermitProgrammes = JSON.parse(
                 JSON.stringify(FLYER_DEFAULTS.work_permit_programmes)
             );
+            const defaultWorkPermitFaqs = JSON.parse(JSON.stringify(FLYER_DEFAULTS.work_permit_faqs));
 
             localStorage.setItem(STORAGE_KEYS.SITE_CONFIG, JSON.stringify(defaultConfig));
             localStorage.setItem(STORAGE_KEYS.SPECIAL_DEALS, JSON.stringify(defaultDeals));
@@ -1779,6 +2173,7 @@
                 STORAGE_KEYS.WORK_PERMIT_PROGRAMMES,
                 JSON.stringify(defaultWorkPermitProgrammes)
             );
+            localStorage.setItem(STORAGE_KEYS.WORK_PERMIT_FAQS, JSON.stringify(defaultWorkPermitFaqs));
 
             this._notifyLocalListeners();
             this._broadcastChange("DB_UPDATED");
@@ -1791,7 +2186,8 @@
                     umrah_packages: defaultPkgs,
                     visa_services: defaultVisas,
                     work_permits: defaultWorkPermits,
-                    work_permit_programmes: defaultWorkPermitProgrammes
+                    work_permit_programmes: defaultWorkPermitProgrammes,
+                    work_permit_faqs: defaultWorkPermitFaqs
                 }
             };
         }

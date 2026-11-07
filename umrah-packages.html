@@ -364,7 +364,7 @@
 
             <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight uppercase leading-[1.15]">
                 <span id="umrahHeroTitle" class="block">All-Inclusive Umrah Packages</span>
-                <span class="font-serif italic font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-teal-light to-sky-200 animated-gradient-text block mt-1 text-2xl sm:text-4xl lg:text-5xl">Sacred Journey, Pure Peace.</span>
+                <span id="umrahHeroScript" class="font-serif italic font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-teal-light to-sky-200 animated-gradient-text block mt-1 text-2xl sm:text-4xl lg:text-5xl">Sacred Journey, Pure Peace.</span>
             </h1>
 
             <p id="umrahHeroSubtitle" class="mt-4 text-base sm:text-lg text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed">
@@ -390,20 +390,20 @@
             <!-- Executive Trust Strip -->
             <div class="mt-10 pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-4xl mx-auto text-center">
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
-                    <div class="text-xl sm:text-2xl font-extrabold text-amber-300">100K+</div>
-                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Pilgrims Served</div>
+                    <div id="umrahTrustStat1Number" class="text-xl sm:text-2xl font-extrabold text-amber-300">100K+</div>
+                    <div id="umrahTrustStat1Label" class="text-[11px] font-semibold text-slate-300 mt-0.5">Pilgrims Served</div>
                 </div>
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
-                    <div class="text-xl sm:text-2xl font-extrabold text-teal-light">Swat Matta</div>
-                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Central Head Office</div>
+                    <div id="umrahTrustStat2Number" class="text-xl sm:text-2xl font-extrabold text-teal-light">Swat Matta</div>
+                    <div id="umrahTrustStat2Label" class="text-[11px] font-semibold text-slate-300 mt-0.5">Central Head Office</div>
                 </div>
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
-                    <div class="text-xl sm:text-2xl font-extrabold text-white">Verified</div>
-                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Near Haram Hotels</div>
+                    <div id="umrahTrustStat3Number" class="text-xl sm:text-2xl font-extrabold text-white">Verified</div>
+                    <div id="umrahTrustStat3Label" class="text-[11px] font-semibold text-slate-300 mt-0.5">Near Haram Hotels</div>
                 </div>
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
-                    <div class="text-xl sm:text-2xl font-extrabold text-emerald-400">24/7</div>
-                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Haramain Support</div>
+                    <div id="umrahTrustStat4Number" class="text-xl sm:text-2xl font-extrabold text-emerald-400">24/7</div>
+                    <div id="umrahTrustStat4Label" class="text-[11px] font-semibold text-slate-300 mt-0.5">Haramain Support</div>
                 </div>
             </div>
         </div>
@@ -438,9 +438,9 @@
                 <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-3">
                     <div>
                         <span class="text-xs font-bold uppercase tracking-widest text-teal">All Available Tiers</span>
-                        <h3 class="text-2xl sm:text-4xl font-black text-navy mt-1">Compare Umrah Packages</h3>
+                        <h3 id="umrahCompareHeading" class="text-2xl sm:text-4xl font-black text-navy mt-1">Compare Umrah Packages</h3>
                     </div>
-                    <p class="text-xs sm:text-sm text-slate-600">Updated live by our Islamabad booking desk — select any package to book on WhatsApp.</p>
+                    <p id="umrahCompareNote" class="text-xs sm:text-sm text-slate-600">Updated live by our Islamabad booking desk — select any package to book on WhatsApp.</p>
                 </div>
 
                 <div id="umrahPackagesGrid" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -456,8 +456,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto mb-12">
                 <span class="text-xs font-bold uppercase tracking-widest text-teal">Transparent Service</span>
-                <h2 class="text-3xl font-black text-navy mt-1">What Is Included in Every Umrah Package?</h2>
-                <p class="text-slate-600 text-sm mt-2">Zero hidden charges. Here is exactly what our agency guarantees for every pilgrim.</p>
+                <h2 id="umrahIncludedHeading" class="text-3xl font-black text-navy mt-1">What Is Included in Every Umrah Package?</h2>
+                <p id="umrahIncludedIntro" class="text-slate-600 text-sm mt-2">Zero hidden charges. Here is exactly what our agency guarantees for every pilgrim.</p>
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
@@ -534,7 +534,7 @@
 
                     <div class="pt-2 flex items-center gap-3 text-xs text-slate-400">
                         <i class="fa-solid fa-shield-halved text-teal-light text-lg"></i>
-                        <span>Rates auto-scale from live hotel contract prices set by our Swat Head Office &amp; Islamabad booking desks.</span>
+                        <span id="calcRatesNote">Rates auto-scale from live hotel contract prices set by our Swat Head Office &amp; Islamabad booking desks.</span>
                     </div>
                 </div>
 
@@ -546,10 +546,7 @@
                             <div>
                                 <label class="block text-xs font-bold uppercase text-slate-500 mb-2">1. Package Duration</label>
                                 <select id="calcDuration" onchange="updateCalculator()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-navy focus:outline-none focus:border-teal">
-                                    <option value="0">14 Nights (Standard Flyer Deal)</option>
-                                    <option value="-18000">10 Nights (Short Stay)</option>
-                                    <option value="35000">21 Nights (Extended Stay)</option>
-                                    <option value="65000">28 Nights (Full Month Umrah)</option>
+                                    <!-- Options are populated by js/homepage-live.js from calculatorRates -->
                                 </select>
                             </div>
 
@@ -557,10 +554,7 @@
                             <div>
                                 <label class="block text-xs font-bold uppercase text-slate-500 mb-2">2. Room Sharing Type</label>
                                 <select id="calcRoom" onchange="updateCalculator()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-navy focus:outline-none focus:border-teal">
-                                    <option value="288000">Sharing Room (PKR 288,000/person)</option>
-                                    <option value="248000">Quad Room - 4 Bed (PKR 248,000/person)</option>
-                                    <option value="268000">Triple Room - 3 Bed (PKR 268,000/person)</option>
-                                    <option value="295000">Double Room - 2 Bed (PKR 295,000/person)</option>
+                                    <!-- Options are populated by js/homepage-live.js from calculatorRates -->
                                 </select>
                             </div>
 
@@ -568,9 +562,7 @@
                             <div>
                                 <label class="block text-xs font-bold uppercase text-slate-500 mb-2">3. Hotel Category</label>
                                 <select id="calcHotel" onchange="updateCalculator()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-navy focus:outline-none focus:border-teal">
-                                    <option value="0">Standard Economy (Shuttle / 600m)</option>
-                                    <option value="45000">3-Star Plus (350m Walking Distance)</option>
-                                    <option value="115000">5-Star Near Haram Courtyard</option>
+                                    <!-- Options are populated by js/homepage-live.js from calculatorRates -->
                                 </select>
                             </div>
 
@@ -621,7 +613,7 @@
                             <span id="footerTaglinePrimary" class="text-[11px] uppercase tracking-widest text-teal-light font-semibold">Your Journey Our Priority</span>
                         </div>
                     </div>
-                    <p class="text-xs text-slate-400 leading-relaxed max-w-sm">
+                    <p id="footerDescription" class="text-xs text-slate-400 leading-relaxed max-w-sm">
                         Headquartered in Swat Matta and trusted by over 100,000+ pilgrims and travelers for Umrah & Ziyarat packages, domestic & international air ticketing, and global visa consultancy.
                     </p>
                     <div class="pt-1 space-y-2 text-xs">
@@ -662,7 +654,7 @@
                         </div>
                         <div class="bg-white/5 rounded-2xl p-3.5 border border-white/10">
                             <strong class="text-teal-light block mb-1">Islamabad Branch</strong>
-                            <p class="text-slate-300 leading-relaxed">Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad</p>
+                            <p id="footerBranch2Address" class="text-slate-300 leading-relaxed">Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad</p>
                         </div>
                     </div>
                 </div>
@@ -683,9 +675,9 @@
     </footer>
 
     <!-- Floating WhatsApp Quick-Connect Button -->
-    <a href="https://wa.me/923490558345?text=Assalam-o-Alaikum%20Zakir%20Travel%20%26%20Tours!%20I%20would%20like%20to%20inquire%20about%20your%20Umrah%20packages." target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-40 group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-3.5 rounded-full shadow-2xl transition-all hover:scale-105 pulse-emerald-ring">
+    <a id="floatingWhatsAppBtn" href="https://wa.me/923490558345?text=Assalam-o-Alaikum%20Zakir%20Travel%20%26%20Tours!%20I%20would%20like%20to%20inquire%20about%20your%20Umrah%20packages." target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-40 group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-3.5 rounded-full shadow-2xl transition-all hover:scale-105 pulse-emerald-ring">
         <i class="fa-brands fa-whatsapp text-2xl"></i>
-        <span class="hidden sm:inline text-xs font-extrabold tracking-wide pr-1">Chat with Swat Head Office</span>
+        <span id="floatingWhatsAppLabel" class="hidden sm:inline text-xs font-extrabold tracking-wide pr-1">Chat with Swat Head Office</span>
     </a>
 
     <!-- Interactive Booking / Inquiry Modal -->
@@ -742,8 +734,8 @@
             </button>
 
             <div class="text-center mb-4">
-                <span class="text-[11px] font-bold uppercase tracking-widest text-teal">Official Monthly Flyer</span>
-                <h3 class="text-xl font-black text-navy">Zakir Travel & Tours Flyer</h3>
+                <span id="flyerModalEyebrow" class="text-[11px] font-bold uppercase tracking-widest text-teal">Official Monthly Flyer</span>
+                <h3 id="flyerModalTitle" class="text-xl font-black text-navy">Zakir Travel & Tours Flyer</h3>
             </div>
 
             <!-- Custom Uploaded Flyer Image (if set in Admin) -->

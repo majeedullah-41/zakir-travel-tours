@@ -355,7 +355,7 @@
 
             <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight uppercase leading-[1.15]">
                 <span id="contactHeroTitle" class="block">Meet Zakir Travel &amp; Tours</span>
-                <span class="font-serif italic font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-teal-light to-sky-200 animated-gradient-text block mt-1 text-2xl sm:text-4xl lg:text-5xl">The People Behind Your Journey.</span>
+                <span id="contactHeroScript" class="font-serif italic font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-teal-light to-sky-200 animated-gradient-text block mt-1 text-2xl sm:text-4xl lg:text-5xl">The People Behind Your Journey.</span>
             </h1>
 
             <p id="contactHeroSubtitle" class="mt-4 text-base sm:text-lg text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed">
@@ -376,20 +376,20 @@
             <!-- Executive Trust Strip -->
             <div class="mt-10 pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-4xl mx-auto text-center">
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
-                    <div class="text-xl sm:text-2xl font-extrabold text-amber-300">Swat Matta</div>
-                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Central Head Office</div>
+                    <div id="contactTrustStat1Number" class="text-xl sm:text-2xl font-extrabold text-amber-300">Swat Matta</div>
+                    <div id="contactTrustStat1Label" class="text-[11px] font-semibold text-slate-300 mt-0.5">Central Head Office</div>
                 </div>
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
-                    <div class="text-xl sm:text-2xl font-extrabold text-teal-light">Islamabad</div>
-                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Potohar Plaza Branch</div>
+                    <div id="contactTrustStat2Number" class="text-xl sm:text-2xl font-extrabold text-teal-light">Islamabad</div>
+                    <div id="contactTrustStat2Label" class="text-[11px] font-semibold text-slate-300 mt-0.5">Potohar Plaza Branch</div>
                 </div>
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
-                    <div class="text-xl sm:text-2xl font-extrabold text-white">Direct</div>
-                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">Management Care</div>
+                    <div id="contactTrustStat3Number" class="text-xl sm:text-2xl font-extrabold text-white">Direct</div>
+                    <div id="contactTrustStat3Label" class="text-[11px] font-semibold text-slate-300 mt-0.5">Management Care</div>
                 </div>
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3">
-                    <div class="text-xl sm:text-2xl font-extrabold text-emerald-400">24/7</div>
-                    <div class="text-[11px] font-semibold text-slate-300 mt-0.5">WhatsApp Helpline</div>
+                    <div id="contactTrustStat4Number" class="text-xl sm:text-2xl font-extrabold text-emerald-400">24/7</div>
+                    <div id="contactTrustStat4Label" class="text-[11px] font-semibold text-slate-300 mt-0.5">WhatsApp Helpline</div>
                 </div>
             </div>
         </div>
@@ -401,8 +401,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center max-w-2xl mx-auto mb-12">
                 <span class="bg-teal-accent text-teal text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block">About Our Agency</span>
-                <h2 class="text-3xl sm:text-4xl font-black text-navy mt-3">Leadership &amp; Vision</h2>
-                <p class="text-slate-600 text-sm sm:text-base mt-2">Built on honesty, transparency and personal care for every pilgrim and traveler.</p>
+                <h2 id="contactLeadershipHeading" class="text-3xl sm:text-4xl font-black text-navy mt-3">Leadership &amp; Vision</h2>
+                <p id="contactLeadershipIntro" class="text-slate-600 text-sm sm:text-base mt-2">Built on honesty, transparency and personal care for every pilgrim and traveler.</p>
             </div>
 
             <!-- CEO Feature Card -->
@@ -426,14 +426,14 @@
 
                 <!-- CEO Message -->
                 <div class="md:col-span-7 lg:col-span-8 space-y-4 relative">
-                    <span class="text-xs font-bold uppercase tracking-widest text-teal-light">Chief Executive Officer</span>
-                    <h3 class="text-3xl sm:text-4xl font-black leading-tight">Zakir Ullah</h3>
+                    <span data-team-role="ceo" class="text-xs font-bold uppercase tracking-widest text-teal-light">Chief Executive Officer</span>
+                    <h3 data-team-name="ceo" class="text-3xl sm:text-4xl font-black leading-tight">Zakir Ullah</h3>
                     <div class="h-1 w-16 rounded-full bg-gradient-to-r from-amber-300 to-teal-light"></div>
                     <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
                         <i class="fa-solid fa-quote-left text-amber-300 mr-1"></i>
-                        Our mission has always been simple — to serve every pilgrim, family and traveler as if they were our own. From our Head Office in Swat Matta, we built Zakir Travel &amp; Tours on honesty, transparent pricing and complete personal responsibility, so that every journey — whether to the Haramain or across the world — is peaceful and worry-free.
+                        <span id="ceoQuote">Our mission has always been simple — to serve every pilgrim, family and traveler as if they were our own. From our Head Office in Swat Matta, we built Zakir Travel &amp; Tours on honesty, transparent pricing and complete personal responsibility, so that every journey — whether to the Haramain or across the world — is peaceful and worry-free.</span>
                     </p>
-                    <div class="flex flex-wrap gap-3 pt-2 text-xs font-bold">
+                    <div id="ceoTagsList" class="flex flex-wrap gap-3 pt-2 text-xs font-bold">
                         <span class="bg-white/10 border border-white/15 px-3.5 py-2 rounded-xl flex items-center gap-2"><i class="fa-solid fa-building-flag text-amber-300"></i>Swat Matta Head Office</span>
                         <span class="bg-white/10 border border-white/15 px-3.5 py-2 rounded-xl flex items-center gap-2"><i class="fa-solid fa-kaaba text-teal-light"></i>Umrah &amp; Ziyarat</span>
                         <span class="bg-white/10 border border-white/15 px-3.5 py-2 rounded-xl flex items-center gap-2"><i class="fa-solid fa-earth-asia text-sky-300"></i>Global Visas &amp; Tickets</span>
@@ -448,8 +448,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center max-w-2xl mx-auto mb-12">
                 <span class="bg-teal-accent text-teal text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block">Senior Professionals</span>
-                <h2 class="text-3xl sm:text-4xl font-black text-navy mt-3">Our Experts</h2>
-                <p class="text-slate-600 text-sm sm:text-base mt-2">Experienced specialists who oversee every Umrah, visa and ticketing file personally.</p>
+                <h2 id="contactExpertsHeading" class="text-3xl sm:text-4xl font-black text-navy mt-3">Our Experts</h2>
+                <p id="contactExpertsIntro" class="text-slate-600 text-sm sm:text-base mt-2">Experienced specialists who oversee every Umrah, visa and ticketing file personally.</p>
             </div>
 
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
@@ -463,8 +463,8 @@
                         </div>
                     </div>
                     <div class="p-6 text-center">
-                        <h3 class="text-xl font-black text-navy">Inam Ullah</h3>
-                        <span class="inline-flex items-center gap-1.5 mt-2 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-extrabold px-3 py-1 rounded-full"><i class="fa-solid fa-user-tie"></i>Manager</span>
+                        <h3 data-team-name="inam" class="text-xl font-black text-navy">Inam Ullah</h3>
+                        <span class="inline-flex items-center gap-1.5 mt-2 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-extrabold px-3 py-1 rounded-full"><i class="fa-solid fa-user-tie"></i><span data-team-role="inam">Manager</span></span>
                     </div>
                 </div>
 
@@ -478,8 +478,8 @@
                         </div>
                     </div>
                     <div class="p-6 text-center">
-                        <h3 class="text-xl font-black text-navy">Hafizullah</h3>
-                        <span class="inline-flex items-center gap-1.5 mt-2 bg-teal-accent text-teal border border-teal/20 text-xs font-extrabold px-3 py-1 rounded-full"><i class="fa-solid fa-passport"></i>Visa Officer</span>
+                        <h3 data-team-name="hafizullah" class="text-xl font-black text-navy">Hafizullah</h3>
+                        <span class="inline-flex items-center gap-1.5 mt-2 bg-teal-accent text-teal border border-teal/20 text-xs font-extrabold px-3 py-1 rounded-full"><i class="fa-solid fa-passport"></i><span data-team-role="hafizullah">Visa Officer</span></span>
                     </div>
                 </div>
 
@@ -493,8 +493,8 @@
                         </div>
                     </div>
                     <div class="p-6 text-center">
-                        <h3 class="text-xl font-black text-navy">Fida Hussain</h3>
-                        <span class="inline-flex items-center gap-1.5 mt-2 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-extrabold px-3 py-1 rounded-full"><i class="fa-solid fa-kaaba"></i>Umrah Officer</span>
+                        <h3 data-team-name="fida" class="text-xl font-black text-navy">Fida Hussain</h3>
+                        <span class="inline-flex items-center gap-1.5 mt-2 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-extrabold px-3 py-1 rounded-full"><i class="fa-solid fa-kaaba"></i><span data-team-role="fida">Umrah Officer</span></span>
                     </div>
                 </div>
             </div>
@@ -506,8 +506,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto mb-12">
                 <span class="bg-teal-accent text-teal text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block">Behind Every File</span>
-                <h2 class="text-3xl sm:text-4xl font-black text-navy mt-3">Our Team</h2>
-                <p class="text-slate-600 text-sm sm:text-base mt-2">The dedicated people who process, manage and support your travel every single day.</p>
+                <h2 id="contactTeamHeading" class="text-3xl sm:text-4xl font-black text-navy mt-3">Our Team</h2>
+                <p id="contactTeamIntro" class="text-slate-600 text-sm sm:text-base mt-2">The dedicated people who process, manage and support your travel every single day.</p>
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
@@ -517,8 +517,8 @@
                         <img alt="Sadiq - Visa Consultant" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover" loading="lazy">
                         <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">S</div>
                     </div>
-                    <h3 class="mt-4 text-base font-black text-navy">Sadiq</h3>
-                    <p class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Visa Consultant</p>
+                    <h3 data-team-name="sadiq" class="mt-4 text-base font-black text-navy">Sadiq</h3>
+                    <p data-team-role="sadiq" class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Visa Consultant</p>
                 </div>
 
                 <!-- Faisal -->
@@ -527,8 +527,8 @@
                         <img alt="Faisal - Visa Processing" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover" loading="lazy">
                         <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">F</div>
                     </div>
-                    <h3 class="mt-4 text-base font-black text-navy">Faisal</h3>
-                    <p class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Visa Processing</p>
+                    <h3 data-team-name="faisal" class="mt-4 text-base font-black text-navy">Faisal</h3>
+                    <p data-team-role="faisal" class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Visa Processing</p>
                 </div>
 
                 <!-- Suliman -->
@@ -537,8 +537,8 @@
                         <img alt="Suliman - Umrah Visa Officer" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover" loading="lazy">
                         <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">S</div>
                     </div>
-                    <h3 class="mt-4 text-base font-black text-navy">Suliman</h3>
-                    <p class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Umrah Visa Officer</p>
+                    <h3 data-team-name="suliman" class="mt-4 text-base font-black text-navy">Suliman</h3>
+                    <p data-team-role="suliman" class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Umrah Visa Officer</p>
                 </div>
 
                 <!-- Mazhar -->
@@ -547,8 +547,8 @@
                         <img alt="Mazhar - Accountant" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover" loading="lazy">
                         <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">M</div>
                     </div>
-                    <h3 class="mt-4 text-base font-black text-navy">Mazhar</h3>
-                    <p class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Accountant</p>
+                    <h3 data-team-name="mazhar" class="mt-4 text-base font-black text-navy">Mazhar</h3>
+                    <p data-team-role="mazhar" class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Accountant</p>
                 </div>
 
                 <!-- Saad Khan -->
@@ -557,8 +557,8 @@
                         <img alt="Saad Khan - Social Media Manager" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover" loading="lazy">
                         <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">SK</div>
                     </div>
-                    <h3 class="mt-4 text-base font-black text-navy">Saad Khan</h3>
-                    <p class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Social Media Manager</p>
+                    <h3 data-team-name="saad" class="mt-4 text-base font-black text-navy">Saad Khan</h3>
+                    <p data-team-role="saad" class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Social Media Manager</p>
                 </div>
 
                 <!-- Salim -->
@@ -567,8 +567,8 @@
                         <img alt="Salim - Office Boy" class="team-photo-img hidden absolute inset-0 w-full h-full object-cover" loading="lazy">
                         <div class="team-photo-placeholder absolute inset-0 flex items-center justify-center text-white text-2xl font-black">S</div>
                     </div>
-                    <h3 class="mt-4 text-base font-black text-navy">Salim</h3>
-                    <p class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Office Boy</p>
+                    <h3 data-team-name="salim" class="mt-4 text-base font-black text-navy">Salim</h3>
+                    <p data-team-role="salim" class="text-[11px] sm:text-xs font-bold text-teal mt-1 leading-snug">Office Boy</p>
                 </div>
             </div>
         </div>
@@ -579,8 +579,8 @@
     <section id="contact-us" class="py-16 lg:py-24 bg-slate-50 subtle-grid-pattern relative scroll-mt-28">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12">
             <span class="bg-teal-accent text-teal text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block">Get In Touch</span>
-            <h2 class="text-3xl sm:text-4xl font-black text-navy mt-3">Contact Us</h2>
-            <p class="text-slate-600 text-sm sm:text-base mt-2">Visit our offices, call our desk, or message us directly on WhatsApp.</p>
+            <h2 id="contactHeading" class="text-3xl sm:text-4xl font-black text-navy mt-3">Contact Us</h2>
+            <p id="contactIntro" class="text-slate-600 text-sm sm:text-base mt-2">Visit our offices, call our desk, or message us directly on WhatsApp.</p>
         </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid lg:grid-cols-12 gap-10">
@@ -609,8 +609,8 @@
                                     2nd Floor, Hayat Market, Matta Swat, Khyber Pakhtunkhwa, Pakistan
                                 </p>
                                 <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
-                                    <div><i class="fa-regular fa-clock text-teal mr-1"></i> Mon–Sat: 9:30 AM – 8:00 PM</div>
-                                    <div><i class="fa-solid fa-walkie-talkie text-teal mr-1"></i> Walk-in pilgrims &amp; group bookings welcome</div>
+                                    <div><i class="fa-regular fa-clock text-teal mr-1"></i><span id="contactBranch1Hours">Mon–Sat: 9:30 AM – 8:00 PM</span></div>
+                                    <div><i class="fa-solid fa-walkie-talkie text-teal mr-1"></i><span id="contactBranch1Note">Walk-in pilgrims &amp; group bookings welcome</span></div>
                                 </div>
                             </div>
 
@@ -625,12 +625,12 @@
                                         <h4 class="text-base font-black text-navy">Islamabad Branch</h4>
                                     </div>
                                 </div>
-                                <p class="text-xs text-slate-600 leading-relaxed font-medium">
+                                <p id="contactBranch2Address" class="text-xs text-slate-600 leading-relaxed font-medium">
                                     Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad
                                 </p>
                                 <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
-                                    <div><i class="fa-regular fa-clock text-teal mr-1"></i> Mon–Sat: 9:30 AM – 7:30 PM</div>
-                                    <div><i class="fa-solid fa-passport text-teal mr-1"></i> Embassy file preparation &amp; flights</div>
+                                    <div><i class="fa-regular fa-clock text-teal mr-1"></i><span id="contactBranch2Hours">Mon–Sat: 9:30 AM – 7:30 PM</span></div>
+                                    <div><i class="fa-solid fa-passport text-teal mr-1"></i><span id="contactBranch2Note">Embassy file preparation &amp; flights</span></div>
                                 </div>
                             </div>
                         </div>
@@ -643,7 +643,7 @@
                             </div>
                             <div class="flex items-center gap-2 text-slate-600">
                                 <i class="fa-solid fa-headset text-teal text-base"></i>
-                                <span>24/7 WhatsApp Support Active</span>
+                                <span id="contactSupportNote">24/7 WhatsApp Support Active</span>
                             </div>
                         </div>
                     </div>
@@ -818,7 +818,7 @@
                             <span id="footerTaglinePrimary" class="text-[11px] uppercase tracking-widest text-teal-light font-semibold">Your Journey Our Priority</span>
                         </div>
                     </div>
-                    <p class="text-xs text-slate-400 leading-relaxed max-w-sm">
+                    <p id="footerDescription" class="text-xs text-slate-400 leading-relaxed max-w-sm">
                         Headquartered in Swat Matta and trusted by over 100,000+ pilgrims and travelers for Umrah & Ziyarat packages, domestic & international air ticketing, and global visa consultancy.
                     </p>
                     <div class="pt-1 space-y-2 text-xs">
@@ -859,7 +859,7 @@
                         </div>
                         <div class="bg-white/5 rounded-2xl p-3.5 border border-white/10">
                             <strong class="text-teal-light block mb-1">Islamabad Branch</strong>
-                            <p class="text-slate-300 leading-relaxed">Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad</p>
+                            <p id="footerBranch2Address" class="text-slate-300 leading-relaxed">Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad</p>
                         </div>
                     </div>
                 </div>
@@ -880,9 +880,9 @@
     </footer>
 
     <!-- Floating WhatsApp Quick-Connect Button -->
-    <a href="https://wa.me/923490558345?text=Assalam-o-Alaikum%20Zakir%20Travel%20%26%20Tours!%20I%20would%20like%20to%20inquire%20about%20your%20services." target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-40 group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-3.5 rounded-full shadow-2xl transition-all hover:scale-105 pulse-emerald-ring">
+    <a id="floatingWhatsAppBtn" href="https://wa.me/923490558345?text=Assalam-o-Alaikum%20Zakir%20Travel%20%26%20Tours!%20I%20would%20like%20to%20inquire%20about%20your%20services." target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-40 group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-3.5 rounded-full shadow-2xl transition-all hover:scale-105 pulse-emerald-ring">
         <i class="fa-brands fa-whatsapp text-2xl"></i>
-        <span class="hidden sm:inline text-xs font-extrabold tracking-wide pr-1">Chat with Swat Head Office</span>
+        <span id="floatingWhatsAppLabel" class="hidden sm:inline text-xs font-extrabold tracking-wide pr-1">Chat with Swat Head Office</span>
     </a>
 
     <!-- Protected Full-Screen Mobile-First Admin Portal Drawer (/admin or #admin) -->
