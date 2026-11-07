@@ -207,7 +207,7 @@
             this.enquiryFilter = "all";
             this.enquirySearch = "";
             this.currentUser = db.getCurrentUser();
-            this._lastSeenMode = null; // last Firebase mode seen by _updateSyncBadge (for change logging)
+            this._lastSeenMode = null; // last mode seen by _updateSyncBadge (for change logging)
             this._activityPanelOpen = false;
 
             this._detectRoutingRole(this.siteConfig);
@@ -232,12 +232,13 @@
             this._bindGlobalEvents();
 
             db.onAuthSnapshot(async (user) => {
-                // Firebase mode only: only the owner or an allowlisted email
-                // may use the portal. Checked on login AND on session
-                // restore (page reload), before the dashboard is shown.
-                // Local-realtime (offline passphrase) logins are untouched
-                // — the allowlist only applies in firebase mode.
-                if (user && (db.mode === "firebase" || db.mode === "api") && typeof db.verifyAdminAccess === "function") {
+                // Server-backed modes only: only the owner or an
+                // allowlisted email may use the portal. Checked on login
+                // AND on session restore (page reload), before the
+                // dashboard is shown. Local-realtime (offline passphrase)
+                // logins are untouched — the allowlist does not apply in
+                // local test mode, so this gate never runs there.
+                if (user && db.mode === "api" && typeof db.verifyAdminAccess === "function") {
                     let allowed = false;
                     try {
                         allowed = await db.verifyAdminAccess(user);
@@ -305,9 +306,9 @@
                 });
             }
 
-            // Connection badge: reflects the REAL Firebase mode, live.
-            // onModeSnapshot fires immediately with the current mode, then
-            // on every mode change (e.g. Firebase finishing init).
+            // Connection badge: reflects the current mode. onModeSnapshot
+            // fires immediately with the current mode, then on every mode
+            // change.
             if (db.onModeSnapshot) {
                 db.onModeSnapshot((mode) => this._updateSyncBadge(mode));
             }
@@ -524,62 +525,58 @@
             this.showToast("Activity log cleared.");
         }
 
-        // Honest save feedback. db save methods return { synced, ... }:
-        // `synced` is true only when the change actually reached Firestore.
-        // - synced === true  -> the save reached Firebase. If `verify`
-        //   is given, the document is re-read straight from the server
-        //   before anything is claimed live (see below).
-        // - synced === false -> warn clearly: saved on this device only,
-        //   and do NOT run the live check — there is nothing live to check.
+        // Honest save feedback. In local test mode there is no server:
+        // db save methods return { synced: false } — that is the
+        // EXPECTED result here, not a failure, so it must never read as
+        // an error or as "not published". When `verify` is given, the
+        // saved document is re-read from local storage and the match
+        // confirms the save before anything is claimed (see below).
         // - result is null/undefined (e.g. a reorder with nothing to move)
         //   -> nothing changed, so show no toast at all.
         // `verify` is { collection, docId, expected } — the document to
         // re-read and the field values that must match. The check runs in
         // the background: the admin stays usable while it runs.
-        _showSyncToast(result, liveMessage, liveType = "success", verify = null) {
+        // `savedMessage` is the plain-language success text for this
+        // save (e.g. which deal was saved); it is shown on its own when
+        // there is no local check to run, and kept as the Activity-log
+        // detail when the check runs.
+        _showSyncToast(result, savedMessage, savedType = "success", verify = null) {
             if (!result || typeof result.synced !== "boolean") return;
-            if (!result.synced) {
-                this.showToast(
-                    "Saved on this device only — NOT published. Firebase is not connected. Open the admin on the live site and check your connection, then save again.",
-                    "warning"
-                );
-                return;
-            }
             if (!verify || !verify.collection || !verify.docId) {
-                this.showToast(liveMessage, liveType);
+                this.showToast(savedMessage, savedType);
                 return;
             }
             const db = window.zakirDB;
             if (!db || typeof db.verifyDocSaved !== "function") {
                 // Very old cached code without the check — fall back to the
                 // plain message instead of breaking the save feedback.
-                this.showToast(liveMessage, liveType);
+                this.showToast(savedMessage, savedType);
                 return;
             }
-            // Saved to Firebase — now prove it is actually live before
-            // saying so. The checking message stays up until the verdict
-            // arrives, then it is replaced by the confirmation (or the
-            // warning). Every step is logged to the Activity log.
-            const checkingToast = this.showToast("Saved. Checking the website…", "info", liveMessage);
+            // Saved in this browser — now prove the local re-read matches
+            // before saying so. The checking message stays up until the
+            // verdict arrives, then it is replaced by the confirmation
+            // (or the warning). Every step is logged to the Activity log.
+            const checkingToast = this.showToast("Saved. Checking it saved correctly…", "info", savedMessage);
             db.verifyDocSaved(verify.collection, verify.docId, verify.expected || {})
                 .then((check) => {
                     this._dismissToast(checkingToast);
                     if (check && check.verified) {
-                        this.showToast("Confirmed live on the website — verified just now ✓", "success", liveMessage);
+                        this.showToast("Saved in this browser — local test mode ✓", "success", savedMessage);
                     } else {
                         this.showToast(
-                            "Saved to Firebase, but the live check could not confirm it yet — please check the website.",
+                            "Saved, but the check could not confirm it yet — please check the website.",
                             "warning",
-                            liveMessage
+                            savedMessage
                         );
                     }
                 })
                 .catch(() => {
                     this._dismissToast(checkingToast);
                     this.showToast(
-                        "Saved to Firebase, but the live check could not confirm it yet — please check the website.",
+                        "Saved, but the check could not confirm it yet — please check the website.",
                         "warning",
-                        liveMessage
+                        savedMessage
                     );
                 });
         }
@@ -588,7 +585,7 @@
         // from a saved record: which document to re-read, and which
         // field values must match. Returns null when there is nothing
         // safe to check (no record / no id), in which case _showSyncToast
-        // falls back to the plain "saved live" message.
+        // falls back to the plain saved message.
         _verifyFor(collection, record, fields, docId) {
             const id = docId || (record && record.id);
             if (!id || !record) return null;
@@ -652,45 +649,25 @@
             }
         }
 
-        // Connection badge: green when Firebase is really connected, amber
-        // when the admin is running on LocalStorage only. Called from the
-        // mode subscription in _init and on every login view update.
+        // Connection badge: this build runs in local test mode only —
+        // there is no server and no live connection to report, so the
+        // badge always says so and never claims a live connection.
+        // Called from the mode subscription in _init and on every login
+        // view update.
         _updateSyncBadge(mode) {
             const badge = this.container.querySelector("#dbModeBadge");
             if (!badge) return;
             const db = window.zakirDB;
             const current = mode || (db ? db.mode : "local-realtime");
-            const live = current === "firebase" || current === "api";
-            // Badge label names the live backend; "Firebase" wording is
-            // unchanged when the backend is Firebase.
-            const backendName = current === "api" ? "the API server" : "Firebase";
-            // Record connection changes in the Activity log (and as a toast):
-            // the first observation is just the starting state, later
-            // transitions mean Firebase connected or dropped out.
-            if (this._lastSeenMode === null) {
-                this._lastSeenMode = current;
-            } else if (this._lastSeenMode !== current) {
-                this._lastSeenMode = current;
-                if (live) {
-                    this.showToast("Connected to " + backendName + " — changes will publish live.");
-                } else {
-                    this.showToast(
-                        "Connection lost — changes save only on this device until Firebase reconnects.",
-                        "warning"
-                    );
-                }
-            }
+            // Track the mode only so a future backend could announce a
+            // change; in local test mode it never changes and there is
+            // nothing to announce.
+            this._lastSeenMode = current;
             badge.className =
                 "text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full flex items-center gap-1 " +
-                (live
-                    ? "bg-emerald-50 text-emerald-700 border border-emerald-300"
-                    : "bg-amber-50 text-amber-800 border border-amber-300");
-            badge.title = live
-                ? "Connected to " + backendName + " — changes publish to the live website."
-                : "Firebase is not connected — changes save only in this browser and will not appear on other devices.";
-            badge.innerHTML = live
-                ? `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live — connected to ${backendName}`
-                : `<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Offline — changes save only on this device`;
+                "bg-amber-50 text-amber-800 border border-amber-300";
+            badge.title = "Local test mode — changes save only in this browser and will not appear on other devices.";
+            badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Local test mode — saves only in this browser`;
         }
 
         renderShell() {
@@ -751,7 +728,7 @@
                                 <span>Secure Admin Access</span>
                             </div>
                             <p class="text-slate-600 leading-relaxed">
-                                Sign in with your authorized email and password to manage website offers, packages, visas, and enquiries.
+                                Sign in to manage website offers, packages, visas, and enquiries.
                             </p>
                         </div>
 
@@ -788,8 +765,8 @@
                                 <div>
                                     <div class="flex items-center gap-2">
                                         <h1 class="font-black text-base sm:text-lg tracking-tight leading-none admin-gradient-text">Zakir Travel Admin</h1>
-                                        <span id="dbModeBadge" class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-1" title="Firebase is not connected yet — changes save only in this browser.">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Offline — changes save only on this device
+                                        <span id="dbModeBadge" class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-1" title="Local test mode — changes save only in this browser and will not appear on other devices.">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Local test mode — saves only in this browser
                                         </span>
                                     </div>
                                     <p id="adminActiveUserLabel" class="text-[11px] text-slate-500 mt-0.5">Signed in as Inam Khan</p>
@@ -798,21 +775,21 @@
 
                             <!-- Action Buttons -->
                             <div class="flex flex-wrap items-center gap-2 sm:gap-2.5 ml-auto">
-                                <!-- Save & Push to Website Button -->
+                                <!-- Save Changes Button -->
                                 <button type="button" id="headerSavePushBtn" data-action="save-push-all" class="anim-pulse-teal admin-btn-shimmer bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white text-xs font-black px-3 sm:px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-lg transition-all active:scale-95">
                                     <i class="fa-solid fa-circle-check text-sm"></i>
-                                    <span>Save & Push to Website</span>
+                                    <span>Save Changes</span>
                                 </button>
 
                                 ${
                                     this.isDrawer
                                         ? `<button type="button" data-action="close-drawer" class="bg-[#E6F6F8] hover:bg-[#D7F0F4] border border-[#0D8A9E]/20 text-[#0B2D5B] text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition-all">
                                             <i class="fa-solid fa-eye text-[#0D8A9E]"></i>
-                                            <span class="hidden sm:inline">View Live Page</span>
+                                            <span class="hidden sm:inline">View Page</span>
                                            </button>`
                                         : `<a href="index.html" class="bg-[#E6F6F8] hover:bg-[#D7F0F4] border border-[#0D8A9E]/20 text-[#0B2D5B] text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition-all">
                                             <i class="fa-solid fa-eye text-[#0D8A9E]"></i>
-                                            <span class="hidden sm:inline">Live Website</span>
+                                            <span class="hidden sm:inline">Website</span>
                                            </a>`
                                 }
 
@@ -1657,7 +1634,7 @@
                                     <div class="border-t border-slate-100 pt-4 space-y-3">
                                         <div class="flex items-center justify-between">
                                             <span class="text-[10px] font-black uppercase text-[#0D8A9E] block"><i class="fa-solid fa-users mr-1"></i>About Us - Team Member Photos</span>
-                                            <span class="text-[10px] font-bold text-slate-400">Upload, adjust if needed, then click Save &amp; Push</span>
+                                            <span class="text-[10px] font-bold text-slate-400">Upload, adjust if needed, then click Save Changes</span>
                                         </div>
                                         <div id="teamPhotosAdminGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                             ${TEAM_MEMBERS.map((m) => `
@@ -1724,7 +1701,7 @@
                                         </div>
                                         <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
                                             <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
-                                            <span>Save Contact Page & Push Live</span>
+                                            <span>Save Contact Page</span>
                                         </button>
                                     </div>
 
@@ -1790,7 +1767,7 @@
                                     <div>
                                         <span class="text-[11px] font-bold uppercase tracking-wider text-[#0D8A9E]">Admin Access</span>
                                         <h3 class="text-lg font-black text-[#0B2D5B]">Who can open the admin portal</h3>
-                                        <p class="text-xs text-slate-500 mt-0.5">Only you (the owner) can see this tab. Add another person's email to let them sign in with their own account, or create a new account for them.</p>
+                                        <p class="text-xs text-slate-500 mt-0.5">Local test mode: there is only one admin here — the passphrase on this browser. Adding other admins is not available until the site has a real backend.</p>
                                     </div>
                                     <span class="bg-[#FEF3C7] text-[#8A6D0B] text-[10px] font-black px-2.5 py-1 rounded-full uppercase">Owner only</span>
                                 </div>
@@ -1958,7 +1935,7 @@
                                 </button>
                                 <button type="submit" class="flex-1 bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black py-3.5 px-6 rounded-xl shadow-lg text-sm flex items-center justify-center gap-2">
                                     <i class="fa-solid fa-circle-check"></i>
-                                    <span>Save & Publish Special Deal</span>
+                                    <span>Save Special Deal</span>
                                 </button>
                             </div>
                         </form>
@@ -2388,7 +2365,7 @@
                             </div>
 
                             <button type="submit" class="w-full bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black py-3.5 rounded-2xl shadow-lg mt-2 text-sm transition-all">
-                                Save &amp; Publish Featured Programme
+                                Save Featured Programme
                             </button>
                         </form>
                     </div>
@@ -2464,7 +2441,7 @@
                 if (userLabel) {
                     userLabel.textContent = `Signed in as ${this.currentUser.displayName || this.currentUser.email}`;
                 }
-                // Never claim "Live" here — show the real connection mode.
+                // Show the real connection mode here, never a "Live" claim.
                 this._updateSyncBadge();
                 this._updateAccessTabVisibility();
                 this._autoGrowFields(dashView);
@@ -2728,8 +2705,8 @@
         // TEAM PHOTO ADJUST — circular crop editor (zoom + drag + rotate).
         // The editor shows the photo exactly as the site shows it (a circle),
         // renders the adjusted crop to a 600x600 JPEG, and feeds the result
-        // back through the normal upload path (Storage or DataURL fallback).
-        // Nothing is saved to the site until "Save & Push to Website".
+        // back through the normal upload path (a local image stored in
+        // this browser). Nothing is saved to the site until "Save Changes".
         // --------------------------------------------------------------------
 
         // Pure crop math: given the image size, a zoom (1..3) and a pan
@@ -2875,10 +2852,10 @@
         _openPhotoAdjust(memberId, memberName, src, fileName) {
             const modal = this._ensurePhotoAdjustModal();
             const img = new Image();
-            // crossOrigin so an already-saved Storage photo can be drawn to
-            // a canvas and exported. Local uploads (blob:/data: URLs) are
-            // unaffected. If the photo cannot be loaded this way, the error
-            // handler below tells Majeed to upload it again.
+            // crossOrigin so an already-saved remote photo can be drawn
+            // to a canvas and exported. Local uploads (blob:/data: URLs)
+            // are unaffected. If the photo cannot be loaded this way, the
+            // error handler below tells Majeed to upload it again.
             img.crossOrigin = "anonymous";
             img.onload = () => {
                 this._photoAdjust = {
@@ -2942,7 +2919,7 @@
                     out.toBlob((b) => (b ? resolve(b) : reject(new Error("Could not create image."))), "image/jpeg", 0.85);
                 });
             } catch (err) {
-                // Happens if the canvas is tainted (e.g. a saved Storage
+                // Happens if the canvas is tainted (e.g. a saved remote
                 // photo loaded without CORS permission) — re-uploading the
                 // original file fixes it.
                 this.showToast("Could not save the adjusted photo. Try uploading the photo again.", "error", `Team photo · ${st.memberName}`);
@@ -2965,8 +2942,8 @@
         }
 
         // The normal team-photo upload path, unchanged apart from the
-        // "adjusted" wording: Storage upload or DataURL fallback, preview
-        // staging, and the reminder to click Save & Push to Website.
+        // "adjusted" wording: local-image upload, preview staging, and
+        // the reminder to click Save Changes.
         async _uploadAdjustedTeamPhoto(memberId, memberName, file) {
             const db = window.zakirDB;
             const sizeText = this._formatFileSize(file.size);
@@ -2974,14 +2951,14 @@
             try {
                 const url = await this._runUploadWithFeedback(
                     `Uploading team photo ${fileDesc}…`,
-                    `Team photo · ${memberName} · Destination: Firebase Storage (zakir_team)`,
+                    `Team photo · ${memberName} · Saved in this browser as a local image`,
                     () => db.uploadMediaFile(file, "zakir_team")
                 );
                 this._setTeamPhotoPreview(memberId, url);
                 if (url.startsWith("data:")) {
-                    this.showToast("Photo adjusted — Storage upload failed, so it will be stored in the database instead when you click Save & Push to Website (counts toward the size limit).", "warning", `Team photo · ${memberName} · ${fileDesc} · fell back to a DataURL (stored in the database on save)`);
+                    this.showToast("Photo adjusted — saved in this browser as a local image. Click Save Changes to keep it.", "success", `Team photo · ${memberName} · ${fileDesc} · saved in this browser as a local image (stored with the site data on save)`);
                 } else {
-                    this.showToast(`Photo adjusted ✓ ${fileDesc} — click Save & Push to Website.`, "success", `Team photo · ${memberName} · Destination: Firebase Storage (zakir_team)`);
+                    this.showToast(`Photo adjusted ✓ ${fileDesc} — click Save Changes.`, "success", `Team photo · ${memberName} · Saved in this browser as a local image`);
                 }
             } catch (err) {
                 this.showToast(`Upload failed: ${err.message || "Unknown error"}`, "error", `Team photo · ${memberName} · ${fileDesc}`);
@@ -3042,7 +3019,7 @@
                                     ${
                                         !deal.isActive
                                             ? `<span class="bg-rose-600 text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full">Hidden</span>`
-                                            : `<span class="bg-[#0D8A9E] text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full">Live</span>`
+                                            : `<span class="bg-[#0D8A9E] text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full">Shown</span>`
                                     }
                                 </div>
 
@@ -3344,7 +3321,7 @@
 
             this._showSyncToast(
                 result,
-                "Saved & Pushed All Changes Live to Website!",
+                "All changes saved in this browser.",
                 "success",
                 this._verifyFor("site_config", result && result.config, ["updatedAt"], "main_settings")
             );
@@ -3691,7 +3668,7 @@
                                     ${
                                         !prog.isActive
                                             ? `<span class="bg-rose-600 text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full">Hidden</span>`
-                                            : `<span class="bg-emerald-600 text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full">Live</span>`
+                                            : `<span class="bg-emerald-600 text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full">Shown</span>`
                                     }
                                 </div>
 
@@ -3849,9 +3826,9 @@
         // ADMIN ACCESS (owner only): who may open the admin portal.
         // ----------------------------------------------------------------
 
-        // True when the signed-in user is the owner (by Firebase UID).
-        // In local-realtime (offline) mode there is no UID, so this is
-        // false — access management needs Firebase.
+        // True when the signed-in user is the owner. In local test mode
+        // there is no owner account, so this is false — access management
+        // does not apply locally.
         _isOwnerUser() {
             const db = window.zakirDB;
             return Boolean(db && typeof db.isOwner === "function" && db.isOwner(this.currentUser));
@@ -3877,10 +3854,10 @@
             const noteEl = this.container.querySelector("#accessRulesNote");
             const formEl = this.container.querySelector("#accessAddForm");
             if (noteEl) noteEl.classList.add("hidden");
-            if (!db || (db.mode !== "firebase" && db.mode !== "api") || typeof db.getAdminAllowlist !== "function") {
+            if (!db || db.mode !== "api" || typeof db.getAdminAllowlist !== "function") {
                 if (formEl) formEl.classList.add("hidden");
                 if (listEl) {
-                    listEl.innerHTML = `<div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center text-amber-800 text-sm font-bold">Connect to Firebase to manage admin access. Access settings do not work in offline mode.</div>`;
+                    listEl.innerHTML = `<div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center text-amber-800 text-sm font-bold">Admin access is not available in local test mode. This browser uses a single admin passphrase — other admins can only be added once the site has a real backend.</div>`;
                 }
                 return;
             }
@@ -3894,18 +3871,10 @@
                 }
                 this._renderAdminAccessList(list ? list.emails : []);
             } catch (err) {
-                // Most likely the new Firestore rules have not been
-                // published yet, so the allowlist cannot be read or
-                // written. Say so plainly instead of failing silently.
-                // In API mode the same failure means the server could
-                // not be reached or the session expired.
-                const isApi = db && db.mode === "api";
-                const loadMsg = isApi
-                    ? "Could not load the admin list — the server could not be reached. Check your connection and reopen this tab."
-                    : "Could not load the admin list — publish the new Firestore rules first (Firestore → Rules → Publish), then reopen this tab.";
-                const toastMsg = isApi
-                    ? "Could not load the admin list. Check your connection and try again."
-                    : "Could not load the admin list. Publish the new Firestore rules first.";
+                // The admin list could not be read. Say so plainly
+                // instead of failing silently.
+                const loadMsg = "Could not load the admin list — try reopening this tab.";
+                const toastMsg = "Could not load the admin list. Try again.";
                 if (noteEl) {
                     noteEl.textContent = loadMsg;
                     noteEl.classList.remove("hidden");
@@ -3971,9 +3940,9 @@
             if (label) label.textContent = mode === "create" ? "Create account & add admin" : "Add admin";
         }
 
-        // Adds an admin: either an existing Auth account (email only) or a
-        // brand-new Auth account (email + temporary password, created on a
-        // secondary Firebase app so the owner's session is untouched).
+        // Adds an admin: either an existing account (email only) or a
+        // brand-new account (email + temporary password, created so the
+        // owner's session is untouched).
         // Either way the email lands on the allowlist, confirmed with the
         // usual save feedback. The temporary password is never logged.
         async _handleAccessAdd(submitBtn) {
@@ -4014,7 +3983,7 @@
                 // NOTE: no verify descriptor here — verifyDocSaved compares
                 // fields with strict equality, which can never match an
                 // emails array. _showSyncToast without verify still
-                // confirms the save reached Firebase (or warns it didn't).
+                // confirms the save went through (or warns it didn't).
                 this._showSyncToast(
                     result,
                     mode === "create"
@@ -4033,7 +4002,7 @@
                 } else if (err && err.code === "auth/invalid-email") {
                     msg = "That email address doesn't look right.";
                 } else if (err && (err.code === "permission-denied" || /permission/i.test(msg))) {
-                    msg = "Could not save — publish the new Firestore rules first (Firestore → Rules → Publish), then try again.";
+                    msg = "Could not save the admin list — try again.";
                 }
                 this.showToast(msg, "error");
             }
@@ -4042,7 +4011,7 @@
         // Removes an admin from the allowlist. Two taps: the first arms
         // the button ("Tap again to remove"), the second confirms, so a
         // stray tap can't revoke someone. Removing only revokes portal
-        // access — the Firebase Auth account is NOT deleted. The owner
+        // access — the sign-in account is NOT deleted. The owner
         // row has no remove button at all, and this guards it anyway.
         async _handleAccessRemove(email, button) {
             const db = window.zakirDB;
@@ -4079,7 +4048,7 @@
             } catch (err) {
                 let msg = err && err.message ? err.message : "Could not remove this admin.";
                 if (err && (err.code === "permission-denied" || /permission/i.test(msg))) {
-                    msg = "Could not save — publish the new Firestore rules first (Firestore → Rules → Publish), then try again.";
+                    msg = "Could not save the admin list — try again.";
                 }
                 this.showToast(msg, "error");
                 this._renderAdminAccessList(this._accessEmails || []);
@@ -4132,7 +4101,7 @@
 
             // Surface browser-storage quota warnings from the database
             // layer (photos stored as DataURLs can fill LocalStorage) as
-            // a toast — the save itself still goes through to Firestore.
+            // a toast.
             window.addEventListener("zakir-storage-quota", (e) => {
                 const message =
                     (e && e.detail && e.detail.message) ||
@@ -4268,7 +4237,7 @@
                     try {
                         const url = await this._runUploadWithFeedback(
                             `Uploading image ${fileDesc}…`,
-                            "Destination: Firebase Storage (zakir_media)",
+                            "Saved in this browser as a local image",
                             () => db.uploadMediaFile(file)
                         );
                         const urlInput = this.container.querySelector(`#${targetInputId}`);
@@ -4283,9 +4252,9 @@
                             if (ph) ph.classList.add("hidden");
                         }
                         if (url.startsWith("data:")) {
-                            this.showToast("Storage upload failed — the image will be stored in the database instead when you save (counts toward the size limit). Check your connection, then upload again.", "warning", `Upload: ${fileDesc} · fell back to a DataURL (stored in the database on save)`);
+                            this.showToast("Image saved in this browser as a local image ✓ — click Save Changes to keep it.", "success", `Upload: ${fileDesc} · saved in this browser as a local image (stored with the site data on save)`);
                         } else {
-                            this.showToast(`Image uploaded to Storage ✓ ${fileDesc} — click Save & Push to Website.`, "success", "Destination: Firebase Storage (zakir_media)");
+                            this.showToast(`Image saved in this browser ✓ ${fileDesc} — click Save Changes.`, "success", "Saved in this browser as a local image");
                         }
                     } catch (err) {
                         this.showToast(`Upload failed: ${err.message || "Unknown error"}`, "error", `Upload: ${fileDesc}`);
@@ -4327,7 +4296,7 @@
             this.container.querySelectorAll("[data-team-photo-remove]").forEach((btn) => {
                 btn.addEventListener("click", () => {
                     this._setTeamPhotoPreview(btn.getAttribute("data-team-photo-remove"), "");
-                    this.showToast("Photo removed. Click Save & Push to Website.", "warning");
+                    this.showToast("Photo removed. Click Save Changes.", "warning");
                 });
             });
 
@@ -4342,15 +4311,15 @@
                     try {
                         const url = await this._runUploadWithFeedback(
                             `Optimizing deal image ${fileDesc}…`,
-                            "Destination: Firebase Storage (zakir_media)",
+                            "Saved in this browser as a local image",
                             () => db.uploadMediaFile(file)
                         );
                         const inputEl = this.container.querySelector(`#${targetId}`);
                         if (inputEl) inputEl.value = url;
                         if (url.startsWith("data:")) {
-                            this.showToast("Storage upload failed — the image will be stored in the database instead when you save (counts toward the size limit). Check your connection, then upload again.", "warning", `Deal image · ${fileDesc} · fell back to a DataURL (stored in the database on save)`);
+                            this.showToast("Deal image saved in this browser as a local image ✓ — save the deal to keep it.", "success", `Deal image · ${fileDesc} · saved in this browser as a local image (stored with the site data on save)`);
                         } else {
-                            this.showToast(`Deal image uploaded to Storage ✓ ${fileDesc} — save the deal to keep it.`, "success", "Destination: Firebase Storage (zakir_media)");
+                            this.showToast(`Deal image saved in this browser ✓ ${fileDesc} — save the deal to keep it.`, "success", "Saved in this browser as a local image");
                         }
                     } catch (err) {
                         this.showToast(`Upload failed: ${err.message || "Unknown error"}`, "error", `Deal image · ${fileDesc}`);
@@ -4402,7 +4371,7 @@
                         this.container.querySelector("#dealCrudModal").classList.add("hidden");
                         this._showSyncToast(
                             result,
-                            "Special Flyer Deal Saved & Published Live!",
+                            "Special Flyer Deal saved in this browser.",
                             "success",
                             this._verifyFor("special_deals", result && result.deal, ["startingPrice", "monthLabel"])
                         );
@@ -4457,7 +4426,7 @@
                         this.container.querySelector("#pkgCrudModal").classList.add("hidden");
                         this._showSyncToast(
                             result,
-                            "Umrah Package Saved & Published Live!",
+                            "Umrah Package saved in this browser.",
                             "success",
                             this._verifyFor("umrah_packages", result && result.package, ["price", "title"])
                         );
@@ -4496,7 +4465,7 @@
                         this.container.querySelector("#visaCrudModal").classList.add("hidden");
                         this._showSyncToast(
                             result,
-                            "Country Visa Saved & Published Live!",
+                            "Country Visa saved in this browser.",
                             "success",
                             this._verifyFor("visa_services", result && result.visa, ["pricePKR", "countryName", "flagUrl"])
                         );
@@ -4547,7 +4516,7 @@
                         this.container.querySelector("#workPermitCrudModal").classList.add("hidden");
                         this._showSyncToast(
                             result,
-                            "Work Permit Country Saved & Published Live!",
+                            "Work Permit Country saved in this browser.",
                             "success",
                             this._verifyFor("work_permits", result && result.permit, ["countryName", "cardTitle", "flagUrl"])
                         );
@@ -4573,15 +4542,15 @@
                     try {
                         const url = await this._runUploadWithFeedback(
                             `Uploading flag ${fileDesc}…`,
-                            `Country flag · ${countryName} · Destination: Firebase Storage (zakir_work_permits)`,
+                            `Country flag · ${countryName} · Saved in this browser as a local image`,
                             () => db.uploadMediaFile(file, "zakir_work_permits")
                         );
                         this.container.querySelector("#wpEditFlagUrl").value = url;
                         this._setWpFlagPreview(url);
                         if (url.startsWith("data:")) {
-                            this.showToast("Storage upload failed — the flag will be stored in the database instead when you save (counts toward the size limit). Check your connection, then upload again.", "warning", `Country flag · ${countryName} · ${fileDesc} · fell back to a DataURL (stored in the database on save)`);
+                            this.showToast("Flag saved in this browser as a local image ✓ — save the country to keep it.", "success", `Country flag · ${countryName} · ${fileDesc} · saved in this browser as a local image (stored with the site data on save)`);
                         } else {
-                            this.showToast(`Flag uploaded to Storage ✓ ${fileDesc} — save the country to keep it.`, "success", `Country flag · ${countryName} · Destination: Firebase Storage (zakir_work_permits)`);
+                            this.showToast(`Flag saved in this browser ✓ ${fileDesc} — save the country to keep it.`, "success", `Country flag · ${countryName} · Saved in this browser as a local image`);
                         }
                     } catch (err) {
                         this.showToast(`Flag upload failed: ${err.message || "Unknown error"}`, "error", `Country flag · ${countryName} · ${fileDesc}`);
@@ -4602,8 +4571,7 @@
 
             // Visa Flag Upload (stored as flagUrl; the code/emoji stays as
             // the fallback when no image is uploaded). Same pattern as the
-            // work-permit country flag, but into the already-allowed
-            // zakir_media Storage folder, so no rules change is needed.
+            // work-permit country flag, but saved as a local image.
             const visaFlagUploadBtn = this.container.querySelector("[data-visa-flag-upload]");
             const visaFlagFileInput = this.container.querySelector("[data-visa-flag-file]");
             if (visaFlagUploadBtn && visaFlagFileInput) {
@@ -4618,15 +4586,15 @@
                     try {
                         const url = await this._runUploadWithFeedback(
                             `Uploading flag ${fileDesc}…`,
-                            `Visa flag · ${countryName} · Destination: Firebase Storage (zakir_media)`,
+                            `Visa flag · ${countryName} · Saved in this browser as a local image`,
                             () => db.uploadMediaFile(file, "zakir_media")
                         );
                         this.container.querySelector("#visaEditFlagUrl").value = url;
                         this._setVisaFlagPreview(url);
                         if (url.startsWith("data:")) {
-                            this.showToast("Storage upload failed — the flag will be stored in the database instead when you save (counts toward the size limit). Check your connection, then upload again.", "warning", `Visa flag · ${countryName} · ${fileDesc} · fell back to a DataURL (stored in the database on save)`);
+                            this.showToast("Flag saved in this browser as a local image ✓ — save the visa to keep it.", "success", `Visa flag · ${countryName} · ${fileDesc} · saved in this browser as a local image (stored with the site data on save)`);
                         } else {
-                            this.showToast(`Flag uploaded to Storage ✓ ${fileDesc} — save the visa to keep it.`, "success", `Visa flag · ${countryName} · Destination: Firebase Storage (zakir_media)`);
+                            this.showToast(`Flag saved in this browser ✓ ${fileDesc} — save the visa to keep it.`, "success", `Visa flag · ${countryName} · Saved in this browser as a local image`);
                         }
                     } catch (err) {
                         this.showToast(`Flag upload failed: ${err.message || "Unknown error"}`, "error", `Visa flag · ${countryName} · ${fileDesc}`);
@@ -4661,15 +4629,15 @@
                     try {
                         const url = await this._runUploadWithFeedback(
                             `Optimizing programme image ${fileDesc}…`,
-                            "Destination: Firebase Storage (zakir_work_permits)",
+                            "Saved in this browser as a local image",
                             () => db.uploadMediaFile(file, "zakir_work_permits")
                         );
                         const inputEl = this.container.querySelector(`#${targetId}`);
                         if (inputEl) inputEl.value = url;
                         if (url.startsWith("data:")) {
-                            this.showToast("Storage upload failed — the image will be stored in the database instead when you save (counts toward the size limit). Check your connection, then upload again.", "warning", `Programme image · ${fileDesc} · fell back to a DataURL (stored in the database on save)`);
+                            this.showToast("Programme image saved in this browser as a local image ✓ — save the programme to keep it.", "success", `Programme image · ${fileDesc} · saved in this browser as a local image (stored with the site data on save)`);
                         } else {
-                            this.showToast(`Programme image uploaded to Storage ✓ ${fileDesc} — save the programme to keep it.`, "success", "Destination: Firebase Storage (zakir_work_permits)");
+                            this.showToast(`Programme image saved in this browser ✓ ${fileDesc} — save the programme to keep it.`, "success", "Saved in this browser as a local image");
                         }
                     } catch (err) {
                         this.showToast(`Upload failed: ${err.message || "Unknown error"}`, "error", `Programme image · ${fileDesc}`);
@@ -4723,7 +4691,7 @@
                         this.container.querySelector("#wpProgrammeCrudModal").classList.add("hidden");
                         this._showSyncToast(
                             result,
-                            "Featured Work Permit Programme Saved & Published Live!",
+                            "Featured Work Permit Programme saved in this browser.",
                             "success",
                             this._verifyFor("work_permit_programmes", result && result.programme, ["countryName"])
                         );
@@ -4777,7 +4745,7 @@
                 } else if (action === "duplicate-deal") {
                     try {
                         const result = await db.duplicateSpecialDeal(actionEl.getAttribute("data-id"));
-                        this._showSyncToast(result, "Special Flyer Deal cloned & published!");
+                        this._showSyncToast(result, "Special Flyer Deal cloned & saved in this browser.");
                     } catch (err) {
                         this.showToast(err.message || "Could not clone the deal.", "error");
                     }
@@ -4798,7 +4766,7 @@
                             const result = await db.saveSpecialDeal({ ...deal, isActive: !deal.isActive });
                             this._showSyncToast(
                                 result,
-                                `Special Deal ${!deal.isActive ? "shown" : "hidden"} live.`
+                                `Special Deal ${!deal.isActive ? "shown on the website" : "hidden from the website"}.`
                             );
                         } catch (err) {
                             this.showToast(err.message || "Could not update the deal.", "error");
@@ -4810,7 +4778,7 @@
                             actionEl.getAttribute("data-id"),
                             actionEl.getAttribute("data-dir")
                         );
-                        this._showSyncToast(result, "Deal order updated live.");
+                        this._showSyncToast(result, "Deal order updated.");
                     } catch (err) {
                         this.showToast(err.message || "Could not reorder deals.", "error");
                     }
@@ -4842,7 +4810,7 @@
                     if (pkg) {
                         try {
                             const result = await db.saveUmrahPackage({ ...pkg, isActive: !pkg.isActive });
-                            this._showSyncToast(result, `Package ${!pkg.isActive ? "shown" : "hidden"} live.`);
+                            this._showSyncToast(result, `Package ${!pkg.isActive ? "shown on the website" : "hidden from the website"}.`);
                         } catch (err) {
                             this.showToast(err.message || "Could not update the package.", "error");
                         }
@@ -4853,7 +4821,7 @@
                             actionEl.getAttribute("data-id"),
                             actionEl.getAttribute("data-dir")
                         );
-                        this._showSyncToast(result, "Package order updated live.");
+                        this._showSyncToast(result, "Package order updated.");
                     } catch (err) {
                         this.showToast(err.message || "Could not reorder packages.", "error");
                     }
@@ -4877,7 +4845,7 @@
                     if (visa) {
                         try {
                             const result = await db.saveVisaService({ ...visa, isActive: !visa.isActive });
-                            this._showSyncToast(result, `Visa card ${!visa.isActive ? "shown" : "hidden"} live.`);
+                            this._showSyncToast(result, `Visa card ${!visa.isActive ? "shown on the website" : "hidden from the website"}.`);
                         } catch (err) {
                             this.showToast(err.message || "Could not update the visa.", "error");
                         }
@@ -4888,7 +4856,7 @@
                             actionEl.getAttribute("data-id"),
                             actionEl.getAttribute("data-dir")
                         );
-                        this._showSyncToast(result, "Visa order updated live.");
+                        this._showSyncToast(result, "Visa order updated.");
                     } catch (err) {
                         this.showToast(err.message || "Could not reorder visas.", "error");
                     }
@@ -4914,7 +4882,7 @@
                             const result = await db.saveWorkPermit({ ...permit, isActive: !permit.isActive });
                             this._showSyncToast(
                                 result,
-                                `Work permit card ${!permit.isActive ? "shown" : "hidden"} live.`
+                                `Work permit card ${!permit.isActive ? "shown on the website" : "hidden from the website"}.`
                             );
                         } catch (err) {
                             this.showToast(err.message || "Could not update the work permit.", "error");
@@ -4926,7 +4894,7 @@
                             actionEl.getAttribute("data-id"),
                             actionEl.getAttribute("data-dir")
                         );
-                        this._showSyncToast(result, "Work permit order updated live.");
+                        this._showSyncToast(result, "Work permit order updated.");
                     } catch (err) {
                         this.showToast(err.message || "Could not reorder work permits.", "error");
                     }
@@ -4940,7 +4908,7 @@
                 } else if (action === "duplicate-wp-programme") {
                     try {
                         const result = await db.duplicateWorkPermitProgramme(actionEl.getAttribute("data-id"));
-                        this._showSyncToast(result, "Featured Programme cloned & published!");
+                        this._showSyncToast(result, "Featured Programme cloned & saved in this browser.");
                     } catch (err) {
                         this.showToast(err.message || "Could not clone the programme.", "error");
                     }
@@ -4951,7 +4919,7 @@
                             const result = await db.saveWorkPermitProgramme({ ...prog, isActive: !prog.isActive });
                             this._showSyncToast(
                                 result,
-                                `Featured Programme ${!prog.isActive ? "shown" : "hidden"} live.`
+                                `Featured Programme ${!prog.isActive ? "shown on the website" : "hidden from the website"}.`
                             );
                         } catch (err) {
                             this.showToast(err.message || "Could not update the programme.", "error");
@@ -4963,7 +4931,7 @@
                             actionEl.getAttribute("data-id"),
                             actionEl.getAttribute("data-dir")
                         );
-                        this._showSyncToast(result, "Programme order updated live.");
+                        this._showSyncToast(result, "Programme order updated.");
                     } catch (err) {
                         this.showToast(err.message || "Could not reorder programmes.", "error");
                     }

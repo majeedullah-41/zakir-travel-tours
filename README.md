@@ -10,7 +10,11 @@ services, air tickets and Europe work permits.
 ## Stack
 
 - Static HTML + Tailwind CSS via CDN (no build step — see note below)
-- Firebase v10 compat SDKs (Firestore / Auth / Storage), project `zakir-travels`
+- Data is local-only for testing: content lives in the browser's
+  LocalStorage, seeded with built-in defaults. There is no shared database
+  and no sync between devices or browsers — an edit made in the admin portal
+  on one device does not appear on another.
+- Admin login is a local per-browser passphrase (no accounts, no cloud login).
 - Deployed on Vercel (`vercel.json` — clean-URL rewrites, permanent alias
   redirects, cache + security headers)
 - Google Analytics measurement ID `G-CRDXFTXY55` (gtag.js snippet in every page)
@@ -28,34 +32,43 @@ services, air tickets and Europe work permits.
 | Not found | `404.html` |
 
 Live content (deals, Umrah packages, visas, work permits, site text, contacts)
-is stored in Firestore and edited from the admin portal — no code changes
-needed for price/date updates. If Firestore is unavailable, pages fall back
-to LocalStorage seed data.
+is stored in the browser's LocalStorage and edited from the admin portal — no
+code changes needed for price/date updates. It starts from built-in seed
+defaults. Because there is no shared database yet, changes are visible only
+in the browser they were made in.
 
 ## Lead capture (enquiries)
 
 Every public form (homepage hero, booking modal, flight form, Umrah
-calculator, work-permit assessment) saves the enquiry to the Firestore
-`enquiries` collection **before** opening WhatsApp, so no lead is lost if a
-visitor closes WhatsApp. Enquiries are listed in the admin portal under
-tab **6. Enquiries** (status, search, WhatsApp/call reply, CSV export).
+calculator, work-permit assessment) saves the enquiry locally in the
+visitor's browser (LocalStorage) **before** opening WhatsApp, so no lead is
+lost if a visitor closes WhatsApp. Enquiries are listed in the admin portal
+under tab **6. Enquiries** (status, search, WhatsApp/call reply, CSV
+export) — but only in the same browser the enquiry was made in. There is no
+shared enquiries inbox until the PHP backend is live (see below).
 
-> **Firestore rules — important.** `service` is a **reserved word** in
-> Firestore Rules, so the field must be accessed as
-> `request.resource.data['service']` — writing `data.service` makes Firebase
-> reject the whole rules file (error on the `is string` line). If you edit
-> `firestore.rules`, keep the bracket notation.
->
-> **Publishing rules.** Merging a PR never changes the live rules — after
-> any rules change, paste the full `firestore.rules` (Firestore Database →
-> Rules → Publish) **and** the full `storage.rules` (Storage → Rules →
-> Publish) in the Firebase console. The `storage.rules` publish from the
-> team-photo fix is still outstanding.
->
-> **Admin access.** The portal's 7th tab, **Admin Access** (owner only),
-> manages the `admin_users/allowed` allowlist of emails that may open the
-> admin besides the owner. Only the owner (or a custom-claim admin) may
-> change the allowlist — an allowlisted admin cannot add new admins.
+> **Admin access.** The portal is protected by a local passphrase stored in
+> the browser. There is no shared account list — a passphrase set on one
+> device does not carry over to another.
+
+## Backend (PHP + MySQL — ready, dormant until hosting is bought)
+
+A PHP + MySQL backend is ready in `api/` (PHP API) and `db/` (`schema.sql`,
+`seed_owner.php`), with `js/api-db.js` as the matching data layer. It is
+dormant: Vercel serves static files only and cannot run PHP or MySQL, so
+merging it changes nothing on the live site.
+
+It activates only after Hostinger hosting is bought and the backend is
+deployed there. Then a browser is switched to the API backend with the
+`localStorage` flag:
+
+```js
+localStorage.setItem('zakir_backend', 'api')
+```
+
+Reload the page after setting it; `localStorage.removeItem('zakir_backend')`
+(and a reload) switches that browser back to the local-only data layer.
+Until hosting is bought, everything runs on the local-only layer above.
 
 ## Deploy
 
@@ -67,15 +80,7 @@ Push to `main` — Vercel rebuilds automatically. Clean URLs are defined in
 redirects to the working URLs: `/umrah` → `/umrah-packages`,
 `/visas` → `/visa-services`, `/home` → `/`, `/contact-us` → `/contact`.
 `/calculator` and `/estimator` redirect (temporary) to
-`/umrah-packages#package-estimator`. `firebase.json` only holds the
-Firestore/Storage rules references; the site is **not** deployed via
-Firebase Hosting.
-
-### Firestore rules (after any rules change)
-
-Firebase console → project `zakir-travels` → **Firestore Database → Rules** →
-paste the full contents of `firestore.rules` → **Publish**. (Or
-`firebase deploy --only firestore:rules` from a machine with the Firebase CLI.)
+`/umrah-packages#package-estimator`.
 
 ## Local preview
 
@@ -92,6 +97,10 @@ python3 -m http.server 8000
   (Vercel-hosted, no custom domain bought). `robots.txt`, `sitemap.xml` and
   the Open Graph tags all use this URL. If a custom domain is bought later,
   search for `zakir-travel-tours.vercel.app` and replace it.
+- **Shared data / hosting:** there is no shared database until Hostinger
+  hosting is bought and the PHP backend in `api/` + `db/` is deployed there.
+  Until then, admin edits and enquiries stay in the browser they were made
+  in and do not sync between devices.
 - **Team photos:** the team section on `contact.html` shows initials only
   until real photo URLs are added in the admin portal.
 - **Deal dates/prices:** the featured deal is seeded as Jan 26 – Feb 09, 2026
