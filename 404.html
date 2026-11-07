@@ -66,7 +66,7 @@
             <p class="text-slate-600 mt-4">The page you were looking for doesn't exist or was moved. Don't worry — our Umrah packages, visa services and work permits are still here.</p>
             <div class="flex flex-col sm:flex-row gap-3 justify-center mt-8">
                 <a href="index.html" class="bg-navy hover:bg-navy-dark text-white font-bold px-6 py-3 rounded-xl transition-colors">Go to Homepage</a>
-                <a href="https://wa.me/923490558345?text=Assalam-o-Alaikum%20Zakir%20Travel%20%26%20Tours!%20I%20could%20not%20find%20the%20page%20I%20was%20looking%20for." target="_blank" rel="noopener" class="bg-[#25D366] hover:opacity-90 text-white font-bold px-6 py-3 rounded-xl transition-opacity"><i class="fab fa-whatsapp mr-2"></i>Chat on WhatsApp</a>
+                <a id="notFoundWhatsAppBtn" href="https://wa.me/923490558345?text=Assalam-o-Alaikum%20Zakir%20Travel%20%26%20Tours!%20I%20could%20not%20find%20the%20page%20I%20was%20looking%20for." target="_blank" rel="noopener" class="bg-[#25D366] hover:opacity-90 text-white font-bold px-6 py-3 rounded-xl transition-opacity"><i class="fab fa-whatsapp mr-2"></i>Chat on WhatsApp</a>
             </div>
             <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-10 text-sm font-semibold text-slate-600">
                 <a href="umrah-packages.html" class="hover:text-teal transition-colors">Umrah Packages</a>
@@ -74,12 +74,18 @@
                 <a href="work-permit.html" class="hover:text-teal transition-colors">Work Permits</a>
                 <a href="contact.html" class="hover:text-teal transition-colors">Contact Us</a>
             </div>
-            <p class="text-xs text-slate-400 mt-10">Zakir Travel &amp; Tours — Head Office: 2nd Floor, Hayat Market, Matta, Swat &middot; Branch: Potohar Plaza, Blue Area, Islamabad &middot; WhatsApp: +92 349 0558345</p>
+            <p id="notFoundFooterInfo" class="text-xs text-slate-400 mt-10">Zakir Travel &amp; Tours — Head Office: 2nd Floor, Hayat Market, Matta, Swat &middot; Branch: Potohar Plaza, Blue Area, Islamabad &middot; WhatsApp: +92 349 0558345</p>
         </div>
     </main>
 
     <footer class="bg-navy-dark text-slate-400 text-center text-xs py-5 px-5">
         &copy; 2026 Zakir Travel &amp; Tours. All rights reserved.
     </footer>
+
+    <!-- Site data + live bindings (same as the public pages): the footer
+         line and WhatsApp link above are bound from admin data, and the
+         meta description / title follow the per-page SEO values. -->
+    <script defer src="./js/local-db.js"></script>
+    <script defer src="./js/homepage-live.js"></script>
 </body>
 </html>

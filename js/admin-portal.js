@@ -40,6 +40,21 @@
         { id: "salim", name: "Salim", role: "Office Boy", initials: "S" }
     ];
 
+    // Initials for a team member's photo placeholder: first letters of
+    // the first two words of the (possibly edited) name, uppercased.
+    // Falls back to the hardcoded initials when the name is empty.
+    function teamMemberInitials(name, fallback) {
+        const words = String(name || "")
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
+        if (!words.length) return fallback || "";
+        return words
+            .slice(0, 2)
+            .map((w) => w.charAt(0).toUpperCase())
+            .join("");
+    }
+
     // Persistent Activity log (admin feedback): every toast is also written
     // here as a timestamped entry, kept in LocalStorage (newest 100).
     const ACTIVITY_LOG_KEY = "zakir_admin_activity_v1";
@@ -203,6 +218,7 @@
             this.visas = db.getLocalVisaServices();
             this.workPermits = db.getLocalWorkPermits ? db.getLocalWorkPermits() : [];
             this.workPermitProgrammes = db.getLocalWorkPermitProgrammes ? db.getLocalWorkPermitProgrammes() : [];
+            this.workPermitFaqs = db.getLocalWorkPermitFaqs ? db.getLocalWorkPermitFaqs() : [];
             this.enquiries = db.getLocalEnquiries ? db.getLocalEnquiries() : [];
             this.enquiryFilter = "all";
             this.enquirySearch = "";
@@ -294,6 +310,14 @@
                 db.onWorkPermitProgrammesSnapshot((progs) => {
                     this.workPermitProgrammes = Array.isArray(progs) ? progs : [];
                     this._renderWorkPermitProgrammesList();
+                    this._updateTabCounters();
+                });
+            }
+
+            if (db.onWorkPermitFaqsSnapshot) {
+                db.onWorkPermitFaqsSnapshot((faqs) => {
+                    this.workPermitFaqs = Array.isArray(faqs) ? faqs : [];
+                    this._renderWorkPermitFaqsList();
                     this._updateTabCounters();
                 });
             }
@@ -884,6 +908,28 @@
                                     </div>
 
                                     <div class="border-t border-slate-100 pt-4 space-y-3">
+                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B]">Hero Card &amp; Client Trust Badge</h4>
+                                        <div class="grid sm:grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Hero Card Eyebrow</label>
+                                                <input type="text" id="homeHeroCardEyebrowInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Hero Card Title</label>
+                                                <input type="text" id="homeHeroCardTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Hero Card Hours Badge</label>
+                                                <input type="text" id="homeHeroCardHoursBadgeInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Client Trust Badge Number</label>
+                                                <input type="text" id="homeTrustBadgeTextInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-t border-slate-100 pt-4 space-y-3">
                                         <h4 class="text-xs font-black uppercase text-[#0B2D5B]">About Our Agency & Mission (Home Page)</h4>
                                         <div class="grid sm:grid-cols-2 gap-3">
                                             <div>
@@ -912,6 +958,38 @@
                                     </div>
 
                                     <div class="border-t border-slate-100 pt-4 space-y-3">
+                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B]">About Badges, Management Desk &amp; Mission Checklist</h4>
+                                        <div class="grid sm:grid-cols-3 gap-3">
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">About Badge 1</label>
+                                                <input type="text" id="homeAboutBadge1Input" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">About Badge 2</label>
+                                                <input type="text" id="homeAboutBadge2Input" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">About Badge 3</label>
+                                                <input type="text" id="homeAboutBadge3Input" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Management Desk Note (names come from Contacts)</label>
+                                            <input type="text" id="homeManagementNoteInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700">
+                                        </div>
+                                        <div class="grid sm:grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Mission Checklist (one per line)</label>
+                                                <textarea id="homeMissionPointsInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700"></textarea>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Mission Badge</label>
+                                                <input type="text" id="homeMissionBadgeInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-t border-slate-100 pt-4 space-y-3">
                                         <h4 class="text-xs font-black uppercase text-[#0B2D5B]">Our 2 Official Branch Locations (Islamabad & Swat Matta)</h4>
                                         <div class="grid sm:grid-cols-2 gap-3">
                                             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
@@ -919,12 +997,14 @@
                                                 <input type="text" id="homeBranch1TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
                                                 <input type="text" id="homeBranch1AddrInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-slate-700">
                                                 <textarea id="homeBranch1DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                                <input type="text" id="homeBranch1NoteInput" required placeholder="Contact page card note" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
                                             </div>
                                             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
                                                 <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Branch 02 (Swat Matta)</span>
                                                 <input type="text" id="homeBranch2TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
                                                 <input type="text" id="homeBranch2AddrInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-slate-700">
                                                 <textarea id="homeBranch2DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                                <input type="text" id="homeBranch2NoteInput" required placeholder="Contact page card note" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
                                             </div>
                                         </div>
                                     </div>
@@ -951,6 +1031,32 @@
                                                 <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Stat Box 4</span>
                                                 <input type="text" id="homeStat4NumInput" required placeholder="Swat Matta" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
                                                 <input type="text" id="homeStat4LblInput" required placeholder="Central Head Office (Matta Swat)" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-t border-slate-100 pt-4">
+                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B] mb-3">Hero Trust Strip (4 cells under the hero — not the stats above)</h4>
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Cell 1</span>
+                                                <input type="text" id="homeHeroStat1NumInput" required placeholder="100K+" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="homeHeroStat1LblInput" required placeholder="Pilgrims & Travelers" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Cell 2</span>
+                                                <input type="text" id="homeHeroStat2NumInput" required placeholder="Swat HQ" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="homeHeroStat2LblInput" required placeholder="2nd Floor, Hayat Market, Matta Swat" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Cell 3</span>
+                                                <input type="text" id="homeHeroStat3NumInput" required placeholder="50+" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="homeHeroStat3LblInput" required placeholder="Partner Airlines" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Cell 4</span>
+                                                <input type="text" id="homeHeroStat4NumInput" required placeholder="24/7" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="homeHeroStat4LblInput" required placeholder="Dedicated Support" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
                                             </div>
                                         </div>
                                     </div>
@@ -995,22 +1101,149 @@
                                                     <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Service Card 1 (Umrah)</span>
                                                     <input type="text" id="homeSrv1TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
                                                     <textarea id="homeSrv1DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                                    <input type="text" id="homeSrv1BadgeInput" required placeholder="Card badge, e.g. Haramain" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0D8A9E]">
+                                                    <label class="block text-[10px] font-semibold text-slate-500">Bullets (one per line)</label>
+                                                    <textarea id="homeSrv1BulletsInput" rows="3" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
                                                 </div>
                                                 <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
                                                     <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Service Card 2 (Flights)</span>
                                                     <input type="text" id="homeSrv2TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
                                                     <textarea id="homeSrv2DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                                    <input type="text" id="homeSrv2BadgeInput" required placeholder="Card badge, e.g. 50+ Airlines" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0D8A9E]">
+                                                    <label class="block text-[10px] font-semibold text-slate-500">Bullets (one per line)</label>
+                                                    <textarea id="homeSrv2BulletsInput" rows="3" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
                                                 </div>
                                                 <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
                                                     <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Service Card 3 (Visas)</span>
                                                     <input type="text" id="homeSrv3TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
                                                     <textarea id="homeSrv3DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                                    <input type="text" id="homeSrv3BadgeInput" required placeholder="Card badge, e.g. Global Visas" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0D8A9E]">
+                                                    <label class="block text-[10px] font-semibold text-slate-500">Bullets (one per line)</label>
+                                                    <textarea id="homeSrv3BulletsInput" rows="3" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
                                                 </div>
                                                 <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
                                                     <span class="text-[10px] font-extrabold uppercase text-[#0D8A9E]">Service Card 4 (Hotels & Transport)</span>
                                                     <input type="text" id="homeSrv4TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0B2D5B]">
                                                     <textarea id="homeSrv4DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
+                                                    <input type="text" id="homeSrv4BadgeInput" required placeholder="Card badge, e.g. Hospitality" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-[#0D8A9E]">
+                                                    <label class="block text-[10px] font-semibold text-slate-500">Bullets (one per line)</label>
+                                                    <textarea id="homeSrv4BulletsInput" rows="3" required class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600"></textarea>
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-t border-slate-100 pt-4 space-y-3">
+                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B]">Services Section Heading &amp; Intro</h4>
+                                        <div>
+                                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Services Heading</label>
+                                            <input type="text" id="homeServicesHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Services Intro (agency name is filled in automatically)</label>
+                                            <textarea id="homeServicesIntroInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-t border-slate-100 pt-4 space-y-3">
+                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B]">Branches Section Heading &amp; Intro</h4>
+                                        <div>
+                                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Branches Heading</label>
+                                            <input type="text" id="homeBranchesHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Branches Intro</label>
+                                            <textarea id="homeBranchesIntroInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-t border-slate-100 pt-4 space-y-3">
+                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B]">How It Works — 4 Steps</h4>
+                                        <div>
+                                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Section Heading</label>
+                                            <input type="text" id="homeProcessHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Section Intro</label>
+                                            <textarea id="homeProcessIntroInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700"></textarea>
+                                        </div>
+                                        <div class="grid sm:grid-cols-2 gap-3">
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Step 1</span>
+                                                <input type="text" id="homeProcess1TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                <textarea id="homeProcess1DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Step 2</span>
+                                                <input type="text" id="homeProcess2TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                <textarea id="homeProcess2DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Step 3</span>
+                                                <input type="text" id="homeProcess3TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                <textarea id="homeProcess3DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Step 4</span>
+                                                <input type="text" id="homeProcess4TitleInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                                <textarea id="homeProcess4DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-t border-slate-100 pt-4 space-y-3">
+                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B]">Footer &amp; Search (SEO) Text</h4>
+                                        <div>
+                                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Footer Business Description (all pages)</label>
+                                            <textarea id="homeFooterDescriptionInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700"></textarea>
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Floating WhatsApp Button Label</label>
+                                            <input type="text" id="homeFloatingChatLabelInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                        </div>
+                                        <p class="text-[10px] text-slate-400">Search descriptions: the manager's WhatsApp number is added automatically — do not type a phone number here.</p>
+                                        <div class="grid sm:grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Home Page — Browser Tab Title</label>
+                                                <input type="text" id="homeSeoTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Umrah Page — Browser Tab Title</label>
+                                                <input type="text" id="umrahSeoTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Visas Page — Browser Tab Title</label>
+                                                <input type="text" id="visasSeoTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Work Permit Page — Browser Tab Title</label>
+                                                <input type="text" id="workPermitSeoTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div class="sm:col-span-2">
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Contact Page — Browser Tab Title</label>
+                                                <input type="text" id="contactSeoTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                        </div>
+                                        <div class="space-y-3">
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Home Page — Search Description</label>
+                                                <textarea id="homeSeoDescriptionInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700"></textarea>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Umrah Page — Search Description</label>
+                                                <textarea id="umrahSeoDescriptionInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700"></textarea>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Visas Page — Search Description</label>
+                                                <textarea id="visasSeoDescriptionInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700"></textarea>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Work Permit Page — Search Description</label>
+                                                <textarea id="workPermitSeoDescriptionInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700"></textarea>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Contact Page — Search Description</label>
+                                                <textarea id="contactSeoDescriptionInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -1089,9 +1322,61 @@
                                             <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Main Heading</label>
                                             <input type="text" id="umrahHeroTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
                                         </div>
+                                        <div>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Hero Script Line (italic second line)</label>
+                                            <input type="text" id="umrahHeroScriptInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                        </div>
                                         <div class="sm:col-span-2">
                                             <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Subtitle</label>
                                             <textarea id="umrahHeroSubtitleInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-t border-slate-100 pt-4 space-y-3">
+                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B]">Hero Trust Strip (4 cells)</h4>
+                                        <div class="grid sm:grid-cols-2 gap-3">
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Cell 1</span>
+                                                <input type="text" id="umrahTrustStat1NumInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="umrahTrustStat1LblInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Cell 2</span>
+                                                <input type="text" id="umrahTrustStat2NumInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="umrahTrustStat2LblInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Cell 3</span>
+                                                <input type="text" id="umrahTrustStat3NumInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="umrahTrustStat3LblInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Cell 4</span>
+                                                <input type="text" id="umrahTrustStat4NumInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="umrahTrustStat4LblInput" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-t border-slate-100 pt-4 space-y-3">
+                                        <h4 class="text-xs font-black uppercase text-[#0B2D5B]">Compare Packages &amp; Inclusions Headings</h4>
+                                        <div class="grid sm:grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Compare Packages Heading</label>
+                                                <input type="text" id="umrahCompareHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Compare Desk Note</label>
+                                                <input type="text" id="umrahCompareNoteInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Inclusions Heading</label>
+                                                <input type="text" id="umrahIncludedHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Inclusions Intro</label>
+                                                <input type="text" id="umrahIncludedIntroInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700">
+                                            </div>
                                         </div>
                                     </div>
 
@@ -1124,6 +1409,10 @@
                                         <div>
                                             <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Family Umrah Banner Description</label>
                                             <input type="text" id="umrahFamilyDescInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-700">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Flyer Popup Eyebrow</label>
+                                            <input type="text" id="umrahFlyerModalEyebrowInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
                                         </div>
                                     </div>
 
@@ -1325,6 +1614,10 @@
                                             <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">What's Included in Every Estimate (one per line)</label>
                                             <textarea id="calcIncludedBulletsInput" rows="4" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
                                         </div>
+                                        <div>
+                                            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Estimator Rates Note (under the estimator)</label>
+                                            <textarea id="calcRatesNoteInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                        </div>
                                     </div>
 
                                     <button type="submit" class="w-full bg-[#0D8A9E] hover:bg-[#096979] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
@@ -1377,11 +1670,54 @@
                                         <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Subtitle</label>
                                         <textarea id="visaHeroSubtitleInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
                                     </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Page Hero Script Line (italic line under the heading)</label>
+                                        <input type="text" id="visaHeroScriptInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                </div>
+
+                                <div class="pt-2 border-t border-slate-100">
+                                    <span class="text-[11px] font-bold uppercase text-slate-500 block mb-3">Hero Trust Strip (4 stat cells)</span>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                            <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Stat 1</span>
+                                            <input type="text" id="visaTrustStat1NumInput" required placeholder="100K+" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                            <input type="text" id="visaTrustStat1LblInput" required placeholder="Visas & Tickets Issued" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                        </div>
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                            <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Stat 2</span>
+                                            <input type="text" id="visaTrustStat2NumInput" required placeholder="Swat Matta" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                            <input type="text" id="visaTrustStat2LblInput" required placeholder="Central Head Office" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                        </div>
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                            <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Stat 3</span>
+                                            <input type="text" id="visaTrustStat3NumInput" required placeholder="50+" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                            <input type="text" id="visaTrustStat3LblInput" required placeholder="Partner Global Airlines" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                        </div>
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                            <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Stat 4</span>
+                                            <input type="text" id="visaTrustStat4NumInput" required placeholder="99%" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                            <input type="text" id="visaTrustStat4LblInput" required placeholder="Documentation Accuracy" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="grid sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
                                     <div>
-                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Flights Section Heading</label>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Destinations Heading</label>
+                                        <input type="text" id="visaDestinationsHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Destinations Note (under the heading)</label>
+                                        <textarea id="visaDestinationsNoteInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="grid sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Flights Eyebrow Badge</label>
+                                        <input type="text" id="visaFlightEyebrowInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mt-3 mb-1">Flights Section Heading</label>
                                         <input type="text" id="visaFlightHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
                                         <label class="block text-[11px] font-bold uppercase text-slate-500 mt-3 mb-1">Flights Description</label>
                                         <textarea id="visaFlightDescInput" rows="3" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
@@ -1391,6 +1727,8 @@
                                         <textarea id="visaFlightBulletsInput" rows="3" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
                                         <label class="block text-[11px] font-bold uppercase text-slate-500 mt-3 mb-1">Partner Airlines (Comma Separated)</label>
                                         <input type="text" id="visaPartnerAirlinesInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mt-3 mb-1">Flight Search Default Departure City</label>
+                                        <input type="text" id="visaDefaultDepartureCityInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
                                     </div>
                                 </div>
 
@@ -1490,6 +1828,36 @@
                                         <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Hero Subtitle</label>
                                         <textarea id="wpHeroSubtitleInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
                                     </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Top Bar Tagline (dark bar above the hero)</label>
+                                        <input type="text" id="wpTopBarTaglineInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                    </div>
+                                </div>
+
+                                <div class="pt-2 border-t border-slate-100">
+                                    <span class="text-[11px] font-bold uppercase text-slate-500 block mb-3">Hero Trust Strip (4 stat cells)</span>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                            <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Stat 1</span>
+                                            <input type="text" id="wpTrustStat1NumInput" required placeholder="7+ Countries" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                            <input type="text" id="wpTrustStat1LblInput" required placeholder="EU Destinations Covered" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                        </div>
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                            <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Stat 2</span>
+                                            <input type="text" id="wpTrustStat2NumInput" required placeholder="100% Legal" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                            <input type="text" id="wpTrustStat2LblInput" required placeholder="Government-Issued Permits" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                        </div>
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                            <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Stat 3</span>
+                                            <input type="text" id="wpTrustStat3NumInput" required placeholder="Schengen" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                            <input type="text" id="wpTrustStat3LblInput" required placeholder="Travel Mobility Rights" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                        </div>
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                            <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Stat 4</span>
+                                            <input type="text" id="wpTrustStat4NumInput" required placeholder="Free" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                            <input type="text" id="wpTrustStat4LblInput" required placeholder="Initial Profile Review" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600">
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="grid sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
@@ -1508,6 +1876,17 @@
                                     <div>
                                         <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Destinations Description</label>
                                         <textarea id="wpDestinationsDescInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">More Destinations Heading</label>
+                                        <input type="text" id="wpMoreDestinationsTitleInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                        <p class="text-[10px] text-slate-400 mt-1">Shown only when the country list below is empty — otherwise the heading is built from the list.</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">More Destinations Countries (comma separated)</label>
+                                        <input type="text" id="wpMoreDestinationsCountriesInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#0B2D5B]">
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mt-3 mb-1">More Destinations Description</label>
+                                        <textarea id="wpMoreDestinationsDescInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
                                     </div>
                                 </div>
 
@@ -1538,11 +1917,100 @@
                                     </div>
                                 </div>
 
+                                <div class="pt-2 border-t border-slate-100">
+                                    <span class="text-[11px] font-bold uppercase text-slate-500 block mb-3">Benefits Cards (4 cards under the Benefits heading)</span>
+                                    <div class="grid sm:grid-cols-2 gap-3">
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                            <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Benefit 1</span>
+                                            <input type="text" id="wpBenefit1TitleInput" required placeholder="Legal Employment" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                            <textarea id="wpBenefit1DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                        </div>
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                            <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Benefit 2</span>
+                                            <input type="text" id="wpBenefit2TitleInput" required placeholder="Schengen Mobility" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                            <textarea id="wpBenefit2DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                        </div>
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                            <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Benefit 3</span>
+                                            <input type="text" id="wpBenefit3TitleInput" required placeholder="Health & Social Security" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                            <textarea id="wpBenefit3DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                        </div>
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                            <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Benefit 4</span>
+                                            <input type="text" id="wpBenefit4TitleInput" required placeholder="Residency Pathway" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                            <textarea id="wpBenefit4DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="pt-2 border-t border-slate-100">
+                                    <span class="text-[11px] font-bold uppercase text-slate-500 block mb-3">4-Step Process (intro + 4 steps)</span>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Process Intro</label>
+                                        <textarea id="wpProcessIntroInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                    </div>
+                                    <div class="grid sm:grid-cols-2 gap-3 mt-3">
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                            <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Step 1</span>
+                                            <input type="text" id="wpProcess1TitleInput" required placeholder="Consultation" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                            <textarea id="wpProcess1DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                        </div>
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                            <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Step 2</span>
+                                            <input type="text" id="wpProcess2TitleInput" required placeholder="Eligibility & Job Match" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                            <textarea id="wpProcess2DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                        </div>
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                            <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Step 3</span>
+                                            <input type="text" id="wpProcess3TitleInput" required placeholder="Permit & Documents" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                            <textarea id="wpProcess3DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                        </div>
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                            <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Step 4</span>
+                                            <input type="text" id="wpProcess4TitleInput" required placeholder="Embassy & Departure" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#0B2D5B]">
+                                            <textarea id="wpProcess4DescInput" rows="2" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-600"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="grid sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Document Checklist (one per line, Title | detail)</label>
+                                        <textarea id="wpChecklistItemsInput" rows="6" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Assessment Fine Print (under the form button)</label>
+                                        <textarea id="wpAssessmentNoteInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                        <label class="block text-[11px] font-bold uppercase text-slate-500 mt-3 mb-1">Assessment Job Sectors (one per line)</label>
+                                        <textarea id="wpSectorsInput" rows="4" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                        <p class="text-[10px] text-slate-400 mt-1">Rebuilds the "Desired Job Sector" dropdown on the Work Permit page. "Other / General Labour" stays as the last option.</p>
+                                    </div>
+                                </div>
+
+                                <div class="pt-2 border-t border-slate-100">
+                                    <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">Programme Services (one per line, Title | detail) — shown on every featured programme</label>
+                                    <textarea id="wpProgrammeServicesInput" rows="4" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700"></textarea>
+                                </div>
+
                                 <button type="submit" class="w-full sm:w-auto bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold px-8 py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
                                     <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
                                     <span>Save Work Permit Page Content</span>
                                 </button>
                             </form>
+
+                            <!-- Work Permit FAQs (CRUD — same pattern as Country Visas) -->
+                            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-card">
+                                <div>
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-[#0D8A9E]">Work Permit Page Content</span>
+                                    <h3 class="text-xl font-black text-[#0B2D5B]">Frequently Asked Questions</h3>
+                                    <p class="text-xs text-slate-500">Add, edit, reorder, or hide the FAQ questions shown at the bottom of the Work Permit page.</p>
+                                </div>
+                                <button type="button" data-action="open-faq-modal" class="bg-gradient-to-r from-[#0B2D5B] to-[#0D8A9E] hover:opacity-95 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 transition-all">
+                                    <i class="fa-solid fa-plus"></i> Add FAQ
+                                </button>
+                            </div>
+
+                            <div id="crudWorkPermitFaqsContainer" class="grid md:grid-cols-2 gap-4"></div>
                         </div>
 
                         <!-- ========================================================== -->
@@ -1627,6 +2095,81 @@
                                                 <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Hero Subtitle</label>
                                                 <textarea id="contactHeroSubtitleInput" rows="2" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700"></textarea>
                                             </div>
+                                            <div class="sm:col-span-2">
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Hero Script Line (italic line under the heading)</label>
+                                                <input type="text" id="contactHeroScriptInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- About & Contact Page Hero Trust Strip -->
+                                    <div class="border-t border-slate-100 pt-4 space-y-3">
+                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E] block">Hero Trust Strip (4 stat cells)</span>
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Stat 1</span>
+                                                <input type="text" id="contactTrustStat1NumInput" required placeholder="Swat Matta" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="contactTrustStat1LblInput" required placeholder="Central Head Office" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[11px] text-slate-600">
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Stat 2</span>
+                                                <input type="text" id="contactTrustStat2NumInput" required placeholder="Islamabad" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="contactTrustStat2LblInput" required placeholder="Potohar Plaza Branch" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[11px] text-slate-600">
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Stat 3</span>
+                                                <input type="text" id="contactTrustStat3NumInput" required placeholder="Direct" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="contactTrustStat3LblInput" required placeholder="Management Care" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[11px] text-slate-600">
+                                            </div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+                                                <span class="text-[10px] font-bold uppercase text-[#0D8A9E]">Trust Stat 4</span>
+                                                <input type="text" id="contactTrustStat4NumInput" required placeholder="24/7" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-black text-[#0B2D5B]">
+                                                <input type="text" id="contactTrustStat4LblInput" required placeholder="WhatsApp Helpline" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[11px] text-slate-600">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- About & Team Section Headings -->
+                                    <div class="border-t border-slate-100 pt-4 space-y-3">
+                                        <span class="text-[10px] font-black uppercase text-[#0D8A9E] block">About &amp; Team Section Headings</span>
+                                        <div class="grid sm:grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Leadership Heading</label>
+                                                <input type="text" id="contactLeadershipHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Leadership Intro</label>
+                                                <input type="text" id="contactLeadershipIntroInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Experts Heading</label>
+                                                <input type="text" id="contactExpertsHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Experts Intro</label>
+                                                <input type="text" id="contactExpertsIntroInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Team Heading</label>
+                                                <input type="text" id="contactTeamHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Team Intro</label>
+                                                <input type="text" id="contactTeamIntroInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Contact Heading</label>
+                                                <input type="text" id="contactContactHeadingInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-[#0B2D5B]">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Contact Intro</label>
+                                                <input type="text" id="contactContactIntroInput" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700">
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Service Required Options (one per line, Label | value)</label>
+                                            <textarea id="contactServiceOptionsInput" rows="5" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700"></textarea>
+                                            <p class="text-[10px] text-slate-400 mt-1">Rebuilds the "Service Required" dropdown on the Contact page.</p>
                                         </div>
                                     </div>
 
@@ -1637,16 +2180,23 @@
                                             <span class="text-[10px] font-bold text-slate-400">Upload, adjust if needed, then click Save Changes</span>
                                         </div>
                                         <div id="teamPhotosAdminGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                                            ${TEAM_MEMBERS.map((m) => `
+                                            ${TEAM_MEMBERS.map((m) => {
+                                                const member = this.getTeamMember(m.id);
+                                                return `
                                             <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex flex-col items-center text-center gap-2">
                                                 <div class="relative w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-[#0B2D5B] to-[#0D8A9E] flex items-center justify-center text-white font-black text-sm">
-                                                    <span id="teamPhotoInitials-${m.id}">${m.initials}</span>
-                                                    <img id="teamPhotoPreview-${m.id}" alt="${m.name}" class="hidden absolute inset-0 w-full h-full object-cover">
+                                                    <span id="teamPhotoInitials-${m.id}">${escapeHtml(member.initials)}</span>
+                                                    <img id="teamPhotoPreview-${m.id}" alt="${escapeHtml(member.name)}" class="hidden absolute inset-0 w-full h-full object-cover">
                                                 </div>
-                                                <div class="leading-tight">
-                                                    <div class="text-xs font-black text-[#0B2D5B]">${m.name}</div>
-                                                    <div class="text-[10px] font-bold text-[#0D8A9E]">${m.role}</div>
+                                                <div class="leading-tight w-full">
+                                                    <div id="teamMemberName-${m.id}" class="text-xs font-black text-[#0B2D5B]">${escapeHtml(member.name)}</div>
+                                                    <div id="teamMemberRole-${m.id}" class="text-[10px] font-bold text-[#0D8A9E]">${escapeHtml(member.role)}</div>
                                                 </div>
+                                                <input type="text" id="teamMemberNameInput-${m.id}" data-team-member-name="${m.id}" value="${escapeHtml(member.name)}" placeholder="Name" aria-label="Team member name" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold text-[#0B2D5B] text-center">
+                                                <input type="text" id="teamMemberRoleInput-${m.id}" data-team-member-role="${m.id}" value="${escapeHtml(member.role)}" placeholder="Role" aria-label="Team member role" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[11px] font-bold text-[#0D8A9E] text-center">
+                                                ${m.id === "ceo" ? `
+                                                <textarea id="teamMemberQuoteInput-ceo" data-team-member-quote="ceo" rows="3" placeholder="CEO message shown on the About page" aria-label="CEO quote" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[11px] text-slate-600 text-left">${escapeHtml(member.quote || "")}</textarea>
+                                                <input type="text" id="contactCeoTagsInput" value="${escapeHtml((((this.siteConfig && this.siteConfig.pageContent) || {}).contact || {}).ceoTags || "Swat Matta Head Office|Umrah & Ziyarat|Global Visas & Tickets")}" placeholder="CEO tags, separated by |" aria-label="CEO tag pills" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[11px] font-bold text-[#0D8A9E] text-center">` : ""}
                                                 <input type="hidden" id="teamPhotoUrl-${m.id}" data-team-photo-key="${m.id}">
                                                 <div class="flex flex-wrap items-center justify-center gap-1.5">
                                                     <label class="cursor-pointer bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-colors">
@@ -1660,7 +2210,8 @@
                                                         <i class="fa-solid fa-trash"></i>
                                                     </button>
                                                 </div>
-                                            </div>`).join("")}
+                                            </div>`;
+                                            }).join("")}
                                         </div>
                                     </div>
                                 </div>
@@ -1691,6 +2242,16 @@
                                             <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Office Hours</label>
                                             <input type="text" id="contactOfficeHours" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-[#0B2D5B]">
                                         </div>
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Swat Branch Hours</label>
+                                                <input type="text" id="contactBranch1Hours" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-[#0B2D5B]">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Islamabad Branch Hours</label>
+                                                <input type="text" id="contactBranch2Hours" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-[#0B2D5B]">
+                                            </div>
+                                        </div>
                                         <div>
                                             <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Official Email(s)</label>
                                             <input type="text" id="contactOfficeEmail" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-[#0B2D5B]">
@@ -1698,6 +2259,22 @@
                                         <div>
                                             <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Google Maps Link</label>
                                             <input type="text" id="contactMapEmbedUrl" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-[11px] text-slate-600">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Swat Map Search Link (Open in Google Maps)</label>
+                                            <input type="text" id="contactBranch1MapSearchUrl" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-[11px] text-slate-600">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Islamabad Branch Map Embed URL</label>
+                                            <input type="text" id="contactBranch2MapEmbedUrl" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-[11px] text-slate-600">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Islamabad Map Search Link (Open in Google Maps)</label>
+                                            <input type="text" id="contactBranch2MapSearchUrl" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-[11px] text-slate-600">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">WhatsApp Support Note (contact info bar)</label>
+                                            <input type="text" id="contactSupportNote" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-[#0B2D5B]">
                                         </div>
                                         <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
                                             <i class="fa-solid fa-floppy-disk text-[#15B2CB]"></i>
@@ -2356,6 +2933,21 @@
                                 <p class="text-[10px] text-slate-400">Displayed as interactive badges at the bottom of the featured showcase card.</p>
                             </div>
 
+                            <!-- Section 7: Official Flyer Poster -->
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-1.5">
+                                <label class="block text-xs font-black uppercase text-[#0B2D5B]">Official Flyer Poster Image (shown by the "View Official Flyer" button)</label>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="text" id="wpProgEditPosterUrl" placeholder="./assets/poland-work-permit.jpg" class="w-full min-w-0 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                                    <div class="relative shrink-0">
+                                        <input type="file" accept="image/*" class="hidden">
+                                        <button type="button" data-wp-prog-image-target="wpProgEditPosterUrl" class="px-2.5 py-2 bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white text-[11px] font-bold rounded-xl whitespace-nowrap">
+                                            <i class="fa-solid fa-cloud-arrow-up mr-1"></i>Upload
+                                        </button>
+                                    </div>
+                                </div>
+                                <p class="text-[10px] text-slate-400">Leave blank to hide the flyer button for this programme.</p>
+                            </div>
+
                             <!-- Active Visibility Checkbox -->
                             <div class="flex items-center gap-6 pt-1">
                                 <label class="flex items-center gap-2 cursor-pointer">
@@ -2372,6 +2964,38 @@
                 </div>
 
                 <!-- ============================================================== -->
+                <!-- MODAL: ADD / EDIT WORK PERMIT FAQ                           -->
+                <!-- ============================================================== -->
+                <div id="faqCrudModal" class="fixed inset-0 z-[85] hidden bg-[#05162E]/80 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto anim-scale-in">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                            <h3 id="faqModalTitle" class="text-lg font-black text-[#0B2D5B]">Add / Edit FAQ</h3>
+                            <button type="button" data-action="close-faq-modal" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <form id="faqCrudForm" class="space-y-3.5">
+                            <input type="hidden" id="faqEditId">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Question</label>
+                                <input type="text" id="faqEditQuestion" required placeholder="Which European country is currently open for applications?" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#0B2D5B]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Answer</label>
+                                <textarea id="faqEditAnswer" rows="5" required placeholder="Answer shown when the visitor opens the question…" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm"></textarea>
+                            </div>
+                            <label class="flex items-center gap-2 pt-1 cursor-pointer">
+                                <input type="checkbox" id="faqEditActive" checked class="w-4 h-4 accent-[#0D8A9E]">
+                                <span class="text-xs font-bold text-[#0B2D5B]">Active (Visible on Website)</span>
+                            </label>
+                            <button type="submit" class="w-full bg-[#0B2D5B] hover:bg-[#0D8A9E] text-white font-extrabold py-3.5 rounded-xl shadow-lg mt-2">
+                                Save FAQ
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
                 <!-- MODAL: RESET TO FLYER DEFAULTS CONFIRMATION                    -->
                 <!-- ============================================================== -->
                 <div id="resetConfirmModal" class="fixed inset-0 z-[90] hidden bg-[#05162E]/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -2380,8 +3004,8 @@
                             <i class="fa-solid fa-rotate-left"></i>
                         </div>
                         <h3 class="text-xl font-black text-[#0B2D5B]">Reset to Original January Flyer Defaults?</h3>
-                        <p class="text-xs text-slate-600 leading-relaxed">
-                            This will restore the Featured Umrah Price to <strong>PKR 232,000</strong>, dates to <strong>Jan 26 \u2013 Feb 09, 2026 (14 Nights)</strong>, and reset all offers, room rates, packages, visas, and contact details.
+                        <p id="resetConfirmText" class="text-xs text-slate-600 leading-relaxed">
+                            This will restore the Featured Umrah Price to <strong>PKR 232,000</strong>, dates to <strong>Jan 26 – Feb 09, 2026 (14 Nights)</strong>, and reset all offers, room rates, packages, visas, and contact details.
                         </p>
                         <div class="flex gap-3 pt-2">
                             <button type="button" data-action="cancel-reset-modal" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-xs">
@@ -2416,7 +3040,7 @@
 
             const workPermitBadge = this.container.querySelector("#tabBadgeWorkPermits");
             if (workPermitBadge) {
-                const totalWP = (this.workPermits || []).length + (this.workPermitProgrammes || []).length;
+                const totalWP = (this.workPermits || []).length + (this.workPermitProgrammes || []).length + (this.workPermitFaqs || []).length;
                 workPermitBadge.textContent = String(totalWP);
             }
 
@@ -2562,10 +3186,16 @@
             const isInvalidOrLegacyOffice = !rawOffice || /fazal banda/i.test(rawOffice) || /potohar|blue area|islamabad/i.test(rawOffice);
             setVal("#contactOfficeAddress", isInvalidOrLegacyOffice ? "2nd Floor, Hayat Market, Matta Swat, Khyber Pakhtunkhwa, Pakistan" : rawOffice);
             setVal("#contactOfficeHours", c.officeHours || "Monday to Saturday: 9:30 AM \u2013 8:00 PM (Sunday Closed / WhatsApp Support Active)");
+            setVal("#contactBranch1Hours", c.branch1Hours || "Monday \u2013 Saturday: 9:30 AM to 8:00 PM");
+            setVal("#contactBranch2Hours", c.branch2Hours || "Monday \u2013 Saturday: 9:30 AM to 8:00 PM");
             setVal("#contactOfficeEmail", c.officeEmail || "info@zakirtravels.com / inam@zakirtravels.com");
             const rawMap = c.mapEmbedUrl || "";
             const isLegacyMap = !rawMap || /potohar/i.test(rawMap) || /fazal-e-haq/i.test(rawMap);
             setVal("#contactMapEmbedUrl", isLegacyMap ? "https://maps.google.com/maps?q=Hayat+Market,+Matta,+Swat,+Pakistan&t=&z=16&ie=UTF8&iwloc=&output=embed" : rawMap);
+            setVal("#contactBranch1MapSearchUrl", c.branch1MapSearchUrl || "https://www.google.com/maps/search/?api=1&query=Hayat+Market,+Matta,+Swat");
+            setVal("#contactBranch2MapEmbedUrl", c.branch2MapEmbedUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3318.847503714243!2d73.0645624!3d33.7128613!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfbf9df175e11d%3A0xe54d6faeebdae812!2sPotohar%20Plaza%2C%20Fazal-e-Haq%20Rd%2C%20Blue%20Area%2C%20Islamabad!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s");
+            setVal("#contactBranch2MapSearchUrl", c.branch2MapSearchUrl || "https://www.google.com/maps/search/?api=1&query=Potohar+Plaza,+Blue+Area,+Islamabad");
+            setVal("#contactSupportNote", c.supportNote || "24/7 WhatsApp Support Active");
 
             // Populate Page-Specific Content Fields
             const pc = (this.siteConfig && this.siteConfig.pageContent) || window.DEFAULT_PAGE_CONTENT || {};
@@ -2591,9 +3221,11 @@
             const isInvalidOrLegacyBranch1 = !rawBranch1 || /fazal banda/i.test(rawBranch1) || /potohar|blue area|islamabad/i.test(rawBranch1);
             setVal("#homeBranch1AddrInput", isInvalidOrLegacyBranch1 ? "2nd Floor, Hayat Market, Matta Swat, Khyber Pakhtunkhwa, Pakistan" : rawBranch1);
             setVal("#homeBranch1DescInput", pHome.branch1Desc || "");
+            setVal("#homeBranch1NoteInput", pHome.branch1Note || "Walk-in pilgrims & group bookings welcome");
             setVal("#homeBranch2TitleInput", pHome.branch2Title || "Islamabad Branch Office");
             setVal("#homeBranch2AddrInput", pHome.branch2Address || "Office No. 7, Ground Floor, Potohar Plaza, Fazal-e-Haq Road, Blue Area, Islamabad");
             setVal("#homeBranch2DescInput", pHome.branch2Desc || "");
+            setVal("#homeBranch2NoteInput", pHome.branch2Note || "Embassy file preparation & flights");
             setVal("#homeStat1NumInput", pHome.stat1Number || "100K+");
             setVal("#homeStat1LblInput", pHome.stat1Label || "Happy Clients & Pilgrims Served");
             setVal("#homeStat2NumInput", pHome.stat2Number || "24/7");
@@ -2610,15 +3242,78 @@
             setVal("#homeWhy3DescInput", pHome.why3Desc || "");
             setVal("#homeSrv1TitleInput", pHome.srv1Title || "Umrah & Ziyarat Packages");
             setVal("#homeSrv1DescInput", pHome.srv1Desc || "");
+            setVal("#homeSrv1BadgeInput", pHome.srv1Badge || "Haramain");
+            setVal("#homeSrv1BulletsInput", pHome.srv1Bullets || "");
             setVal("#homeSrv2TitleInput", pHome.srv2Title || "Flight Tickets");
             setVal("#homeSrv2DescInput", pHome.srv2Desc || "");
+            setVal("#homeSrv2BadgeInput", pHome.srv2Badge || "50+ Airlines");
+            setVal("#homeSrv2BulletsInput", pHome.srv2Bullets || "");
             setVal("#homeSrv3TitleInput", pHome.srv3Title || "Visa Consultancy");
             setVal("#homeSrv3DescInput", pHome.srv3Desc || "");
+            setVal("#homeSrv3BadgeInput", pHome.srv3Badge || "Global Visas");
+            setVal("#homeSrv3BulletsInput", pHome.srv3Bullets || "");
             setVal("#homeSrv4TitleInput", pHome.srv4Title || "Hotel & Transport");
             setVal("#homeSrv4DescInput", pHome.srv4Desc || "");
+            setVal("#homeSrv4BadgeInput", pHome.srv4Badge || "Hospitality");
+            setVal("#homeSrv4BulletsInput", pHome.srv4Bullets || "");
+
+            // Home: hero card, trust strip, about badges, mission, services,
+            // branches, process, footer & SEO (hardcoded-content audit).
+            setVal("#homeHeroCardEyebrowInput", pHome.heroCardEyebrow || "Headquartered in Swat");
+            setVal("#homeHeroCardTitleInput", pHome.heroCardTitle || "Swat Head Office & Branch");
+            setVal("#homeHeroCardHoursBadgeInput", pHome.heroCardHoursBadge || "Open Mon\u2013Sat");
+            setVal("#homeTrustBadgeTextInput", pHome.trustBadgeText || "100,000+ Served");
+            setVal("#homeHeroStat1NumInput", pHome.heroStat1Number || "100K+");
+            setVal("#homeHeroStat1LblInput", pHome.heroStat1Label || "Pilgrims & Travelers");
+            setVal("#homeHeroStat2NumInput", pHome.heroStat2Number || "Swat HQ");
+            setVal("#homeHeroStat2LblInput", pHome.heroStat2Label || "2nd Floor, Hayat Market, Matta Swat");
+            setVal("#homeHeroStat3NumInput", pHome.heroStat3Number || "50+");
+            setVal("#homeHeroStat3LblInput", pHome.heroStat3Label || "Partner Airlines");
+            setVal("#homeHeroStat4NumInput", pHome.heroStat4Number || "24/7");
+            setVal("#homeHeroStat4LblInput", pHome.heroStat4Label || "Dedicated Support");
+            setVal("#homeAboutBadge1Input", pHome.aboutBadge1 || "Swat Matta Headquarters");
+            setVal("#homeAboutBadge2Input", pHome.aboutBadge2 || "100K+ Pilgrims & Clients");
+            setVal("#homeAboutBadge3Input", pHome.aboutBadge3 || "Fast-Track Visas & Tickets");
+            setVal("#homeManagementNoteInput", pHome.managementNote || "Personal oversight on every Umrah, Visa & Air Ticket file.");
+            setVal("#homeMissionPointsInput", pHome.missionPoints || "");
+            setVal("#homeMissionBadgeInput", pHome.missionBadge || "100% Transparent Documentation");
+            setVal("#homeServicesHeadingInput", pHome.servicesHeading || "Specialized Travel & Visa Solutions");
+            setVal("#homeServicesIntroInput", pHome.servicesIntro || "");
+            setVal("#homeBranchesHeadingInput", pHome.branchesHeading || "Swat Head Office & Regional Branch");
+            setVal("#homeBranchesIntroInput", pHome.branchesIntro || "");
+            setVal("#homeProcessHeadingInput", pHome.processHeading || "How Zakir Travel & Tours Works");
+            setVal("#homeProcessIntroInput", pHome.processIntro || "");
+            setVal("#homeProcess1TitleInput", pHome.process1Title || "Personal Consultation");
+            setVal("#homeProcess1DescInput", pHome.process1Desc || "");
+            setVal("#homeProcess2TitleInput", pHome.process2Title || "Tailored Travel Plan");
+            setVal("#homeProcess2DescInput", pHome.process2Desc || "");
+            setVal("#homeProcess3TitleInput", pHome.process3Title || "Fast Documentation");
+            setVal("#homeProcess3DescInput", pHome.process3Desc || "");
+            setVal("#homeProcess4TitleInput", pHome.process4Title || "24/7 On-Trip Support");
+            setVal("#homeProcess4DescInput", pHome.process4Desc || "");
+            setVal("#homeFooterDescriptionInput", pHome.footerDescription || "");
+            setVal("#homeFloatingChatLabelInput", pHome.floatingChatLabel || "Chat with Swat Head Office");
+            setVal("#homeSeoTitleInput", pHome.seoTitle || "");
+            setVal("#homeSeoDescriptionInput", pHome.seoDescription || "");
 
             setVal("#umrahHeroBadgeInput", pUmrah.heroBadge || "Direct Departures from Islamabad (ISB)");
             setVal("#umrahHeroTitleInput", pUmrah.heroTitle || "All-Inclusive Umrah Packages");
+            setVal("#umrahHeroScriptInput", pUmrah.heroScript || "Sacred Journey, Pure Peace.");
+            setVal("#umrahSeoTitleInput", pUmrah.seoTitle || "");
+            setVal("#umrahSeoDescriptionInput", pUmrah.seoDescription || "");
+            setVal("#umrahTrustStat1NumInput", pUmrah.trustStat1Number || "100K+");
+            setVal("#umrahTrustStat1LblInput", pUmrah.trustStat1Label || "Pilgrims Served");
+            setVal("#umrahTrustStat2NumInput", pUmrah.trustStat2Number || "Swat Matta");
+            setVal("#umrahTrustStat2LblInput", pUmrah.trustStat2Label || "Central Head Office");
+            setVal("#umrahTrustStat3NumInput", pUmrah.trustStat3Number || "Verified");
+            setVal("#umrahTrustStat3LblInput", pUmrah.trustStat3Label || "Near Haram Hotels");
+            setVal("#umrahTrustStat4NumInput", pUmrah.trustStat4Number || "24/7");
+            setVal("#umrahTrustStat4LblInput", pUmrah.trustStat4Label || "Haramain Support");
+            setVal("#umrahCompareHeadingInput", pUmrah.compareHeading || "Compare Umrah Packages");
+            setVal("#umrahCompareNoteInput", pUmrah.compareNote || "");
+            setVal("#umrahIncludedHeadingInput", pUmrah.includedHeading || "What Is Included in Every Umrah Package?");
+            setVal("#umrahIncludedIntroInput", pUmrah.includedIntro || "");
+            setVal("#umrahFlyerModalEyebrowInput", pUmrah.flyerModalEyebrow || "Official Monthly Flyer");
             setVal("#umrahHeroSubtitleInput", pUmrah.heroSubtitle || "");
             setVal("#umrahInc1TitleInput", pUmrah.inc1Title || "Flights & Visas");
             setVal("#umrahInc1BulletsInput", pUmrah.inc1Bullets || "");
@@ -2631,6 +3326,19 @@
 
             setVal("#visaHeroBadgeInput", pVisas.heroBadge || "Fast Processing & Embassy File Preparation");
             setVal("#visaHeroTitleInput", pVisas.heroTitle || "Worldwide Visas & Air Tickets");
+            setVal("#visaHeroScriptInput", pVisas.heroScript || "Seamless Approvals, Guaranteed Fares.");
+            setVal("#visaTrustStat1NumInput", pVisas.trustStat1Number || "100K+");
+            setVal("#visaTrustStat1LblInput", pVisas.trustStat1Label || "Visas & Tickets Issued");
+            setVal("#visaTrustStat2NumInput", pVisas.trustStat2Number || "Swat Matta");
+            setVal("#visaTrustStat2LblInput", pVisas.trustStat2Label || "Central Head Office");
+            setVal("#visaTrustStat3NumInput", pVisas.trustStat3Number || "50+");
+            setVal("#visaTrustStat3LblInput", pVisas.trustStat3Label || "Partner Global Airlines");
+            setVal("#visaTrustStat4NumInput", pVisas.trustStat4Number || "99%");
+            setVal("#visaTrustStat4LblInput", pVisas.trustStat4Label || "Documentation Accuracy");
+            setVal("#visaDestinationsHeadingInput", pVisas.destinationsHeading || "Top Visa Destinations & Fees");
+            setVal("#visaDestinationsNoteInput", pVisas.destinationsNote || "");
+            setVal("#visaFlightEyebrowInput", pVisas.flightEyebrow || "Guaranteed Best Fares");
+            setVal("#visaDefaultDepartureCityInput", pVisas.defaultDepartureCity || "Islamabad (ISB)");
             setVal("#visaHeroSubtitleInput", pVisas.heroSubtitle || "");
             setVal("#visaFlightHeadingInput", pVisas.flightHeading || "Domestic & International Air Ticket Booking");
             setVal("#visaFlightDescInput", pVisas.flightDescription || "");
@@ -2642,14 +3350,50 @@
             setVal("#visaStep2DescInput", pVisas.step2Desc || "");
             setVal("#visaStep3TitleInput", pVisas.step3Title || "Receive Approved Visa");
             setVal("#visaStep3DescInput", pVisas.step3Desc || "");
+            setVal("#visasSeoTitleInput", pVisas.seoTitle || "");
+            setVal("#visasSeoDescriptionInput", pVisas.seoDescription || "");
 
             setVal("#calcHeroBadgeInput", pCalc.heroBadge || "Live Real-Time Cost Estimator");
             setVal("#calcHeroTitleInput", pCalc.heroTitle || "Umrah Package Budget Calculator");
             setVal("#calcHeroSubtitleInput", pCalc.heroSubtitle || "");
             setVal("#calcIncludedBulletsInput", pCalc.includedBullets || "");
+            setVal("#calcRatesNoteInput", pCalc.ratesNote || "");
 
             setVal("#wpHeroBadgeInput", pWork.heroBadge || "Europe Work Permit Specialists");
             setVal("#wpHeroTitleInput", pWork.heroTitle || "Work Permit & Job Placement Abroad");
+            setVal("#wpTopBarTaglineInput", pWork.topBarTagline || "Europe Work Permits & Overseas Employment");
+            setVal("#wpTrustStat1NumInput", pWork.trustStat1Number || "7+ Countries");
+            setVal("#wpTrustStat1LblInput", pWork.trustStat1Label || "EU Destinations Covered");
+            setVal("#wpTrustStat2NumInput", pWork.trustStat2Number || "100% Legal");
+            setVal("#wpTrustStat2LblInput", pWork.trustStat2Label || "Government-Issued Permits");
+            setVal("#wpTrustStat3NumInput", pWork.trustStat3Number || "Schengen");
+            setVal("#wpTrustStat3LblInput", pWork.trustStat3Label || "Travel Mobility Rights");
+            setVal("#wpTrustStat4NumInput", pWork.trustStat4Number || "Free");
+            setVal("#wpTrustStat4LblInput", pWork.trustStat4Label || "Initial Profile Review");
+            setVal("#wpMoreDestinationsTitleInput", pWork.moreDestinationsTitle || "Looking for Malta, Lithuania, Serbia or another country?");
+            setVal("#wpMoreDestinationsDescInput", pWork.moreDestinationsDesc || "");
+            setVal("#wpMoreDestinationsCountriesInput", pWork.moreDestinationsCountries || "Malta, Lithuania, Serbia");
+            setVal("#wpBenefit1TitleInput", pWork.benefit1Title || "Legal Employment");
+            setVal("#wpBenefit1DescInput", pWork.benefit1Desc || "");
+            setVal("#wpBenefit2TitleInput", pWork.benefit2Title || "Schengen Mobility");
+            setVal("#wpBenefit2DescInput", pWork.benefit2Desc || "");
+            setVal("#wpBenefit3TitleInput", pWork.benefit3Title || "Health & Social Security");
+            setVal("#wpBenefit3DescInput", pWork.benefit3Desc || "");
+            setVal("#wpBenefit4TitleInput", pWork.benefit4Title || "Residency Pathway");
+            setVal("#wpBenefit4DescInput", pWork.benefit4Desc || "");
+            setVal("#wpProcessIntroInput", pWork.processIntro || "");
+            setVal("#wpProcess1TitleInput", pWork.process1Title || "Consultation");
+            setVal("#wpProcess1DescInput", pWork.process1Desc || "");
+            setVal("#wpProcess2TitleInput", pWork.process2Title || "Eligibility & Job Match");
+            setVal("#wpProcess2DescInput", pWork.process2Desc || "");
+            setVal("#wpProcess3TitleInput", pWork.process3Title || "Permit & Documents");
+            setVal("#wpProcess3DescInput", pWork.process3Desc || "");
+            setVal("#wpProcess4TitleInput", pWork.process4Title || "Embassy & Departure");
+            setVal("#wpProcess4DescInput", pWork.process4Desc || "");
+            setVal("#wpChecklistItemsInput", pWork.checklistItems || "");
+            setVal("#wpAssessmentNoteInput", pWork.assessmentNote || "");
+            setVal("#wpSectorsInput", pWork.sectors || "");
+            setVal("#wpProgrammeServicesInput", pWork.programmeServices || "");
             setVal("#wpHeroScriptInput", pWork.heroScript || "Your Gateway to Europe");
             setVal("#wpHeroSubtitleInput", pWork.heroSubtitle || "");
             setVal("#wpFeaturedScriptInput", pWork.featuredScript || "Featured Destination");
@@ -2662,6 +3406,8 @@
             setVal("#wpChecklistDescInput", pWork.checklistDesc || "");
             setVal("#wpAssessmentHeadingInput", pWork.assessmentHeading || "Start Your Work Permit Assessment");
             setVal("#wpFaqHeadingInput", pWork.faqHeading || "Work Permit FAQs");
+            setVal("#workPermitSeoTitleInput", pWork.seoTitle || "");
+            setVal("#workPermitSeoDescriptionInput", pWork.seoDescription || "");
 
             const legacyBadges = ["Head Office: Blue Area, Islamabad", "Swat Head Office (Matta) \u2022 Islamabad Branch Office"];
             const aboutBadge = pContact.heroBadge && !legacyBadges.includes(pContact.heroBadge) ? pContact.heroBadge : "About Us \u2022 Our People \u2022 Contact";
@@ -2673,13 +3419,88 @@
             setVal("#contactHeroBadgeInput", aboutBadge);
             setVal("#contactHeroTitleInput", aboutTitle);
             setVal("#contactHeroSubtitleInput", aboutSubtitle);
+            setVal("#contactSeoTitleInput", pContact.seoTitle || "");
+            setVal("#contactSeoDescriptionInput", pContact.seoDescription || "");
+            setVal("#contactHeroScriptInput", pContact.heroScript || "The People Behind Your Journey.");
+            setVal("#contactTrustStat1NumInput", pContact.trustStat1Number || "Swat Matta");
+            setVal("#contactTrustStat1LblInput", pContact.trustStat1Label || "Central Head Office");
+            setVal("#contactTrustStat2NumInput", pContact.trustStat2Number || "Islamabad");
+            setVal("#contactTrustStat2LblInput", pContact.trustStat2Label || "Potohar Plaza Branch");
+            setVal("#contactTrustStat3NumInput", pContact.trustStat3Number || "Direct");
+            setVal("#contactTrustStat3LblInput", pContact.trustStat3Label || "Management Care");
+            setVal("#contactTrustStat4NumInput", pContact.trustStat4Number || "24/7");
+            setVal("#contactTrustStat4LblInput", pContact.trustStat4Label || "WhatsApp Helpline");
+            setVal("#contactLeadershipHeadingInput", pContact.leadershipHeading || "Leadership & Vision");
+            setVal("#contactLeadershipIntroInput", pContact.leadershipIntro || "");
+            setVal("#contactExpertsHeadingInput", pContact.expertsHeading || "Our Experts");
+            setVal("#contactExpertsIntroInput", pContact.expertsIntro || "");
+            setVal("#contactTeamHeadingInput", pContact.teamHeading || "Our Team");
+            setVal("#contactTeamIntroInput", pContact.teamIntro || "");
+            setVal("#contactContactHeadingInput", pContact.contactHeading || "Contact Us");
+            setVal("#contactContactIntroInput", pContact.contactIntro || "");
+            setVal("#contactServiceOptionsInput", pContact.serviceOptions || "");
+            setVal("#contactCeoTagsInput", pContact.ceoTags || "Swat Matta Head Office|Umrah & Ziyarat|Global Visas & Tickets");
 
             // About Us - Team Member Photos
             const teamPhotos = (this.siteConfig && this.siteConfig.teamPhotos) || {};
             TEAM_MEMBERS.forEach((m) => this._setTeamPhotoPreview(m.id, teamPhotos[m.id] || ""));
 
+            // About Us - Team Member Names & Roles (editable; fall back to defaults)
+            TEAM_MEMBERS.forEach((m) => this._setTeamMemberFields(m.id));
+
             this._updateLivePreviewBadges();
             this._autoGrowFields();
+        }
+
+        // Effective team member details: the admin-edited name/role from
+        // site_config.teamMembers when present, else the TEAM_MEMBERS
+        // defaults. Single source of truth for the admin team cards —
+        // card rendering, prefill, photo dialogs and the public page
+        // fallback all go through here (or the same stored values).
+        getTeamMember(id) {
+            const fallback = TEAM_MEMBERS.find((m) => m.id === id) || {
+                id,
+                name: "",
+                role: "",
+                initials: ""
+            };
+            const saved = (this.siteConfig && this.siteConfig.teamMembers && this.siteConfig.teamMembers[id]) || {};
+            const name = String(saved.name != null ? saved.name : "").trim() || fallback.name || "";
+            const role = String(saved.role != null ? saved.role : "").trim() || fallback.role || "";
+            const quote = String(saved.quote != null ? saved.quote : "").trim();
+            return { id, name, role, quote, initials: teamMemberInitials(name, fallback.initials) };
+        }
+
+        // Fill a team card's Name/Role inputs from the effective values.
+        // Called from _populateConfigFields, so the inputs always match
+        // the stored config (including after a save round-trips).
+        _setTeamMemberFields(memberId) {
+            const member = this.getTeamMember(memberId);
+            const nameInput = this.container.querySelector(`#teamMemberNameInput-${memberId}`);
+            const roleInput = this.container.querySelector(`#teamMemberRoleInput-${memberId}`);
+            if (nameInput) nameInput.value = member.name;
+            if (roleInput) roleInput.value = member.role;
+            const quoteInput = this.container.querySelector(`#teamMemberQuoteInput-${memberId}`);
+            if (quoteInput) quoteInput.value = member.quote || "";
+            this._updateTeamMemberCard(memberId, member.name, member.role);
+        }
+
+        // Refresh a team card's displayed name/role, placeholder initials
+        // and photo alt from the (possibly just typed) name and role.
+        // Empty values fall back to the TEAM_MEMBERS defaults, so the
+        // card never renders blank.
+        _updateTeamMemberCard(memberId, name, role) {
+            const member = this.getTeamMember(memberId);
+            const displayName = String(name || "").trim() || member.name;
+            const displayRole = String(role || "").trim() || member.role;
+            const nameEl = this.container.querySelector(`#teamMemberName-${memberId}`);
+            const roleEl = this.container.querySelector(`#teamMemberRole-${memberId}`);
+            if (nameEl) nameEl.textContent = displayName;
+            if (roleEl) roleEl.textContent = displayRole;
+            const initialsEl = this.container.querySelector(`#teamPhotoInitials-${memberId}`);
+            if (initialsEl) initialsEl.textContent = teamMemberInitials(displayName, member.initials);
+            const img = this.container.querySelector(`#teamPhotoPreview-${memberId}`);
+            if (img) img.alt = displayRole ? `${displayName} - ${displayRole}` : displayName;
         }
 
         _setTeamPhotoPreview(memberId, url) {
@@ -3165,10 +3986,33 @@
                 teamPhotos[inp.getAttribute("data-team-photo-key")] = inp.value.trim();
             });
 
+            // About Us - Team Member Names & Roles (all 10, fixed ids).
+            // Stored exactly as typed (trimmed); blank values fall back
+            // to the TEAM_MEMBERS defaults when rendered. The CEO quote
+            // (G-04) rides on the ceo record and is preserved here so a
+            // save never wipes it.
+            const teamMembers = { ...((this.siteConfig && this.siteConfig.teamMembers) || {}) };
+            TEAM_MEMBERS.forEach((m) => {
+                const nameInput = this.container.querySelector(`#teamMemberNameInput-${m.id}`);
+                const roleInput = this.container.querySelector(`#teamMemberRoleInput-${m.id}`);
+                const quoteInput = this.container.querySelector(`#teamMemberQuoteInput-${m.id}`);
+                const entry = {
+                    name: nameInput ? nameInput.value.trim() : ((teamMembers[m.id] && teamMembers[m.id].name) || m.name),
+                    role: roleInput ? roleInput.value.trim() : ((teamMembers[m.id] && teamMembers[m.id].role) || m.role)
+                };
+                if (quoteInput) {
+                    entry.quote = quoteInput.value.trim();
+                } else if (teamMembers[m.id] && teamMembers[m.id].quote) {
+                    entry.quote = teamMembers[m.id].quote;
+                }
+                teamMembers[m.id] = entry;
+            });
+
             let result;
             try {
                 result = await this._runSaveWithFeedback(triggerButton, () => db.updateSiteConfig({
                     teamPhotos,
+                    teamMembers,
                     spotlight: {
                         monthLabel: getVal("#spotMonthLabel", "January"),
                         title: getVal("#spotTitle", "UMRAH PACKAGE") || "UMRAH PACKAGE",
@@ -3213,14 +4057,56 @@
                         activeBookingWhatsApp,
                         officeAddress: getVal("#contactOfficeAddress", ""),
                         officeHours: getVal("#contactOfficeHours", "Monday to Saturday: 9:30 AM \u2013 8:00 PM (Sunday Closed / WhatsApp Support Active)"),
+                        branch1Hours: getVal("#contactBranch1Hours", "Monday \u2013 Saturday: 9:30 AM to 8:00 PM"),
+                        branch2Hours: getVal("#contactBranch2Hours", "Monday \u2013 Saturday: 9:30 AM to 8:00 PM"),
                         officeEmail: getVal("#contactOfficeEmail", "info@zakirtravels.com / inam@zakirtravels.com"),
-                        mapEmbedUrl: getVal("#contactMapEmbedUrl", "")
+                        mapEmbedUrl: getVal("#contactMapEmbedUrl", ""),
+                        branch1MapSearchUrl: getVal("#contactBranch1MapSearchUrl", ""),
+                        branch2MapEmbedUrl: getVal("#contactBranch2MapEmbedUrl", ""),
+                        branch2MapSearchUrl: getVal("#contactBranch2MapSearchUrl", ""),
+                        supportNote: getVal("#contactSupportNote", "")
                     },
                     pageContent: {
                         home: {
                             heroBadge: getVal("#homeHeroBadgeInput"),
                             heroHeadingMain: getVal("#homeHeroHeadingMainInput"),
                             heroDescription: getVal("#homeHeroDescriptionInput"),
+                            seoTitle: getVal("#homeSeoTitleInput"),
+                            seoDescription: getVal("#homeSeoDescriptionInput"),
+                            footerDescription: getVal("#homeFooterDescriptionInput"),
+                            floatingChatLabel: getVal("#homeFloatingChatLabelInput"),
+                            heroStat1Number: getVal("#homeHeroStat1NumInput"),
+                            heroStat1Label: getVal("#homeHeroStat1LblInput"),
+                            heroStat2Number: getVal("#homeHeroStat2NumInput"),
+                            heroStat2Label: getVal("#homeHeroStat2LblInput"),
+                            heroStat3Number: getVal("#homeHeroStat3NumInput"),
+                            heroStat3Label: getVal("#homeHeroStat3LblInput"),
+                            heroStat4Number: getVal("#homeHeroStat4NumInput"),
+                            heroStat4Label: getVal("#homeHeroStat4LblInput"),
+                            trustBadgeText: getVal("#homeTrustBadgeTextInput"),
+                            heroCardEyebrow: getVal("#homeHeroCardEyebrowInput"),
+                            heroCardTitle: getVal("#homeHeroCardTitleInput"),
+                            heroCardHoursBadge: getVal("#homeHeroCardHoursBadgeInput"),
+                            aboutBadge1: getVal("#homeAboutBadge1Input"),
+                            aboutBadge2: getVal("#homeAboutBadge2Input"),
+                            aboutBadge3: getVal("#homeAboutBadge3Input"),
+                            managementNote: getVal("#homeManagementNoteInput"),
+                            missionPoints: getVal("#homeMissionPointsInput"),
+                            missionBadge: getVal("#homeMissionBadgeInput"),
+                            servicesHeading: getVal("#homeServicesHeadingInput"),
+                            servicesIntro: getVal("#homeServicesIntroInput"),
+                            branchesHeading: getVal("#homeBranchesHeadingInput"),
+                            branchesIntro: getVal("#homeBranchesIntroInput"),
+                            processHeading: getVal("#homeProcessHeadingInput"),
+                            processIntro: getVal("#homeProcessIntroInput"),
+                            process1Title: getVal("#homeProcess1TitleInput"),
+                            process1Desc: getVal("#homeProcess1DescInput"),
+                            process2Title: getVal("#homeProcess2TitleInput"),
+                            process2Desc: getVal("#homeProcess2DescInput"),
+                            process3Title: getVal("#homeProcess3TitleInput"),
+                            process3Desc: getVal("#homeProcess3DescInput"),
+                            process4Title: getVal("#homeProcess4TitleInput"),
+                            process4Desc: getVal("#homeProcess4DescInput"),
                             aboutBadge: getVal("#homeAboutBadgeInput"),
                             aboutHeading: getVal("#homeAboutHeadingInput"),
                             aboutDescription: getVal("#homeAboutDescInput"),
@@ -3231,9 +4117,11 @@
                             branch1Title: getVal("#homeBranch1TitleInput"),
                             branch1Address: getVal("#homeBranch1AddrInput"),
                             branch1Desc: getVal("#homeBranch1DescInput"),
+                            branch1Note: getVal("#homeBranch1NoteInput"),
                             branch2Title: getVal("#homeBranch2TitleInput"),
                             branch2Address: getVal("#homeBranch2AddrInput"),
                             branch2Desc: getVal("#homeBranch2DescInput"),
+                            branch2Note: getVal("#homeBranch2NoteInput"),
                             stat1Number: getVal("#homeStat1NumInput"),
                             stat1Label: getVal("#homeStat1LblInput"),
                             stat2Number: getVal("#homeStat2NumInput"),
@@ -3250,16 +4138,40 @@
                             why3Desc: getVal("#homeWhy3DescInput"),
                             srv1Title: getVal("#homeSrv1TitleInput"),
                             srv1Desc: getVal("#homeSrv1DescInput"),
+                            srv1Badge: getVal("#homeSrv1BadgeInput"),
+                            srv1Bullets: getVal("#homeSrv1BulletsInput"),
                             srv2Title: getVal("#homeSrv2TitleInput"),
                             srv2Desc: getVal("#homeSrv2DescInput"),
+                            srv2Badge: getVal("#homeSrv2BadgeInput"),
+                            srv2Bullets: getVal("#homeSrv2BulletsInput"),
                             srv3Title: getVal("#homeSrv3TitleInput"),
                             srv3Desc: getVal("#homeSrv3DescInput"),
+                            srv3Badge: getVal("#homeSrv3BadgeInput"),
+                            srv3Bullets: getVal("#homeSrv3BulletsInput"),
                             srv4Title: getVal("#homeSrv4TitleInput"),
-                            srv4Desc: getVal("#homeSrv4DescInput")
+                            srv4Desc: getVal("#homeSrv4DescInput"),
+                            srv4Badge: getVal("#homeSrv4BadgeInput"),
+                            srv4Bullets: getVal("#homeSrv4BulletsInput")
                         },
                         umrah: {
                             heroBadge: getVal("#umrahHeroBadgeInput"),
                             heroTitle: getVal("#umrahHeroTitleInput"),
+                            heroScript: getVal("#umrahHeroScriptInput"),
+                            seoTitle: getVal("#umrahSeoTitleInput"),
+                            seoDescription: getVal("#umrahSeoDescriptionInput"),
+                            trustStat1Number: getVal("#umrahTrustStat1NumInput"),
+                            trustStat1Label: getVal("#umrahTrustStat1LblInput"),
+                            trustStat2Number: getVal("#umrahTrustStat2NumInput"),
+                            trustStat2Label: getVal("#umrahTrustStat2LblInput"),
+                            trustStat3Number: getVal("#umrahTrustStat3NumInput"),
+                            trustStat3Label: getVal("#umrahTrustStat3LblInput"),
+                            trustStat4Number: getVal("#umrahTrustStat4NumInput"),
+                            trustStat4Label: getVal("#umrahTrustStat4LblInput"),
+                            compareHeading: getVal("#umrahCompareHeadingInput"),
+                            compareNote: getVal("#umrahCompareNoteInput"),
+                            includedHeading: getVal("#umrahIncludedHeadingInput"),
+                            includedIntro: getVal("#umrahIncludedIntroInput"),
+                            flyerModalEyebrow: getVal("#umrahFlyerModalEyebrowInput"),
                             heroSubtitle: getVal("#umrahHeroSubtitleInput"),
                             inc1Title: getVal("#umrahInc1TitleInput"),
                             inc1Bullets: getVal("#umrahInc1BulletsInput"),
@@ -3273,7 +4185,22 @@
                         visas: {
                             heroBadge: getVal("#visaHeroBadgeInput"),
                             heroTitle: getVal("#visaHeroTitleInput"),
+                            heroScript: getVal("#visaHeroScriptInput"),
+                            seoTitle: getVal("#visasSeoTitleInput"),
+                            seoDescription: getVal("#visasSeoDescriptionInput"),
                             heroSubtitle: getVal("#visaHeroSubtitleInput"),
+                            trustStat1Number: getVal("#visaTrustStat1NumInput"),
+                            trustStat1Label: getVal("#visaTrustStat1LblInput"),
+                            trustStat2Number: getVal("#visaTrustStat2NumInput"),
+                            trustStat2Label: getVal("#visaTrustStat2LblInput"),
+                            trustStat3Number: getVal("#visaTrustStat3NumInput"),
+                            trustStat3Label: getVal("#visaTrustStat3LblInput"),
+                            trustStat4Number: getVal("#visaTrustStat4NumInput"),
+                            trustStat4Label: getVal("#visaTrustStat4LblInput"),
+                            destinationsHeading: getVal("#visaDestinationsHeadingInput"),
+                            destinationsNote: getVal("#visaDestinationsNoteInput"),
+                            flightEyebrow: getVal("#visaFlightEyebrowInput"),
+                            defaultDepartureCity: getVal("#visaDefaultDepartureCityInput"),
                             flightHeading: getVal("#visaFlightHeadingInput"),
                             flightDescription: getVal("#visaFlightDescInput"),
                             flightBullets: getVal("#visaFlightBulletsInput"),
@@ -3289,28 +4216,85 @@
                             heroBadge: getVal("#calcHeroBadgeInput"),
                             heroTitle: getVal("#calcHeroTitleInput"),
                             heroSubtitle: getVal("#calcHeroSubtitleInput"),
-                            includedBullets: getVal("#calcIncludedBulletsInput")
+                            includedBullets: getVal("#calcIncludedBulletsInput"),
+                            ratesNote: getVal("#calcRatesNoteInput")
                         },
                         workPermit: {
                             heroBadge: getVal("#wpHeroBadgeInput"),
                             heroTitle: getVal("#wpHeroTitleInput"),
                             heroScript: getVal("#wpHeroScriptInput"),
+                            seoTitle: getVal("#workPermitSeoTitleInput"),
+                            seoDescription: getVal("#workPermitSeoDescriptionInput"),
+                            topBarTagline: getVal("#wpTopBarTaglineInput"),
                             heroSubtitle: getVal("#wpHeroSubtitleInput"),
+                            trustStat1Number: getVal("#wpTrustStat1NumInput"),
+                            trustStat1Label: getVal("#wpTrustStat1LblInput"),
+                            trustStat2Number: getVal("#wpTrustStat2NumInput"),
+                            trustStat2Label: getVal("#wpTrustStat2LblInput"),
+                            trustStat3Number: getVal("#wpTrustStat3NumInput"),
+                            trustStat3Label: getVal("#wpTrustStat3LblInput"),
+                            trustStat4Number: getVal("#wpTrustStat4NumInput"),
+                            trustStat4Label: getVal("#wpTrustStat4LblInput"),
                             featuredScript: getVal("#wpFeaturedScriptInput"),
                             featuredDesc: getVal("#wpFeaturedDescInput"),
                             destinationsHeading: getVal("#wpDestinationsHeadingInput"),
                             destinationsDesc: getVal("#wpDestinationsDescInput"),
+                            moreDestinationsTitle: getVal("#wpMoreDestinationsTitleInput"),
+                            moreDestinationsDesc: getVal("#wpMoreDestinationsDescInput"),
+                            moreDestinationsCountries: getVal("#wpMoreDestinationsCountriesInput"),
                             benefitsHeading: getVal("#wpBenefitsHeadingInput"),
+                            benefit1Title: getVal("#wpBenefit1TitleInput"),
+                            benefit1Desc: getVal("#wpBenefit1DescInput"),
+                            benefit2Title: getVal("#wpBenefit2TitleInput"),
+                            benefit2Desc: getVal("#wpBenefit2DescInput"),
+                            benefit3Title: getVal("#wpBenefit3TitleInput"),
+                            benefit3Desc: getVal("#wpBenefit3DescInput"),
+                            benefit4Title: getVal("#wpBenefit4TitleInput"),
+                            benefit4Desc: getVal("#wpBenefit4DescInput"),
                             processHeading: getVal("#wpProcessHeadingInput"),
+                            processIntro: getVal("#wpProcessIntroInput"),
+                            process1Title: getVal("#wpProcess1TitleInput"),
+                            process1Desc: getVal("#wpProcess1DescInput"),
+                            process2Title: getVal("#wpProcess2TitleInput"),
+                            process2Desc: getVal("#wpProcess2DescInput"),
+                            process3Title: getVal("#wpProcess3TitleInput"),
+                            process3Desc: getVal("#wpProcess3DescInput"),
+                            process4Title: getVal("#wpProcess4TitleInput"),
+                            process4Desc: getVal("#wpProcess4DescInput"),
                             checklistHeading: getVal("#wpChecklistHeadingInput"),
                             checklistDesc: getVal("#wpChecklistDescInput"),
+                            checklistItems: getVal("#wpChecklistItemsInput"),
                             assessmentHeading: getVal("#wpAssessmentHeadingInput"),
+                            assessmentNote: getVal("#wpAssessmentNoteInput"),
+                            sectors: getVal("#wpSectorsInput"),
+                            programmeServices: getVal("#wpProgrammeServicesInput"),
                             faqHeading: getVal("#wpFaqHeadingInput")
                         },
                         contact: {
                             heroBadge: getVal("#contactHeroBadgeInput"),
                             heroTitle: getVal("#contactHeroTitleInput"),
-                            heroSubtitle: getVal("#contactHeroSubtitleInput")
+                            heroScript: getVal("#contactHeroScriptInput"),
+                            heroSubtitle: getVal("#contactHeroSubtitleInput"),
+                            seoTitle: getVal("#contactSeoTitleInput"),
+                            seoDescription: getVal("#contactSeoDescriptionInput"),
+                            trustStat1Number: getVal("#contactTrustStat1NumInput"),
+                            trustStat1Label: getVal("#contactTrustStat1LblInput"),
+                            trustStat2Number: getVal("#contactTrustStat2NumInput"),
+                            trustStat2Label: getVal("#contactTrustStat2LblInput"),
+                            trustStat3Number: getVal("#contactTrustStat3NumInput"),
+                            trustStat3Label: getVal("#contactTrustStat3LblInput"),
+                            trustStat4Number: getVal("#contactTrustStat4NumInput"),
+                            trustStat4Label: getVal("#contactTrustStat4LblInput"),
+                            leadershipHeading: getVal("#contactLeadershipHeadingInput"),
+                            leadershipIntro: getVal("#contactLeadershipIntroInput"),
+                            expertsHeading: getVal("#contactExpertsHeadingInput"),
+                            expertsIntro: getVal("#contactExpertsIntroInput"),
+                            teamHeading: getVal("#contactTeamHeadingInput"),
+                            teamIntro: getVal("#contactTeamIntroInput"),
+                            contactHeading: getVal("#contactContactHeadingInput"),
+                            contactIntro: getVal("#contactContactIntroInput"),
+                            serviceOptions: getVal("#contactServiceOptionsInput"),
+                            ceoTags: getVal("#contactCeoTagsInput")
                         }
                     }
                 }));
@@ -3610,6 +4594,52 @@
                 </div>
             `;
                 })
+                .join("");
+        }
+
+        _renderWorkPermitFaqsList() {
+            const wrap = this.container.querySelector("#crudWorkPermitFaqsContainer");
+            if (!wrap) return;
+
+            const faqs = this.workPermitFaqs || [];
+            if (!faqs.length) {
+                wrap.innerHTML = `<div class="col-span-full bg-white rounded-2xl p-8 text-center text-slate-500 text-sm">No FAQs yet. Click "Add FAQ" to create one.</div>`;
+                return;
+            }
+
+            wrap.innerHTML = faqs
+                .map(
+                    (f, idx) => `
+                <div class="admin-card-hover bg-white rounded-3xl p-5 border ${f.isActive ? "border-slate-200" : "border-slate-200 opacity-60 bg-slate-50"} shadow-card flex flex-col justify-between gap-4">
+                    <div>
+                        <h4 class="text-base font-black text-[#0B2D5B]">${escapeHtml(f.question)}</h4>
+                        <p class="text-[11px] text-slate-500 mt-2 leading-relaxed">${escapeHtml(String(f.answer || "").slice(0, 220))}${String(f.answer || "").length > 220 ? "…" : ""}</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-1.5 pt-2 border-t border-slate-100">
+                        <div class="flex items-center gap-1">
+                            <button type="button" data-action="move-faq" data-id="${escapeHtml(f.id)}" data-dir="up" ${idx === 0 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-arrow-up"></i>
+                            </button>
+                            <button type="button" data-action="move-faq" data-id="${escapeHtml(f.id)}" data-dir="down" ${idx === faqs.length - 1 ? "disabled" : ""} class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-arrow-down"></i>
+                            </button>
+                            <button type="button" data-action="toggle-faq-active" data-id="${escapeHtml(f.id)}" class="px-3 py-1.5 rounded-lg text-xs font-bold ${f.isActive ? "bg-[#E6F6F8] text-[#0D8A9E]" : "bg-slate-200 text-slate-700"}">
+                                ${f.isActive ? "Active" : "Hidden"}
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" data-action="edit-faq" data-id="${escapeHtml(f.id)}" class="px-3.5 py-1.5 rounded-lg bg-[#0B2D5B] text-white hover:bg-[#0D8A9E] text-xs font-bold transition-colors">
+                                <i class="fa-solid fa-pen mr-1"></i>Edit
+                            </button>
+                            <button type="button" data-action="delete-faq" data-id="${escapeHtml(f.id)}" class="w-8 h-8 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `
+                )
                 .join("");
         }
 
@@ -4111,6 +5141,20 @@
 
             this.container.addEventListener("input", (e) => {
                 const target = e.target;
+                if (target && target.hasAttribute && (target.hasAttribute("data-team-member-name") || target.hasAttribute("data-team-member-role"))) {
+                    // Typing a team name/role updates the card's displayed
+                    // name/role and placeholder initials immediately;
+                    // nothing is saved until Save Changes.
+                    const memberId = target.getAttribute("data-team-member-name") || target.getAttribute("data-team-member-role");
+                    const nameInput = this.container.querySelector(`#teamMemberNameInput-${memberId}`);
+                    const roleInput = this.container.querySelector(`#teamMemberRoleInput-${memberId}`);
+                    this._updateTeamMemberCard(
+                        memberId,
+                        nameInput ? nameInput.value : "",
+                        roleInput ? roleInput.value : ""
+                    );
+                    return;
+                }
                 if (target && target.id === "enquirySearchInput") {
                     this.enquirySearch = target.value || "";
                     this._renderEnquiriesList();
@@ -4270,8 +5314,7 @@
                     fileInput.value = "";
                     if (!file) return;
                     const memberId = fileInput.getAttribute("data-team-photo-upload");
-                    const member = TEAM_MEMBERS.find((m) => m.id === memberId);
-                    const memberName = member ? member.name : memberId;
+                    const memberName = this.getTeamMember(memberId).name || memberId;
                     if (!file.type || !file.type.startsWith("image/")) {
                         this.showToast("Please pick an image file.", "error", `Team photo · ${memberName}`);
                         return;
@@ -4282,8 +5325,7 @@
             this.container.querySelectorAll("[data-team-photo-adjust]").forEach((btn) => {
                 btn.addEventListener("click", () => {
                     const memberId = btn.getAttribute("data-team-photo-adjust");
-                    const member = TEAM_MEMBERS.find((m) => m.id === memberId);
-                    const memberName = member ? member.name : memberId;
+                    const memberName = this.getTeamMember(memberId).name || memberId;
                     const urlInput = this.container.querySelector(`#teamPhotoUrl-${memberId}`);
                     const currentUrl = urlInput ? urlInput.value.trim() : "";
                     if (!currentUrl) {
@@ -4471,6 +5513,39 @@
                         );
                     } catch (err) {
                         this.showToast(err.message || "Could not save the visa.", "error");
+                    }
+                });
+            }
+
+            // Work Permit FAQ Modal Submit
+            const faqForm = this.container.querySelector("#faqCrudForm");
+            if (faqForm) {
+                faqForm.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    const question = this.container.querySelector("#faqEditQuestion").value.trim();
+                    if (!question) {
+                        this.showToast("FAQ question is required!", "error");
+                        return;
+                    }
+
+                    const submitBtn = e.submitter || faqForm.querySelector("button[type='submit']");
+                    try {
+                        const result = await this._runSaveWithFeedback(submitBtn, () => db.saveWorkPermitFaq({
+                            id: this.container.querySelector("#faqEditId").value || undefined,
+                            question,
+                            answer: this.container.querySelector("#faqEditAnswer").value.trim(),
+                            isActive: this.container.querySelector("#faqEditActive").checked
+                        }));
+
+                        this.container.querySelector("#faqCrudModal").classList.add("hidden");
+                        this._showSyncToast(
+                            result,
+                            "FAQ saved in this browser.",
+                            "success",
+                            this._verifyFor("work_permit_faqs", result && result.faq, ["question", "answer"])
+                        );
+                    } catch (err) {
+                        this.showToast(err.message || "Could not save the FAQ.", "error");
                     }
                 });
             }
@@ -4681,6 +5756,7 @@
                         residence: this.container.querySelector("#wpProgEditResidence").value.trim() || "Karta Pobytu",
                         residenceNote: this.container.querySelector("#wpProgEditResidenceNote").value.trim() || "TRC",
                         jobCategories: this.container.querySelector("#wpProgEditJobCategories").value.trim(),
+                        posterImageUrl: this.container.querySelector("#wpProgEditPosterUrl").value.trim(),
                         applyCountry: countryName,
                         isActive: this.container.querySelector("#wpProgEditActive").checked
                     };
@@ -4860,6 +5936,41 @@
                     } catch (err) {
                         this.showToast(err.message || "Could not reorder visas.", "error");
                     }
+                } else if (action === "open-faq-modal") {
+                    this._openWorkPermitFaqModal(null);
+                } else if (action === "close-faq-modal") {
+                    this.container.querySelector("#faqCrudModal").classList.add("hidden");
+                } else if (action === "edit-faq") {
+                    const faq = this.workPermitFaqs.find((f) => f.id === actionEl.getAttribute("data-id"));
+                    if (faq) this._openWorkPermitFaqModal(faq);
+                } else if (action === "delete-faq") {
+                    if (!this._armDeleteConfirm(actionEl, "delete-faq:" + actionEl.getAttribute("data-id"))) return;
+                    try {
+                        const result = await db.deleteWorkPermitFaq(actionEl.getAttribute("data-id"));
+                        this._showSyncToast(result, "FAQ deleted.", "warning");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not delete the FAQ.", "error");
+                    }
+                } else if (action === "toggle-faq-active") {
+                    const faq = this.workPermitFaqs.find((f) => f.id === actionEl.getAttribute("data-id"));
+                    if (faq) {
+                        try {
+                            const result = await db.saveWorkPermitFaq({ ...faq, isActive: !faq.isActive });
+                            this._showSyncToast(result, `FAQ ${!faq.isActive ? "shown on the website" : "hidden from the website"}.`);
+                        } catch (err) {
+                            this.showToast(err.message || "Could not update the FAQ.", "error");
+                        }
+                    }
+                } else if (action === "move-faq") {
+                    try {
+                        const result = await db.reorderWorkPermitFaq(
+                            actionEl.getAttribute("data-id"),
+                            actionEl.getAttribute("data-dir")
+                        );
+                        this._showSyncToast(result, "FAQ order updated.");
+                    } catch (err) {
+                        this.showToast(err.message || "Could not reorder FAQs.", "error");
+                    }
                 } else if (action === "open-workpermit-modal") {
                     this._openWorkPermitModal(null);
                 } else if (action === "close-workpermit-modal") {
@@ -4962,6 +6073,22 @@
                         this.showToast(err.message || "Could not delete the enquiry.", "error");
                     }
                 } else if (action === "reset-flyer-defaults") {
+                    // H-03: the confirmation quotes the seed values, so
+                    // compose it from FLYER_DEFAULTS at runtime instead
+                    // of hardcoding the price/dates in the modal text.
+                    const flyerDefaults =
+                        (window.FLYER_DEFAULTS &&
+                            window.FLYER_DEFAULTS.site_config &&
+                            window.FLYER_DEFAULTS.site_config.main_settings) ||
+                        {};
+                    const spot = flyerDefaults.spotlight || {};
+                    const resetTextEl = this.container.querySelector("#resetConfirmText");
+                    if (resetTextEl) {
+                        resetTextEl.innerHTML =
+                            `This will restore the Featured Umrah Price to <strong>PKR ${formatPKR(spot.startingPrice || 232000)}</strong>, ` +
+                            `dates to <strong>${escapeHtml(spot.departureDate || "Jan 26, 2026")} – ${escapeHtml(spot.returnDate || "Feb 09, 2026")} (${escapeHtml(spot.duration || "14 Nights")})</strong>, ` +
+                            `and reset all offers, room rates, packages, visas, and contact details.`;
+                    }
                     this.container.querySelector("#resetConfirmModal").classList.remove("hidden");
                 } else if (action === "cancel-reset-modal") {
                     this.container.querySelector("#resetConfirmModal").classList.add("hidden");
@@ -5109,6 +6236,20 @@
             }
         }
 
+        _openWorkPermitFaqModal(faq) {
+            this.container.querySelector("#faqModalTitle").textContent = faq
+                ? "Edit FAQ"
+                : "Add New FAQ";
+            this.container.querySelector("#faqEditId").value = (faq && faq.id) || "";
+            this.container.querySelector("#faqEditQuestion").value = (faq && faq.question) || "";
+            this.container.querySelector("#faqEditAnswer").value = (faq && faq.answer) || "";
+            this.container.querySelector("#faqEditActive").checked = faq ? Boolean(faq.isActive) : true;
+
+            const faqModal = this.container.querySelector("#faqCrudModal");
+            faqModal.classList.remove("hidden");
+            this._autoGrowFields(faqModal);
+        }
+
         _openWorkPermitModal(permit) {
             this.container.querySelector("#workPermitModalTitle").textContent = permit
                 ? "Edit Work Permit Country"
@@ -5177,6 +6318,7 @@
             this.container.querySelector("#wpProgEditResidenceNote").value = (prog && prog.residenceNote) || "TRC";
 
             this.container.querySelector("#wpProgEditJobCategories").value = (prog && prog.jobCategories) || "Warehouse & Logistics|Construction|Factory & Production|CE Drivers|Hospitality|Agriculture";
+            this.container.querySelector("#wpProgEditPosterUrl").value = (prog && prog.posterImageUrl) || "";
             this.container.querySelector("#wpProgEditActive").checked = prog ? Boolean(prog.isActive) : true;
 
             const modal = this.container.querySelector("#wpProgrammeCrudModal");
