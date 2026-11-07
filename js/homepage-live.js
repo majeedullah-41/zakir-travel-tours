@@ -194,6 +194,24 @@
                 window.selectWorkPermitCountry(wpApplyBtn.getAttribute("data-wp-apply"));
             }
         });
+
+        // Image fallbacks ride on data-fallback attributes, never inline
+        // onerror handlers: an admin-entered URL containing a quote could
+        // break out of an inline handler's JS string (stored XSS). Error
+        // events do not bubble, so this listens in the capture phase and
+        // swaps in the fallback once per image.
+        document.addEventListener(
+            "error",
+            (e) => {
+                const img = e.target instanceof Element ? e.target.closest("img[data-fallback]") : null;
+                if (!img) return;
+                const fallback = img.getAttribute("data-fallback");
+                if (!fallback || img.getAttribute("src") === fallback || img.dataset.fallbackApplied) return;
+                img.dataset.fallbackApplied = "1";
+                img.src = fallback;
+            },
+            true
+        );
     }
 
     // ============================================================================
@@ -237,18 +255,29 @@
             if (el) el.textContent = text;
         };
 
-        // --- Top Contact Bar ---
+        // --- Top Contact Bar (header AND footer copies) ---
         setText("topBarOfficeAddress", officeAddress);
         setText("topBarManagerName", cleanManagerDisplayName);
         setText("topBarManagerPhone", c.managerPhone || "+92 349 0558345");
         setText("topBarSecondaryName", cleanSecondaryDisplayName);
         setText("topBarSecondaryPhone", c.secondaryPhone || "+92 343 4159182");
+        setText("footerTopBarOfficeAddress", officeAddress);
+        setText("footerTopBarManagerName", cleanManagerDisplayName);
+        setText("footerTopBarManagerPhone", c.managerPhone || "+92 349 0558345");
+        setText("footerTopBarSecondaryName", cleanSecondaryDisplayName);
+        setText("footerTopBarSecondaryPhone", c.secondaryPhone || "+92 343 4159182");
 
         const topManagerLink = document.getElementById("topBarManagerLink");
         if (topManagerLink) topManagerLink.href = `tel:${managerTel}`;
 
         const topSecondaryLink = document.getElementById("topBarSecondaryLink");
         if (topSecondaryLink) topSecondaryLink.href = `tel:${secondaryTel}`;
+
+        const footerTopManagerLink = document.getElementById("footerTopBarManagerLink");
+        if (footerTopManagerLink) footerTopManagerLink.href = `tel:${managerTel}`;
+
+        const footerTopSecondaryLink = document.getElementById("footerTopBarSecondaryLink");
+        if (footerTopSecondaryLink) footerTopSecondaryLink.href = `tel:${secondaryTel}`;
 
         // --- Header Logo & Tagline ---
         const agencyParts = agencyName.trim().split(/\s+/);
@@ -568,9 +597,24 @@
         if (mapIframe && !mapIframe.getAttribute("data-switched")) {
             const rawMapUrl = c.mapEmbedUrl || "";
             const isLegacyIslamabadMap = !rawMapUrl || /potohar/i.test(rawMapUrl) || /fazal-e-haq/i.test(rawMapUrl);
-            const activeMapUrl = isLegacyIslamabadMap
-                ? "https://maps.google.com/maps?q=Hayat+Market,+Matta,+Swat,+Pakistan&t=&z=16&ie=UTF8&iwloc=&output=embed"
-                : rawMapUrl;
+            // The map URL comes from admin-entered site config and is
+            // assigned straight to the iframe src — only allow Google
+            // Maps embeds over https, so a bad or malicious URL can never
+            // frame another site. Anything else falls back to the Swat map.
+            let isAllowedMapUrl = false;
+            try {
+                const mapUrl = new URL(rawMapUrl);
+                isAllowedMapUrl =
+                    mapUrl.protocol === "https:" &&
+                    /(^|\.)google\.com$/.test(mapUrl.hostname) &&
+                    mapUrl.pathname.startsWith("/maps");
+            } catch (_) {
+                isAllowedMapUrl = false;
+            }
+            const activeMapUrl =
+                isLegacyIslamabadMap || !isAllowedMapUrl
+                    ? "https://maps.google.com/maps?q=Hayat+Market,+Matta,+Swat,+Pakistan&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                    : rawMapUrl;
             if (mapIframe.src !== activeMapUrl) {
                 mapIframe.src = activeMapUrl;
             }
@@ -1363,7 +1407,7 @@
                                         ? "bg-gradient-to-r from-navy to-teal text-white shadow-md scale-[1.02]"
                                         : "text-slate-600 hover:text-navy hover:bg-slate-100"
                                 }">
-                                ${flagHtmlFor({ flagUrl: programmeFlagUrl(p), flagClass: p.flagClass || "flag-pl" }, "")}
+                                ${flagHtmlFor({ flagUrl: programmeFlagUrl(p), flagClass: p.flagClass || "flag-eu" }, "")}
                                 <span>${escapeHtmlAttr(p.countryName)}</span>
                             </button>
                         `
@@ -1410,7 +1454,7 @@
                             <span class="inline-flex items-center gap-1 text-[9.5px] sm:text-[11px] font-black uppercase tracking-wider px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full shadow-sm bg-gradient-to-r from-navy to-teal text-white">
                                 <i class="fa-solid fa-crown text-amber-300"></i> Featured Programme
                             </span>
-                            ${flagHtmlFor({ flagUrl: programmeFlagUrl(prog), flagClass: prog.flagClass || "flag-pl" }, "flag-lg")}
+                            ${flagHtmlFor({ flagUrl: programmeFlagUrl(prog), flagClass: prog.flagClass || "flag-eu" }, "flag-lg")}
                             <h3 class="text-base sm:text-2xl font-black tracking-tight uppercase">
                                 <span class="text-navy">Work Permit</span>
                                 <span class="text-teal">${escapeHtmlAttr(country)}</span>
@@ -1433,7 +1477,7 @@
                         <div class="relative grid grid-cols-2 gap-2 sm:gap-6 lg:gap-10 items-center">
                             <div class="group relative rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 border-teal shadow-md sm:shadow-lg h-36 sm:h-64 lg:h-72">
                                 <img src="${escapeHtmlAttr(prog.leftImageUrl || "./assets/warsaw-poland.jpg")}"
-                                     onerror="this.src='${escapeHtmlAttr(leftFallback)}'"
+                                     data-fallback="${escapeHtmlAttr(leftFallback)}"
                                      alt="${escapeHtmlAttr(prog.leftCityTitle || country)}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
                                 <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/25 to-transparent"></div>
                                 <div class="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 text-white max-w-[78%] sm:max-w-[70%]">
@@ -1457,7 +1501,7 @@
 
                             <div class="group relative rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 border-navy shadow-md sm:shadow-lg h-36 sm:h-64 lg:h-72">
                                 <img src="${escapeHtmlAttr(prog.rightImageUrl || "./assets/krakow-wroclaw-poland.jpg")}"
-                                     onerror="this.src='${escapeHtmlAttr(rightFallback)}'"
+                                     data-fallback="${escapeHtmlAttr(rightFallback)}"
                                      alt="${escapeHtmlAttr(prog.rightCityTitle || country)}"
                                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
                                 <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/25 to-transparent"></div>
@@ -1557,7 +1601,7 @@
 
                             <!-- Action Buttons -->
                             <div class="mt-4 sm:mt-7 flex flex-wrap items-center justify-center gap-2 sm:gap-4">
-                                <button type="button" onclick="selectWorkPermitCountry('${escapeHtmlAttr(country)}')" class="bg-navy hover:bg-navy-light text-white font-bold px-3.5 sm:px-8 py-2.5 sm:py-3.5 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
+                                <button type="button" data-wp-apply="${escapeHtmlAttr(country)}" class="bg-navy hover:bg-navy-light text-white font-bold px-3.5 sm:px-8 py-2.5 sm:py-3.5 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
                                     <i class="fa-solid fa-file-circle-check text-teal-light"></i><span>Apply Now</span>
                                 </button>
                                 <a href="https://wa.me/${activeWA}?text=${waText}" target="_blank" rel="noopener noreferrer" class="bg-teal hover:bg-teal-dark text-white font-bold px-3.5 sm:px-8 py-2.5 sm:py-3.5 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-base">
@@ -1667,6 +1711,13 @@
                           .split(/\r?\n|\|/)
                           .map((t) => t.trim())
                           .filter(Boolean);
+                // Real WhatsApp link (not "#") so middle-click, open-in-new
+                // -tab and no-JS all work. The delegated handler in
+                // work-permit.html still intercepts normal clicks and opens
+                // the same message with the live routing number.
+                const waHref = `https://wa.me/${getResolvedActiveWhatsApp(liveSiteConfig)}?text=${encodeURIComponent(
+                    `Assalam-o-Alaikum Zakir Travel & Tours!\n\nI am interested in a *${country} Work Permit*.\nPlease share eligibility, required documents, processing time and current openings.`
+                )}`;
 
                 return `
                 <div class="dest-card card-hover-lift ${p.isFeatured ? "border-2 border-teal/50" : "border border-slate-200"}">
@@ -1700,7 +1751,7 @@
                     <div class="dest-ticks">${ticks
                         .map((t) => `<span><i class="fa-solid fa-check"></i> ${escapeHtmlAttr(t)}</span>`)
                         .join("")}</div>
-                    <div class="dest-actions"><button type="button" data-wp-apply="${countryAttr}" class="dest-btn-primary"><i class="fa-solid fa-paper-plane text-teal-light"></i> Quick Apply</button><a href="#" data-wa-country="${countryAttr}" class="dest-btn-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></div>
+                    <div class="dest-actions"><button type="button" data-wp-apply="${countryAttr}" class="dest-btn-primary"><i class="fa-solid fa-paper-plane text-teal-light"></i> Quick Apply</button><a href="${waHref}" target="_blank" rel="noopener noreferrer" data-wa-country="${countryAttr}" class="dest-btn-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></div>
                 </div>`;
             })
             .join("");
@@ -1824,73 +1875,8 @@
     }
 
     // ============================================================================
-    // 6. GLOBAL INTERACTIVE HANDLERS (HERO TABS, CALCULATOR, BOOKING MODAL)
+    // 6. GLOBAL INTERACTIVE HANDLERS (CALCULATOR, BOOKING MODAL)
     // ============================================================================
-
-    let currentHeroTab = "umrah";
-
-    window.switchHeroTab = function (tabName) {
-        currentHeroTab = tabName;
-        const tabs = ["umrah", "flights", "visa"];
-        tabs.forEach((t) => {
-            const btn = document.getElementById(`tab-${t}`);
-            const fields = document.getElementById(`fields-${t}`);
-            if (!btn || !fields) return;
-            if (t === tabName) {
-                btn.className =
-                    "hero-tab bg-navy text-white font-bold text-xs sm:text-sm py-2.5 rounded-lg shadow transition-all flex items-center justify-center gap-1.5";
-                fields.classList.remove("hidden");
-            } else {
-                btn.className =
-                    "hero-tab text-slate-600 hover:text-navy font-bold text-xs sm:text-sm py-2.5 rounded-lg transition-all flex items-center justify-center gap-1.5";
-                fields.classList.add("hidden");
-            }
-        });
-    };
-
-    window.handleHeroSubmit = async function (e) {
-        e.preventDefault();
-        const clientInfo = document.getElementById("clientPhone").value.trim();
-        const activeWA = getResolvedActiveWhatsApp(liveSiteConfig);
-        const agencyName =
-            (liveSiteConfig && liveSiteConfig.contacts && liveSiteConfig.contacts.agencyName) ||
-            "Zakir Travel & Tours";
-
-        let details = "";
-        if (currentHeroTab === "umrah") {
-            const pkg = document.getElementById("umrahPackageType").value;
-            const room = document.getElementById("umrahRoom").value;
-            const pax = document.getElementById("umrahPax").value;
-            details = `*Umrah Inquiry*\n- Package: ${pkg}\n- Room: ${room}\n- Travelers: ${pax} Persons`;
-        } else if (currentHeroTab === "flights") {
-            const from = document.getElementById("flightFrom").value;
-            const to = document.getElementById("flightTo").value || "Not specified";
-            const type = document.getElementById("flightType").value;
-            const date = document.getElementById("flightDate").value || "Flexible";
-            details = `*Flight Ticket Inquiry*\n- Route: ${from} to ${to}\n- Type: ${type}\n- Date: ${date}`;
-        } else {
-            const country = document.getElementById("visaCountry").value;
-            const applicants = document.getElementById("visaApplicants").value;
-            details = `*Visa Inquiry*\n- Destination: ${country}\n- Applicants: ${applicants}`;
-        }
-
-        const message = encodeURIComponent(
-            `Assalam-o-Alaikum ${agencyName}!\n\n${details}\n- Client Contact: ${clientInfo}\n\nPlease share the best rates and details.`
-        );
-        const serviceLabel =
-            currentHeroTab === "umrah" ? "Umrah Inquiry" : currentHeroTab === "flights" ? "Flight Ticket Inquiry" : "Visa Inquiry";
-        await saveEnquiryThenOpenWhatsApp(
-            {
-                source: `hero-${currentHeroTab}`,
-                service: serviceLabel,
-                name: clientInfo,
-                phone: cleanWhatsAppDigits(clientInfo) || clientInfo,
-                details: details.replace(/\*/g, "") + ` | Client Contact: ${clientInfo}`,
-                whatsappNumber: activeWA
-            },
-            `https://wa.me/${activeWA}?text=${message}`
-        );
-    };
 
     window.switchMapBranch = function (branch) {
         const iframe = document.getElementById("contactMapIframe");
@@ -2019,9 +2005,15 @@
         const durationSelect = document.getElementById("calcDuration");
         const roomSelect = document.getElementById("calcRoom");
         const hotelSelect = document.getElementById("calcHotel");
-        const pax = document.getElementById("calcPax").value;
-        const totalText = document.getElementById("calcTotalDisplay").textContent;
-        const perPersonText = document.getElementById("calcPerPersonDisplay").textContent;
+        const paxEl = document.getElementById("calcPax");
+        const totalEl = document.getElementById("calcTotalDisplay");
+        const perPersonEl = document.getElementById("calcPerPersonDisplay");
+
+        if (!durationSelect || !roomSelect || !hotelSelect || !paxEl || !totalEl || !perPersonEl) return;
+
+        const pax = paxEl.value;
+        const totalText = totalEl.textContent;
+        const perPersonText = perPersonEl.textContent;
 
         const durationText =
             (durationSelect.options[durationSelect.selectedIndex] &&

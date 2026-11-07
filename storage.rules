@@ -12,21 +12,21 @@ service firebase.storage {
       allow read: if true;
       allow write: if isAdmin()
                    && request.resource.size < 8 * 1024 * 1024
-                   && request.resource.contentType.matches('image/.*');
+                   && request.resource.contentType.matches('image/(jpeg|png|webp|gif)');
     }
 
     match /zakir_team/{allPaths=**} {
       allow read: if true;
       allow write: if isAdmin()
                    && request.resource.size < 8 * 1024 * 1024
-                   && request.resource.contentType.matches('image/.*');
+                   && request.resource.contentType.matches('image/(jpeg|png|webp|gif)');
     }
 
     match /zakir_work_permits/{allPaths=**} {
       allow read: if true;
       allow write: if isAdmin()
                    && request.resource.size < 8 * 1024 * 1024
-                   && request.resource.contentType.matches('image/.*');
+                   && request.resource.contentType.matches('image/(jpeg|png|webp|gif)');
     }
   }
 }

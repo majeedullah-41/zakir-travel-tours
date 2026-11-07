@@ -11,7 +11,8 @@ services, air tickets and Europe work permits.
 
 - Static HTML + Tailwind CSS via CDN (no build step — see note below)
 - Firebase v10 compat SDKs (Firestore / Auth / Storage), project `zakir-travels`
-- Deployed on Vercel (`vercel.json` — clean-URL rewrites, cache headers)
+- Deployed on Vercel (`vercel.json` — clean-URL rewrites, permanent alias
+  redirects, cache + security headers)
 - Google Analytics measurement ID `G-CRDXFTXY55` (gtag.js snippet in every page)
 
 ## Pages
@@ -19,8 +20,8 @@ services, air tickets and Europe work permits.
 | Page | File |
 |---|---|
 | Homepage | `index.html` |
-| Umrah packages | `umrah-packages.html` (`/umrah`) |
-| Visa services | `visa-services.html` (`/visas`) |
+| Umrah packages | `umrah-packages.html` (`/umrah-packages`) |
+| Visa services | `visa-services.html` (`/visa-services`) |
 | Work permits | `work-permit.html` (`/work-permit`) |
 | Contact / team | `contact.html` (`/contact`) |
 | Admin portal (mobile) | `admin.html` (`/admin`) |
@@ -44,15 +45,31 @@ tab **6. Enquiries** (status, search, WhatsApp/call reply, CSV export).
 > `request.resource.data['service']` — writing `data.service` makes Firebase
 > reject the whole rules file (error on the `is string` line). If you edit
 > `firestore.rules`, keep the bracket notation.
+>
+> **Publishing rules.** Merging a PR never changes the live rules — after
+> any rules change, paste the full `firestore.rules` (Firestore Database →
+> Rules → Publish) **and** the full `storage.rules` (Storage → Rules →
+> Publish) in the Firebase console. The `storage.rules` publish from the
+> team-photo fix is still outstanding.
+>
+> **Admin access.** The portal's 7th tab, **Admin Access** (owner only),
+> manages the `admin_users/allowed` allowlist of emails that may open the
+> admin besides the owner. Only the owner (or a custom-claim admin) may
+> change the allowlist — an allowlisted admin cannot add new admins.
 
 ## Deploy
 
 ### Vercel (the live site)
 
 Push to `main` — Vercel rebuilds automatically. Clean URLs are defined in
-`vercel.json` (`/admin`, `/umrah`, `/visas`, `/work-permit`, `/contact`,
-`/home`). `firebase.json` only holds the Firestore/Storage rules references;
-the site is **not** deployed via Firebase Hosting.
+`vercel.json`: `/admin`, `/umrah-packages`, `/visa-services`, `/work-permit`,
+`/contact`, `/` (homepage). The old alias slugs are permanent (308)
+redirects to the working URLs: `/umrah` → `/umrah-packages`,
+`/visas` → `/visa-services`, `/home` → `/`, `/contact-us` → `/contact`.
+`/calculator` and `/estimator` redirect (temporary) to
+`/umrah-packages#package-estimator`. `firebase.json` only holds the
+Firestore/Storage rules references; the site is **not** deployed via
+Firebase Hosting.
 
 ### Firestore rules (after any rules change)
 
