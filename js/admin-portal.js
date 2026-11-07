@@ -237,7 +237,7 @@
                 // restore (page reload), before the dashboard is shown.
                 // Local-realtime (offline passphrase) logins are untouched
                 // — the allowlist only applies in firebase mode.
-                if (user && db.mode === "firebase" && typeof db.verifyAdminAccess === "function") {
+                if (user && (db.mode === "firebase" || db.mode === "api") && typeof db.verifyAdminAccess === "function") {
                     let allowed = false;
                     try {
                         allowed = await db.verifyAdminAccess(user);
@@ -660,7 +660,10 @@
             if (!badge) return;
             const db = window.zakirDB;
             const current = mode || (db ? db.mode : "local-realtime");
-            const live = current === "firebase";
+            const live = current === "firebase" || current === "api";
+            // Badge label names the live backend; "Firebase" wording is
+            // unchanged when the backend is Firebase.
+            const backendName = current === "api" ? "the API server" : "Firebase";
             // Record connection changes in the Activity log (and as a toast):
             // the first observation is just the starting state, later
             // transitions mean Firebase connected or dropped out.
@@ -669,7 +672,7 @@
             } else if (this._lastSeenMode !== current) {
                 this._lastSeenMode = current;
                 if (live) {
-                    this.showToast("Connected to Firebase — changes will publish live.");
+                    this.showToast("Connected to " + backendName + " — changes will publish live.");
                 } else {
                     this.showToast(
                         "Connection lost — changes save only on this device until Firebase reconnects.",
@@ -683,10 +686,10 @@
                     ? "bg-emerald-50 text-emerald-700 border border-emerald-300"
                     : "bg-amber-50 text-amber-800 border border-amber-300");
             badge.title = live
-                ? "Connected to Firebase — changes publish to the live website."
+                ? "Connected to " + backendName + " — changes publish to the live website."
                 : "Firebase is not connected — changes save only in this browser and will not appear on other devices.";
             badge.innerHTML = live
-                ? `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live — connected to Firebase`
+                ? `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live — connected to ${backendName}`
                 : `<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Offline — changes save only on this device`;
         }
 
@@ -3874,7 +3877,7 @@
             const noteEl = this.container.querySelector("#accessRulesNote");
             const formEl = this.container.querySelector("#accessAddForm");
             if (noteEl) noteEl.classList.add("hidden");
-            if (!db || db.mode !== "firebase" || typeof db.getAdminAllowlist !== "function") {
+            if (!db || (db.mode !== "firebase" && db.mode !== "api") || typeof db.getAdminAllowlist !== "function") {
                 if (formEl) formEl.classList.add("hidden");
                 if (listEl) {
                     listEl.innerHTML = `<div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center text-amber-800 text-sm font-bold">Connect to Firebase to manage admin access. Access settings do not work in offline mode.</div>`;
@@ -3894,12 +3897,20 @@
                 // Most likely the new Firestore rules have not been
                 // published yet, so the allowlist cannot be read or
                 // written. Say so plainly instead of failing silently.
+                // In API mode the same failure means the server could
+                // not be reached or the session expired.
+                const isApi = db && db.mode === "api";
+                const loadMsg = isApi
+                    ? "Could not load the admin list — the server could not be reached. Check your connection and reopen this tab."
+                    : "Could not load the admin list — publish the new Firestore rules first (Firestore → Rules → Publish), then reopen this tab.";
+                const toastMsg = isApi
+                    ? "Could not load the admin list. Check your connection and try again."
+                    : "Could not load the admin list. Publish the new Firestore rules first.";
                 if (noteEl) {
-                    noteEl.textContent =
-                        "Could not load the admin list — publish the new Firestore rules first (Firestore → Rules → Publish), then reopen this tab.";
+                    noteEl.textContent = loadMsg;
                     noteEl.classList.remove("hidden");
                 }
-                this.showToast("Could not load the admin list. Publish the new Firestore rules first.", "error");
+                this.showToast(toastMsg, "error");
                 if (listEl) {
                     listEl.innerHTML = `<div class="bg-slate-50 rounded-2xl p-6 text-center text-slate-500 text-sm">The admin list could not be loaded.</div>`;
                 }

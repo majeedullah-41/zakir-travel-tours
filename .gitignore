@@ -36,3 +36,6 @@ Desktop.ini
 # Logs
 *.log
 npm-debug.log*
+
+# User uploads (never commit uploaded photos)
+uploads/
